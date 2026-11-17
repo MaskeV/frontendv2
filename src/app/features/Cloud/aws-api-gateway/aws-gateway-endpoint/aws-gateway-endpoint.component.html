@@ -1,0 +1,87 @@
+<main>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb custom-breadcrumb mb-0">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img src="assets/images/api gateway.png" class="icons" alt="API Gateway Logo" />
+                <a routerLink="/aws-gateway">API Gateway</a>
+            </li>
+            <li class="breadcrumb-item"><a routerLink="/aws-gateway/aws-service">{{selectedService}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{selectedEndpoint}}</li>
+        </ol> 
+    </nav>
+
+    <div class="tab-content custom-bg p-2">
+
+
+        <div class="bs-cards-row ps-2 pe-3 mt-3">
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Total number of API requests handled during the selected time period."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointCountChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count 4xx</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Count of client-side error responses (4xx) returned by the API."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointCount4xxChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count 5xx</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Count of client-side error responses (5xx) returned by the API."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointCount5xxChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bs-cards-row ps-2 pe-3 mt-2">
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Request Average Latency (ms)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Average time taken by the API to process and respond to requests."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointReqAvgLatencyChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Request Average Integration Latency (ms)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Average time spent by the API Gateway communicating with backend integrations."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointReqAvgIntLatencyChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Data Processed (KB, HTTP API Only)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Total volume of data processed by the HTTP API in kilobytes."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="endpointDataProcessCountChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

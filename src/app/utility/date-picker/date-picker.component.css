@@ -1,0 +1,315 @@
+/* input,
+select {
+  font-size: 12px;
+  height: 23px;
+  width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+input::placeholder,
+select {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+select {
+  text-align: left;
+  appearance: none;
+  padding-right: 1.5rem;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+.present-time-btn {
+  width: 7rem;
+  height: 26px;
+  font-size: small;
+  padding-top: 2px;
+  text-align: center;
+  margin-right: 0.5vw;
+}
+
+.start-time {
+  width: 10.1rem;
+  height: 24px;
+  font-size: small;
+}
+
+.end-time {
+  width: 10.1rem;
+  height: 24px;
+  font-size: small;
+  margin-left: 0.5vw;
+}
+
+.set {
+  font-size: 21px;
+  height: 24px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  border: none;
+}
+
+.custom-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: 86%;
+  left: 0;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  width: 95.2%;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  z-index: 1000;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.custom-dropdown-menu li {
+  padding-left: 7%;
+  padding-top: 6%;
+  padding-bottom: 2%;
+  cursor: pointer;
+  color: #212529;
+  margin-top: -2%;
+  margin-bottom: 3%;
+  white-space: nowrap;
+}
+
+.custom-dropdown-menu li:hover {
+  background-color: #f8f9fa;
+} */
+
+.container {
+  margin: 0;
+  padding: 0px 2px;
+  width: 100%;
+}
+
+.button-wrapper {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+}
+
+.card {
+  padding: 0;
+  width: 260px;
+  background-color: white;
+  z-index: 10;
+  border: 1px solid rgba(7, 7, 7, 0.2);
+  border-radius: 4px;
+  color: black;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  height: auto !important;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card1 {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  z-index: 1001;
+}
+
+.card2 {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  color: black;
+  z-index: 1001;
+}
+
+.box1 {
+  background-color: #e0dada45;
+  color: black;
+  /* ✅ Text in black */
+  font-family: 'Poppins';
+  /* border-bottom: 1px solid rgba(161, 35, 35, 0.2); */
+   padding: 10px;
+  font-size: 13px;
+}
+
+.box2 {
+  background-color: white;
+  /* border-top: 1px solid rgba(161, 35, 35, 0.2); */
+  padding: 0px;
+}
+
+.custom-tabs {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: black;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  border-bottom: 1px solid rgba(35, 100, 161, 0.2);
+}
+
+.tab-buttons button {
+  flex: 1;
+  font-size: 11px;
+  padding: 4px 0;
+  background-color: white;
+  color: black;
+  /* ✅ Text in black */
+  border: none;
+  border-bottom: 2px solid #239da1;
+  ;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 24px;
+}
+
+.tab-buttons button.active {
+  background-color: #239da1;
+  /* ✅ Red background */
+  color: white;
+  /* ✅ White text on red */
+  border-bottom: 2px solid #239da1;
+}
+
+.tab-buttons button:hover:not(.active) {
+  background-color: #23a1901a;
+  color: black;
+}
+
+.tab-content {
+  background-color: white;
+  padding: 0px;
+  height: auto !important;
+
+  border-top: none;
+  color: black;
+}
+
+.list-group {
+  margin-bottom: 0px !important;
+  padding: 0px !important;
+}
+
+.list-group-item {
+  background-color: white;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  /* padding: 4px 8px;
+  font-size: 12px; */
+  padding: 8px 10px;
+  font-size: 13px;
+  text-align: center;
+  color: black;
+  /* ✅ Black list text */
+
+}
+
+.list-group-item:hover {
+  background-color: #23a1901a;
+  color: black;
+  cursor: pointer;
+}
+
+
+.apply-btn {
+  padding: 6px 6px;
+  background: #239da1;
+  height: 21px;
+  border-radius: 3px;
+  border-color: #239da1;
+  font-size: 10px;
+  color: #ffffff;
+}
+
+.date-picker-btn {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: transparent;
+  color: white;
+}
+
+
+.apply-btn:hover {
+  color: #ffffff;
+  transform: scale(1.05);
+  transition: all 0.1s ease-in-out;
+  border-radius: 4px;
+
+}
+
+
+.inline-toast-right {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 2px 3px;
+  border-radius: 1px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  /* gap: 1px; */
+  max-width: 350px;
+  animation: fadeIn 0.3s ease;
+  position: absolute;
+  top: 40%;
+  right: 0;
+  margin-top: 1px;
+  z-index: 10;
+  line-height: normal;
+}
+
+.close-btn {
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+.preset-button {
+  font-size: small;
+  padding: 2.5px 10px;
+  margin-right: 4px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-datetime {
+  font-size: 10px;
+  height: 26px;
+  padding: 2px 6px;
+  width: 113px;
+}

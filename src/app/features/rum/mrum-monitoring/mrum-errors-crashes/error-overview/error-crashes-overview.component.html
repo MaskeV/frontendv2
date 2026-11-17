@@ -1,0 +1,1108 @@
+                    <div class="mrum-dashboard-modern errors-crashes-tab"
+                        style="background-color: #f8fafc; padding: 15.0px;; --card-bg: #f8fafc;">
+                        <!-- Top Metric Cards Row -->
+                        <div class="row g-2 mb-3">
+                            <!-- Total Errors -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2; position: relative;; --card-bg: #fff1f2;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #9f1239;">Total
+                                            Errors</span>
+                                        <span class="tooltip-wrap tooltip-left">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #9f1239; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;; --card-bg: #ffe4e6;">Total
+                                                number of errors encountered.<br /><b>Formula:</b> (Error Events ÷ Total
+                                                Sessions) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #9f1239;">{{
+                                        (errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.totalErrors /
+                                        errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #9f1239; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.totalErrors | number }} Errors</div>
+                                    <div
+                                        style="position: absolute; bottom: 0; right: 0; padding: 5%; width: 60%; height: 85%; display: flex; align-items: flex-end; gap: 2px; opacity: 0.5; box-sizing: border-box;">
+                                        <div class="tooltip-wrap" *ngFor="let d of mockEotData"
+                                            [style.height.%]="(d.errors / maxErrors) * 100 || 5"
+                                            [style.background]="d.errors === maxErrors && d.errors > 0 ? '#e11d48' : '#fb7185'"
+                                            style="width: 3.0px; cursor: pointer;">
+                                            <span class="custom-tooltip"
+                                                style="background-color: #e11d48; color: #ffffff; border: 1px solid #be123c; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #e11d48;">{{
+                                                d.tooltipTime }}
+                                                - {{ d.errors }} Errors</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Error Users -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2; position: relative;; --card-bg: #fff1f2;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #9f1239;">Error
+                                            Users</span>
+                                        <span class="tooltip-wrap">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #9f1239; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;; --card-bg: #ffe4e6;">Number
+                                                of unique users affected by errors.<br /><b>Formula:</b> (Error Users ÷
+                                                Total Users) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #9f1239;">{{
+                                        (errorsCrashesOverview.totalUsers ? (errorsCrashesOverview.errorUsers /
+                                        errorsCrashesOverview.totalUsers * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #9f1239; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.errorUsers | number }} Users</div>
+                                    <div
+                                        style="position: absolute; bottom: 0; right: 0; padding: 5%; width: 60%; height: 85%; display: flex; align-items: flex-end; gap: 2px; opacity: 0.5; box-sizing: border-box;">
+                                        <div class="tooltip-wrap" *ngFor="let d of mockEotData"
+                                            [style.height.%]="(d.errors / maxErrors) * 100 || 5"
+                                            [style.background]="d.errors === maxErrors && d.errors > 0 ? '#e11d48' : '#fb7185'"
+                                            style="width: 3.0px; cursor: pointer;">
+                                            <span class="custom-tooltip"
+                                                style="background-color: #e11d48; color: #ffffff; border: 1px solid #be123c; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #e11d48;">{{
+                                                d.tooltipTime }}
+                                                - {{ d.errors }} Users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Error Free Sessions -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #f0fdf4; position: relative;; --card-bg: #f0fdf4;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #166534;">Error Free
+                                            Sessions</span>
+                                        <span class="tooltip-wrap tooltip-right">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #166534; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #dcfce7; color: #166534; border: 1px solid #86efac;; --card-bg: #dcfce7;">Percentage
+                                                of sessions without any errors.<br /><b>Formula:</b> ((Total Sessions −
+                                                Error Sessions) ÷ Total Sessions) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #166534;">{{
+                                        (errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.errorFreeSessions
+                                        / errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #166534; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.errorFreeSessions | number }} Sessions</div>
+                                    <div class="tooltip-wrap"
+                                        style="position: absolute; bottom: 15%; right: 5%; width: 60%; height: 8.0px; background: #bbf7d0; border-radius: 4px; cursor: pointer;">
+                                        <div [style.width.%]="errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.errorFreeSessions / errorsCrashesOverview.totalSessions * 100) : 0"
+                                            style="height: 100%; background: #22c55e; border-radius: 2px;">
+                                        </div>
+                                        <span class="custom-tooltip"
+                                            style="background-color: #16a34a; color: #ffffff; border: 1px solid #15803d; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #16a34a;">{{
+                                            (errorsCrashesOverview.totalSessions ?
+                                            (errorsCrashesOverview.errorFreeSessions /
+                                            errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%
+                                            Error Free</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Crashes -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2; position: relative;; --card-bg: #fff1f2;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #9f1239;">Total
+                                            Crashes</span>
+                                        <span class="tooltip-wrap tooltip-left">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #9f1239; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;; --card-bg: #ffe4e6;">Total
+                                                number of application crashes.<br /><b>Formula:</b> (Crash Events ÷
+                                                Total Sessions) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #9f1239;">{{
+                                        (errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.totalCrashes /
+                                        errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #9f1239; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.totalCrashes | number }} Crashes</div>
+                                    <div
+                                        style="position: absolute; bottom: 0; right: 0; padding: 5%; width: 60%; height: 85%; display: flex; align-items: flex-end; gap: 2px; opacity: 0.5; box-sizing: border-box;">
+                                        <div class="tooltip-wrap" *ngFor="let d of mockEotData"
+                                            [style.height.%]="(d.crashes / maxCrashes) * 100 || 5"
+                                            [style.background]="d.crashes === maxCrashes && d.crashes > 0 ? '#e11d48' : '#fb7185'"
+                                            style="width: 3.0px; cursor: pointer;">
+                                            <span class="custom-tooltip"
+                                                style="background-color: #e11d48; color: #ffffff; border: 1px solid #be123c; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #e11d48;">{{
+                                                d.tooltipTime }}
+                                                - {{ d.crashes }} Crashes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Crash Users -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2; position: relative;; --card-bg: #fff1f2;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #9f1239;">Crash
+                                            Users</span>
+                                        <span class="tooltip-wrap">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #9f1239; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af;; --card-bg: #ffe4e6;">Number
+                                                of unique users who experienced crashes.<br /><b>Formula:</b> (Crash
+                                                Users ÷ Total Users) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #9f1239;">{{
+                                        (errorsCrashesOverview.totalUsers ? (errorsCrashesOverview.crashUsers /
+                                        errorsCrashesOverview.totalUsers * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #9f1239; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.crashUsers | number }} Users</div>
+                                    <div
+                                        style="position: absolute; bottom: 0; right: 0; padding: 5%; width: 60%; height: 85%; display: flex; align-items: flex-end; gap: 2px; opacity: 0.5; box-sizing: border-box;">
+                                        <div class="tooltip-wrap" *ngFor="let d of mockEotData"
+                                            [style.height.%]="(d.crashes / maxCrashes) * 100 || 5"
+                                            [style.background]="d.crashes === maxCrashes && d.crashes > 0 ? '#e11d48' : '#fb7185'"
+                                            style="width: 3.0px; cursor: pointer;">
+                                            <span class="custom-tooltip"
+                                                style="background-color: #e11d48; color: #ffffff; border: 1px solid #be123c; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #e11d48;">{{
+                                                d.tooltipTime }}
+                                                - {{ d.crashes }} Users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Crash Free Sessions -->
+                            <div class="col-12 col-md-4 col-xl-2">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #f0fdf4; position: relative;; --card-bg: #f0fdf4;">
+                                    <div class="mb-1 d-flex align-items-center">
+                                        <span style="font-size: 11.0px; font-weight: 600; color: #166534;">Crash Free
+                                            Sessions</span>
+                                        <span class="tooltip-wrap tooltip-right">
+                                            <i class="bi bi-info-circle ms-1"
+                                                style="font-size: 10.0px; color: #166534; opacity: 0.7;"></i>
+                                            <span class="custom-tooltip"
+                                                style="background-color: #dcfce7; color: #166534; border: 1px solid #86efac;; --card-bg: #dcfce7;">Percentage
+                                                of sessions that did not experience a crash.<br /><b>Formula:</b>
+                                                ((Total Sessions − Crash Sessions) ÷ Total Sessions) × 100</span>
+                                        </span>
+                                    </div>
+                                    <div class="fw-bold mb-0" style="font-size: 22.0px; color: #166534;">{{
+                                        (errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.crashFreeSessions
+                                        / errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%</div>
+                                    <div
+                                        style="font-size: 12.0px; font-weight: 500; color: #166534; opacity: 0.8; margin-bottom: 4.0px;">
+                                        {{ errorsCrashesOverview.crashFreeSessions | number }} Sessions</div>
+                                    <div class="tooltip-wrap"
+                                        style="position: absolute; bottom: 15%; right: 5%; width: 60%; height: 8.0px; background: #bbf7d0; border-radius: 4px; cursor: pointer;">
+                                        <div [style.width.%]="errorsCrashesOverview.totalSessions ? (errorsCrashesOverview.crashFreeSessions / errorsCrashesOverview.totalSessions * 100) : 0"
+                                            style="height: 100%; background: #22c55e; border-radius: 2px;">
+                                        </div>
+                                        <span class="custom-tooltip"
+                                            style="background-color: #16a34a; color: #ffffff; border: 1px solid #15803d; font-size: 13.0px; padding: 8.0px 14px; white-space: nowrap; font-weight: 700; border-radius: 4px; z-index: 50; width: max-content;; --card-bg: #16a34a;">{{
+                                            (errorsCrashesOverview.totalSessions ?
+                                            (errorsCrashesOverview.crashFreeSessions /
+                                            errorsCrashesOverview.totalSessions * 100) : 0) | number:'1.2-2' }}%
+                                            Crash Free</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Charts -->
+                        <div class="row g-2 mb-3">
+
+                            <style>
+                                .svg-tooltip-wrap .svg-tooltip {
+                                    visibility: hidden;
+                                    opacity: 0;
+                                    transition: opacity 0.2s;
+                                }
+
+                                .svg-tooltip-wrap:hover .svg-tooltip {
+                                    visibility: visible;
+                                    opacity: 1;
+                                }
+
+                                .donut-arc-crashes:hover~.donut-tooltip-crashes {
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                }
+
+                                .donut-arc-errors:hover~.donut-tooltip-errors {
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                }
+
+
+                                .pb-arc-other:hover~.pb-tooltip-other {
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                }
+
+                                .pb-arc-ios:hover~.pb-tooltip-ios {
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                }
+
+                                .pb-arc-android:hover~.pb-tooltip-android {
+                                    visibility: visible !important;
+                                    opacity: 1 !important;
+                                }
+                            </style>
+
+                            <!-- Errors & Crashes Over Time -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100 d-flex flex-column"
+                                    style="background-color: #eef2ff;; --card-bg: #eef2ff;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span style="font-size: 12.0px; font-weight: 600; color: #312e81;">Errors &
+                                                Crashes Over Time <span class="tooltip-wrap">
+                                                    <i class="bi bi-info-circle ms-1 text-muted"
+                                                        style="font-size: 12.0px; font-weight: 600;"></i>
+                                                    <span class="custom-tooltip">Timeline showing the occurrence of
+                                                        errors and crashes.</span>
+                                                </span></span>
+                                        </div>
+
+                                    </div>
+                                    <div class="d-flex gap-3 mb-2 px-2"
+                                        style="font-size: 10.0px; font-weight: 600; color: #4338ca;">
+                                        <div class="d-flex align-items-center gap-1"
+                                            (click)="showEotErrors = !showEotErrors; calculateEotGraph()"
+                                            [style.opacity]="showEotErrors ? 1 : 0.5" style="cursor: pointer;"><span
+                                                style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#ef4444;"></span>
+                                            Errors</div>
+                                        <div class="d-flex align-items-center gap-1"
+                                            (click)="showEotCrashes = !showEotCrashes; calculateEotGraph()"
+                                            [style.opacity]="showEotCrashes ? 1 : 0.5" style="cursor: pointer;"><span
+                                                style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#8b5cf6;"></span>
+                                            Crashes</div>
+                                    </div>
+                                    <!-- Using SVG to simulate the chart -->
+                                    <div class="position-relative mt-2" style="height: 180.0px;">
+                                        <svg viewBox="-20 0 520 150" preserveAspectRatio="none"
+                                            style="width: 100%; height: 100%;">
+                                            <!-- Chart Background -->
+                                            <rect x="30" y="0" width="460" height="130" fill="#e0e7ff" rx="4" />
+                                            <!-- Grid lines and Y-axis labels -->
+                                            <g *ngFor="let lbl of eotYAxisLabels">
+                                                <line x1="30" [attr.y1]="lbl.y" x2="490" [attr.y2]="lbl.y"
+                                                    stroke="#c7d2fe" stroke-width="1"
+                                                    style="transition: y1 0.3s, y2 0.3s;" />
+                                                <text x="25" [attr.y]="lbl.y + 3" font-size="10" font-weight="600"
+                                                    fill="#3730a3" text-anchor="end" style="transition: y 0.3s;">{{
+                                                    lbl.val }}</text>
+                                            </g>
+
+                                            <!-- Area for Crashes (Purple) -->
+                                            <g *ngIf="showEotCrashes">
+                                                <defs>
+                                                    <linearGradient id="gradCrash" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.2" />
+                                                        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <!-- Line for Crashes (Purple) -->
+                                                <path [attr.d]="eotCrashesPath" fill="none" stroke="#8b5cf6"
+                                                    stroke-width="1.5"
+                                                    style="pointer-events: none; transition: d 0.3s;" />
+                                                <path [attr.d]="eotCrashesAreaPath"
+                                                    style="pointer-events: none; transition: d 0.3s;"
+                                                    fill="url(#gradCrash)" />
+
+                                                <!-- Dots for Crashes -->
+                                                <g class="svg-tooltip-wrap" *ngFor="let pt of eotCrashesPoints">
+                                                    <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="2.5" fill="#8b5cf6"
+                                                        style="cursor: pointer;"></circle>
+                                                    <g class="svg-tooltip">
+                                                        <rect [attr.x]="pt.rectX" [attr.y]="pt.rectY" width="130"
+                                                            height="22" fill="#ede9fe" rx="3" />
+                                                        <text [attr.x]="pt.textX" [attr.y]="pt.textY" font-size="10"
+                                                            font-weight="600" fill="#4c1d95" text-anchor="middle">{{
+                                                            pt.tooltipTime }} - {{ pt.val }} Crashes</text>
+                                                    </g>
+                                                </g>
+                                            </g>
+
+                                            <!-- Area for Errors (Red) -->
+                                            <g *ngIf="showEotErrors">
+                                                <defs>
+                                                    <linearGradient id="gradError" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                        <stop offset="0%" stop-color="#ef4444" stop-opacity="0.15" />
+                                                        <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <!-- Line for Errors (Red) -->
+                                                <path [attr.d]="eotErrorsPath" fill="none" stroke="#ef4444"
+                                                    stroke-width="1.5"
+                                                    style="pointer-events: none; transition: d 0.3s;" />
+                                                <path [attr.d]="eotErrorsAreaPath"
+                                                    style="pointer-events: none; transition: d 0.3s;"
+                                                    fill="url(#gradError)" />
+
+                                                <!-- Dots for Errors -->
+                                                <g class="svg-tooltip-wrap" *ngFor="let pt of eotErrorsPoints">
+                                                    <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="2.5" fill="#ef4444"
+                                                        style="cursor: pointer;"></circle>
+                                                    <g class="svg-tooltip">
+                                                        <rect [attr.x]="pt.rectX" [attr.y]="pt.rectY" width="130"
+                                                            height="22" fill="#fee2e2" rx="3" />
+                                                        <text [attr.x]="pt.textX" [attr.y]="pt.textY" font-size="10"
+                                                            font-weight="600" fill="#991b1b" text-anchor="middle">{{
+                                                            pt.tooltipTime }} - {{ pt.val }} Errors</text>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                            <!-- X-axis labels -->
+                                            <g *ngFor="let lbl of eotXAxisLabels; let last = last">
+                                                <text [attr.x]="lbl.x" y="145" font-size="10" font-weight="600"
+                                                    fill="#3730a3" [attr.text-anchor]="last ? 'end' : 'middle'">{{
+                                                    lbl.label }}</text>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Errors vs Crashes Donut -->
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #eef2ff;; --card-bg: #eef2ff;">
+                                    <div class="mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #312e81;">Errors vs
+                                            Crashes <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Breakdown of total issues into errors vs
+                                                    crashes.</span>
+                                            </span></span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center gap-4 mt-2">
+                                        <div style="position: relative; width: 220.0px; height: 220.0px;">
+                                            <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                                                <!-- Crashes part -->
+                                                <circle *ngIf="showEvcCrashes" class="donut-arc-crashes" cx="50" cy="50"
+                                                    r="40" fill="transparent" stroke="#8b5cf6" stroke-width="10"
+                                                    [attr.stroke-dasharray]="getEvcDash('crashes').array"
+                                                    [attr.stroke-dashoffset]="getEvcDash('crashes').offset"
+                                                    style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+                                                <!-- Errors part -->
+                                                <circle *ngIf="showEvcErrors" class="donut-arc-errors" cx="50" cy="50"
+                                                    r="40" fill="transparent" stroke="#ef4444" stroke-width="10"
+                                                    [attr.stroke-dasharray]="getEvcDash('errors').array"
+                                                    [attr.stroke-dashoffset]="getEvcDash('errors').offset"
+                                                    style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+
+                                                <!-- Tooltips -->
+                                                <g class="donut-tooltip-crashes"
+                                                    style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                    <rect x="17.5" y="5" width="65" height="10" fill="#ede9fe" rx="2" />
+                                                    <text x="50" y="12" style="font-size: 4.5px;" font-weight="600" fill="#4c1d95"
+                                                        text-anchor="middle">Crashes: {{
+                                                        errorsCrashesOverview.totalCrashes | number }} ({{
+                                                        ((errorsCrashesOverview.totalCrashes +
+                                                        errorsCrashesOverview.totalErrors) ?
+                                                        (errorsCrashesOverview.totalCrashes /
+                                                        (errorsCrashesOverview.totalCrashes +
+                                                        errorsCrashesOverview.totalErrors) * 100) : 0) | number:'1.2-2'
+                                                        }}%)</text>
+                                                </g>
+                                                <g class="donut-tooltip-errors"
+                                                    style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                    <rect x="17.5" y="85" width="65" height="10" fill="#fee2e2" rx="2" />
+                                                    <text x="50" y="92" style="font-size: 4.5px;" font-weight="600" fill="#991b1b"
+                                                        text-anchor="middle">Errors: {{
+                                                        errorsCrashesOverview.totalErrors | number }} ({{
+                                                        ((errorsCrashesOverview.totalCrashes +
+                                                        errorsCrashesOverview.totalErrors) ?
+                                                        (errorsCrashesOverview.totalErrors /
+                                                        (errorsCrashesOverview.totalCrashes +
+                                                        errorsCrashesOverview.totalErrors) * 100) : 0) | number:'1.2-2'
+                                                        }}%)</text>
+                                                </g>
+                                            </svg>
+                                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                                <div class="fw-bold"
+                                                    style="font-size: 28.0px; color: #312e81; line-height: 1;">
+                                                    {{ showEvcErrors && showEvcCrashes ?
+                                                    (errorsCrashesOverview.totalCrashes +
+                                                    errorsCrashesOverview.totalErrors | number) :
+                                                    showEvcErrors ? (errorsCrashesOverview.totalErrors | number) :
+                                                    showEvcCrashes ? (errorsCrashesOverview.totalCrashes | number) : '0'
+                                                    }}
+                                                </div>
+                                                <div style="font-size: 12.0px; font-weight: 600; color: #4338ca;">
+                                                    {{ showEvcErrors && showEvcCrashes ? 'Total' :
+                                                    showEvcErrors ? 'Errors' :
+                                                    showEvcCrashes ? 'Crashes' : 'No Data' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column gap-3">
+                                            <div>
+                                                <div class="d-flex align-items-center gap-1 mb-1"
+                                                    style="font-size: 12.0px; font-weight: 600; color: #312e81; cursor: pointer;"
+                                                    (click)="showEvcErrors = !showEvcErrors"
+                                                    [style.opacity]="showEvcErrors ? 1 : 0.5">
+                                                    <span
+                                                        style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#ef4444;"></span>
+                                                    Errors
+                                                </div>
+                                                <div
+                                                    style="font-size: 11.0px; font-weight: 600; color: #4338ca; padding-left: 10.0px;">
+                                                    {{ errorsCrashesOverview.totalErrors | number }}
+                                                    ({{ ((errorsCrashesOverview.totalCrashes +
+                                                    errorsCrashesOverview.totalErrors) ?
+                                                    (errorsCrashesOverview.totalErrors /
+                                                    (errorsCrashesOverview.totalCrashes +
+                                                    errorsCrashesOverview.totalErrors) * 100) : 0) | number:'1.2-2' }}%)
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-1 mb-1"
+                                                    style="font-size: 12.0px; font-weight: 600; color: #312e81; cursor: pointer;"
+                                                    (click)="showEvcCrashes = !showEvcCrashes"
+                                                    [style.opacity]="showEvcCrashes ? 1 : 0.5">
+                                                    <span
+                                                        style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#8b5cf6;"></span>
+                                                    Crashes
+                                                </div>
+                                                <div
+                                                    style="font-size: 11.0px; font-weight: 600; color: #4338ca; padding-left: 10.0px;">
+                                                    {{ errorsCrashesOverview.totalCrashes | number }}
+                                                    ({{ ((errorsCrashesOverview.totalCrashes +
+                                                    errorsCrashesOverview.totalErrors) ?
+                                                    (errorsCrashesOverview.totalCrashes /
+                                                    (errorsCrashesOverview.totalCrashes +
+                                                    errorsCrashesOverview.totalErrors) * 100) : 0) | number:'1.2-2' }}%)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Top Affected Users -->
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100 d-flex flex-column"
+                                    style="background-color: #faf5ff;; --card-bg: #faf5ff;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <div class="d-flex align-items-center mb-1">
+                                                <span style="font-size: 12.0px; font-weight: 700; color: #581c87;">Top
+                                                    Affected Users</span>
+                                                <span class="tooltip-wrap">
+                                                    <i class="bi bi-info-circle ms-1 text-muted"
+                                                        style="font-size: 12.0px; font-weight: 600;"></i>
+                                                    <span class="custom-tooltip">Users experiencing the highest number
+                                                        of issues.</span>
+                                                </span>
+                                            </div>
+                                            <div style="font-size: 9.0px; color: #64748b;">Users experienced errors or
+                                                crashes</div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2" style="color: #8b5cf6;">
+                                            <div class="fw-bold" style="font-size: 22.0px; line-height: 1;">{{
+                                                topAffectedUsers.length | number }}</div>
+                                            <div style="font-size: 24.0px; opacity: 0.8; line-height: 1;">
+                                                <i class="bi bi-people-fill"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mt-2 mb-2 py-1 px-1"
+                                        style="background-color: #e9d5ff; font-size: 11.0px; border-radius: 2px;; --card-bg: #e9d5ff;">
+                                        <span class="fw-bold"
+                                            style="width: 140.0px; color: #4c1d95 !important; padding-left: 5.0px;">User</span>
+                                        <span class="fw-bold"
+                                            style="width: 80.0px; text-align: center; margin-right: 12.0px; color: #4c1d95 !important;">Total
+                                            Sessions</span>
+                                        <span class="flex-grow-1 fw-bold" style="color: #4c1d95 !important;">Affected
+                                            Sessions</span>
+                                    </div>
+
+                                    <div class="flex-grow-1 d-flex flex-column"
+                                        style="font-size: 12.0px; font-weight: 600;">
+                                        <!-- Users List -->
+                                        <div class="d-flex align-items-center py-2"
+                                            *ngFor="let user of topAffectedUsers | slice:0:5; let last = last"
+                                            [style.border-bottom]="!last ? '1px solid #e9d5ff' : 'none'">
+                                            <span
+                                                style="width: 140.0px; color: #581c87; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-left: 5.0px;"
+                                                [title]="user.user || 'Unknown'">{{ user.user || 'Unknown' }}</span>
+                                            <span
+                                                style="width: 80.0px; text-align: center; margin-right: 12.0px; color: #581c87;">{{
+                                                (user.totalSessions || 0) | number }}</span>
+                                            <div class="flex-grow-1 d-flex align-items-center gap-2">
+                                                <span style="color: #581c87;">{{ (user.affectedSessions || 0) | number
+                                                    }}</span>
+                                                <div
+                                                    style="flex-grow: 1; height: 4.0px; background: #e9d5ff; border-radius: 2px;">
+                                                    <div [style.width.%]="user.percentage || 0"
+                                                        style="height: 100%; background: #8b5cf6; border-radius: 2px;">
+                                                    </div>
+                                                </div>
+                                                <span
+                                                    style="font-size: 9.0px; min-width: 28.0px; text-align: right; color: #581c87;">{{
+                                                    (user.percentage || 0) | number:'1.1-1' }}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-center p-3" style="font-size: 11.0px; color: #581c87 !important;"
+                                            *ngIf="topAffectedUsers.length === 0">No data available</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Tables -->
+                        <div class="row g-2 mb-3">
+                            <!-- Top Error Types -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2;; --card-bg: #fff1f2;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #9f1239;">Top Error Types
+                                            <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Most frequent types of errors
+                                                    encountered.</span>
+                                            </span></span>
+                                        <a href="javascript:void(0)" (click)="viewAllErrors($event)" class="text-decoration-none" style="font-size: 11px; font-weight: 600; color: #9f1239;">View all <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                    <table class="table table-borderless table-hover m-0"
+                                        style="font-size: 11.0px; --bs-table-color: #7f1d1d;">
+                                        <thead style="background-color: #fecdd3;; --card-bg: #fecdd3;">
+                                            <tr style="border-bottom: 1px solid #fecdd3; color: #881337;">
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Error Type
+                                                </th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Count</th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Users</th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">% of Errors
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let error of topErrorTypes" (click)="viewErrorDetail(error)" style="cursor: pointer;">
+                                                <td class="p-1 fw-medium" style="color: #7f1d1d !important;">
+                                                    {{ error.name || 'Unknown Error' }}
+                                                </td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">{{ error.count |
+                                                    number }}</td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">{{ (error.users || 0)
+                                                    | number }}</td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">
+                                                    <div class="d-flex align-items-center gap-2"
+                                                        title="{{ (errorsCrashesOverview.totalErrors > 0 ? (error.count / errorsCrashesOverview.totalErrors * 100) : 0) | number:'1.1-1' }}%">
+                                                        <div
+                                                            style="flex:1; height: 4.0px; background:#fee2e2; border-radius:2px;">
+                                                            <div [style.width.%]="errorsCrashesOverview.totalErrors > 0 ? (error.count / errorsCrashesOverview.totalErrors * 100) : 0"
+                                                                style="height:100%; background:#ef4444; border-radius:2px;">
+                                                            </div>
+                                                        </div>
+                                                        <span
+                                                            style="min-width: 28.0px; text-align: right; font-size: 9.0px;">{{
+                                                            (errorsCrashesOverview.totalErrors > 0 ? (error.count /
+                                                            errorsCrashesOverview.totalErrors * 100) : 0) |
+                                                            number:'1.1-1' }}%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="topErrorTypes.length === 0">
+                                                <td colspan="4" class="text-center p-3"
+                                                    style="font-size: 11.0px; color: #7f1d1d !important;">No data
+                                                    available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                            <!-- Top Crashes -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fff1f2;; --card-bg: #fff1f2;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #9f1239;">Top Crashes
+                                            <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Most frequent crashes encountered.</span>
+                                            </span></span>
+                                        <a href="javascript:void(0)" (click)="viewAllErrors($event, 'Crash')" class="text-decoration-none" style="font-size: 11px; font-weight: 600; color: #9f1239;">View all <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                    <table class="table table-borderless table-hover m-0"
+                                        style="font-size: 11.0px; --bs-table-color: #7f1d1d;">
+                                        <thead style="background-color: #fecdd3;; --card-bg: #fecdd3;">
+                                            <tr style="border-bottom: 1px solid #fecdd3; color: #881337;">
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Crash Type
+                                                </th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Count</th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">Users</th>
+                                                <th class="p-2 fw-bold" style="color: #881337 !important;">% of Crashes
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let crash of topCrashes" (click)="viewErrorDetail(crash)" style="cursor: pointer;">
+                                                <td class="p-1 fw-medium" style="color: #7f1d1d !important;">
+                                                    {{ crash.name || 'Unknown Crash' }}
+                                                </td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">{{ crash.count |
+                                                    number }}</td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">{{ (crash.users || 0)
+                                                    | number }}</td>
+                                                <td class="p-1" style="color: #7f1d1d !important;">
+                                                    <div class="d-flex align-items-center gap-2"
+                                                        title="{{ (errorsCrashesOverview.totalCrashes > 0 ? (crash.count / errorsCrashesOverview.totalCrashes * 100) : 0) | number:'1.1-1' }}%">
+                                                        <div
+                                                            style="flex:1; height: 4.0px; background:#fee2e2; border-radius:2px;">
+                                                            <div [style.width.%]="errorsCrashesOverview.totalCrashes > 0 ? (crash.count / errorsCrashesOverview.totalCrashes * 100) : 0"
+                                                                style="height:100%; background:#ef4444; border-radius:2px;">
+                                                            </div>
+                                                        </div>
+                                                        <span
+                                                            style="min-width: 28.0px; text-align: right; font-size: 9.0px;">{{
+                                                            (errorsCrashesOverview.totalCrashes > 0 ? (crash.count /
+                                                            errorsCrashesOverview.totalCrashes * 100) : 0) |
+                                                            number:'1.1-1' }}%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="topCrashes.length === 0">
+                                                <td colspan="4" class="text-center p-3"
+                                                    style="font-size: 11.0px; color: #7f1d1d !important;">No data
+                                                    available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                            <!-- Crashes by App Version -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #eff6ff;; --card-bg: #eff6ff;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #1e3a8a;">Crashes by App
+                                            Version <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Distribution of crashes across different
+                                                    app versions.</span>
+                                            </span></span>
+                                        <a href="javascript:void(0)" (click)="viewAllErrors($event)" class="text-decoration-none" style="font-size: 11px; font-weight: 600; color: #1e3a8a;">View all <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                    <table class="table table-borderless table-hover m-0"
+                                        style="font-size: 11.0px; --bs-table-color: #1e3a8a;">
+                                        <thead style="background-color: #bfdbfe;; --card-bg: #bfdbfe;">
+                                            <tr style="border-bottom: 1px solid #bfdbfe; color: #1e3a8a;">
+                                                <th class="p-2 fw-bold w-50" style="color: #1e3a8a !important;">Version
+                                                </th>
+                                                <th class="p-2 fw-bold text-center" style="color: #1e3a8a !important;">
+                                                    Users</th>
+                                                <th class="p-2 fw-bold text-center" style="color: #1e3a8a !important;">
+                                                    {{ getDynamicRateHeader('Crash') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let crash of crashesByAppVersion" (click)="viewErrorDetail(crash)" style="cursor: pointer;">
+                                                <td class="p-1 fw-medium d-flex align-items-center gap-2"
+                                                    title="{{ (errorsCrashesOverview.totalCrashes > 0 ? (crash.count / errorsCrashesOverview.totalCrashes * 100) : 0) | number:'1.1-1' }}%"
+                                                    style="color: #1e3a8a !important;">
+                                                    <span style="min-width: 35.0px;">{{ crash.name || 'Unknown' }}</span>
+                                                    <div
+                                                        style="flex:1; height: 4.0px; background:#dbeafe; border-radius:2px;">
+                                                        <div [style.width.%]="errorsCrashesOverview.totalCrashes > 0 ? (crash.count / errorsCrashesOverview.totalCrashes * 100) : 0"
+                                                            style="height:100%; background:#3b82f6; border-radius:2px;">
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        style="font-size: 9.0px; min-width: 24.0px; text-align: right; color: #1e3a8a;">{{
+                                                        (errorsCrashesOverview.totalCrashes > 0 ? (crash.count /
+                                                        errorsCrashesOverview.totalCrashes * 100) : 0) | number:'1.1-1'
+                                                        }}%</span>
+                                                </td>
+                                                <td class="p-1 text-center" style="color: #1e3a8a !important;">{{
+                                                    (crash.users || 0) | number }}</td>
+                                                <td class="p-1 text-center" style="color: #1e3a8a !important;">{{
+                                                    getDynamicRateValue(crash.count) |
+                                                    number:(errorsCrashesOverview.totalSessions >= 100 ? '1.2-2' :
+                                                    '1.0-0') }}</td>
+                                            </tr>
+                                            <tr *ngIf="crashesByAppVersion.length === 0">
+                                                <td colspan="3" class="text-center p-3"
+                                                    style="font-size: 11.0px; color: #1e3a8a !important;">No data
+                                                    available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Errors by App Version -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #f0fdf4;; --card-bg: #f0fdf4;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #14532d;">Errors by App
+                                            Version <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Distribution of errors across different app
+                                                    versions.</span>
+                                            </span></span>
+                                        <a href="javascript:void(0)" (click)="viewAllErrors($event)" class="text-decoration-none" style="font-size: 11px; font-weight: 600; color: #14532d;">View all <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                    <table class="table table-borderless table-hover m-0"
+                                        style="font-size: 11.0px; --bs-table-color: #14532d;">
+                                        <thead style="background-color: #bbf7d0;; --card-bg: #bbf7d0;">
+                                            <tr style="border-bottom: 1px solid #bbf7d0; color: #14532d;">
+                                                <th class="p-2 fw-bold w-50" style="color: #14532d !important;">Version
+                                                </th>
+                                                <th class="p-2 fw-bold text-center" style="color: #14532d !important;">
+                                                    Users</th>
+                                                <th class="p-2 fw-bold text-center" style="color: #14532d !important;">
+                                                    {{ getDynamicRateHeader('Error') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let error of errorsByAppVersion" (click)="viewErrorDetail(error)" style="cursor: pointer;">
+                                                <td class="p-1 fw-medium d-flex align-items-center gap-2"
+                                                    title="{{ (errorsCrashesOverview.totalErrors > 0 ? (error.count / errorsCrashesOverview.totalErrors * 100) : 0) | number:'1.1-1' }}%"
+                                                    style="color: #14532d !important;">
+                                                    <span style="min-width: 35.0px;">{{ error.name || 'Unknown' }}</span>
+                                                    <div
+                                                        style="flex:1; height: 4.0px; background:#dcfce7; border-radius:2px;">
+                                                        <div [style.width.%]="errorsCrashesOverview.totalErrors > 0 ? (error.count / errorsCrashesOverview.totalErrors * 100) : 0"
+                                                            style="height:100%; background:#22c55e; border-radius:2px;">
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        style="font-size: 9.0px; min-width: 24.0px; text-align: right; color: #14532d;">{{
+                                                        (errorsCrashesOverview.totalErrors > 0 ? (error.count /
+                                                        errorsCrashesOverview.totalErrors * 100) : 0) | number:'1.1-1'
+                                                        }}%</span>
+                                                </td>
+                                                <td class="p-1 text-center" style="color: #14532d !important;">{{
+                                                    (error.users || 0) | number }}</td>
+                                                <td class="p-1 text-center" style="color: #14532d !important;">{{
+                                                    getDynamicRateValue(error.count) |
+                                                    number:(errorsCrashesOverview.totalSessions >= 100 ? '1.2-2' :
+                                                    '1.0-0') }}</td>
+                                            </tr>
+                                            <tr *ngIf="errorsByAppVersion.length === 0">
+                                                <td colspan="3" class="text-center p-3"
+                                                    style="font-size: 11.0px; color: #14532d !important;">No data
+                                                    available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Top Error Messages -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #fffbeb;; --card-bg: #fffbeb;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #b45309;">Top Error
+                                            Messages <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Most frequent error messages
+                                                    reported.</span>
+                                            </span></span>
+                                        <a href="javascript:void(0)" (click)="viewAllErrors($event)" class="text-decoration-none" style="font-size: 11px; font-weight: 600; color: #b45309;">View all <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                                    <table class="table table-borderless table-hover m-0"
+                                        style="font-size: 11.0px; --bs-table-color: #92400e;">
+                                        <thead style="background-color: #fef3c7;; --card-bg: #fef3c7;">
+                                            <tr style="border-bottom: 1px solid #fef3c7; color: #92400e;">
+                                                <th class="p-2 fw-bold w-75" style="color: #92400e !important;">Error
+                                                    Message</th>
+                                                <th class="p-2 fw-bold text-center" style="color: #92400e !important;">
+                                                    Count</th>
+                                                <th class="p-2 fw-bold text-center" style="color: #92400e !important;">
+                                                    Users</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let msg of topErrorMessages" (click)="viewErrorDetail(msg)" style="cursor: pointer;">
+                                                <td class="p-1 fw-medium"
+                                                    style="color: #92400e !important; word-break: break-word;">
+                                                    {{ msg.name || 'Unknown Error Message' }}
+                                                </td>
+                                                <td class="p-1 text-center" style="color: #92400e !important;">{{
+                                                    msg.count | number }}</td>
+                                                <td class="p-1 text-center" style="color: #92400e !important;">{{
+                                                    (msg.users || 0) | number }}</td>
+                                            </tr>
+                                            <tr *ngIf="topErrorMessages.length === 0">
+                                                <td colspan="3" class="text-center p-3"
+                                                    style="font-size: 11.0px; color: #92400e !important;">No data
+                                                    available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Platform Breakdown -->
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card p-3 rounded shadow-sm border-0 h-100"
+                                    style="background-color: #f0fdfa !important;; --card-bg: #f0fdfa;">
+                                    <div class="mb-3">
+                                        <span style="font-size: 12.0px; font-weight: 600; color: #115e59;">Platform
+                                            Breakdown <span class="tooltip-wrap">
+                                                <i class="bi bi-info-circle ms-1 text-muted"
+                                                    style="font-size: 12.0px; font-weight: 600;"></i>
+                                                <span class="custom-tooltip">Distribution of errors and crashes across
+                                                    platforms.</span>
+                                            </span></span>
+                                    </div>
+                                    <div class="d-flex h-75 mt-2">
+                                        <!-- Errors side -->
+                                        <div class="w-50 d-flex flex-column align-items-center">
+                                            <div
+                                                style="font-size: 14.0px; font-weight: 700; color: #134e4a; margin-bottom: 10.0px; align-self: flex-start; padding-left: 10.0px;">
+                                                Errors</div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div style="position: relative; width: 140.0px; height: 140.0px;">
+                                                    <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                                                        <!-- Other -->
+                                                        <circle *ngIf="showPbErrorsOther" class="pb-arc-other" cx="50"
+                                                            cy="50" r="40" fill="transparent" stroke="#fbbf24"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbErrorsDash('other').array"
+                                                            [attr.stroke-dashoffset]="getPbErrorsDash('other').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+                                                        <!-- iOS -->
+                                                        <circle *ngIf="showPbErrorsIos" class="pb-arc-ios" cx="50"
+                                                            cy="50" r="40" fill="transparent" stroke="#8b5cf6"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbErrorsDash('ios').array"
+                                                            [attr.stroke-dashoffset]="getPbErrorsDash('ios').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+                                                        <!-- Android -->
+                                                        <circle *ngIf="showPbErrorsAndroid" class="pb-arc-android"
+                                                            cx="50" cy="50" r="40" fill="transparent" stroke="#10b981"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbErrorsDash('android').array"
+                                                            [attr.stroke-dashoffset]="getPbErrorsDash('android').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+
+                                                        <g class="pb-tooltip-other"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="38" width="100" height="24" fill="#fffbeb"
+                                                                rx="3" stroke="#f59e0b" stroke-width="1" />
+                                                            <text x="50" y="53" font-size="9" font-weight="600"
+                                                                fill="#b45309" text-anchor="middle">Other: {{
+                                                                (pbStats.totalErrors ? pbStats.other.errors /
+                                                                pbStats.totalErrors * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                        <g class="pb-tooltip-ios"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="66" width="100" height="24" fill="#f5f3ff"
+                                                                rx="3" stroke="#8b5cf6" stroke-width="1" />
+                                                            <text x="50" y="81" font-size="9" font-weight="600"
+                                                                fill="#6d28d9" text-anchor="middle">iOS: {{
+                                                                (pbStats.totalErrors ? pbStats.ios.errors /
+                                                                pbStats.totalErrors * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                        <g class="pb-tooltip-android"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="10" width="100" height="24" fill="#ecfdf5"
+                                                                rx="3" stroke="#10b981" stroke-width="1" />
+                                                            <text x="50" y="25" font-size="9" font-weight="600"
+                                                                fill="#047857" text-anchor="middle">Android: {{
+                                                                (pbStats.totalErrors ? pbStats.android.errors /
+                                                                pbStats.totalErrors * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                    </svg>
+                                                    <div class="position-absolute top-50 start-50 translate-middle text-center"
+                                                        style="pointer-events: none;">
+                                                        <div class="fw-bold"
+                                                            style="font-size: 20.0px; color: #134e4a; line-height: 1;">
+                                                            {{ (showPbErrorsAndroid ? pbStats.android.errors : 0) +
+                                                            (showPbErrorsIos ? pbStats.ios.errors : 0) +
+                                                            (showPbErrorsOther ? pbStats.other.errors : 0) | number }}
+                                                        </div>
+                                                        <div style="font-size: 10.0px; font-weight: 600; color: #0f766e;">
+                                                            Errors</div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex flex-column gap-2"
+                                                    style="font-size: 13.0px; font-weight: 600; color: #115e59;">
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbErrorsAndroid = !showPbErrorsAndroid"
+                                                        [style.opacity]="showPbErrorsAndroid ? 1 : 0.5"
+                                                        style="cursor: pointer;"><span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#10b981;"></span>
+                                                        Android <span class="text-muted ms-1">{{ (pbStats.totalErrors ?
+                                                            pbStats.android.errors / pbStats.totalErrors * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.android.errors | number
+                                                            }})</span></div>
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbErrorsIos = !showPbErrorsIos"
+                                                        [style.opacity]="showPbErrorsIos ? 1 : 0.5"
+                                                        style="cursor: pointer;">
+                                                        <span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#8b5cf6;"></span>
+                                                        iOS <span class="text-muted ms-1">{{ (pbStats.totalErrors ?
+                                                            pbStats.ios.errors / pbStats.totalErrors * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.ios.errors | number
+                                                            }})</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbErrorsOther = !showPbErrorsOther"
+                                                        [style.opacity]="showPbErrorsOther ? 1 : 0.5"
+                                                        style="cursor: pointer;"><span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#fbbf24;"></span>
+                                                        Other <span class="text-muted ms-1">{{ (pbStats.totalErrors ?
+                                                            pbStats.other.errors / pbStats.totalErrors * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.other.errors | number
+                                                            }})</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Crashes side -->
+                                        <div
+                                            class="w-50 d-flex flex-column align-items-center border-start border-light">
+                                            <div
+                                                style="font-size: 14.0px; font-weight: 700; color: #134e4a; margin-bottom: 10.0px; align-self: flex-start; padding-left: 10.0px;">
+                                                Crashes</div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div style="position: relative; width: 140.0px; height: 140.0px;">
+                                                    <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                                                        <!-- Other -->
+                                                        <circle *ngIf="showPbCrashesOther" class="pb-arc-other" cx="50"
+                                                            cy="50" r="40" fill="transparent" stroke="#fbbf24"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbCrashesDash('other').array"
+                                                            [attr.stroke-dashoffset]="getPbCrashesDash('other').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+                                                        <!-- iOS -->
+                                                        <circle *ngIf="showPbCrashesIos" class="pb-arc-ios" cx="50"
+                                                            cy="50" r="40" fill="transparent" stroke="#8b5cf6"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbCrashesDash('ios').array"
+                                                            [attr.stroke-dashoffset]="getPbCrashesDash('ios').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+                                                        <!-- Android -->
+                                                        <circle *ngIf="showPbCrashesAndroid" class="pb-arc-android"
+                                                            cx="50" cy="50" r="40" fill="transparent" stroke="#10b981"
+                                                            stroke-width="20"
+                                                            [attr.stroke-dasharray]="getPbCrashesDash('android').array"
+                                                            [attr.stroke-dashoffset]="getPbCrashesDash('android').offset"
+                                                            style="cursor: pointer; transition: stroke-dasharray 0.3s, stroke-dashoffset 0.3s;" />
+
+                                                        <g class="pb-tooltip-other"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="38" width="100" height="24" fill="#fffbeb"
+                                                                rx="3" stroke="#f59e0b" stroke-width="1" />
+                                                            <text x="50" y="53" font-size="9" font-weight="600"
+                                                                fill="#b45309" text-anchor="middle">Other: {{
+                                                                (pbStats.totalCrashes ? pbStats.other.crashes /
+                                                                pbStats.totalCrashes * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                        <g class="pb-tooltip-ios"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="66" width="100" height="24" fill="#f5f3ff"
+                                                                rx="3" stroke="#8b5cf6" stroke-width="1" />
+                                                            <text x="50" y="81" font-size="9" font-weight="600"
+                                                                fill="#6d28d9" text-anchor="middle">iOS: {{
+                                                                (pbStats.totalCrashes ? pbStats.ios.crashes /
+                                                                pbStats.totalCrashes * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                        <g class="pb-tooltip-android"
+                                                            style="visibility: hidden; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                                                            <rect x="0" y="10" width="100" height="24" fill="#ecfdf5"
+                                                                rx="3" stroke="#10b981" stroke-width="1" />
+                                                            <text x="50" y="25" font-size="9" font-weight="600"
+                                                                fill="#047857" text-anchor="middle">Android: {{
+                                                                (pbStats.totalCrashes ? pbStats.android.crashes /
+                                                                pbStats.totalCrashes * 100 : 0) | number:'1.0-1'
+                                                                }}%</text>
+                                                        </g>
+                                                    </svg>
+                                                    <div class="position-absolute top-50 start-50 translate-middle text-center"
+                                                        style="pointer-events: none;">
+                                                        <div class="fw-bold"
+                                                            style="font-size: 20.0px; color: #134e4a; line-height: 1;">
+                                                            {{ (showPbCrashesAndroid ? pbStats.android.crashes : 0) +
+                                                            (showPbCrashesIos ? pbStats.ios.crashes : 0) +
+                                                            (showPbCrashesOther ? pbStats.other.crashes : 0) | number }}
+                                                        </div>
+                                                        <div style="font-size: 10.0px; font-weight: 600; color: #0f766e;">
+                                                            Crashes</div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex flex-column gap-2"
+                                                    style="font-size: 13.0px; font-weight: 600; color: #115e59;">
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbCrashesAndroid = !showPbCrashesAndroid"
+                                                        [style.opacity]="showPbCrashesAndroid ? 1 : 0.5"
+                                                        style="cursor: pointer;"><span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#10b981;"></span>
+                                                        Android <span class="text-muted ms-1">{{ (pbStats.totalCrashes ?
+                                                            pbStats.android.crashes / pbStats.totalCrashes * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.android.crashes | number
+                                                            }})</span></div>
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbCrashesIos = !showPbCrashesIos"
+                                                        [style.opacity]="showPbCrashesIos ? 1 : 0.5"
+                                                        style="cursor: pointer;">
+                                                        <span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#8b5cf6;"></span>
+                                                        iOS <span class="text-muted ms-1">{{ (pbStats.totalCrashes ?
+                                                            pbStats.ios.crashes / pbStats.totalCrashes * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.ios.crashes | number
+                                                            }})</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-1"
+                                                        (click)="showPbCrashesOther = !showPbCrashesOther"
+                                                        [style.opacity]="showPbCrashesOther ? 1 : 0.5"
+                                                        style="cursor: pointer;"><span
+                                                            style="display:inline-block; width: 6.0px; height: 6.0px; border-radius:50%; background:#fbbf24;"></span>
+                                                        Other <span class="text-muted ms-1">{{ (pbStats.totalCrashes ?
+                                                            pbStats.other.crashes / pbStats.totalCrashes * 100 : 0) |
+                                                            number:'1.0-1' }}% ({{ pbStats.other.crashes | number
+                                                            }})</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                <!-- End of Errors Tab Body -->

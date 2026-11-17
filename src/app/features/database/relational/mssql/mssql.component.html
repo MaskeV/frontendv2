@@ -1,0 +1,151 @@
+<div class="main">
+
+    <div class=" p-1 rounded">
+        <header class="pb-0 mb-0 ">
+          <ul class="nav nav-tabs">
+            <li class="nav-item ">
+              <a class="nav-link active sm-font" aria-current="page">MS SQL</a>
+            </li>
+          </ul>
+        </header>
+    
+        <nav aria-label="breadcrumb" class="mx-1" style="height: 7.5vh; font-size: small;margin-bottom: -30px;">
+            <ol class="breadcrumb" style="padding: 0px 5px;margin-top: -8px;">
+              <li class="breadcrumb-item active" aria-current="page">Database-Root</li>
+            </ol>
+          </nav>
+          <div class="w-100 h-92">
+            <div class="databaseTable">
+              <div class="custom-border border rounded-3 shadow mx-2 my-2 mb-2" style="height: 80vh;">
+                <!-- Search Bar -->
+                <div class="searchbar w-50 mx-4 mt-2">
+                  <input type="text" class="form-control form-control-sm mr-2 custom-border" name="search"
+                    [(ngModel)]="searchText" style="background-color: transparent;" placeholder="Search" />
+                  &nbsp;&nbsp;
+                  <a class="search_icon"><i class="fas fa-lg fw-bold fa-search"></i></a>
+                </div>
+
+                <div class="border-secondary custom-border mx-4 my-2" style="height: 80%; overflow-y: auto;">
+                    <table class="table table-sm mb-0 table-striped" style="table-layout: auto !important;">
+                      <thead class="thead-light">
+                        <tr class="headings" style="font-size: x-small; height: 30px; text-transform: uppercase; ">
+                          <th class="pointer" (click)="sortBy('name')">
+                            Name
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'name'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'name' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'name' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('status')">
+                            Status
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'status'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'status' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'status' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('cpu')">
+                            CPU %
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'cpu'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'cpu' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'cpu' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('memoryUsage')">
+                            RSS Memory
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'memoryUsage'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'memoryUsage' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'memoryUsage' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('tx')">
+                            TX
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'tx'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'tx' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'tx' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('rx')">
+                            RX
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'rx'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'rx' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'rx' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                          <th class="pointer" (click)="sortBy('started')">
+                            Uptime (Days)
+                            <span class="sort-icon">
+                              <i *ngIf="sortparam !== 'started'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'started' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                              <i *ngIf="sortparam === 'started' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                            </span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of pagedServiceData | searchPipe:searchText | sort:sortparam:sortDirection">
+                          <!-- Name + Icon -->
+                          <!-- Service Name -->
+                          <td class="service-cell" (click)="setServiceId(item.name)">
+                            <img src="assets/images/mssql.png" alt="icon" class="icon" />
+                            <span class="service-name">{{ item.name }}</span>
+                          </td>
+          
+                          <!-- Status -->
+                          <td class="status-cell">
+                            <span class="status-label">{{ item.status }}</span>
+                          </td>
+          
+                          <!-- CPU -->
+                          <td class="cpu-cell">{{ item.cpu }}</td>
+          
+                          <!-- RSS Memory + Progress Bar -->
+                          <td class="memory-cell">
+                            <div class="memory-bar-wrapper">
+                              <div class="memory-bar-bg">
+                                <div class="memory-bar-fill" [style.width.%]="item.memoryUsage"></div>
+                              </div>
+                              <span class="memory-label">{{ item.memory }}</span>
+                            </div>
+                          </td>
+          
+                          <!-- TX -->
+                          <td class="tx-cell">{{ item.tx }}</td>
+          
+                          <!-- RX -->
+                          <td class="rx-cell">{{ item.rx }}</td>
+          
+                          <!-- Started -->
+                          <td class="started-cell">{{ item.started }}</td>
+                        </tr>
+          
+                      </tbody>
+                    </table>
+                  </div>
+
+
+
+                  <div class="col-12 d-flex justify-content-center mt-2">
+                    <nav>
+                      <ul class="pagination">
+                        <li class="page-item" [class.disabled]="currentPage === 1">
+                          <a class="page-link" (click)="previousPage()">&laquo;</a>
+                        </li>
+                        <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                          <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                          <a class="page-link" (click)="nextPage()">&raquo;</a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>

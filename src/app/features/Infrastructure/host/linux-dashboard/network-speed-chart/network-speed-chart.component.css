@@ -1,0 +1,8 @@
+.gauge-container {
+    width: 250px;
+    height: 180px; /* must be non-zero */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+  }

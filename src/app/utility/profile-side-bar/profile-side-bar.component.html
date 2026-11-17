@@ -1,0 +1,33 @@
+<div class="profile-sidebar" [class.open]="isOpen" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <button class="close-btn" (click)="closeSidebar()">×</button>
+
+  <div class="sidebar-content">
+    <div class="profile text-center">
+      <div class="rad mb-2">
+        <span>{{ user.fullName?.[0] || '?' }}</span>
+      </div>
+
+      <div class="user-info mb-3">
+        <div class="username">{{ user.fullName || 'N/A' }}</div>
+        <div class="usertype" style="font-size: 0.9rem;">{{ user.userType || 'N/A' }}</div>
+      </div>
+
+      <div class="det">
+        <b>Mail Id:</b> {{ user.mailId || 'N/A' }}
+      </div>
+      <div class="det">
+        <b>Last login:</b> {{ lastLogin || 'N/A' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-action-buttons d-flex justify-content-around align-items-center p-3">
+    <button type="button" class="btn btn-outline-light px-3" *ngIf="user?.userType === 'Super Admin'"
+      (click)="goToLicensePage()">
+      <i class="fa fa-id-card mr-1"></i> License
+    </button>
+    <button type="button" class="btn btn-outline-light px-3" (click)="userLogout();">
+      <i class="fa fa-sign-out mr-1"></i> Logout
+    </button>
+  </div>
+</div>

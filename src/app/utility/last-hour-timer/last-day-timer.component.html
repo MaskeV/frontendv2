@@ -1,0 +1,169 @@
+<div class="container my-0">
+  <div class="button-wrapper" (mouseenter)="hover = true" (mouseleave)="hover = false">
+
+    <button (click)="toggleCard2()" class="my-0 py-0 border px-2 bg-light smm-font"><i class="fa-solid fa-angle-left fw-bold"></i> &nbsp;
+      Last {{ timeDiffDisplay || 'Select time' }}</button>
+
+    <!-- Card 1: Appears on hover -->
+    <div class="card card1" *ngIf="hover">
+      <div class="container-fluid smm-font mx-0 d-flex flex-column p-2 box1 fw-light">
+        <div class=" smm-font">
+          Current Timeframe
+        </div>
+        <div class="container-fluid d-flex mx-0 px-0">
+          <div class="px-0 d-flex flex-column">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path d="M80-800v-80h800v80H80Zm340 640v-560h120v560H420Z" />
+              </svg>
+
+            </div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path
+                  d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z" />
+              </svg>
+
+            </div>
+            <div>
+
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path d="M80-80v-66.67h800V-80H80Zm346.67-166.67v-566.66h106.66v566.66H426.67Z" />
+              </svg>
+            </div>
+          </div>
+          <div class="container-fluid d-flex flex-column smm-font">
+            <div>{{ startDateTime || 'Start time' }}</div>
+            <div class="d-flex justify-content-between">
+              <div class="smm-font">{{ timeDiffDisplay || 'Select time' }}</div>
+              <!-- <div><svg xmlns="http://www.w3.org/2000/svg" height="15px" viewBox="0 -960 960 960" width="15px"
+                  fill="#434343">
+                  <path
+                    d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                </svg></div> -->
+
+            </div>
+            <div class="smm-font">{{ endDateTime || 'End time' }}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 2: Appears on click -->
+    <div class="card card2 smm-font" *ngIf="showCard2">
+      <div class="container-fluid mx-0 p-2 box1">
+        <div class="container-fluid d-flex mx-0 px-0">
+          <div class="px-0 d-flex flex-column">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path d="M80-800v-80h800v80H80Zm340 640v-560h120v560H420Z" />
+              </svg>
+
+            </div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path
+                  d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z" />
+              </svg>
+
+            </div>
+            <div>
+
+              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                fill="#434343">
+                <path d="M80-80v-66.67h800V-80H80Zm346.67-166.67v-566.66h106.66v566.66H426.67Z" />
+              </svg>
+            </div>
+          </div>
+          <div class="container-fluid d-flex flex-column smm-font">
+            <div>{{ startDateTime || 'Start time' }}</div>
+            <div class="d-flex justify-content-between">
+              <div class="tableColFontSize">{{ timeDiffDisplay || 'Select time' }}</div>
+              <!-- <div><svg xmlns="http://www.w3.org/2000/svg" height="15px" viewBox="0 -960 960 960" matTooltip="Help"
+                  matTooltipPosition="right" width="15px" fill="#434343">
+                  <path
+                    d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                </svg></div> -->
+
+            </div>
+            <div>{{ endDateTime || 'End time' }}</div>
+          </div>
+        </div>
+
+      </div>
+      <!-- Compact Custom Tabs -->
+      <div class="mt-1 box2">
+
+
+        <div class="custom-tabs smm-font">
+          <div class="tab-buttons mb-0">
+            <button (click)="activeTab = 'first'" [class.active]="activeTab === 'first'"
+              class="btn  btn-sm rounded-0 mx-1  fw-bold" mat-button>Preset</button>
+            <button (click)="activeTab = 'second'" [class.active]="activeTab === 'second'"
+              class="btn  btn-sm rounded-0 me-1  fw-bold" mat-button>Custom</button>
+
+          </div>
+          <div class="tab-content rounded-0 p-0 mx-0">
+            <div *ngIf="activeTab === 'first'">
+              <ul class="list-group rounded-0 px-0">
+                <li class="list-group-item rounded-0 text-center" *ngFor="let option of filteredPresetOptions"
+                   (click)="selectPreset(option.days, option.label)">
+                  {{ option.label }}
+                </li>
+
+              </ul>
+            </div>
+            <div *ngIf="activeTab === 'second'">
+              <div class="container-fluid custom-date d-flex flex-column tableColFontSize mb-1 px-0">
+                <div class="mx-2 " [ngClass]="showToast ? 'mt-4' : 'mt-2'">
+
+
+                  <div [ngClass]="showToast ? 'mt-2' : 'mt-0'" >
+                    <!-- <label class="sm-font">Date:{{ currentDate | date:'MMM d, y' }}</label> -->
+
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="">
+                      <div>
+                        <label for="startTime" class="text-center">Start Date:</label><br />
+                       <input type="date" [(ngModel)]="startDate" max="{{ currentDate | date:'yyyy-MM-dd' }}" />
+                      </div>
+                    </div>
+                    <div>
+                      to
+                    </div>
+                    <div>
+                      <div>
+                        <label for="endTime" class="text-center">End Date:</label><br />
+                         <input type="date" [(ngModel)]="endDate" max="{{ currentDate | date:'yyyy-MM-dd' }}" />
+                        <div *ngIf="showToast" class="inline-toast-right">
+                          <span>Data is available only up to the current time {{availableTime}}.</span>
+                          <span class="close-btn" (click)="showToast = false">&times;</span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="container-fluid mx-0 px-1  d-flex justify-content-end mt-3"
+                  style="border-top: 1px solid  rgb(196, 193, 193) ;">
+                  <button (click)="onCustomApply()"
+                    class="btn apply-btn btn-sm rounded-0 mt-1  fw-bold" mat-button>Apply</button>
+                </div>
+              </div>
+
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

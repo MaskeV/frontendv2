@@ -1,0 +1,46 @@
+#treeContainer {
+    user-select: none;
+    position: relative;
+}
+
+#tooltip {
+    width: auto;
+    height: auto;
+    font: 12px sans-serif;
+    background: rgb(255, 255, 255);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 10px;
+    transition: opacity 0.2s ease;
+}
+
+.hide-div {
+    display: none;
+}
+
+.btn-outline-primary.btn-sm:focus,
+.btn-outline-primary.btn-sm:active {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* #tooltip {
+  background-color: #555;
+  color: #000000;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 12px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1000;
+  max-width: 300px;
+  white-space: normal;      
+  word-wrap: break-word;    
+  overflow-wrap: break-word;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+} */

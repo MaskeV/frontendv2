@@ -1,0 +1,106 @@
+<div class="daemonsets-dashboard">
+
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DaemonSet Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('daemonset')">
+          <span>DaemonSet Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'daemonset'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'daemonset'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="daemonSetNameSearch">
+          </div>
+          <div class="option" *ngFor="let ds of filteredDaemonSetNames()" (click)="toggleSelection(ds, selectedDaemonSetNames)">
+            <input type="checkbox" [checked]="selectedDaemonSetNames.has(ds)"
+              (click)="$event.stopPropagation(); toggleSelection(ds, selectedDaemonSetNames)">
+            <span>{{ ds }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOP METRICS ===== -->
+  <div class="metrics-grid">
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasAvailable === 0 }">
+      <div class="metric-title">Replicas Available</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasAvailable === 0 }">
+        {{ replicasAvailable }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasDesired === 0 }">
+      <div class="metric-title">Replicas Desired</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasDesired === 0 }">
+        {{ replicasDesired }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasUnavailable === 0 }">
+      <div class="metric-title">Replicas Unavailable</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasUnavailable === 0 }">
+        {{ replicasUnavailable }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasReady === 0 }">
+      <div class="metric-title">Replicas Ready</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasReady === 0 }">
+        {{ replicasReady }}
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===== CHART ===== -->
+  <div class="card">
+    <div class="card-title">
+      Replicas per DaemonSet
+      <span>(Metrics Kubernetes)</span>
+    </div>
+
+    <highcharts-chart *ngIf="replicasChartOptions" [Highcharts]="Highcharts" [options]="replicasChartOptions" [oneToOne]="true"
+      class="chart-lg">
+    </highcharts-chart>
+
+    <div *ngIf="!replicasChartOptions" class="no-data">
+      No data available
+    </div>
+  </div>
+
+</div>

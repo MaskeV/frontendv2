@@ -1,0 +1,67 @@
+<main class="bm-root">
+
+  <div class="bm-header">
+    <h3 class="bm-header__title raleway-font semi-text">EKS Applications</h3>
+    <div class="bm-search-wrap">
+      <input type="text" class="bm-search-input" placeholder="Search Application Name" [(ngModel)]="searchQuery"
+        (input)="onSearch()" autocomplete="off" />
+      <i class="fas fa-search bm-search-wrap__icon"></i>
+    </div>
+  </div>
+
+  <div class="bm-table-wrap">
+    <table class="bm-table">
+      <colgroup>
+        <col style="width: 100%">
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th>Service Names</th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="pagedServiceId.length > 0">
+        <tr class="bm-tr" *ngFor="let item of pagedServiceId; let i = index">
+          <td class="bm-td--name" (click)="setServiceId(item.applicationName)">
+            <span class="bm-avatar">
+              <img [src]="getImagePath(item.applicationTechnology, item.applicationType)" class="bm-avatar__img"
+                (error)="onImageError($event)" />
+            </span>
+            <span class="bm-name-text">{{ item.applicationName || 'No Data' }}</span>
+          </td>
+        </tr>
+      </tbody>
+
+      <tbody *ngIf="pagedServiceId.length === 0">
+        <tr>
+          <td class="bm-td--empty">
+            <div class="bm-empty-container">
+              <i class="fas fa-search bm-empty-icon"></i>
+              <p class="bm-empty-text">No services found</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <div class="bm-pager" *ngIf="pagedServiceId.length > 0">
+    <span class="bm-pager__info">
+      Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredServiceId.length }} services
+    </span>
+    <div class="bm-pager__controls">
+      <button class="bm-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <input type="number" class="bm-pager__input" [value]="currentPage" (keydown.enter)="goToPage(inputPage.value)"
+        #inputPage min="1" [max]="totalPages" />
+      <span class="bm-pager__of">of {{ totalPages }}</span>
+      <button class="bm-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+
+</main>

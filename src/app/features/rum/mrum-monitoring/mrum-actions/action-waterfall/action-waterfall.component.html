@@ -1,0 +1,191 @@
+<main class="content-wrapper" style="background-color: #f8fafc; height: 100vh; overflow-y: auto; padding-bottom: 50px;">
+    <!-- Breadcrumb -->
+    <div class="px-4 pt-3 pb-1" style="background-color: #ffffff; border-bottom: 1px solid #e2e8f0;">
+        <app-mrum-breadcrumb 
+            [breadcrumbs]="breadcrumbData">
+        </app-mrum-breadcrumb>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container-fluid p-4">
+        
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-4 rounded-4 shadow-sm border" style="border-color: #e2e8f0 !important;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #ecfdf5; color: #10b981;">
+                    <i class="bi bi-activity fs-3"></i>
+                </div>
+                <div>
+                    <h4 class="mb-1 fw-bold text-dark">User Action Analysis</h4>
+                    <span class="text-muted" style="font-size: 13px;">Waterfall analysis of user actions and network requests</span>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+
+                <button [routerLink]="['/mrum/users', userFilter || userInfo.id]" [queryParams]="{ serviceId: serviceId, st: startTime, et: endTime }" class="btn btn-sm" style="color: #10b981; font-weight: 600; background-color: #ecfdf5; border: none; padding: 6px 12px; border-radius: 6px;">View User Profile</button>
+                <button [routerLink]="['/mrum/actions', actionName]" [queryParams]="{ serviceId: serviceId, st: startTime, et: endTime, sessionId: sessionId, from: 'waterfall' }" class="btn btn-sm" style="color: #10b981; font-weight: 600; border: 1px solid #10b981; background-color: white; padding: 6px 12px; border-radius: 6px;">Analyze user action</button>
+            </div>
+        </div>
+
+
+
+        <!-- Waterfall Area -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark">Selected execution: Today, 12:16:26 <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></h6>
+                
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center gap-1" style="font-size: 12px; font-weight: 600;"><div style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981;"></div> User action</div>
+                    <div class="d-flex align-items-center gap-1" style="font-size: 12px; font-weight: 600;"><div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b;"></div> Network request</div>
+                    <div class="d-flex align-items-center gap-1" style="font-size: 12px; font-weight: 600;"><div style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444;"></div> Request error</div>
+                    
+                    <div class="btn-group shadow-sm" role="group">
+                        <button type="button" class="btn btn-sm btn-light" style="font-size: 12px; font-weight: 600; color: #10b981; border: 1px solid #10b981; background-color: #ecfdf5;">Waterfall view</button>
+                        <button type="button" class="btn btn-sm btn-light" style="font-size: 12px; font-weight: 600; color: #64748b; border: 1px solid #e2e8f0; background-color: #ffffff;">List view</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 pt-2">
+                <!-- Timeline axis -->
+                <div class="d-flex justify-content-end mb-3 position-relative" style="height: 20px; font-size: 11px; color: #64748b; font-weight: 600;">
+                    <div class="position-absolute" style="left: 200px; bottom: 0;">0 s</div>
+                    <div class="position-absolute" style="left: calc(200px + (100% - 200px)*0.166); bottom: 0;">0.2 s</div>
+                    <div class="position-absolute" style="left: calc(200px + (100% - 200px)*0.333); bottom: 0;">0.4 s</div>
+                    <div class="position-absolute" style="left: calc(200px + (100% - 200px)*0.5); bottom: 0;">0.6 s</div>
+                    <div class="position-absolute" style="left: calc(200px + (100% - 200px)*0.666); bottom: 0;">0.8 s</div>
+                    <div class="position-absolute" style="left: calc(200px + (100% - 200px)*0.833); bottom: 0;">1 s</div>
+                    <div class="position-absolute" style="right: 0; bottom: 0;">1.2 s</div>
+                    <div style="position: absolute; left: 200px; right: 0; bottom: -5px; border-bottom: 1px solid #e2e8f0;"></div>
+                </div>
+
+                <!-- Waterfall Content container -->
+                <div class="position-relative" style="min-height: 200px;">
+                    
+                    <!-- Vertical grid lines -->
+                    <div class="position-absolute h-100" style="left: 200px; width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.166); width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.333); width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.5); width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.666); width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.833); width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+                    <div class="position-absolute h-100" style="right: 0; width: 1px; background-color: #f1f5f9; z-index: 1;"></div>
+
+                    <!-- Annotations (Lifecycle & Error) -->
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.52); width: 1px; border-left: 1px dashed #0f172a; z-index: 2;">
+                        <div class="position-absolute d-flex align-items-center justify-content-center text-white" style="top: -6px; left: -8px; width: 16px; height: 16px; background-color: #0f172a; border-radius: 50%; font-size: 9px; font-weight: bold;">L</div>
+                        <div class="position-absolute d-flex align-items-center justify-content-center text-white" style="bottom: 0px; left: -8px; width: 16px; height: 16px; background-color: #0f172a; border-radius: 50%; font-size: 9px; font-weight: bold;">L</div>
+                    </div>
+
+                    <div class="position-absolute h-100" style="left: calc(200px + (100% - 200px)*0.675); width: 1px; border-left: 1px dashed #ef4444; z-index: 2;">
+                        <div class="position-absolute d-flex align-items-center justify-content-center text-white" style="top: -6px; left: -8px; width: 16px; height: 16px; background-color: #ef4444; border-radius: 50%; font-size: 9px; font-weight: bold;">!</div>
+                        <div class="position-absolute d-flex align-items-center justify-content-center text-white" style="bottom: 0px; left: -8px; width: 16px; height: 16px; background-color: #ef4444; border-radius: 50%; font-size: 9px; font-weight: bold;">!</div>
+                    </div>
+
+                    <!-- Waterfall Rows -->
+                    <div class="position-relative" style="z-index: 3; padding-top: 15px; padding-bottom: 30px;">
+                        <ng-container *ngFor="let group of waterfallItems">
+                            <div class="d-flex align-items-center mb-2 position-relative">
+                                <div style="width: 200px; padding-right: 15px; font-size: 11px; font-weight: 700; color: #0f172a; display: flex; align-items: center; justify-content: space-between;">
+                                    <span class="text-truncate"><i class="bi bi-chevron-down me-1"></i> {{ group.name }}</span>
+                                    <span style="color: #64748b;">{{ group.durationStr }}</span>
+                                </div>
+                                <div style="flex-grow: 1; height: 12px; position: relative;">
+                                    <div *ngIf="group.durationMs > 0" class="position-absolute" [style.left]="getLeftPct(group.startMs)" [style.width]="getWidthPct(group.durationMs)" [style.background-color]="group.color" style="height: 10px;"></div>
+                                </div>
+                            </div>
+                            
+                            <ng-container *ngFor="let child of group.children">
+                                <div class="d-flex align-items-center mb-2 position-relative">
+                                    <div style="width: 200px; padding-right: 15px; padding-left: 15px; font-size: 11px; font-weight: 600; color: #334155; display: flex; align-items: center; justify-content: space-between;">
+                                        <span class="text-truncate">{{ child.name }}</span>
+                                        <span style="color: #64748b;">{{ child.durationStr }}</span>
+                                    </div>
+                                    <div style="flex-grow: 1; height: 12px; position: relative;">
+                                        <div class="position-absolute" [style.left]="getLeftPct(child.startMs)" [style.width]="getWidthPct(child.durationMs)" [style.background-color]="child.color" style="height: 10px;"></div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        
+                        <!-- Legend at bottom left -->
+                        <div class="d-flex align-items-center gap-3 mt-4 ps-2" style="font-size: 11px; font-weight: 700;">
+                            <div class="d-flex align-items-center gap-1"><div class="d-flex align-items-center justify-content-center text-white" style="width: 14px; height: 14px; background-color: #0f172a; border-radius: 50%; font-size: 8px;">L</div> Lifecycle event</div>
+                            <div class="d-flex align-items-center gap-1 text-danger"><div class="d-flex align-items-center justify-content-center text-white" style="width: 14px; height: 14px; background-color: #ef4444; border-radius: 50%; font-size: 8px;">!</div> Request error</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Tables Row -->
+        <div class="row g-4 mb-4">
+            <!-- Web Request Errors -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-circle text-danger fs-5"></i>
+                            <h6 class="mb-0 fw-bold text-dark">Web request errors</h6>
+                        </div>
+                        <a href="#" class="text-decoration-none" style="font-size: 12px; font-weight: 600; color: #0ea5e9;">View all errors <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-borderless table-hover mb-0" style="font-size: 12px; color: #334155;">
+                            <thead style="border-bottom: 1px solid #e2e8f0; color: #64748b;">
+                                <tr>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Time <i class="bi bi-arrow-down-up ms-1" style="font-size: 10px;"></i></th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Response <i class="bi bi-arrow-down-up ms-1" style="font-size: 10px;"></i></th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Provider <i class="bi bi-arrow-down-up ms-1" style="font-size: 10px;"></i></th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">URL</th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let err of webRequestErrors">
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ err.time }}</td>
+                                    <td style="padding: 16px 20px; font-weight: 700; color: #ef4444;">{{ err.response }}</td>
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ err.provider }}</td>
+                                    <td style="padding: 16px 20px;"><a href="#" class="text-dark text-decoration-none d-flex align-items-center gap-1">{{ err.url }} <i class="bi bi-box-arrow-up-right text-muted" style="font-size: 10px;"></i></a></td>
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ err.duration }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Named Events -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-soundwave text-primary fs-5"></i>
+                            <h6 class="mb-0 fw-bold text-dark">Named events</h6>
+                        </div>
+                        <a href="#" class="text-decoration-none" style="font-size: 12px; font-weight: 600; color: #0ea5e9;">View all events <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-borderless table-hover mb-0" style="font-size: 12px; color: #334155;">
+                            <thead style="border-bottom: 1px solid #e2e8f0; color: #64748b;">
+                                <tr>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Time <i class="bi bi-arrow-down-up ms-1" style="font-size: 10px;"></i></th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Event <i class="bi bi-arrow-down-up ms-1" style="font-size: 10px;"></i></th>
+                                    <th style="font-weight: 600; padding: 12px 20px;">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let evt of namedEvents">
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ evt.time }}</td>
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ evt.event }}</td>
+                                    <td style="padding: 16px 20px; font-weight: 600;">{{ evt.duration }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

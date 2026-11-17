@@ -1,0 +1,289 @@
+<main>
+    <div class="container-fluid py-2 scroll-container" style="height: 82vh; overflow-y: auto;">
+        
+        <!-- Filter Bar -->
+        <div class="filter-card modern-filter-card mb-3">
+            <form class="row gx-3 gy-2 align-items-center">
+                <div class="col-12 col-md-3">
+                    <label class="form-label ms-1">Application</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="appName" name="application"
+                        (change)="getAllIndicesByAppNameAndUserID(alert_message)">
+                        <option *ngFor="let data of applicationList" [value]="data.applicationName">
+                            {{ data.applicationName }}
+                        </option>
+                    </select>
+                </div>
+        
+                <div class="col-12 col-md-3">
+                    <label class="form-label ms-1">Index</label>
+                    <select id="index" class="form-select form-select-sm" [(ngModel)]="indexName" name="index" (change)="resetForm()">
+                        <option *ngFor="let data of indexList" [value]="data">{{ data }}</option>
+                    </select>
+                </div>
+        
+                <div class="col-12 col-md-3">
+                    <label class="form-label ms-1">Records Limit</label>
+                    <input type="number" class="form-control form-control-sm" name="numberOfDocuments" [(ngModel)]="numberOfDocuments" min="10"
+                        max="10000">
+                </div>
+        
+                <div class="col-12 col-md-3 d-flex align-items-center justify-content-center mt-auto">
+                    <button type="submit" class="btn btn-primary-custom btn-submit-filter" (click)="getIndexData(alert_message)">
+                        <i class="fa fa-play me-2"></i> Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    
+        <!-- Dashboard Content -->
+        <div *ngIf="indexRawData" class="mt-3">
+            
+            <!-- Top Controls Row -->
+            <div class="stats-container modern-stats-container d-flex flex-column flex-md-row justify-content-between align-items-center mb-3">
+              <!-- Left: Graph toggle and total hits -->
+              <div class="d-flex align-items-center gap-3 mb-2 mb-md-0">
+                <div class="form-check form-switch mb-0">
+                  <input class="form-check-input" type="checkbox" id="showGraph" (change)="showHide()" [checked]="showChart">
+                  <label class="form-check-label ms-1" for="showGraph">Show Graph</label>
+                </div>
+                <div class="stat-badge">
+                    Total Hits: {{ indexRawData.hitsCount }}
+                </div>
+              </div>
+          
+              <!-- Right: Search bar + query + export -->
+              <div class="controls-right-group">
+                <!-- RQL Query with info icon -->
+                <div class="kql-input-wrapper">
+                    <div class="kql-info-container">
+                        <i class="fa fa-info-circle kql-info-icon" title="View RQL Examples"></i>
+                        <div class="kql-info-tooltip">
+                            <div class="kql-tooltip-header">RQL Query Examples</div>
+                            <div class="kql-tooltip-row"><code class="kql-code">status: 200</code> <span class="kql-desc">- Exact match</span></div>
+                            <div class="kql-tooltip-row"><code class="kql-code">level: ERROR OR level: WARN</code> <span class="kql-desc">- Boolean OR</span></div>
+                            <div class="kql-tooltip-row"><code class="kql-code">message: "timeout"</code> <span class="kql-desc">- Exact phrase</span></div>
+                            <div class="kql-tooltip-row"><code class="kql-code">response_time: >= 500</code> <span class="kql-desc">- Range search</span></div>
+                            <div class="kql-tooltip-row"><code class="kql-code">application: *auth*</code> <span class="kql-desc">- Wildcard match</span></div>
+                        </div>
+                    </div>
+                    <div class="input-group input-group-sm input-group-custom kql-input-group">
+                        <input type="text" [(ngModel)]="kqlQuery" placeholder="RQL Query" class="form-control" title="RQL Query">
+                        <button class="btn btn-primary-custom btn-search-icon" (click)="getLogDocumentsByQuery()" title="Search by Query">
+                          <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Keyword -->
+                <div class="input-group input-group-sm input-group-custom kql-input-group">
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Search Keyword" class="form-control" (keyup)="onSearch($event)" title="Search Keyword">
+                    <button class="btn btn-primary-custom btn-search-icon" (click)="getLogDocumentsBySearchKeyword()" title="Search by Keyword">
+                      <i class="fa fa-search"></i>
+                    </button>
+                </div>
+
+                <button class="btn btn-outline-custom btn-export" (click)="openExportModal()" title="Export Logs">
+                  <i class="fa fa-file-export me-1"></i> Export
+                </button>
+              </div>
+            </div>
+          
+            <!-- Graph container -->
+            <div *ngIf="showChart" class="chart-container">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="columnChart" style="width: 100%; height: 200px; display: block;"></highcharts-chart>
+            </div>
+          
+            <!-- Log documents table -->
+            <div class="srg-log-table-card mt-2">
+              <div class="srg-log-table-scroll">
+                <table class="srg-log-table">
+                  <thead>
+                    <tr>
+                      <th style="width:2%"></th>
+                      <th style="width:18%">Timestamp</th>
+                      <th style="width:9%">Log Level</th>
+                      <th>Log / Message</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (indexD of pagedIndexDet; track $index; let i = $index) {
+
+                      <!-- Main row -->
+                      <tr class="srg-log-tr" [class.srg-log-tr--active]="expandedLogIndex === i" (click)="toggleDetailLog(i)">
+                        <td><span class="srg-log-expand-icon">{{ expandedLogIndex === i ? '▼' : '▶' }}</span></td>
+                        <td class="srg-log-td--muted">{{ formatTimeBucket(indexD.time_bucket) }}</td>
+                        <td>
+                          @if (getLogLevel(indexD) !== '-') {
+                            <span class="srg-level-badge" [ngClass]="getLevelBadgeClass(getLogLevel(indexD))">
+                              {{ getLogLevel(indexD) }}
+                            </span>
+                          } @else {
+                            <span class="srg-log-td--muted">-</span>
+                          }
+                        </td>
+                        <td class="srg-log-td--content">{{ indexD.log ?? '-' }}</td>
+                      </tr>
+
+                      <!-- Expanded detail row -->
+                      @if (expandedLogIndex === i) {
+                        <tr class="srg-log-tr-detail">
+                          <td colspan="4" style="padding:0;">
+                            <div class="srg-log-detail-panel">
+
+                              @for (det of (indexD | keyValue); track det.key) {
+                                @if (det.key !== 'time_bucket' && det.key !== 'log') {
+                                  <div class="srg-log-detail-row">
+                                    <span class="srg-log-detail-label">{{ det.key }}</span>
+                                    <input type="text" class="srg-log-detail-input" [value]="det.value ?? ''" readonly />
+                                  </div>
+                                }
+                              }
+
+                              @if (indexD.log) {
+                                <div class="srg-log-detail-row">
+                                  <span class="srg-log-detail-label">log</span>
+                                  <textarea class="srg-log-detail-textarea" [value]="indexD.log" rows="4" readonly></textarea>
+                                </div>
+                              }
+
+                            </div>
+                          </td>
+                        </tr>
+                      }
+
+                    }
+                  </tbody>
+                </table>
+
+                @if (!indexDet || indexDet.length === 0) {
+                  <div class="srg-log-empty">No Data Available</div>
+                }
+              </div>
+
+              <!-- Pagination footer -->
+              @if (indexDet && indexDet.length > 0) {
+              <div class="srg-log-pager">
+                <span class="srg-log-pager__info">{{ logItemRange }}</span>
+                <div class="srg-log-pager__controls">
+                  <button class="srg-log-pager__btn" [disabled]="currentLogPage === 1" (click)="prevLogPage()">
+                    <i class="fa fa-angle-left"></i>
+                  </button>
+                  <span class="srg-log-pager__page">{{ currentLogPage }} / {{ totalLogPages }}</span>
+                  <button class="srg-log-pager__btn" [disabled]="currentLogPage === totalLogPages" (click)="nextLogPage()">
+                    <i class="fa fa-angle-right"></i>
+                  </button>
+                  <button class="srg-log-pager__load-more" (click)="loadNextLogDocuments()" title="Fetch next batch from server">
+                    <i class="fa fa-download me-1"></i> Load More
+                  </button>
+                </div>
+              </div>
+              }
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="documentBodyModal" tabindex="-1" role="dialog" aria-labelledby="documentBodyModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div class="modal-content border-0 shadow-lg" style="background-color: var(--modal-bg-color, #1b1c21);">
+                    <div class="modal-header modal-header-custom align-items-center">
+                        <h5 class="modal-title fw-bold mb-0">
+                            <i class="fa fa-list-alt me-2"></i> Document Details
+                        </h5>
+                        <div class="ms-auto d-flex align-items-center gap-3">
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="searchText2" (keyup)="search()"
+                                placeholder="Search Fields..." autofocus autocomplete="off" style="width: 200px;">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-body modal-body-custom p-0">
+                        <div class="table-responsive m-0">
+                            <table class="table table-dark table-hover mb-0" style="background-color: transparent;">
+                                <thead class="table-dark text-uppercase small" style="position: sticky; top: 0; z-index: 1;">
+                                    <tr>
+                                        <th class="ps-3 border-0" style="width: 30%; color: var(--accent-blue, #26cee9); background-color: var(--table-header-bg, #021220);">Field</th>
+                                        <th class="border-0" style="color: var(--accent-blue, #26cee9); background-color: var(--table-header-bg, #021220);">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem;">
+                                    <tr *ngFor="let documentObj of dataArr">
+                                        <td class="ps-3 fw-bold" style="color: var(--text-color, #e2e8f0); border-color: var(--border-color, #415080); background-color: var(--table-body-bg, #031423);">{{ documentObj.documentField }}</td>
+                                        <td style="color: var(--text-color, #e2e8f0); border-color: var(--border-color, #415080); background-color: var(--table-body-bg, #031423); word-break: break-all;">{{ documentObj.documentValue }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: var(--card-header-bg, #091f32); border-top: 1px solid var(--border-color, #415080);">
+                        <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Export Fields Modal -->
+        <ng-template #exportModal>
+            <div class="export-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="export-modal-icon-wrap">
+                        <i class="fa fa-file-export"></i>
+                    </div>
+                    <h5 class="mb-0 export-modal-title">Select Export Fields</h5>
+                </div>
+                <button type="button" class="export-modal-close" (click)="modalRef.close()" aria-label="Close">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="export-modal-body">
+                <!-- Controls row -->
+                <div class="export-field-controls">
+                    <div class="export-search-wrapper">
+                        <i class="fa fa-search export-search-icon"></i>
+                        <input type="text" class="export-search-input"
+                               [(ngModel)]="exportFieldSearch"
+                               placeholder="Search fields...">
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="export-field-count">{{ selectedExportFieldCount }} / {{ allExportFields.length }} selected</span>
+                        <button class="export-action-btn" (click)="selectAllExportFields()">All</button>
+                        <button class="export-action-btn" (click)="deselectAllExportFields()">None</button>
+                    </div>
+                </div>
+
+                <!-- Fields grid -->
+                <div class="export-fields-grid">
+                    @for (field of filteredExportFields; track field) {
+                        <label class="export-field-item" [class.export-field-item--selected]="exportFieldSelection[field]">
+                            <input type="checkbox" [(ngModel)]="exportFieldSelection[field]" />
+                            <span class="export-field-name">{{ field }}</span>
+                        </label>
+                    }
+                    @if (filteredExportFields.length === 0) {
+                        <div class="export-no-fields">No fields match your search.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="export-modal-footer">
+                <button class="export-btn export-btn--cancel" (click)="modalRef.close()" [disabled]="isExporting">Cancel</button>
+                <button class="export-btn export-btn--primary" (click)="confirmExport()" [disabled]="!hasExportFieldSelected || isExporting">
+                    @if (isExporting) {
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span> Fetching all records…
+                    } @else {
+                        <i class="fa fa-download me-1"></i> Export CSV
+                    }
+                </button>
+            </div>
+        </ng-template>
+
+        <!-- Alert Template -->
+        <ng-template #alert_message>
+            <div class="modal-body text-center p-4" style="background-color: var(--card-bg-color, #0a1824); color: var(--text-color, #e2e8f0); border-radius: 8px;">
+                <i class="fa fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                <h5 class="mb-3">{{ alertMessage }}</h5>
+                <button type="button" class="btn btn-primary-custom px-4" (click)="cancelRequest()">OK</button>
+            </div>
+        </ng-template>
+    </div>
+</main>

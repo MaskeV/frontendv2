@@ -1,0 +1,205 @@
+<div class="login-wrapper">
+    <div class="login-box">
+        <img src="../../../assets/images/ApMoSys_NETRAA_Logo.png" class="login-logo" alt="Netraa Logo" />
+
+        <!-- Login Form -->
+        <form *ngIf="isLoginUserForm" (ngSubmit)="userLogin()" #loginForm="ngForm">
+
+            <input type="text" name="username" [(ngModel)]="userName" placeholder="Username"
+                class="form-control text-light mb-3" required />
+
+            <div class="position-relative mb-3">
+                <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password"
+                    placeholder="Password" class="form-control text-light pr-5" required />
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                    (click)="showPassword = !showPassword"
+                    style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #ccc;"></i>
+            </div>
+            
+            @if (captchaProvider==='RECAPTCHA') {
+                <div class="captcha-wrapper  mb-1">
+                    <re-captcha #captchaRef name="recaptcha" theme="dark" [(ngModel)]="recaptchaToken" required></re-captcha>
+                </div>
+            } @else {
+                <div class="captcha-container mb-1">
+                    <label class="captcha-label">
+                        Type the characters shown below
+                    </label>
+                    <div class="captcha-image-row">
+                        <div class="captcha-image">
+                            <img [src]="this.captchaImage" alt="Captcha">
+                        </div>
+                        <button type="button" class="refresh-btn" (click)="reloadCaptcha()" title="Refresh Captcha">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                    <input type="text" name="captcha" class="captcha-input" placeholder="Enter CAPTCHA" [(ngModel)]="captchaAnswer" maxlength="6" required>
+                </div>    
+            }
+            
+            
+            <button type="submit" class="login-btn" [disabled]="loginForm.invalid">Login</button>
+
+            <div class="login-footer mt-3">
+                <a class="forgot-password" (click)="showEmailForm()" style="cursor: pointer;">Forgot Password?</a>
+                <a class="forgot-password" (click)="openLicenseModal()" style="cursor: pointer;">Activate License</a>
+            </div>
+        </form>
+
+        <!-- Email Form -->
+        <form *ngIf="isAskingOtpForm" #emailForm="ngForm">
+            <input type="email" name="email" [(ngModel)]="userName" placeholder="Enter Email ID"
+                class="form-control text-light mb-3" required email #emailInput="ngModel" />
+
+            <button type="button" class="login-btn" (click)="sendOTP()" [disabled]="!emailInput.valid">Send OTP</button>
+
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-link backToLogin" (click)="openSignInForm()">Back to Login</button>
+            </div>
+        </form>
+
+        <!-- OTP Form -->
+        <form *ngIf="isOtpForm" #otpForm="ngForm">
+            <input type="text" name="otp" [(ngModel)]="requestedOtp" placeholder="Enter OTP"
+                class="form-control text-light mb-3" required />
+
+            <div class="d-flex justify-content-between">
+                <button type="button" class="login-btn me-2" (click)="confirmOTP()">Confirm OTP</button>
+                <button type="button" class="login-btn" (click)="sendOTP()">Resend OTP</button>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-link backToLogin" (click)="openSignInForm()">Back to Login</button>
+            </div>
+        </form>
+
+        <!-- New Password Form -->
+        <form *ngIf="isPasswordChangeForm" #otpForm="ngForm">
+            <div class="position-relative mb-3">
+                <p class="text-sm" style="text-align: start;">
+                    Strong Password requirement:
+                    <li> At least8 character long</li>
+                    <li> At least1 Uppercase</li>
+                    <li> At least1 Lowercase</li>
+                    <li> At least1 Digit</li>
+                    <li> At least1 Special character</li>
+                </p>
+            </div>
+
+            <div class="position-relative mb-3">
+                <input [type]="showPassword ? 'text' : 'password'" name="newPassword" [(ngModel)]="newPassword"
+                    placeholder="Enter New Password" class="form-control text-light pr-5" required />
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                    (click)="showPassword = !showPassword"
+                    style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #ccc;"></i>
+            </div>
+
+            <div class="position-relative mb-3">
+                <input [type]="showPassword ? 'text' : 'password'" name="conformNewPassword"
+                    [(ngModel)]="conformNewPassword" placeholder="Confirm New Password"
+                    class="form-control text-light pr-5" required />
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                    (click)="showPassword = !showPassword"
+                    style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #ccc;"></i>
+            </div>
+
+            <div class="position-relative mb-3">
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="login-btn me-2" (click)="changePassword()">Change Password</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-link backToLogin" (click)="openSignInForm()">Back to
+                        Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div *ngIf="isModalVisible"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="w-full max-w-lg p-6 relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4" style="border-color: var(--border-color);">
+            <h2 class="text-2xl font-semibold">SESSION DETECTED</h2>
+            <button (click)="closeModal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="space-y-4">
+            <p style="color: var(--text-color);" class="text-sm">
+                User is already logged in.<br>
+                Do you want to log in here and close the previous session?
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-end gap-2">
+            <button (click)="closeModal()" class="px-4 py-2 rounded-lg transition"
+                style="background-color: var(--input-bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                Cancel
+            </button>
+            <button (click)="confirmDeleteUser()" class="button-primary px-4 py-2 rounded-lg"
+                style="background-color: var(--primary-color); color: white;"
+                onmouseover="this.style.backgroundColor='var(--primary-hover-color)'"
+                onmouseout="this.style.backgroundColor='var(--primary-color)'">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLicenseModalVisible"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+
+    <div class="w-full max-w-lg p-6 relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4" style="border-color: var(--border-color);">
+            <h2 class="text-2xl font-semibold">Activate License</h2>
+            <button (click)="closeLicenseodal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="space-y-4">
+            <p style="color: var(--text-color);" class="text-sm">
+                Please enter a new license string to activate your License.
+                For any queries, contact sales@apmosys.com.
+            </p>
+
+            <input id="licenseString" type="text" [(ngModel)]="licenseString" placeholder="Enter your license string"
+                class="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 text-sm"
+                style="background-color: var(--input-bg-color); border: 1px solid var(--input-border-color); color: var(--text-color);" />
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-end gap-2">
+            <button (click)="closeLicenseodal()" class="px-4 py-2 rounded-lg transition"
+                style="background-color: var(--input-bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                Cancel
+            </button>
+
+            <button (click)="confirmLicense()" class="button-primary px-4 py-2 rounded-lg"
+                style="background-color: var(--primary-color); color: white;"
+                onmouseover="this.style.backgroundColor='var(--primary-hover-color)'"
+                onmouseout="this.style.backgroundColor='var(--primary-color)'">
+                Confirm
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="toast.visible" class="toast-box" [ngClass]="toast.type">
+    {{ toast.message }}
+</div>

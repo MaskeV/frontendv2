@@ -1,0 +1,160 @@
+<main>
+  <div class="tab-content custom-bg p-1">
+    <div class="d-flex align-items-center mb-2" style="padding-left: 10px; padding-top: 15px;">
+      <div class="me-3" style="background: rgba(13, 110, 253, 0.1); padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-chart-line text-primary fs-5"></i>
+      </div>
+      <div>
+        <h3 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">Technical Dashboard</h3>
+      </div>
+    </div>
+    <div class="d-flex align-items-stretch my-3">
+      <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 100%;">
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Service Error Count</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Total number of errors occurring across services over time."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="serviceErrorChartOptions" chartType="tilemap"
+              [tilemapChartOptions]="serviceErrorChartOptions" class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Endpoint Error (Counts)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 services with highest endpoint error counts."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="serviceEndpointErrorChartOptions" chartType="line"
+              [lineChartOptions]="serviceEndpointErrorChartOptions">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Latency (ms)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 services with highest average response time (ms)."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="applicationLatencyChartOptions" chartType="line"
+              [lineChartOptions]="applicationLatencyChartOptions" class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Total Network Usage (Bytes)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 hosts by total network data usage (bytes)"></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="totalNetworkChartOptions" chartType="line" [lineChartOptions]="totalNetworkChartOptions"
+              class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Network Traffic (Bytes)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 hosts by network traffic (incoming & outgoing bytes)."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="networkTrafficChartOptions" chartType="area"
+              [areaChartOptions]="networkTrafficChartOptions" class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>CPU Usage</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 hosts by CPU utilization (%)."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="cpuUsageChartOptions" chartType="line" [lineChartOptions]="cpuUsageChartOptions"
+              class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Memory Usage (MB)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 hosts by memory consumption (MB)"></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="memoryUsageChartOptions" chartType="bar" [barChartOptions]="memoryUsageChartOptions"
+              class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Log Error Heatmap</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Distribution of log errors across time and services."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="logsErrorChartOptions" chartType="scatter" [scatterChartOptions]="logsErrorChartOptions"
+              class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-33 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Critical Flow</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Flow of Application."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="criticalFlowChartOptions" chartType="spline"
+              [splineChartOptions]="criticalFlowChartOptions" class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-49 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Disk Usage (%)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 hosts by disk usage (%)."></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="diskUsageChartOptions" chartType="column" [columnChartOptions]="diskUsageChartOptions"
+              class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+        <div class="card w-49 mt-2">
+          <div class="card-header chart-title d-flex justify-content-between align-items-center">
+            <span>Slow DB Queries (ms)</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Top 5 DB with slowest database queries (ms)"></i>
+          </div>
+          <div class="card-body px-0 py-2 h-26">
+            <app-chart *ngIf="slowDBQueriesChartOptions" chartType="column"
+              [columnChartOptions]="slowDBQueriesChartOptions" class="h-full w-full">
+            </app-chart>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>

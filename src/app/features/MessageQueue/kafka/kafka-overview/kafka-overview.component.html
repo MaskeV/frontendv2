@@ -1,0 +1,455 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;" class="pt-1">
+    <!-- Breadcrum -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img src="assets/img/technologies/kafka.png" class="icons" alt="kafka logo" title="kafka" /><a
+                    routerLink="/message-queue/kafka-service">Kafka-Clusters</a>
+            </li>
+            <li class="breadcrumb-item active">{{clusterName}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="cluster-nav">
+                <li class="nav-item">
+                    <a class="nav-link" [ngClass]="selectedTab === 'overview' ? 'active' : '' " data-bs-toggle="tab"
+                        role="tab" href="#overview" (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [ngClass]="selectedTab === 'broker' ? 'active' : '' " data-bs-toggle="tab"
+                        role="tab" href="#broker_page" (click)="loadData('broker')">Broker</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="tab-content overflow-auto">
+        <!-- Overview TAB -->
+        <div id="overview" class="tab-pane fade" [ngClass]="selectedTab === 'overview' ? 'show active' : ''">
+            <!-- KPI Section -->
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Cluster Health</h3>
+                </div>
+                <div class="row g-3">
+                    <!-- System status -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">System Status</span>
+                                <span class="text-success fs-6"><i class="fa-regular fa-circle-check"></i></span>
+                            </div>
+                            <div>
+                                <span class="fs-lg fw-bold text-dark">Healthy</span>
+                                <p class="small mt-1 fw-medium text-muted" *ngIf="clusterKPI.uptimePCT !=null"><span
+                                        class="text-success">{{clusterKPI.uptimePCT | numericData}}%</span> Uptime
+                                </p>
+                                <p class="small mt-1 fw-medium text-muted" *ngIf="clusterKPI.uptimePCT == null"><span
+                                        class="text-success">No Data</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Brokers  -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Total Brokers</span>
+                                <span class="text-primary fs-6"><i class="fa-solid fa-server"></i></span>
+                            </div>
+                            <div>
+                                <span class="fs-lg fw-bold text-dark">{{clusterKPI.totalBrokers | shortNumber}}</span>
+                                <p class="small text-success mt-1 d-flex align-items-center fw-medium">
+                                    <span class="me-1" style="font-size:12px;"><i
+                                            class="fa-solid fa-long-arrow-right"></i></span>
+                                    Stable
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Topics -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Active Topics</span>
+                                <span class="material-symbols-outlined text-info fs-6"><i
+                                        class="fa-regular fa-file-text"></i></span>
+                            </div>
+                            <div>
+                                <span class="fs-lg fw-bold text-dark">{{clusterKPI.topics?.total| shortNumber}}</span>
+                                <p class="small mt-1 fw-medium text-muted">Total Partitions <span
+                                        class="text-primary">{{clusterKPI.partitions?.total| shortNumber}}</span> </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controller -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Controller</span>
+                                <span class="material-symbols-outlined text-purple fs-6"><i
+                                        class="fa fa-network-wired"></i></span>
+                            </div>
+                            <div>
+                                <span class="fs-lg fw-bold text-dark">{{clusterKPI.controller?.total |
+                                    shortNumber}}</span>
+                                <p class="small text-muted mt-1 fw-medium">Active Node</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Main Section -->
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+
+                <!-- MAIN STACK -->
+                <div class="gap-3 d-grid mb-2">
+                    <!-- Max Lag -->
+                    <div class="card-soft position-relative p-2 rounded-3 overflow-hidden">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <h4 class="fw-bold text-dark small">Max Lag</h4>
+                                <p class="small text-muted fw-medium">Message delay trend</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-warning"><mat-icon class="icon-sm"
+                                        [matMenuTriggerFor]="lagMenu">slow_motion_video</mat-icon></span>
+                            </div>
+                        </div>
+
+                        <div class="rounded border pt-1 bg-white chart-wrapper">
+                            <div id="max-lag-chart" class="h-100"> </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid 1 -->
+                    <div class="d-flex">
+                        <!-- Partition Count -->
+                        <div class="col-6 pe-1">
+                            <div class="card-soft rounded-3 p-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <div>
+                                        <h4 class="text-11 fw-bold text-secondary py-1">Partition Count</h4>
+                                        <div class="fw-lg fw-bold text-dark">{{clusterKPI.partitions?.total |
+                                            shortNumber}}</div>
+                                    </div>
+                                    <div>
+                                        <span class="text-success"><mat-icon class="icon-sm"
+                                                [matMenuTriggerFor]="partitionMenu">horizontal_split</mat-icon></span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white chart-wrapper-sm">
+                                    <div id="partition-chart" class="h-100"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Leader Count -->
+                        <div class="col-6 ps-1">
+                            <div class="card-soft rounded-3 p-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <div class="mb-1">
+                                        <h4 class="text-11 fw-bold text-secondary py-1">Leader Count</h4>
+                                        <div class="fw-lg fw-bold text-dark">{{clusterKPI.leaders?.total | shortNumber}}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="text-purple"><mat-icon class="icon-sm"
+                                                [matMenuTriggerFor]="leaderMenu">account_tree</mat-icon></span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white chart-wrapper-sm">
+                                    <div id="leader-count-chart" class="h-100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid 2 -->
+                    <div class="d-flex">
+                        <!-- Unclean Elections -->
+                        <div class="col-6 pe-1">
+                            <div class="card-soft  p-2 rounded-3">
+                                <h4 class="text-11 fw-bold text-secondary mb-1">Unclean Elections</h4>
+                                <div class="d-flex align-items-baseline gap-1 mb-1">
+                                    <div class="fw-lg fw-bold text-dark">{{uncleanLeaderElectionsKPI | shortNumber}}
+                                    </div>
+                                    <div class="text-muted text-10 fw-medium" *ngIf="uncleanLeaderElectionsKPI!=null">
+                                        /sec</div>
+                                </div>
+
+                                <div class="bg-white chart-wrapper-sm">
+                                    <div id="unclear-election-chart" class="h-100"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Election Rate -->
+                        <div class="col-6 ps-1">
+                            <div class="card-soft p-2 rounded-3">
+                                <h4 class="text-11 fw-bold text-secondary mb-1">Election Rate</h4>
+                                <div class="d-flex align-items-baseline gap-1 mb-1">
+                                    <div class="fw-lg fw-bold text-dark">{{electionRateKPI | shortNumber}}</div>
+                                    <div class="text-muted text-10 fw-medium" *ngIf="electionRateKPI!=null">/sec</div>
+                                </div>
+
+                                <div class="bg-white chart-wrapper-sm">
+                                    <div id="election-rate-chart" class="h-100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid 3 -->
+                    <div class="card-soft position-relative p-2 rounded-3 overflow-hidden">
+                        <!-- Under Replicated Partitions-->
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <h4 class="fw-bold text-dark small mb-1">Stability Trend</h4>
+                                <p class="small text-muted fw-medium">Under Replicated Partitions</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-warning"><mat-icon class="icon-sm"
+                                        [matMenuTriggerFor]="urpMenu">sync_problem</mat-icon></span>
+                            </div>
+                        </div>
+                        <div class="bg-white chart-wrapper-xsm">
+                            <div id="under-replicated-partition-chart" class="h-100"></div>
+                        </div>
+                        <!-- Offline Partitions -->
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <p class="small text-muted fw-medium">Offline Partitions</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-danger"><mat-icon class="icon-sm"
+                                        [matMenuTriggerFor]="offlineMenu">warning</mat-icon></span>
+                            </div>
+                        </div>
+                        <div class="bg-white chart-wrapper-sm">
+                            <div id="offline-partition-chart" class="h-100"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Controller -->
+                    <div class="card-soft position-relative p-2 rounded-3 overflow-hidden">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <h4 class="fw-bold small text-dark">Active Controller History</h4>
+                                <p>
+                                    <span class="small text-muted fw-medium">Current </span>
+                                    <span class="fw-bold text-dark lh-1">{{clusterKPI.controller?.total |
+                                        shortNumber}}</span>
+                                </p>
+                            </div>
+                            <div>
+                                <span class="badge-soft bg-success bg-opacity-25 text-success">Stable</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-wrapper-sm bg-white rounded border">
+                            <div id="active-controller-chart" class="h-100"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- Broker Page Tab -->
+        <div id="broker_page" class="tab-pane fade p-1" [ngClass]="selectedTab === 'broker' ? 'show active' : ''">
+            <div class="root">
+                <!-- Header and search bar -->
+                <div class="card-header">
+                    <div class="ps-2 py-2 col-md-12 d-flex justify-content-between">
+                        <div style="width: 15%; position: relative;">
+                            <input type="text" class="form-control form-control-sm pe-3" [(ngModel)]="searchText"
+                                (input)="resetCurrentPage(brokers,searchText,['host','brokerId','health'])"
+                                placeholder="Search Brokers..." />
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Broker Info Table -->
+                <div class="card-body bg-transparent rounded-2 p-1 overflow-hidden">
+                    <div class="table-container">
+                        <table class="table w-full table-fixed bg-transparent h-100 " style="font-size: small;">
+                            <thead class="bg-transparent text-white sticky"
+                                style="background-color: transparent; table-layout: fixed;">
+                                <tr style="border-bottom: 2px solid #a7a7a750; cursor: pointer;">
+                                    <th style="color: #219ebc;" (click)="sortData('host')">BROKER ID / HOST
+                                        <i class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'host' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc;" (click)="sortData('health')">STATUS
+                                        <i class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'health' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc;" (click)="sortData('cpu')">CPU USAGE
+                                        <i class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'cpu' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc;" (click)="sortData('memory')">MEMORY USAGE
+                                        <i class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'memory' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc;" (click)="sortData('messages')">MESSAGES/SEC
+                                        <i class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'messages' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="totalItems > 0 || isLoading===true; else noDataTemplate">
+                                <tr
+                                    *ngFor="let broker of brokers | sort:sortColumn:sortDirection | objectFilter:searchText : ['host','brokerId','health'] | paginate: currentPage: pageSize;">
+                                    <td style="cursor: pointer;" (click)="setEntityId($event,broker.host)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-primary fs-6 me-2"><i
+                                                    class="fa-solid fa-server"></i></span>
+                                            <div class="d-flex flex-col text-start">
+                                                <!-- <div class="fw-lg text-dark">{{'#'+broker.brokerId || 'No Data'}}</div> -->
+                                                <!-- <div class="small text-secondary">{{broker.host ?? 'No Data'}}</div> -->
+                                                <div class="fw-lg text-dark">{{broker.host ?? 'No Data'}}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-capitalize text-nowrap">
+                                        <span class="d-inline-flex align-items-center badge rounded-pill border"
+                                            [ngClass]="healthClassMap[broker.health]">
+                                            <span class="rounded-circle me-1 dot"
+                                                [ngClass]="dotClassMap[broker.health]"></span>
+
+                                            {{ broker.health?.toLowerCase() ?? 'no data' }}
+                                        </span>
+                                    </td>
+                                    <td>{{broker.cpu | numericData}}</td>
+                                    <td>{{broker.memory | numericData}}</td>
+                                    <td>{{broker.messages | shortNumber:0}}</td>
+                                </tr>
+                            </tbody>
+                            <tbody *ngIf="isLoading">
+                                <tr class="skeleton-row" *ngFor="let skeleton of skeletonRows">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <div class="skeleton skeleton-icon"></div>
+                                            <div class="skeleton skeleton-text"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton skeleton-short"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton skeleton-short"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton skeleton-short"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton skeleton-short"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer with Pagination and items info -->
+                <div class="card-footer p-2">
+                    <div class="pe-3 d-flex justify-content-between align-items-center">
+                        <div class="ps-1" style="font-size: small; color: rgb(128, 126, 126);">
+                            showing {{((currentPage*pageSize) < totalItems ) ? ( currentPage*pageSize) : totalItems}} of
+                                {{totalItems}} brokers </div>
+                                <div class="pagination-container d-flex align-items-center justify-content-center gap-2 my-1 me-1"
+                                    style="font-size: small;">
+                                    <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn"
+                                        (click)="previousPage()" [disabled]="currentPage <= 1" tabindex="0">
+                                        <i class="fa-solid fa-angle-left icon-color"></i>
+                                    </button>
+                                    <span class="page-number">
+                                        Page
+                                        <input type="number" [(ngModel)]="inputPage" (keydown.enter)="goToPage()"
+                                            class="page-input" />
+                                        of {{ totalPages }}
+                                    </span>
+                                    <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn"
+                                        (click)="nextPage()" [disabled]="currentPage >= totalPages" tabindex="0">
+                                        <i class="fa-solid fa-angle-right icon-color"></i>
+                                    </button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</main>
+
+<!-- No Data Template -->
+<ng-template #noDataTemplate>
+    <div class="d-flex justify-content-center align-items-center p-5">
+        <img src="assets/images/NoSearch.png" style="height: 5vw;padding-right: 10px;" alt="kafka logo" title="kafka" />
+        <div class="text-center fs-5">No Data Available</div>
+    </div>
+</ng-template>
+
+<!-- Max Lag tooltip -->
+<mat-menu #lagMenu="matMenu" class="mat-menu" yPosition="below" xPosition="before" matTooltipClass="white-tooltip">
+    <div class="lag-content px-2 pt-1 small text-dark fw-medium">
+        <strong>Max Lag</strong>
+        <div *ngFor="let item of maxLagIndicator">
+            {{ item }}
+        </div>
+    </div>
+</mat-menu>
+
+<!-- Partition tooltip -->
+<mat-menu #partitionMenu="matMenu" class="mat-menu" yPosition="below" xPosition="before"
+    matTooltipClass="white-tooltip">
+    <div class="lag-content px-2 pt-1 small text-dark fw-medium">
+        <strong>Avg Partitions</strong>
+        <div *ngFor="let item of partitionIndicator">
+            {{ item }}
+        </div>
+    </div>
+</mat-menu>
+
+<!-- Leader Count tooltip -->
+<mat-menu #leaderMenu="matMenu" class="mat-menu" yPosition="below" xPosition="before" matTooltipClass="white-tooltip">
+    <div class="lag-content px-2 pt-1 small text-dark fw-medium">
+        <strong>Avg Leader Count</strong>
+        <div *ngFor="let item of leaderIndicator">
+            {{ item }}
+        </div>
+    </div>
+</mat-menu>
+
+<!-- URP tooltip -->
+<mat-menu #urpMenu="matMenu" class="mat-menu" yPosition="below" xPosition="before" matTooltipClass="white-tooltip">
+    <div class="lag-content px-2 pt-1 small text-dark fw-medium">
+        <strong>Max URP Count</strong>
+        <div *ngFor="let item of underReplicatedPartitionIndicator">
+            {{ item }}
+        </div>
+    </div>
+</mat-menu>
+
+<!-- Offline partitions tooltip -->
+<mat-menu #offlineMenu="matMenu" class="mat-menu" yPosition="below" xPosition="before" matTooltipClass="white-tooltip">
+    <div class="lag-content px-2 pt-1 small text-dark fw-medium">
+        <strong>Max Offline Partitions Count</strong>
+        <div *ngFor="let item of offlinePartitionIndicator">
+            {{ item }}
+        </div>
+    </div>
+</mat-menu>

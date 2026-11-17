@@ -1,0 +1,106 @@
+<main class="sv-root">
+    <!-- Header with Search -->
+    <div class="sv-header">
+        <h3 class="sv-header__title raleway-font semi-text">ActiveMQ Clusters</h3>
+        <div class="sv-search-wrap">
+            <input type="text" class="sv-search-input" placeholder="Search Clusters..."
+                [(ngModel)]="searchText" (input)="resetCurrentPage(serviceResponseList, searchText, ['applicationName'])" autocomplete="off" />
+            <i class="fas fa-search sv-search-wrap__icon"></i>
+        </div>
+    </div>
+
+    <!-- Table scroll wrap -->
+    <div class="sv-table-wrap">
+        <table class="sv-table">
+            <colgroup>
+                <col style="width: 28%">
+                <col style="width: 18%">
+                <col style="width: 18%">
+                <col style="width: 18%">
+                <col style="width: 18%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th (click)="sortData('applicationName')">
+                        Service Names
+                        <i class="ms-2 fa"
+                            [ngClass]="sortColumn === 'applicationName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                    </th>
+                    <th>BROKERS</th>
+                    <th>DESTINATIONS</th>
+                    <th>THREAD COUNT</th>
+                    <th>MEMORY USAGE</th>
+                </tr>
+            </thead>
+
+            <!-- Skeleton loader -->
+            <tbody *ngIf="isLoading">
+                <tr class="sv-tr" *ngFor="let i of skeletonRows">
+                    <td>
+                        <div class="sv-skeleton" style="width: 160px;"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton" style="width: 50px;"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton" style="width: 50px;"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton" style="width: 50px;"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton" style="width: 50px;"></div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <!-- Data list -->
+            <tbody *ngIf="!isLoading && totalItems > 0">
+                <tr class="sv-tr"
+                    *ngFor="let service of serviceResponseList | sort:sortColumn:sortDirection | objectFilter:searchText : ['applicationName'] | paginate: currentPage: pageSize;">
+                    <td class="sv-td--name" (click)="setServiceId($event, service)">
+                        <span class="sv-avatar">
+                            <img [src]="getImagePath(service.applicationTechnology, service.applicationType)" 
+                                class="sv-avatar__img" (error)="onImageError($event)" />
+                        </span>
+                        <span class="sv-name-text">{{ service.applicationName ?? 'No Data' }}</span>
+                    </td>
+                    <td>{{ brokerCounts[service.applicationName] !== undefined ? brokerCounts[service.applicationName] : '-' }}</td>
+                    <td>{{ destinationCounts[service.applicationName] || '-' }}</td>
+                    <td>{{ threadCounts[service.applicationName] || '-' }}</td>
+                    <td>{{ memoryUsages[service.applicationName] || '-' }}</td>
+                </tr>
+            </tbody>
+
+            <!-- Empty state -->
+            <tbody *ngIf="!isLoading && totalItems === 0">
+                <tr>
+                    <td colspan="5" class="sv-td--empty">
+                        <div class="sv-empty-container">
+                            <i class="fas fa-search sv-empty-icon"></i>
+                            <p class="sv-empty-text">No clusters found</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="sv-pager">
+        <span class="sv-pager__info">
+            Showing {{ ((currentPage - 1) * pageSize) + 1 }}–{{ (currentPage * pageSize < totalItems) ? (currentPage * pageSize) : totalItems }} of {{ totalItems }} clusters
+        </span>
+        <div class="sv-pager__controls">
+            <button class="sv-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <input type="number" class="sv-pager__input" [(ngModel)]="inputPage"
+                (keydown.enter)="goToPage()" min="1" [max]="totalPages" />
+            <span class="sv-pager__of">of {{ totalPages }}</span>
+            <button class="sv-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+    </div>
+</main>

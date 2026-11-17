@@ -1,0 +1,27 @@
+.card {
+  transition: box-shadow 0.2s ease-in-out;
+}
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+.table > :not(caption) > * > * {
+  border-bottom-width: 1px;
+  border-bottom-color: #f1f5f9;
+}
+.table > tbody > tr:last-child > td {
+  border-bottom: none;
+}
+.table-hover tbody tr:hover {
+  background-color: #f8fafc;
+}
+.btn-light:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+.custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: "›";
+  color: #94a3b8;
+  font-size: 16px;
+  vertical-align: middle;
+  padding: 0 8px;
+}

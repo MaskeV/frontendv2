@@ -1,0 +1,215 @@
+<div class="volumes-container">
+
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pod Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('pod')">
+          <span>Pod Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'pod'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'pod'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="podNameSearch">
+          </div>
+          <div class="option" *ngFor="let pod of filteredPodNames()" (click)="toggleSelection(pod, selectedPodNames)">
+            <input type="checkbox" [checked]="selectedPodNames.has(pod)"
+              (click)="$event.stopPropagation(); toggleSelection(pod, selectedPodNames)">
+            <span>{{ pod }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volume Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('volume')">
+          <span>Volume Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'volume'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'volume'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="volumeNameSearch">
+          </div>
+          <div class="option" *ngFor="let vol of filteredVolumeNames()" (click)="toggleSelection(vol, selectedVolumes)">
+            <input type="checkbox" [checked]="selectedVolumes.has(vol)"
+              (click)="$event.stopPropagation(); toggleSelection(vol, selectedVolumes)">
+            <span>{{ vol }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VOLUME USAGE PER POD ================= -->
+  <div class="card">
+    <div class="card-title card-title-row">
+      <div>
+        Volume Usage per Pod <span>(Metrics Kubernetes)</span>
+      </div>
+      <button class="btn-download" (click)="downloadVolumeUsagePerPod()">
+        ⬇ Download
+      </button>
+    </div>
+
+    <div class="table-wrapper table-wrapper-lg" *ngIf="paginatedVolumeUsage.length > 0; else noVolumeUsage">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Pod Name</th>
+            <th>Volume</th>
+            <th>Volume Used %</th>
+            <th>Used Bytes</th>
+            <th>Volume Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of paginatedVolumeUsage">
+            <td>{{ row.podName }}</td>
+            <td>{{ row.volume }}</td>
+            <td>{{ row.usedPercent }}</td>
+            <td>{{ row.usedBytes }}</td>
+            <td>{{ row.volumeSize }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noVolumeUsage>
+      <div class="no-data">No volume usage data available</div>
+    </ng-template>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="volumeUsagePerPod.length > itemsPerPage">
+      <button [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM TABLES ================= -->
+  <div class="tables-grid">
+
+    <!-- ===== FILESYSTEM INODES ===== -->
+    <div class="card">
+      <div class="card-title card-title-row">
+        <div>
+          Filesystem Inodes Informations <span>(Metrics Kubernetes)</span>
+        </div>
+        <button class="btn-download" (click)="downloadFilesystemInodes()">
+          ⬇ Download
+        </button>
+      </div>
+
+      <div class="table-wrapper" *ngIf="paginatedFilesystemInodes.length > 0; else noInodes">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Volume</th>
+              <th>Number of Inodes</th>
+              <th>Free Inodes</th>
+              <th>Used Inodes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of paginatedFilesystemInodes">
+              <td>{{ row.volume }}</td>
+              <td>{{ row.totalInodes }}</td>
+              <td>{{ row.freeInodes }}</td>
+              <td>{{ row.usedInodes }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noInodes>
+        <div class="no-data">No filesystem inode data available</div>
+      </ng-template>
+
+      <!-- Pagination Controls for Inodes -->
+      <div class="pagination-controls" *ngIf="filesystemInodes.length > inodesItemsPerPage">
+        <button [disabled]="inodesCurrentPage === 1" (click)="prevInodesPage()">Previous</button>
+        <span>Page {{ inodesCurrentPage }} of {{ inodesTotalPages }}</span>
+        <button [disabled]="inodesCurrentPage === inodesTotalPages" (click)="nextInodesPage()">Next</button>
+      </div>
+    </div>
+
+    <!-- ===== FILESYSTEM USAGE ===== -->
+    <div class="card">
+      <div class="card-title card-title-row">
+        <div>
+          Filesystem Informations <span>(Metrics Kubernetes)</span>
+        </div>
+        <button class="btn-download" (click)="downloadFilesystemUsage()">
+          ⬇ Download
+        </button>
+      </div>
+
+      <div class="table-wrapper"  *ngIf="paginatedFilesystemUsage.length > 0; else noFsUsage">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Volume</th>
+              <th>Fs Available bytes</th>
+              <th>Fs Capacity bytes</th>
+              <th>Fs Used bytes</th>
+              <th>Fs Usage %</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tbody>
+            <tr *ngFor="let row of paginatedFilesystemUsage">
+              <td>{{ row.volume }}</td>
+              <td>{{ row.available }}</td>
+              <td>{{ row.capacity }}</td>
+              <td>{{ row.used }}</td>
+              <td>{{ row.usagePercent }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noFsUsage>
+        <div class="no-data">No filesystem usage data available</div>
+      </ng-template>
+
+      <!-- Pagination Controls for Fs Info -->
+      <div class="pagination-controls" *ngIf="filesystemUsage.length > fsInfoItemsPerPage">
+        <button [disabled]="fsInfoCurrentPage === 1" (click)="prevFsInfoPage()">Previous</button>
+        <span>Page {{ fsInfoCurrentPage }} of {{ fsInfoTotalPages }}</span>
+        <button [disabled]="fsInfoCurrentPage === fsInfoTotalPages" (click)="nextFsInfoPage()">Next</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

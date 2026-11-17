@@ -1,0 +1,834 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;" class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img [src]="getImagePath(applicationTechnology, applicationType)" class="icons" 
+                    (error)="onImageError($event)" [title]="applicationTechnology || 'rabbitmq'"
+                    style="height: 16px;" /><a routerLink="/message-queue/rabbitmq-service">RabbitMQ-Cluster</a>
+            </li>
+            <li class="breadcrumb-item active">{{clusterName}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="cluster-nav">
+                <li class="nav-item">
+                    <a class="nav-link" [ngClass]="selectedTab === 'overview' ? 'active' : '' " data-bs-toggle="tab"
+                        role="tab" href="#overview" (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [ngClass]="selectedTab === 'node' ? 'active' : '' " data-bs-toggle="tab"
+                        role="tab" href="#node_page" (click)="loadData('node')">Nodes</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="tab-content">
+        <!-- Overview TAB -->
+        <div id="overview" class="tab-pane fade" [ngClass]="selectedTab === 'overview' ? 'show active' : ''">
+            <!-- KPI Section -->
+            <section class="mt-1 p-2" *ngIf="!isLoadingOverview; else overviewSkeletonTemplate">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Cluster Status</h3>
+                </div>
+                <div class="row g-2 justify-content-start row-cols-lg-6 px-1">
+                    <!-- KPI Cards remain the same -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Ready Messages</span>
+                                <div class="icon-box bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Messages waiting in queues">drafts</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.messages_ready !== null; else noData">{{ clusterKPI.messages_ready
+                                    | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">In queues</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Incoming / s</span>
+                                <div class="icon-box bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip"
+                                        title="Rate of messages entering the cluster">arrow_downward</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.incoming_messages_total !== null; else noData">{{
+                                    clusterKPI.incoming_messages_total | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Publishing rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Publishers</span>
+                                <div class="icon-box bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Active publishers">publish</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.publisher_total !== null; else noData">{{
+                                    clusterKPI.publisher_total | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Active producers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Connections</span>
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Active TCP connections">link</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.connections_total !== null; else noData">{{
+                                    clusterKPI.connections_total | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">TCP connections</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Queues</span>
+                                <div class="icon-box bg-indigo bg-opacity-10 text-indigo rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip"
+                                        title="Total active queues">format_list_numbered</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.queue_total !== null; else noData">{{ clusterKPI.queue_total |
+                                    shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Total queues</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Unacked</span>
+                                <div class="icon-box bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Messages in flight">warning</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.unacknowledged_messages !== null; else noData">{{
+                                    clusterKPI.unacknowledged_messages | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">In flight</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Outgoing / s</span>
+                                <div class="icon-box bg-blue bg-opacity-10 text-blue rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip"
+                                        title="Rate of messages delivered">arrow_upward</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.outgoing_messages_total !== null; else noData">{{
+                                    clusterKPI.outgoing_messages_total | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Delivery rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Consumers</span>
+                                <div class="icon-box bg-purple bg-opacity-10 text-purple rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Active consumers">people</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.consumer_total !== null; else noData">{{ clusterKPI.consumer_total
+                                    | shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Active subscribers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Channels</span>
+                                <div class="icon-box bg-indigo-dark bg-opacity-10 text-indigo-dark rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Logical channels">account_tree</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.channel_total !== null; else noData">{{ clusterKPI.channel_total |
+                                    shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Logical channels</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Nodes</span>
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 28px; height: 28px;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                        data-bs-toggle="tooltip" title="Online nodes">dns</mat-icon>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark"
+                                    *ngIf="clusterKPI.total_nodes !== null; else noData">{{ clusterKPI.total_nodes |
+                                    shortNumber }}</span>
+                                <p class="small mb-0 text-muted">Online nodes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Message Lifecycle Flow Section -->
+            <section class="mt-2 p-2">
+                <div class="flex align-items-center mb-3 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Message Lifecycle Flow</h3>
+                </div>
+                <div
+                    class="lifecycle-container p-2 rounded-4 shadow-sm border bg-white position-relative overflow-hidden mb-2">
+                    <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                        <mat-icon style="font-size: 120px; width: 120px; height: 120px; color: #6366f1;">hub</mat-icon>
+                    </div>
+                    <div class="row align-items-center position-relative">
+                        <div class="col-lg-2">
+                            <div class="lifecycle-step text-center ms-5">
+                                <div class="step-icon-wrapper mx-auto mb-3 bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 64px; height: 64px;">
+                                    <mat-icon style="font-size: 32px; width: 32px; height: 32px;">sensors</mat-icon>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1">Producers</h5>
+                                <div class="badge bg-primary bg-opacity-10 text-primary mb-2">
+                                    {{clusterKPI.publisher_total | shortNumber}} Active</div>
+                                <div class="mt-2">
+                                    <div class="small text-muted mb-0">Publishing Rate</div>
+                                    <div class="fs-5 fw-bold text-primary">{{clusterKPI.incoming_messages_total |
+                                        shortNumber}} <span class="small fw-medium">msg/s</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 d-none d-lg-flex justify-content-center">
+                            <mat-icon class="text-muted opacity-25"
+                                style="font-size: 40px; width: 40px; height: 40px;">east</mat-icon>
+                        </div>
+                        <div class="col-lg-3">
+                            <div
+                                class="lifecycle-step text-center p-2 rounded-4 bg-light bg-opacity-50 shadow-sm h-100">
+                                <div class="step-icon-wrapper mx-auto mb-2 bg-indigo bg-opacity-10 text-indigo rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <mat-icon style="font-size: 24px; width: 24px; height: 24px;">alt_route</mat-icon>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-0">Exchange</h6>
+                                <p class="text-muted mb-2" style="font-size: 0.65rem;">Routing Logic</p>
+                                <div class="mt-1 text-start px-1">
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span style="font-size: 0.55rem;"
+                                                class="fw-bold text-secondary text-uppercase">Routed</span>
+                                            <span style="font-size: 0.55rem;"
+                                                class="fw-bold text-success">{{clusterKPI.outgoing_messages_total |
+                                                shortNumber}}</span>
+                                        </div>
+                                        <div class="progress rounded-pill bg-success bg-opacity-10"
+                                            style="height: 6px;">
+                                            <div class="progress-bar bg-success" role="progressbar"
+                                                [style.width.%]="(clusterKPI.outgoing_messages_total || 0) / ((clusterKPI.incoming_messages_total || 0) || 1) * 100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span style="font-size: 0.55rem;"
+                                                class="fw-bold text-secondary text-uppercase">Unrouted</span>
+                                            <span style="font-size: 0.55rem;"
+                                                class="fw-bold text-danger">{{((clusterKPI.returned_messages || 0) +
+                                                (clusterKPI.dropped_messages || 0)) | shortNumber}}</span>
+                                        </div>
+                                        <div class="progress rounded-pill bg-danger bg-opacity-10" style="height: 6px;">
+                                            <div class="progress-bar bg-danger" role="progressbar"
+                                                [style.width.%]="((clusterKPI.returned_messages || 0) + (clusterKPI.dropped_messages || 0)) / ((clusterKPI.incoming_messages_total || 0) || 1) * 100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 d-none d-lg-flex justify-content-center">
+                            <mat-icon class="text-muted opacity-25"
+                                style="font-size: 32px; width: 32px; height: 32px;">east</mat-icon>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="lifecycle-step text-center p-2 rounded-4 bg-white  shadow-sm h-100">
+                                <div class="step-icon-wrapper mx-auto mb-2 bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <mat-icon
+                                        style="font-size: 24px; width: 24px; height: 24px;">queue_play_next</mat-icon>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-0">Queues</h6>
+                                <p class="text-muted mb-2" style="font-size: 0.65rem;">{{clusterKPI.queue_total |
+                                    shortNumber}} active</p>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <div class="p-2 rounded-3 bg-light border-0">
+                                            <div class="small text-secondary mb-0" style="font-size: 0.65rem;">Backlog
+                                            </div>
+                                            <div class="fs-6 fw-bold text-dark">{{clusterKPI.messages_ready |
+                                                shortNumber}} <span class="small text-muted fw-normal"
+                                                    style="font-size: 0.6rem;">Ready</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 d-none d-lg-flex justify-content-center">
+                            <mat-icon class="text-muted opacity-25"
+                                style="font-size: 32px; width: 32px; height: 32px;">east</mat-icon>
+                        </div>
+                        <div class="col-lg-2">
+                            <div
+                                class="lifecycle-step text-center p-2 rounded-4 bg-purple bg-opacity-5 shadow-sm h-100">
+                                <div class="step-icon-wrapper mx-auto mb-2 bg-purple bg-opacity-10 text-purple rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <mat-icon style="font-size: 24px; width: 24px; height: 24px;">groups</mat-icon>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-0">Consumers</h6>
+                                <p class="text-muted mb-2" style="font-size: 0.65rem;">{{clusterKPI.consumer_total |
+                                    shortNumber}} Active</p>
+                                <div class="p-2 rounded-3 bg-white shadow-sm border-0">
+                                    <div class="small text-secondary mb-0" style="font-size: 0.65rem;">In Flight</div>
+                                    <div class="fs-6 fw-bold text-warning">{{clusterKPI.unacknowledged_messages |
+                                        shortNumber}} <span class="small text-muted fw-normal"
+                                            style="font-size: 0.6rem;">Unacked</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Charts Section -->
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+                <div class="row g-3">
+                    <!-- Row 1 -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Message Rates</h4>
+                                    <p class="small text-muted fw-medium mb-0">Publishing vs Delivery</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-primary" [matMenuTriggerFor]="ratesMenu"
+                                    data-bs-toggle="tooltip"
+                                    title="Real-time publishing and delivery throughput">speed</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="message-rates-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Queued Messages</h4>
+                                    <p class="small text-muted fw-medium mb-0">Ready vs Unacked</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-success" [matMenuTriggerFor]="queuedMenu"
+                                    data-bs-toggle="tooltip"
+                                    title="Comparison of ready vs unacknowledged messages">queue</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="queued-messages-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Erlang Memory</h4>
+                                    <p class="small text-muted fw-medium mb-0">VM Memory Available</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-purple" data-bs-toggle="tooltip"
+                                    title="Memory utilized by the Erlang runtime and processes">memory</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="erlang-memory-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Churn Rates</h4>
+                                    <p class="small text-muted fw-medium mb-0">Object lifecycle events</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-warning" [matMenuTriggerFor]="churnMenu"
+                                    data-bs-toggle="tooltip"
+                                    title="Rate of creation and deletion for cluster objects">sync_alt</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="churn-rates-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Resource Usage</h4>
+                                    <p class="small text-muted fw-medium mb-0">FDs & TCP sockets</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-info" data-bs-toggle="tooltip"
+                                    title="System-level file descriptors and TCP socket usage">analytics</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="resource-usage-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-soft p-2 rounded-3 shadow-sm bg-white">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Disk Space</h4>
+                                    <p class="small text-muted fw-medium mb-0">Available</p>
+                                </div>
+                                <mat-icon style="cursor: pointer;" class="text-danger" data-bs-toggle="tooltip"
+                                    title="Available disk space before publishers are blocked">pie_chart</mat-icon>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="memory-usage-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Message Flow Funnel Section -->
+            <section class="mt-4 p-2">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-card funnel-card shadow-sm border rounded-4 bg-white overflow-hidden">
+                            <!-- Card Header -->
+                            <div
+                                class="card-header-funnel border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+                                <div class="title-group">
+                                   
+                                        <h5 class=" card-title-funnel text-center fw-bold text-dark mb-0"
+                                    style="font-size: 0.9rem; color: #1e293b !important;">Message Flow from Published to
+                                    Acknowledged</h5>
+                                </div>
+                                <div class="header-actions d-flex align-items-center gap-3">
+
+                                    <div class="footer-info d-flex align-items-center gap-2 text-muted"
+                                        style="font-size: 0.8rem;">
+                                        <div class="info-icon-bg bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 20px; height: 20px;">
+                                            <mat-icon
+                                                style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
+                                        </div>
+                                        <span>Funnel shows the reduction of messages through each stage of the RabbitMQ
+                                            message lifecycle.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body-funnel p-2">
+                                
+
+                                <div
+                                    class="funnel-layout mx-2 my-2 d-flex justify-content-between align-items-center gap-1">
+
+
+                                    <!-- Left: Detailed Table -->
+                                    <div class="funnel-table-container p-2 rounded-4"
+                                        style="width: 690px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                                        <table class="funnel-table w-100">
+                                            <thead>
+                                                <tr class="text-muted small border-bottom">
+                                                    <th class="pb-2 fw-medium" style="width: 60%;">Step</th>
+                                                    <th class="text-end pb-2 fw-medium" style="width: 20%;">Messages</th>
+                                                    <th class="text-end pb-2 fw-medium" style="width: 20%;">% of Published</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="!isLoadingFunnel && funnelIndicator.length > 0">
+                                                <ng-container *ngFor="let item of funnelIndicator; let i = index">
+                                                    <tr *ngIf="i === 0">
+                                                        <td colspan="3"
+                                                            class="py-1 px-2 bg-light text-uppercase fw-bold text-secondary"
+                                                            style="font-size: 0.6rem; border-left: 3px solid #3f37c9;">
+                                                            Exchange Layer
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="i === 3">
+                                                        <td colspan="3"
+                                                            class="py-1 px-2 bg-light text-uppercase fw-bold text-secondary"
+                                                            style="font-size: 0.6rem; border-left: 3px solid #edc531;">
+                                                            Queue Layer
+                                                        </td>
+                                                    </tr>
+                                                    <tr *ngIf="i === 4">
+                                                        <td colspan="3"
+                                                            class="py-1 px-2 bg-light text-uppercase fw-bold text-secondary"
+                                                            style="font-size: 0.6rem; border-left: 3px solid #ff9e00;">
+                                                            Consumer Layer
+                                                        </td>
+                                                    </tr>
+                                                    <tr [class.total-loss-row]="item.isLoss" class="border-bottom-row">
+                                                        <td class="py-2">
+                                                            <div class="step-cell d-flex align-items-center gap-2">
+                                                                <div *ngIf="!item.isLoss"
+                                                                    class="step-color-dot rounded-circle shadow-sm"
+                                                                    [style.background-color]="item.color"
+                                                                    style="width: 14px; height: 14px; flex-shrink: 0;">
+                                                                </div>
+                                                                <div *ngIf="item.isLoss" class="step-icon text-muted"
+                                                                    style="width: 14px; height: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                                                    <mat-icon
+                                                                        style="font-size: 16px; width: 16px; height: 16px;">trending_down</mat-icon>
+                                                                </div>
+                                                                <div class="step-info d-flex align-items-center gap-2">
+                                                                    <span class="step-name fw-bold text-dark"
+                                                                        style="font-size: 0.8rem;">{{item.name}}</span>
+                                                                    <span class="step-desc text-muted border-start ps-2"
+                                                                        style="font-size: 0.7rem;">{{item.desc}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-end fw-bold py-2" [style.color]="item.color"
+                                                            style="font-size: 0.85rem;">
+                                                            {{item.count | shortNumber:0}}
+                                                        </td>
+                                                        <td class="text-end fw-bold py-2" [style.color]="item.color"
+                                                            style="font-size: 0.85rem;">
+                                                            {{item.pct}}%
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                            <!-- Funnel Table Skeleton -->
+                                            <tbody *ngIf="isLoadingFunnel">
+                                                <tr *ngFor="let row of funnelSkeletonRows" class="border-bottom-row">
+                                                    <td class="py-2" style="height: 44px;">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <div class="skeleton" style="width: 14px; height: 14px; border-radius: 50%;"></div>
+                                                            <div class="skeleton" style="width: 200px; height: 14px;"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-2" style="height: 44px;"><div class="skeleton ms-auto" style="width: 60px; height: 14px;"></div></td>
+                                                    <td class="py-2" style="height: 44px;"><div class="skeleton ms-auto" style="width: 50px; height: 14px;"></div></td>
+                                                </tr>
+                                            </tbody>
+                                            <!-- No Data Funnel Table -->
+                                            <tbody *ngIf="!isLoadingFunnel && funnelIndicator.length === 0">
+                                                <tr>
+                                                    <td colspan="3" class="text-center py-5">
+                                                        <div class="d-flex flex-column align-items-center gap-2 opacity-50">
+                                                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;">bar_chart</mat-icon>
+                                                            <span class="fw-medium">No lifecycle data available for the selected period</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Right: Funnel Chart -->
+                                    <div class="funnel-chart-container d-flex align-items-center justify-content-center"
+                                        style="width: 460px; height: 400px; border-radius: 1rem;">
+                                        <div *ngIf="!isLoadingFunnel && funnelIndicator.length > 0" id="message-funnel-chart" style="height: 100%; width: 100%;"></div>
+                                        
+                                        <!-- Funnel Chart Skeleton -->
+                                        <div *ngIf="isLoadingFunnel" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-4"
+                                             style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem;">
+                                            <div class="skeleton mb-2" style="width: 80%; height: 60px; border-radius: 4px 4px 0 0;"></div>
+                                            <div class="skeleton mb-2" style="width: 70%; height: 55px;"></div>
+                                            <div class="skeleton mb-2" style="width: 60%; height: 50px;"></div>
+                                            <div class="skeleton mb-2" style="width: 50%; height: 45px;"></div>
+                                            <div class="skeleton mb-2" style="width: 40%; height: 40px;"></div>
+                                            <div class="skeleton mb-2" style="width: 30%; height: 35px;"></div>
+                                            <div class="skeleton" style="width: 20%; height: 30px; border-radius: 0 0 4px 4px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Footer -->
+                            <!-- <div class="card-footer-funnel border-top bg-light p-3 px-4 d-flex justify-content-between align-items-center">
+                                <div class="footer-info d-flex align-items-center gap-2 text-muted" style="font-size: 0.8rem;">
+                                    <div class="info-icon-bg bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
+                                        <mat-icon style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
+                                    </div>
+                                    <span>Funnel shows the reduction of messages through each stage of the RabbitMQ message lifecycle.</span>
+                                </div>
+                                <div class="footer-timestamp d-flex align-items-center gap-2 text-muted" style="font-size: 0.8rem;">
+                                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;">query_builder</mat-icon>
+                                    <span>Last updated: {{lastUpdated}}</span>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Node Page Tab -->
+        <div id="node_page" class="tab-pane fade p-1" [ngClass]="selectedTab === 'node' ? 'show active' : ''">
+            <div class="root">
+                <div class="card-header">
+                    <div class="ps-2 py-2 col-md-12 d-flex justify-content-between">
+                        <div style="width: 250px; position: relative;">
+                            <input type="text" class="form-control form-control-sm pe-3" [(ngModel)]="searchText"
+                                (input)="resetCurrentPage(nodes,searchText,['host'])" placeholder="Search Nodes..." />
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body bg-transparent rounded-2 p-1 overflow-hidden">
+                    <div class="table-container">
+                        <table class="table w-full table-fixed bg-transparent h-100" style="font-size: small;">
+                            <thead class="bg-transparent text-white sticky"
+                                style="background-color: transparent; table-layout: fixed;">
+                                <tr style="border-bottom: 2px solid #a7a7a750; cursor: pointer;">
+                                    <th style="color: #219ebc; width: 25%;" (click)="sortData('host')">NODE <i class="fa"
+                                            style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'host' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 15%;" (click)="sortData('health')">STATUS <i class="fa"
+                                            style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'health' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 12%;" (click)="sortData('connections')">CONNECTIONS <i
+                                            class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'connections' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 12%;" (click)="sortData('channels')">CHANNELS <i class="fa"
+                                            style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'channels' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 12%;" (click)="sortData('queues')">QUEUES <i class="fa"
+                                            style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'queues' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 12%;" (click)="sortData('memory')">MEMORY <i class="fa"
+                                            style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'memory' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="color: #219ebc; width: 12%;" (click)="sortData('messages')">MESSAGES/SEC <i
+                                            class="fa" style="margin-left: 0.6px;"
+                                            [ngClass]="sortColumn === 'messages' ? (sortDirection === 'asc' ? 'fa-arrow-up' : (sortDirection === 'desc' ? 'fa-arrow-down' : 'fa-sort')) : 'fa-sort'"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="!isLoading && nodes && nodes.length > 0">
+                                <tr
+                                    *ngFor="let node of nodes | sort:sortColumn:sortDirection | objectFilter:searchText : ['host','health'] | paginate: currentPage: pageSize;">
+                                    <td style="cursor: pointer; width: 25%;" (click)="navigateToNode(node.host)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-primary fs-6 me-2"><i
+                                                    class="fa-solid fa-server"></i></span>
+                                            <div class="d-flex flex-col text-start">
+                                                <div class="fw-lg text-dark">{{node.host ?? 'No Data'}}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-capitalize text-nowrap" style="width: 15%;">
+                                        <span class="d-inline-flex align-items-center badge rounded-pill border"
+                                            [ngClass]="healthClassMap[node.health || 'HEALTHY']">
+                                            <span class="rounded-circle me-1 dot"
+                                                [ngClass]="dotClassMap[node.health || 'HEALTHY']"></span>
+                                            {{ (node.health || 'HEALTHY').toLowerCase() }}
+                                        </span>
+                                    </td>
+                                    <td style="width: 12%;">{{node.connections | shortNumber}}</td>
+                                    <td style="width: 12%;">{{node.channels | shortNumber}}</td>
+                                    <td style="width: 12%;">{{node.queues | shortNumber}}</td>
+                                    <td style="width: 12%;">{{node.memory | shortNumber}}</td>
+                                    <td style="width: 12%;">{{node.messages | shortNumber:0}}</td>
+                                </tr>
+                            </tbody>
+                            
+                            <!-- Loading Body -->
+                            <ng-container *ngIf="isLoading">
+                                <tbody class="skeleton-body">
+                                    <tr class="skeleton-row" *ngFor="let skeleton of skeletonRows">
+                                        <td style="height: 40px; width: 25%;">
+                                            <div class="d-flex align-items-center gap-2 ps-2">
+                                                <div class="skeleton" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+                                                <div class="skeleton" style="width: 140px; height: 14px;"></div>
+                                            </div>
+                                        </td>
+                                        <td style="height: 40px; width: 15%;"><div class="skeleton" style="width: 80px; height: 20px; border-radius: 20px;"></div></td>
+                                        <td style="height: 40px; width: 12%;"><div class="skeleton" style="width: 40px; height: 14px;"></div></td>
+                                        <td style="height: 40px; width: 12%;"><div class="skeleton" style="width: 40px; height: 14px;"></div></td>
+                                        <td style="height: 40px; width: 12%;"><div class="skeleton" style="width: 40px; height: 14px;"></div></td>
+                                        <td style="height: 40px; width: 12%;"><div class="skeleton" style="width: 60px; height: 14px;"></div></td>
+                                        <td style="height: 40px; width: 12%;"><div class="skeleton" style="width: 50px; height: 14px;"></div></td>
+                                    </tr>
+                                </tbody>
+                            </ng-container>
+
+                            <!-- No Data Body -->
+                            <tbody *ngIf="!isLoading && (!nodes || nodes.length === 0)">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="d-flex flex-column justify-content-center align-items-center p-5 opacity-75">
+                                            <img src="assets/images/NoSearch.png" style="height: 80px;" alt="no data" class="mb-3" />
+                                            <div class="fw-semibold text-secondary">No Nodes Found</div>
+                                            <p class="text-muted small">We couldn't find any nodes for this cluster.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer p-2">
+                    <div class="pe-3 d-flex justify-content-between align-items-center">
+                        <div class="ps-1" style="font-size: small; color: rgb(128, 126, 126);">showing
+                            {{((currentPage*pageSize) < totalItems ) ? ( currentPage*pageSize) : totalItems}} of
+                                {{totalItems}} nodes </div>
+                                <div class="pagination-container d-flex align-items-center justify-content-center gap-2 my-1 me-1"
+                                    style="font-size: small;">
+                                    <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn"
+                                        (click)="previousPage()" [disabled]="currentPage <= 1">
+                                        <i class="fa-solid fa-angle-left icon-color" style="color: #219ebc;"></i>
+                                    </button>
+                                    <span class="page-number"> Page <input type="number" [(ngModel)]="inputPage"
+                                            (keydown.enter)="goToPage()" class="page-input" /> of {{ totalPages }}
+                                    </span>
+                                    <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn"
+                                        (click)="nextPage()" [disabled]="currentPage >= totalPages">
+                                        <i class="fa-solid fa-angle-right icon-color" style="color: #219ebc;"></i>
+                                    </button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skeleton Template -->
+        <ng-template #overviewSkeletonTemplate>
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Cluster Status</h3>
+                </div>
+                <div class="row g-2 row-cols-lg-6 px-1">
+                    <div class="col" *ngFor="let s of skeletonRows.slice(0,6)">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="skeleton" style="width:80px; height:10px; border-radius:4px;"></div>
+                                <div class="skeleton" style="width:16px; height:16px; border-radius:50%;"></div>
+                            </div>
+                            <div class="skeleton"
+                                style="width:50px; height:18px; border-radius:4px; margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:60px; height:8px; border-radius:4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="mt-2 p-2">
+                <div class="flex align-items-center mb-3 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Message Lifecycle Flow</h3>
+                </div>
+                <div class="p-2 rounded-4 border bg-white" style="height:160px;">
+                    <div class="skeleton w-100 h-100" style="border-radius:8px;"></div>
+                </div>
+            </section>
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6" *ngFor="let s of skeletonRows.slice(0,6)">
+                        <div class="card-soft p-2 rounded-3 bg-white">
+                            <div class="skeleton"
+                                style="width:100px; height:12px; border-radius:4px; margin-bottom:8px;"></div>
+                            <div class="skeleton"
+                                style="width:60px; height:8px; border-radius:4px; margin-bottom:12px;"></div>
+                            <div class="skeleton w-100" style="height:20vh; border-radius:8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </ng-template>
+        <!-- No Data Template for KPIs -->
+        <ng-template #noData>
+            <span class="text-muted fw-normal" style="font-size: 0.85rem;">No Data</span>
+        </ng-template>
+</main>
+
+<!-- Tooltips -->
+<mat-menu #ratesMenu="matMenu">
+    <div class="px-2 pt-1 small">
+        <strong>Peak Rates</strong>
+        <div *ngFor="let item of messageRatesIndicator">{{item}}</div>
+    </div>
+</mat-menu>
+
+<mat-menu #queuedMenu="matMenu">
+    <div class="px-2 pt-1 small">
+        <strong>Queued Stats</strong>
+        <div *ngFor="let item of queuedMessagesIndicator">{{item}}</div>
+    </div>
+</mat-menu>
+
+<mat-menu #churnMenu="matMenu">
+    <div class="px-2 pt-1 small">
+        <strong>Peak Churn Rates</strong>
+        <div *ngFor="let item of churnRatesIndicator">{{item}}</div>
+    </div>
+</mat-menu>

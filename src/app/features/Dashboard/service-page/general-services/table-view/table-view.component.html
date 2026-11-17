@@ -1,0 +1,112 @@
+<div *ngIf="traceMetaData.length > 0; else noData">
+
+    <!-- Search bar -->
+    <div class="tv-search-bar">
+        <div class="tv-search-wrap">
+            <input type="text" class="tv-search-input" [(ngModel)]="searchText" placeholder="Search method…"
+                autocomplete="off" />
+            <i class="fas fa-search tv-search-icon"></i>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="tv-table-scroll">
+        <table class="tv-table">
+
+            <thead>
+                <tr>
+                    <th style="width:5%" (click)="sortData('isError')">
+                        Status
+                        <i class="fa" [ngClass]="sortColumn==='isError'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+                    </th>
+                    <th style="width:28%" (click)="sortData('method')">
+                        Method
+                        <i class="fa" [ngClass]="sortColumn==='method'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+                    </th>
+                    <th style="width:14%" (click)="sortData('startTime')">
+                        Start Time
+                        <i class="fa" [ngClass]="sortColumn==='startTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+                    </th>
+                    <th style="width:10%" (click)="sortData('execTime')">
+                        Exec (ms)
+                        <i class="fa" [ngClass]="sortColumn==='execTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+                    </th>
+                    <th style="width:10%" (click)="sortData('selfExecTime')">
+                        Self Exec (ms)
+                        <i class="fa" [ngClass]="sortColumn==='selfExecTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+                    </th>
+                    <th style="width:10%">API</th>
+                    <th style="width:23%">Service</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr class="tv-tr" *ngFor="let trace of traceMetaData | searchTable:searchText:['endpointName']"
+                    (click)="onItemClick(trace)">
+
+                    <!-- Status -->
+                    <td style="width:5%">
+                        <div class="tv-status-bar"
+                            [ngClass]="trace.isError ? 'tv-status-bar--err' : 'tv-status-bar--ok'">
+                        </div>
+                    </td>
+
+                    <!-- Method / Endpoint -->
+                    <td style="width:28%" [ngClass]="trace.isError ? 'tv-td--err' : 'tv-td--link'"
+                        [title]="trace.endpointName">
+                        {{ trace.endpointName }}
+                    </td>
+
+                    <!-- Start Time -->
+                    <td style="width:14%" class="tv-td--muted">
+                        {{ formatDate(trace.startTime) }}
+                    </td>
+
+                    <!-- Exec ms -->
+                    <td style="width:10%">
+                        <span class="tv-lat-pill"
+                            [class.tv-lat-pill--warn]="calculateExecTime(trace.startTime, trace.endTime) > 200">
+                            {{ calculateExecTime(trace.startTime, trace.endTime) }} ms
+                        </span>
+                    </td>
+
+                    <!-- Self Exec ms -->
+                    <td style="width:10%">
+                        <span class="tv-lat-pill" [class.tv-lat-pill--warn]="calculateSelfExecTime(trace) > 200">
+                            {{ calculateSelfExecTime(trace) }} ms
+                        </span>
+                    </td>
+
+                    <!-- API / Component -->
+                    <td style="width:10%" class="tv-td--muted">
+                        {{ trace.component }}
+                    </td>
+
+                    <!-- Service -->
+                    <td style="width:23%" class="tv-td--muted" [title]="trace.serviceCode">
+                        {{ trace.serviceCode }}
+                    </td>
+
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<ng-template #noData>
+    <div class="tv-empty">
+        No Data Available
+    </div>
+</ng-template>

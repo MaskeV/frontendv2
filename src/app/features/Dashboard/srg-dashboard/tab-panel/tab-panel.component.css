@@ -1,0 +1,24 @@
+/* Active tab styling */
+.nav-tabs .nav-link.active {
+    background-color: transparent;
+    color: black !important;
+    /* border-color: #103c47 #103c47 transparent !important; */
+    /* border-bottom: 2px solid #103c47 !important;  */
+}
+
+/* Hover styling for all tabs */
+.nav-tabs .nav-link:hover {
+    /* border-color: #103c47 !important; */
+    color: #219ebc !important;
+}
+
+.nav-link{
+    color: #a1c181;
+    font-weight: bold;
+}
+
+.w-100{
+    padding: 0%;
+    border: 1px solid #103c47;
+    border-radius: 1%;
+}

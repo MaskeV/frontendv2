@@ -1,0 +1,284 @@
+<main class="sv-root">
+
+    <!-- ══════════════════════════════════
+         HEADER
+         ══════════════════════════════════ -->
+    <div class="sv-header">
+        <h3 class="sv-header__title raleway-font semi-text">Services</h3>
+        <div class="sv-search-wrap">
+            <input type="text" class="sv-search-input" placeholder="Search Application Name" [(ngModel)]="searchQuery"
+                (input)="onSearch()" autocomplete="off" />
+            <i class="fas fa-search sv-search-wrap__icon"></i>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TABLE AREA
+         ══════════════════════════════════ -->
+    <div class="sv-table-wrap">
+        <table class="sv-table">
+
+            <colgroup>
+                <col style="width: 28%"> <!-- Service Name -->
+                <col style="width: 12%"> <!-- Load -->
+                <col style="width: 12%"> <!-- Success Rate -->
+                <col style="width: 12%"> <!-- Latency -->
+                <col style="width: 12%"> <!-- Apdex -->
+                <col style="width: 12%"> <!-- Infrastructure -->
+                <col style="width: 12%"> <!-- Alert -->
+            </colgroup>
+
+            <thead>
+                <tr>
+                    <th (click)="onSort('applicationName')">
+                        Service Name
+                        <i class="ms-2 fa"
+                            [ngClass]="sortColumn === 'applicationName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('service_load')">
+                        Load <span class="sv-th-unit">(req/min)</span>
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'service_load' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('success_rate')">
+                        Success <span class="sv-th-unit">(%)</span>
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'success_rate' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('latency')">
+                        Latency <span class="sv-th-unit">(ms)</span>
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'latency' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('service_apdex')">
+                        Apdex
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'service_apdex' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('infra_ip')">
+                        Infrastructure
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'infra_ip' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('total_count')">
+                        Alerts
+                        <i class="ms-1 fa"
+                            [ngClass]="sortColumn === 'total_count' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                </tr>
+            </thead>
+
+            <!-- ── SKELETON ── -->
+            <tbody *ngIf="isLoading">
+                <tr class="sv-tr" *ngFor="let i of [].constructor(15)">
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="sv-skeleton"></div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <!-- ── DATA ── -->
+            <tbody *ngIf="!isLoading && pagedServiceId">
+                <tr class="sv-tr" *ngFor="let item of pagedServiceId; let i = index">
+
+                    <!-- Service Name — avatar + logo + name -->
+                    <td class="sv-td--name" (click)="setServiceId(item)">
+                        <span class="sv-avatar">
+                            <img *ngIf="item.logo_path" [src]="'assets/images/' + item.logo_path"
+                                class="sv-avatar__img" />
+                            <span *ngIf="!item.logo_path" class="sv-avatar__initials">
+                                {{ (item.applicationName + '') | slice:0:2 | uppercase }}
+                            </span>
+                        </span>
+                        <span class="sv-name-text">{{ item.applicationName }}</span>
+                    </td>
+
+                    <!-- Load — number + mini progress bar -->
+                    <td [ngClass]="{'sv-td--nodata': item.service_load == null}">
+                        <ng-container *ngIf="item.service_load != null; else noData">
+                            <div class="sv-load-cell">
+                                <span class="sv-load-val" (click)="openLoadPopup($event, item.applicationName)">
+                                    <i class="fa-solid fa-chart-line sv-metric-icon sv-metric-icon--load"></i>
+                                    {{ item.service_load }}
+                                </span>
+                                <!-- <div class="sv-load-bar">
+                                    <div class="sv-load-bar__fill"></div>
+                                </div> -->
+                            </div>
+                        </ng-container>
+                    </td>
+
+                    <!-- Success Rate — green pill -->
+                    <td [ngClass]="{'sv-td--nodata': item.success_rate == null}">
+                        <ng-container *ngIf="item.success_rate != null; else noData">
+                            <!-- <span class="sv-success-pill" (click)="openSuccessRatePopup($event, item.applicationName)">
+                                <i class="fa-regular fa-circle-check sv-metric-icon"></i>
+                                {{ item.success_rate }}%
+                            </span> -->
+                            <span class="sv-load-val" (click)="openSuccessRatePopup($event, item.applicationName)">
+                                <i class="fa-regular fa-circle-check sv-metric-icon sv-metric-icon--successRate"></i>
+                                {{ item.success_rate }}<span class="sv-unit">%</span>
+                            </span>
+                        </ng-container>
+                    </td>
+
+                    <!-- Latency -->
+                    <td [ngClass]="{'sv-td--nodata': item.latency == null}">
+                        <ng-container *ngIf="item.latency != null; else noData">
+                            <span class="sv-latency-val" (click)="openLatencyPopup($event, item.applicationName)">
+                                <i class="fa-regular fa-hourglass sv-metric-icon sv-metric-icon--lat"></i>
+                                {{ item.latency }}<span class="sv-unit">ms</span>
+                            </span>
+                        </ng-container>
+                    </td>
+
+                    <!-- Apdex — bar + number -->
+                    <td [ngClass]="{'sv-td--nodata': item.service_apdex == null}">
+                        <ng-container *ngIf="item.service_apdex != null; else noData">
+                            <div class="sv-apdex-cell" (click)="openApdexPopup($event, item.applicationName)">
+                                <div class="sv-apdex-bar">
+                                    <div class="sv-apdex-bar__fill" [style.width.%]="(item.service_apdex * 100)"></div>
+                                </div>
+                                <span class="sv-apdex-val">{{ item.service_apdex }}</span>
+                            </div>
+                        </ng-container>
+                    </td>
+
+                    <!-- Infrastructure IP -->
+                    <td class="sv-td--muted" [ngClass]="{'sv-td--nodata': item.infra_ip == null}">
+                        {{ item.infra_ip != null ? item.infra_ip : 'No Data' }}
+                    </td>
+
+                    <!-- Alerts — colored dot badge with count -->
+                    <td [ngClass]="{'sv-td--nodata': item.total_count == null}">
+                        <ng-container *ngIf="item.total_count != null; else noData">
+                            <span class="sv-alert-badge"
+                                [ngClass]="(item.open_alert_count > 0 || item.openalertcount > 0) ? 'sv-alert-badge--active' : 'sv-alert-badge--ok'">
+                                {{ item.total_count }}
+                            </span>
+                        </ng-container>
+                    </td>
+
+                </tr>
+            <!-- ── EMPTY STATE (Search Results) ── -->
+            <tbody *ngIf="!isLoading && filteredServiceId.length === 0">
+                <tr>
+                    <td colspan="7" class="sv-td--empty">
+                        <div class="sv-empty-container">
+                            <i class="fas fa-search sv-empty-icon"></i>
+                            <p class="sv-empty-text">No services found matching</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+        <!-- No data (Fallback for total absence of data) -->
+        <!-- <div *ngIf="!isLoading && serviceNames.length === 0" class="sv-empty">
+            No Data Available
+        </div> -->
+
+        <!-- No data template -->
+        <ng-template #noData>
+            <span class="sv-nodata-text">No Data</span>
+        </ng-template>
+    </div>
+
+    <!-- ══════════════════════════════════
+         FIXED BOTTOM PAGINATION
+         ══════════════════════════════════ -->
+    <div class="sv-pager">
+        <span class="sv-pager__info">
+            Showing {{ startIndex }}–{{ endIndex }} of {{ filteredServiceId.length }} services
+        </span>
+        <div class="sv-pager__controls">
+            <button class="sv-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <input type="number" class="sv-pager__input" [value]="currentPage"
+                (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1" [max]="totalPages" />
+            <span class="sv-pager__of">of {{ totalPages }}</span>
+            <button class="sv-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+    </div>
+
+</main>
+
+
+<!-- ══════════════════════════════════
+     POPUPS
+     ══════════════════════════════════ -->
+
+<div *ngIf="showLoadPopup" class="sv-popup" [ngStyle]="{'left': loadPopupX + 'px', 'top': loadPopupY + 'px'}">
+    <div class="sv-popup__header">
+        <div class="sv-popup__title">
+            <span class="sv-popup__dot sv-popup__dot--load"></span>
+            Load
+        </div>
+        <button class="sv-popup__close" (click)="closeLoadPopup()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sv-popup__body" id="serviceLoadTimeValue"></div>
+</div>
+
+<div *ngIf="showSuccessRatePopup" class="sv-popup"
+    [ngStyle]="{'left': successRatePopupX + 'px', 'top': successRatePopupY + 'px'}">
+    <div class="sv-popup__header">
+        <div class="sv-popup__title">
+            <span class="sv-popup__dot sv-popup__dot--success"></span>
+            Success Rate
+        </div>
+        <button class="sv-popup__close" (click)="closeSuccessRatePopup()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sv-popup__body" id="successRateTimeValue"></div>
+</div>
+
+<div *ngIf="showLatencyPopup" class="sv-popup" [ngStyle]="{'left': latencyPopupX + 'px', 'top': latencyPopupY + 'px'}">
+    <div class="sv-popup__header">
+        <div class="sv-popup__title">
+            <span class="sv-popup__dot sv-popup__dot--lat"></span>
+            Latency
+        </div>
+        <button class="sv-popup__close" (click)="closeLatencyPopup()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sv-popup__body" id="latencyTimeValue"></div>
+</div>
+
+<div *ngIf="showApdexPopup" class="sv-popup" [ngStyle]="{'left': apdexPopupX + 'px', 'top': apdexPopupY + 'px'}">
+    <div class="sv-popup__header">
+        <div class="sv-popup__title">
+            <span class="sv-popup__dot sv-popup__dot--apdex"></span>
+            Apdex
+        </div>
+        <button class="sv-popup__close" (click)="closeApdexPopup()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sv-popup__body" id="apdexTimeValue"></div>
+</div>

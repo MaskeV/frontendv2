@@ -1,0 +1,203 @@
+<main>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb custom-breadcrumb mb-0">
+      <li class="breadcrumb-item d-flex align-items-center gap-1">
+        <img src="assets/images/eks.png" class="icons" alt="EKS Logo" />
+        <a routerLink="/eks">EKS Applications</a>
+      </li>
+      <li class="breadcrumb-item"><a routerLink="/eks/eks-service">{{selectedService}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{selectedInstance}}</li>
+    </ol>
+  </nav>
+
+  <div class="p-1 rounded" style="margin-bottom: -4px;">
+    <header class="pb-0 mb-0">
+      <ul class="mb-0 nav nav-tabs border-bottom" id="service-nav">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#node" (click)="loadData('node')">Node</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" role="tab" href="#pod" (click)="loadData('pod')">Pod</a>
+        </li>
+      </ul>
+    </header>
+  </div>
+
+  <div class="tab-content custom-bg p-1">
+    <div class="tab-pane fade in active show" id="node">
+
+      <div class="bs-cards-row ps-2 pe-3 mt-3">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Pod Count</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="podCountChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>CPU Utilization (%)</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="cpuUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Memory Utilization</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="memoryUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bs-cards-row ps-2 pe-3 mt-2">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network RX</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkRxChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network TX</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkTxChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network RX Error Count</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkRxErrorCountChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bs-cards-row ps-2 pe-3 mt-2">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network TX Error Count</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkTxErrorCountChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Disk IO Read</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="diskIOReadChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Disk IO Write</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="diskIOWriteChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bs-cards-row ps-2 pe-3 mt-2">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>FS Utilization (%)</span>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="fsUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="w-66"></div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="pod">
+
+      <div class="bs-cards-row ps-2 pe-3 mt-3">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>CPU Utilization</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Percentage of CPU capacity currently used by the instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="cpuUtilizationChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Memory Utilization</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="memoryUtilizationChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network TX Count</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Amount of memory swapped to disk due to insufficient RAM."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkTxChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bs-cards-row ps-2 pe-3 mt-2">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network TX Error Count</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Number of active client connections to the database."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkTxErrorChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network RX Count</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkRxChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network RX Error Count</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkRxErrorChartPodContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

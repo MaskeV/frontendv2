@@ -1,0 +1,151 @@
+<div class="pv-pvc-dashboard">
+  
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- PV Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('pv')">
+          <span>Persistent Volume</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'pv'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'pv'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search PV..." [(ngModel)]="pvNameSearch">
+          </div>
+          <div class="option" *ngFor="let pv of filteredPVNames()" (click)="toggleSelection(pv, selectedPVs)">
+            <input type="checkbox" [checked]="selectedPVs.has(pv)"
+              (click)="$event.stopPropagation(); toggleSelection(pv, selectedPVs)">
+            <span>{{ pv }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PVC Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('pvc')">
+          <span>Persistent Volume Claim</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'pvc'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'pvc'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search PVC..." [(ngModel)]="pvcNameSearch">
+          </div>
+          <div class="option" *ngFor="let pvc of filteredPVCNames()" (click)="toggleSelection(pvc, selectedPVCs)">
+            <input type="checkbox" [checked]="selectedPVCs.has(pvc)"
+              (click)="$event.stopPropagation(); toggleSelection(pvc, selectedPVCs)">
+            <span>{{ pvc }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ===== PERSISTENT VOLUMES ===== -->
+  <div class="card">
+    <div class="card-title card-title-row">
+      <div>
+        Persistent Volumes Informations <span>(Metrics Kubernetes)</span>
+      </div>
+
+      <button class="btn-download" (click)="downloadPVs()" [disabled]="persistentVolumes.length === 0">
+        ⬇ Download
+      </button>
+    </div>
+    <div class="table-wrapper" *ngIf="persistentVolumes.length > 0; else noPVs">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phase</th>
+            <th>Capacity</th>
+            <th>Storage Class</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pv of paginatedPVs">
+            <td>{{ pv.name }}</td>
+            <td class="status-true">{{ pv.phase }}</td>
+            <td>{{ pv.capacity }}</td>
+            <td>{{ pv.storageClass }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination Controls PV -->
+    <div class="pagination-controls" *ngIf="persistentVolumes.length > 0">
+      <button class="btn-download" (click)="prevPagePV()" [disabled]="pvCurrentPage === 1">Previous</button>
+      <span>Page {{ pvCurrentPage }} of {{ pvTotalPages }}</span>
+      <button class="btn-download" (click)="nextPagePV()" [disabled]="pvCurrentPage === pvTotalPages">Next</button>
+    </div>
+    <ng-template #noPVs>
+      <div class="no-data">
+        No persistent volumes data available
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- ===== PERSISTENT VOLUME CLAIMS ===== -->
+  <div class="card">
+    <div class="card-title card-title-row">
+      <div>
+        Persistent Volume Claims Informations <span>(Metrics Kubernetes)</span>
+      </div>
+
+      <button class="btn-download" (click)="downloadPVCs()" [disabled]="persistentVolumeClaims.length === 0">
+        ⬇ Download
+      </button>
+    </div>
+
+    <div class="table-wrapper table-wrapper-lg" *ngIf="persistentVolumeClaims.length > 0; else noPVCs">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phase</th>
+            <th>Volume</th>
+            <th>Capacity</th>
+            <th>Access Mode</th>
+            <th>Storage Class</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pvc of paginatedPVCs">
+            <td>{{ pvc.name }}</td>
+            <td class="status-true">{{ pvc.phase }}</td>
+            <td>{{ pvc.volume }}</td>
+            <td>{{ pvc.capacity }}</td>
+            <td>{{ pvc.accessMode }}</td>
+            <td>{{ pvc.storageClass }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination Controls PVC -->
+    <div class="pagination-controls" *ngIf="persistentVolumeClaims.length > 0">
+      <button class="btn-download" (click)="prevPagePVC()" [disabled]="pvcCurrentPage === 1">Previous</button>
+      <span>Page {{ pvcCurrentPage }} of {{ pvcTotalPages }}</span>
+      <button class="btn-download" (click)="nextPagePVC()" [disabled]="pvcCurrentPage === pvcTotalPages">Next</button>
+    </div>
+    <ng-template #noPVCs>
+      <div class="no-data">
+        No persistent volume claims data available
+      </div>
+    </ng-template>
+  </div>
+
+</div>

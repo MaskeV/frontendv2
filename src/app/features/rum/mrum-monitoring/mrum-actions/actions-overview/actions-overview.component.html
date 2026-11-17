@@ -1,0 +1,134 @@
+<div class="mrum-page-container p-4" style="background-color: #fafafa; height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden;">
+  <!-- Breadcrumbs -->
+  <app-mrum-breadcrumb 
+    [breadcrumbs]="breadcrumbData">
+  </app-mrum-breadcrumb>
+
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="page-title m-0 fw-bold text-dark" style="font-size: 24px; letter-spacing: -0.5px;">Actions Overview</h1>
+    <p class="text-muted m-0 mt-1" style="font-size: 13px;">Analyze and monitor all user actions performed in your application.</p>
+  </div>
+
+  <!-- KPI and Controls Row -->
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <!-- Total Actions Card -->
+    <div class="card border-0 shadow-sm" style="width: 260px; border-radius: 12px; background-color: #fdfcff; border: 1px solid #f3e8ff !important;">
+      <div class="card-body p-4 pb-0">
+        <div class="d-flex align-items-center mb-3">
+          <div class="rounded d-flex justify-content-center align-items-center" style="width: 28px; height: 28px; background-color: #f3e8ff; color: #7c3aed;">
+            <i class="bi bi-activity"></i>
+          </div>
+          <span class="ms-2 fw-semibold" style="color: #6d28d9; font-size: 13px;">Total Actions</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1" style="font-size: 28px;">135,487</h2>
+        <div class="d-flex align-items-center mb-3" style="font-size: 12px; font-weight: 500;">
+          <i class="bi bi-arrow-up-short text-success fs-6 lh-1"></i>
+          <span class="text-success">12.6%</span>
+          <span class="text-muted ms-1">vs prev 30m</span>
+        </div>
+        <div class="mt-2" style="margin-left: -1rem; margin-right: -1rem;">
+          <div id="totalActionsSparkline" style="width: 100%; height: 60px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="d-flex gap-3 align-items-center">
+      <div class="position-relative">
+        <input type="text" class="form-control bg-white shadow-sm border-0" [(ngModel)]="searchText" (input)="applySearchFilter()" placeholder="Search action name or type..." style="width: 280px; padding-right: 35px; font-size: 13px; height: 40px; border-radius: 8px; border: 1px solid #e2e8f0 !important;">
+        <i class="bi bi-search position-absolute text-muted" style="right: 12px; top: 50%; transform: translateY(-50%);"></i>
+      </div>
+      <div class="d-flex align-items-center">
+        <span class="text-muted me-2" style="font-size: 13px;">Filter by</span>
+        <select class="form-select bg-white shadow-sm border-0" style="width: 180px; font-size: 13px; height: 40px; border-radius: 8px; border: 1px solid #e2e8f0 !important; font-weight: 500; color: #334155;">
+          <option>All Action Types</option>
+          <option>Tap</option>
+          <option>Input</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size: 13px;">
+          <thead style="background-color: #ffffff;">
+            <tr>
+              <th class="border-bottom-0 text-muted fw-semibold py-3 px-4" style="font-size: 12px;">Action Name</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Type</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Total Executions</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Unique Users</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Avg. Duration</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">P90 Duration</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Error Rate</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Apdex</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3" style="font-size: 12px;">Trend</th>
+              <th class="border-bottom-0 text-muted fw-semibold py-3 px-4" style="font-size: 12px;">Last Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let action of paginatedActions; let i = index" class="border-top" style="cursor: pointer; height: 60px;" (click)="viewActionDetails(action)">
+              <td class="px-4">
+                <div class="d-flex align-items-center">
+                  <span class="fw-semibold text-primary" style="font-size: 13px;">{{ action.actionName }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge {{ action.typeClass }} rounded-1 fw-medium" style="padding: 5px 8px;">{{ action.type }}</span>
+              </td>
+              <td class="text-dark">{{ action.totalExecutions | number }}</td>
+              <td class="text-dark">{{ action.uniqueUsers | number }}</td>
+              <td class="text-dark">{{ action.avgDuration }}</td>
+              <td class="text-dark">{{ action.p90Duration }}</td>
+              <td class="text-dark">{{ action.errorRate }}</td>
+              <td>
+                <span class="badge rounded-1 fw-medium" 
+                      [ngStyle]="{'background-color': action.apdex >= 0.9 ? '#dcfce7' : (action.apdex >= 0.8 ? '#fef08a' : '#fee2e2'), 'color': action.apdex >= 0.9 ? '#16a34a' : (action.apdex >= 0.8 ? '#ca8a04' : '#ef4444')}"
+                      style="padding: 4px 8px;">
+                  {{ action.apdex | number:'1.2-2' }}
+                </span>
+              </td>
+              <td>
+                <div [id]="'trendSparkline_' + i" style="width: 60px; height: 30px;"></div>
+              </td>
+              <td class="text-muted px-4">{{ action.lastSeen }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="card-footer bg-transparent border-0 py-4 px-4 d-flex justify-content-between align-items-center" style="background-color: #f8fafc !important; border-top: 1px solid #e2e8f0 !important; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+        <div style="font-size: 12px; font-weight: 600; color: #64748b;">
+          Showing {{ actionPaginationStart + 1 }} to {{ actionPaginationEnd }} of {{ filteredActions.length }} actions
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div class="d-flex align-items-center gap-2">
+            <input type="number" min="1" class="form-control form-control-sm" style="width: 70px; text-align: center; font-weight: 600;" [(ngModel)]="actionPageSize" (ngModelChange)="updatePagination()">
+            <span style="font-size: 12px; font-weight: 700; color: #334155;">per page</span>
+          </div>
+          <nav>
+            <ul class="pagination mb-0 shadow-sm" style="border-radius: 8px; overflow: hidden; font-weight: 600;">
+              <li class="page-item" [class.disabled]="currentActionPage === 1">
+                <a class="page-link border-0 py-2 px-3" style="cursor: pointer;" (click)="changePage(currentActionPage - 1)" [style.background-color]="currentActionPage === 1 ? '#f8fafc' : '#ffffff'" [style.color]="currentActionPage === 1 ? '#cbd5e1' : '#64748b'"><i class="bi bi-chevron-left"></i></a>
+              </li>
+              
+              <li class="page-item" *ngFor="let page of actionPaginationPages" [class.active]="currentActionPage === page">
+                <a class="page-link border-0 py-2 px-3" style="cursor: pointer;" (click)="changePage(page)" 
+                   [style.background-color]="currentActionPage === page ? '#4f46e5' : '#ffffff'" 
+                   [style.color]="currentActionPage === page ? '#ffffff' : '#64748b'">{{ page }}</a>
+              </li>
+              
+              <li class="page-item" [class.disabled]="currentActionPage === totalActionPages">
+                <a class="page-link border-0 py-2 px-3" style="cursor: pointer;" (click)="changePage(currentActionPage + 1)" [style.background-color]="currentActionPage === totalActionPages ? '#f8fafc' : '#ffffff'" [style.color]="currentActionPage === totalActionPages ? '#cbd5e1' : '#64748b'"><i class="bi bi-chevron-right"></i></a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

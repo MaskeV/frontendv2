@@ -1,0 +1,19 @@
+<div class="modal">
+    <div class="modal-content">
+        <button (click)="onCloseModal()" class="close-button" aria-label="Close">&times;</button>
+        <span class="modal-header">Trace Detail</span>
+        <div class="modal-body">
+            <p><strong>Service: </strong>{{ modalData?.serviceCode }}</p>
+            <p><strong>Instance: </strong>{{ modalData?.serviceInstanceName }}</p>
+            <p><strong>Endpoint: </strong> {{ modalData?.endpointName }}</p>
+            <p><strong>Span Type: </strong>{{ modalData?.type }}</p>
+            <p><strong>Component: </strong>{{ modalData?.component }}</p>
+            <p><strong>Peer: </strong>{{ modalData?.peer }}</p>
+            <p><strong>Error: </strong>{{ modalData?.isError ? 'Yes' : 'No' }}</p>
+            <p><strong>Tags: </strong></p>
+            <pre class="tags">{{ getFormattedTags() }}</pre>
+            <p *ngIf="modalData?.logs"><strong>Logs: </strong></p>
+            <pre class="logs" *ngIf="modalData?.logs">{{ getFormattedLogs() }}</pre>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,233 @@
+<div class="main-container container-fluid p-0">
+    <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="m-0 fw-bold text-dark">Problems</h4>
+            <small class="text-muted">Global alerts and problem monitoring</small>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <div class="d-flex flex-column" style="min-width: 180px;">
+                <label class="small fw-bold text-muted mb-1">COMPONENT TYPE</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedAppType" (change)="onAppTypeChange()">
+                    <option value="Select">All Types</option>
+                    <option *ngFor="let type of appTypes" [value]="type">{{type}}</option>
+                </select>
+            </div>
+            <div class="d-flex flex-column" style="min-width: 180px;">
+                <label class="small fw-bold text-muted mb-1">TECHNOLOGY TYPE</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedTechType" (change)="onTechTypeChange()"
+                    [disabled]="techTypes.length === 0">
+                    <option value="Select">All Technologies</option>
+                    <option *ngFor="let tech of techTypes" [value]="tech.technologyType">{{tech.technologyType}}
+                    </option>
+                </select>
+            </div>
+            <div class="d-flex flex-column" style="min-width: 180px;">
+                <label class="small fw-bold text-muted mb-1">APPLICATION</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedApplication"
+                    (change)="onApplicationChange()"
+                    [disabled]="applications.length === 0 && selectedAppType !== 'Select'">
+                    <option value="Select">All Applications</option>
+                    <option *ngFor="let app of applications" [value]="app.applicationId || app.appID">
+                        {{app.applicationName}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-grow-1" style="min-height: 0; overflow: hidden;">
+        <!-- Sidebar Filters -->
+        <div class="problem-sidebar p-3 border-right bg-light" style="width: 220px; height: 100%; overflow-y: auto;">
+            <div class="filter-section mb-4">
+                <span class="filter-title status-title">STATUS</span>
+                <div class="filter-options">
+                    <label *ngFor="let option of problemStatusOptions" class="filter-item">
+                        <input type="radio" name="status" [value]="option.value" [(ngModel)]="selectedProblemStatus"
+                            (change)="onProblemStatusChange(option.value)" />
+                        <span>{{ option.label }}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1 p-3 bg-white d-flex flex-column" style="overflow-y: auto; min-height: 0;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <div class="d-flex align-items-center gap-3">
+                    <h5 class="fw-bold m-0">Problems</h5>
+                    <button *ngIf="preZoomTimeframe" (click)="resetZoom()"
+                        class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 py-1 px-2 rounded-pill"
+                        style="font-size: 11px; font-weight: 600;">
+                        <i class="fa fa-undo"></i> Reset Zoom
+                    </button>
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search problems..."
+                            [(ngModel)]="searchText" (keyup)="filterProblems()">
+                        <i class="fa fa-search search-icon"></i>
+                    </div>
+                    <span
+                        class="badge bg-light text-secondary border d-flex align-items-center gap-1 py-1 px-2 rounded-pill"
+                        style="font-size: 11px;">
+                        <i class="fa fa-search-plus text-primary"></i> Drag on chart to zoom / crop timeline
+                    </span>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="status-card total shadow-xs border">
+                        <div class="status-icon-wrapper"><i class="fa fa-list-ul"></i></div>
+                        <div class="status-info">
+                            <span class="status-label">TOTAL</span>
+                            <span class="status-val text-dark">{{totalCount}}</span>
+                        </div>
+                    </div>
+                    <div class="status-card open shadow-xs border" [class.alert-glow]="openCount > 0">
+                        <div class="status-icon-wrapper text-danger"><i class="fa fa-exclamation-triangle"></i></div>
+                        <div class="status-info">
+                            <span class="status-label text-danger">OPEN</span>
+                            <span class="status-val text-danger">{{openCount}}</span>
+                        </div>
+                    </div>
+                    <div class="status-card closed shadow-xs border">
+                        <div class="status-icon-wrapper text-success"><i class="fa fa-check-circle"></i></div>
+                        <div class="status-info">
+                            <span class="status-label text-secondary">CLOSED</span>
+                            <span class="status-val text-secondary">{{closedCount}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="red-gradient-line mb-3"></div>
+
+            <div id="problemTimelineChart" style="width: 100%; min-height: 250px;" class="mb-3 flex-shrink-0"></div>
+
+            <!-- Scrollable Table -->
+            <div class="table-container shadow-sm rounded border" style="overflow: visible;">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th style="width: 5px; padding: 0;"></th>
+                            <th>PROBLEM</th>
+                            <th>IMPACTED</th>
+                            <th>COMPONENT TYPE</th>
+                            <th class="text-center">STATUS</th>
+                            <th class="text-center sortable-header cursor-pointer select-none"
+                                (click)="toggleSort('severity')">
+                                SEVERITY
+                                <i class="fa ms-1" [ngClass]="{
+                                    'fa-sort-up': sortKey === 'severity' && sortDirection === 'asc',
+                                    'fa-sort-down': sortKey === 'severity' && sortDirection === 'desc',
+                                    'fa-sort text-muted opacity-50': sortKey !== 'severity'
+                                }"></i>
+                            </th>
+                            <th class="text-center sortable-header cursor-pointer select-none"
+                                (click)="toggleSort('startDate')">
+                                START TIME
+                                <i class="fa ms-1" [ngClass]="{
+                                    'fa-sort-up': sortKey === 'startDate' && sortDirection === 'asc',
+                                    'fa-sort-down': sortKey === 'startDate' && sortDirection === 'desc',
+                                    'fa-sort text-muted opacity-50': sortKey !== 'startDate'
+                                }"></i>
+                            </th>
+                            <th class="text-center">
+                                END TIME
+                            </th>
+                            <th class="text-center sortable-header cursor-pointer select-none"
+                                (click)="toggleSort('duration')">
+                                DURATION
+                                <i class="fa ms-1" [ngClass]="{
+                                    'fa-sort-up': sortKey === 'duration' && sortDirection === 'asc',
+                                    'fa-sort-down': sortKey === 'duration' && sortDirection === 'desc',
+                                    'fa-sort text-muted opacity-50': sortKey !== 'duration'
+                                }"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 12px;">
+                        <ng-container *ngFor="let row of pagedData">
+                            <tr [class.open-row]="row.problemStatus === 'open'"
+                                [class.closed-row]="row.problemStatus === 'closed'">
+                                <td class="status-indicator"></td>
+                                <td>
+                                    <div class="problem-name-link fw-bold"
+                                        [style.color]="row.problemStatus === 'open' ? '#e11d48' : '#334155'"
+                                        style="font-size: 12.5px; cursor: pointer;"
+                                        (click)="navigateToProblemDetail(row)">
+                                        {{row.problem || ('PID-' + row.details.pid)}}
+                                    </div>
+                                    <div style="font-size: 11px; font-weight: 600; margin-top: 2px;"
+                                        [style.color]="row.problemStatus === 'open' ? '#f87171' : '#64748b'">
+                                        PID-{{row.details.pid || '-'}}
+                                    </div>
+                                </td>
+                                <td class="fw-bold">{{row.impacted}}</td>
+                                <td class="fw-bold">{{row.applicationType}}</td>
+                                <td class="text-center">
+                                    <span class="status-badge" [ngClass]="row.problemStatus">
+                                        {{row.problemStatus}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="severity-badge" [ngClass]="row.severity?.toLowerCase()">
+                                        {{row.severity}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {{row.startDate}}
+                                </td>
+
+                                <td class="text-center">
+                                    {{row.endDate || '-'}}
+                                </td>
+
+                                <td class="text-center fw-bold">
+                                    {{row.duration}}
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <tr *ngIf="pagedData.length === 0">
+                            <td colspan="8" class="text-center py-5 text-muted">No problems found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div *ngIf="filteredTableData.length > 0" class="col-12 d-flex justify-content-between p-2 mt-2 shadow-sm rounded border flex-shrink-0"
+                style="background-color: var(--card-bg-color, white);">
+                <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                    {{ (currentPage - 1) * itemsPerPage + 1 }} - {{
+                    (currentPage * itemsPerPage) > filteredTableData.length ?
+                    filteredTableData.length : (currentPage * itemsPerPage) }}
+                    of {{ filteredTableData.length }}
+                </span>
+                <nav class="mb-1 mr-1">
+                    <ul class="pagination justify-content-center align-items-center mb-0"
+                        style="font-size: small; gap: 0.5rem;">
+                        <li class="page-item" [class.disabled]="currentPage === 1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                (click)="previousPage()"
+                                [disabled]="currentPage === 1" tabindex="0">
+                                &laquo; Previous
+                            </button>
+                        </li>
+
+                        <li class="page-item d-flex align-items-center">
+                            <input type="number" class="form-control form-control-sm text-center"
+                                style="width:60px" [value]="currentPage"
+                                (keydown.enter)="goToPage(inputPage.value)"
+                                #inputPage min="1" [max]="totalPages"
+                                aria-label="Page number input" />
+                            <span class="ms-2"> of {{ totalPages }}</span>
+                        </li>
+
+                        <li class="page-item"
+                            [class.disabled]="currentPage === totalPages">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                (click)="nextPage()"
+                                [disabled]="currentPage === totalPages" tabindex="0">
+                                Next &raquo;
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,342 @@
+<div class="top-error-bar" *ngIf="showError">
+    <span class="error-icon">!</span>
+    <span>{{ errorMessage }}</span>
+</div>
+
+<div class="top-success-bar" *ngIf="showSuccess">
+    <span class="success-icon">✓</span>
+    <span>User created successfully</span>
+</div>
+
+<div class="top-update-bar" *ngIf="showUpdateSuccess">
+    <span class="update-icon">↻</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="top-delete-bar" *ngIf="showDelete">
+    <span class="delete-icon1">✖</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="main-wrapper card1">
+
+    <div class="header mt-3">
+        <div class="header-left">
+            <div class="icon user-icon" aria-label="User" data-bs-toggle="tooltip" data-bs-placement="right"
+                title="Create User" style="cursor: pointer; margin-left: 14%;" (click)="goToCreateForm()">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+
+
+            <div style="width: 166px; margin-left: 0%;">
+                <h2>
+                    {{ isUpdation ? 'Update User' : 'Create New User' }}
+                </h2>
+
+                <p>
+                    {{ isUpdation ? 'Modify user details' : 'Configure new user' }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- TABLE TOGGLE ICON -->
+        <button class="table-toggle-btn" title="View Users" style="margin-right: 1%;" (click)="showUserTable()">
+            ☰
+        </button>
+    </div>
+
+    <div class="user-wrapper" *ngIf="!showUsersTable">
+
+        <!-- Stepper -->
+        <div class="stepper-netraa">
+            <div class="step" [class.active]="step>=1" [class.completed]="step > 1">
+                <div class="circle"><i class="fa fa-user"></i></div>
+                <span>Basic Info</span>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="step" [class.active]="step>=2" [class.completed]="step > 2">
+                <div class="circle"><i class="fa fa-shield"></i></div>
+                <span>Permissions</span>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="step" [class.active]="step>=3">
+                <div class="circle"><i class="fa fa-check"></i></div>
+                <span>Review</span>
+            </div>
+        </div>
+
+
+        <div class="card" *ngIf="!showUsersTable">
+
+            <div class="user-header">
+                <i class="fa fa-user-plus"></i>
+                <div>
+                    <div class="title">
+                        {{ isUpdation ? 'Update Existing User' : 'Create New User' }}
+                    </div>
+                    <div class="subtitle" *ngIf="step===1">Enter the user's basic information</div>
+                    <div class="subtitle" *ngIf="step===2">Configure permissions and access</div>
+                    <div class="subtitle" *ngIf="step===3">
+                        {{ isUpdation ? 'Review before updating' : 'Review before saving' }}
+                    </div>
+
+                </div>
+            </div>
+
+
+            <form *ngIf="showForm" [formGroup]="userForm">
+
+                <!-- STEP 1 -->
+                <div *ngIf="step===1" class="grid-2">
+
+                    <div>
+                        <label>User ID *</label>
+                        <input formControlName="userId" placeholder="USR001" appSanitizeInput>
+                        <small *ngIf="f['userId'].touched && f['userId'].invalid">Required</small>
+                    </div>
+
+                    <div>
+                        <label>User Name *</label>
+                        <input formControlName="userName" placeholder="John Smith" appSanitizeInput>
+                        <small *ngIf="f['userName'].touched && f['userName'].invalid">Required</small>
+                    </div>
+
+                    <div>
+                        <label>Email *</label>
+                        <input formControlName="email" placeholder="john@company.com" appSanitizeInput>
+                        <small *ngIf="f['email'].touched && f['email'].invalid">Invalid email</small>
+                    </div>
+
+                    <div>
+                        <label>Mobile *</label>
+                        <input formControlName="mobile" placeholder="+91 9876543210" appSanitizeInput>
+                        <small *ngIf="f['mobile'].touched && f['mobile'].invalid">Required</small>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" class="primary" (click)="goToPermissions()" [disabled]="
+                            (f['userId'].enabled && f['userId'].invalid) ||
+                            f['userName'].invalid ||
+                            f['email'].invalid ||
+                            f['mobile'].invalid
+                          ">
+                            Next
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- STEP 2 -->
+                <div *ngIf="step===2" class="grid-2">
+
+                    <div>
+                        <label>Authentication *</label>
+                        <input value="Netraa User" disabled>
+                    </div>
+
+                    <div>
+                        <label>User Type *</label>
+                        <select formControlName="userType">
+                            <option value="">Select</option>
+                            <option>Super Admin</option>
+                            <option>Admin</option>
+                            <option>User</option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="isCreation">
+                        <label>Approver *</label>
+                        <select formControlName="approver">
+                            <option value="">Select</option>
+                            <option *ngFor="let a of approverList" [value]="a.id">
+                                {{ a.fullName }}
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <div *ngIf="f['userType'].value !== 'Super Admin'">
+                        <label>Role *</label>
+                        <select formControlName="role">
+                            <option value="">Select</option>
+                            <option *ngFor="let r of allRolesList" [value]="r.id">
+                                {{ r.roleName }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Session Timeout *</label>
+                        <select formControlName="timeout">
+                            <option value="">Select</option>
+                            <option value="15">15 min</option>
+                            <option value="30">30 min</option>
+                            <option value="45">45 min</option>
+                            <option value="60">60 min</option>
+                            <option value="0">Never</option>
+
+                        </select>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" (click)="back()">Previous</button>
+                        <button type="button" class="primary" (click)="goToReview()" [disabled]="
+                            f['userType'].invalid ||
+                            (f['role'].enabled && f['role'].invalid) ||
+                            f['timeout'].invalid
+                          ">
+                            Next
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- STEP 3 -->
+                <div *ngIf="step===3" class="review">
+
+                    <div><b>User ID:</b> {{ f['userId'].value }}</div>
+                    <div><b>Name:</b> {{ f['userName'].value }}</div>
+                    <div><b>Email:</b> {{ f['email'].value }}</div>
+                    <div><b>Mobile:</b> {{ f['mobile'].value }}</div>
+                    <div><b>User Type:</b> {{ f['userType'].value }}</div>
+                    <div><b>Role:</b> {{ getRoleNameById(f['role'].value) }}</div>
+                    <div><b>Timeout:</b> {{ f['timeout'].value }}</div>
+
+                    <div class="actions">
+                        <button type="button" (click)="back()">Previous</button>
+                        <button type="button" class="primary" (click)="submitUser()">
+                            {{ isUpdation ? 'Update User' : 'Create User' }}
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4" style="width: 96%; margin-left: 2%;"
+        *ngIf="showUsersTable && !showForm && allActiveUsersList?.length">
+
+        <h4 style="margin-left: 2%; margin-top: 1%;">All Users</h4>
+
+        <div class="table-glass" style="overflow-y: hidden;  overflow-x: auto; max-width: 100%;">
+
+            <!-- Toolbar -->
+            <div class="table-toolbar">
+                <div class="table-search">
+                    <input type="text" [(ngModel)]="searchText" (ngModelChange)="page=1; applyFilterAndPagination()"
+                        placeholder="Search users..." appSanitizeInput />
+
+                </div>
+            </div>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+
+                        <th (click)="sortBy('userId')">User ID</th>
+                        <th (click)="sortBy('fullName')">User Name</th>
+                        <th (click)="sortBy('mobileNo')">Mobile</th>
+                        <th (click)="sortBy('mailId')">Email</th>
+                        <th (click)="sortBy('authentication')">Auth</th>
+                        <th (click)="sortBy('approverName')">Approver</th>
+                        <th (click)="sortBy('userType')">User Type</th>
+                        <th (click)="sortBy('createdOn')">Created On</th>
+                        <th (click)="sortBy('created')">Created By</th>
+                        <th *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let u of pagedUsers; let i = index">
+
+
+                        <td>{{ u.userId }}</td>
+                        <td>{{ u.fullName }}</td>
+                        <td>{{ u.mobileNo }}</td>
+                        <td>{{ u.mailId }}</td>
+                        <td>{{ u.authentication }}</td>
+                        <td>{{ u.approverName }}</td>
+                        <td>{{ u.userType }}</td>
+                        <td>{{ u.createdOn | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ u.created }}</td>
+
+                        <td *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete">
+                            <button class="icon-btn" title="Edit" *ngIf="userTypeCrudMap.edit"
+                                (click)="openUpdateUserFromNewUI(u)">✏️</button>
+
+                            <button class="icon-btn" title="Delete" *ngIf="userTypeCrudMap.delete"
+                                (click)="openDeleteModal(deleteConfirmTemplate, u)">
+                                🗑️
+                            </button>
+
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination minimal-pagination" *ngIf="totalPages > 1">
+
+                <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                    ‹ Previous
+                </button>
+
+                <span class="page-indicator">
+                    <strong>{{ page }}</strong> / {{ totalPages }}
+                </span>
+
+                <button class="page-btn" (click)="nextPage()" [disabled]="page === totalPages">
+                    Next ›
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<ng-template #deleteConfirmTemplate let-modal>
+    <div class="delete-modal-wrapper">
+
+        <!-- HEADER -->
+        <div class="delete-header">
+            <div class="delete-icon-circle">
+                !
+            </div>
+            <div class="delete-header-text">
+                <h3>Confirm Deletion</h3>
+                <p>
+                    You are about to delete this user.
+                    This will remove all associated data.
+                </p>
+            </div>
+        </div>
+
+        <!-- CAUTION -->
+        <div class="delete-warning">
+            <span class="warn-icon">⚠</span>
+            <span><strong>Caution:</strong> This action cannot be undone.</span>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="delete-actions">
+            <button class="btn btn-outline-secondary" (click)="modal.dismiss()">
+                No, Keep It
+            </button>
+
+            <button class="btn btn-danger" [disabled]="isDeleting" (click)="confirmDelete(deleteModalRef)">
+                {{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}
+            </button>
+        </div>
+
+    </div>
+</ng-template>

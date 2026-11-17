@@ -1,0 +1,180 @@
+.tab-content {
+    width: 99.6%;
+    height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden !important;
+}
+
+.custom-bg {
+    background-color: var(--custom-bg-color);
+}
+
+/* Nav Tab */
+
+.nav-tabs {
+    background-color: transparent;
+    display: flex;
+    border: 0;
+    margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link {
+    position: relative;
+    color: #000000;
+    font-weight: normal;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-tabs .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F);
+    transition: width 0.4s ease;
+    z-index: 1;
+}
+
+.nav-tabs .nav-link.active::after {
+    width: 100%;
+}
+
+.nav-tabs .nav-link.active {
+    color: #000000;
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #60b6d3;
+}
+
+/* Width */
+
+.w-33 {
+    width: 33%;
+}
+
+.w-14 {
+    width: 14%;
+}
+
+.uptim1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-size: 1.3rem;
+    padding-top: 10px;
+}
+
+/* Metric Box Cards */
+.metric-box {
+    /* background-color: var(--bg-color); */
+    border-radius: 4px;
+    padding: 3px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background-color: #fff;
+    transition: transform .2s, box-shadow .2s;
+
+}
+
+.metric-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.metric-box .small {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: small;
+    font-weight: 500;
+    width: 100%;
+    padding: 6px;
+    margin: 0;
+    /* background-color: var(--card-header-bg); */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    /* border-bottom: 0.5px solid var(--border-color-dark); */
+}
+
+.metric-box .fw-bold {
+    color: var(--primary-color);
+    font-size: 1.9rem;
+    height: 100%;
+    width: 100%;
+    padding: 0px 0px 0px 6px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    /* background-color: #faf4b633; */
+}
+
+.kpi-value {
+    font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif;
+}
+
+/* Card */
+
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 2px 15px -3px #0000000d;
+    background: #fff;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    border-color: #60A5FA !important;
+    box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+.card-header {
+    padding: 7px 6px 3px 7px;
+    border: none;
+    border-radius: 0%;
+    font-size: small;
+    font-weight: 100;
+    /* border-bottom: 1px solid var(--border-color); */
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.chart-title {
+    font-weight: 500;
+    color: var(--text-color);
+    background-color: white;
+}
+
+.card-body {
+    height: 26vh;
+}
+
+/* Icon */
+
+.gradiantIcon {
+    background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* No Data */
+
+.noData {
+    height: 25vh;
+}

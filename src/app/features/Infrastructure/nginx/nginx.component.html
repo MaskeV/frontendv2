@@ -1,0 +1,428 @@
+<main class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img src="assets/img/technologies/NGINX.png" class="icons" alt="nginx logo" />
+                <a style="cursor: pointer; color: #3b82f6;" (click)="gotoNginxDetails()">{{selectedEntity}}</a>
+            </li>
+            <li class="breadcrumb-item active">General Service</li>
+        </ol>
+    </nav>
+
+    <!-- Navigation Tabs -->
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="service-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instance"
+                        (click)="loadData('instance')">Instance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#endpoint"
+                        (click)="loadData('endpoint')">Endpoint</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="tab-content p-2">
+        <!-- OVERVIEW TAB -->
+        <div class="tab-pane fade in active show" id="overview">
+            <!-- KPI Section -->
+            <section class="mb-4">
+                <div class="d-flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Service Health</h3>
+                </div>
+                <div class="row g-3">
+                    <ng-container *ngIf="!isLoading; else kpiSkeleton">
+                        <!-- Total HTTP Requests -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">Total HTTP Requests</span>
+                                    <span class="text-primary fs-6"><i class="fa-solid fa-chart-line" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total HTTP Requests across all services"></i></span>
+                                </div>
+                                <div class="kpi-value">
+                                    {{ totalHttpRequests ?? 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Bandwidth -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">Bandwidth</span>
+                                    <span class="text-warning fs-6"><i class="fa-regular fa-hourglass" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total Bandwidth (Request + Response)"></i></span>
+                                </div>
+                                <div class="kpi-value d-flex align-items-baseline gap-1">
+                                    <span>{{ totalBandwidthKB ?? '0' }}</span>
+                                    <span class="text-muted small fw-medium">KB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Active Connections -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">Active Connections</span>
+                                    <span class="text-success fs-6"><i class="fa-solid fa-network-wired" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Currently Active Connections"></i></span>
+                                </div>
+                                <div class="kpi-value">
+                                    {{ avgConnections ?? 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 2xx Status -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">2xx Status</span>
+                                    <span class="fs-6" style="color: rgb(58, 135, 84);"><i
+                                            class="bi bi-check-circle-fill" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Percentage of Successful (2xx) requests"></i></span>
+                                </div>
+                                <div class="kpi-value d-flex align-items-baseline gap-1" style="color: rgb(58, 135, 84);">
+                                    <span>{{ getSuccessRate(nginxStats) }}</span>
+                                    <span class=" small fw-medium" style="color: rgb(58, 135, 84);">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 4xx Error -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">4xx Error</span>
+                                    <span class="fs-6" style="color: #f4845f;"><i
+                                            class="bi bi-exclamation-triangle-fill" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Percentage of Client Error (4xx) requests"></i></span>
+                                </div>
+                                <div class="kpi-value d-flex align-items-baseline gap-1" style="color: #f4845f;">
+                                    <span>{{ nginxStats?.http_4xx_percent ?? '0' }}</span>
+                                    <span class=" small fw-medium" style="color: #f4845f;">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 5xx Error -->
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="metric-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="kpi-label">5xx Error</span>
+                                    <span class="fs-6" style="color: #f25c54;"><i class="bi bi-bug-fill" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Percentage of Server Error (5xx) requests"></i></span>
+                                </div>
+                                <div class="kpi-value d-flex align-items-baseline gap-1" style="color: #f25c54;">
+                                    <span>{{ nginxStats?.http_5xx_percent ?? '0' }}</span>
+                                    <span class=" small fw-medium" style="color: #f25c54;">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </section>
+
+            <!-- Metrics Visualized Section -->
+            <section>
+                <div class="d-flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <ng-container *ngIf="!isLoading; else chartSkeleton">
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">HTTP Request
+                                            Trend</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #b388eb;"><i class="fa-solid fa-chart-line" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Requests per second trend"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="httpRequestChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">HTTP Latency</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #9ac6c5;"><i class="fa-solid fa-stopwatch" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Average Response Latency (ms)"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="httpLatencyChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">HTTP Connections</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #06D6A0;"><i class="fa-solid fa-network-wired" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Connections breakdown (Read/Write/Wait)"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="httpConnectionsChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <ng-container *ngIf="!isLoading; else chartSkeleton">
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">HTTP Status Trend</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #36b47e;"><i class="fa-solid fa-signal" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="HTTP Status Code Distribution"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="httpStatusChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">4xx Error Rate</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #f4845f;"><i
+                                                class="fa-solid fa-triangle-exclamation" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Trend of 4xx Client Errors"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="http4xxChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">5xx Error Rate</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #f25c54;"><i class="fa-solid fa-bug" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Trend of 5xx Server Errors"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="http5xxChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <ng-container *ngIf="!isLoading; else chartSkeletonSingle">
+                        <div class="col-md-4">
+                            <div class="card-soft px-3 py-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="my-0 1 fw-bold text-secondary" style="font-size: 14px">HTTP Bandwidth</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span style="color: #118AB2;"><i
+                                                class="fa-solid fa-arrow-right-arrow-left" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Cumulative Bandwidth utilization"></i></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded chart-wrapper-sm">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="httpBandwidthChartOptions"
+                                        style="height: 100%; width: 100%; display: block;"></highcharts-chart>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </section>
+        </div>
+
+        <!-- INSTANCE TAB -->
+        <div class="tab-pane fade" id="instance">
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="table-container">
+                    <table class="table w-full mb-0">
+                        <thead>
+                            <tr>
+                                <th>Instance</th>
+                                <th>HTTP Requests</th>
+                                <th>Bandwidth (KB)</th>
+                                <th>Active Connections</th>
+                                <th>Success Rate (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="!isLoading; else tableSkeletonInstance">
+                            <tr *ngFor="let inst of nginxInstances">
+                                <td class="fw-medium">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-server text-primary" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Nginx Instance Identifier"></i>
+                                        <span style="cursor: pointer;"
+                                            (click)="gotoNginxInstanceDetails(inst.instance)">
+                                            {{ inst.instance }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-chart-line text-primary" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total HTTP Requests for this instance"></i>
+                                        {{ inst.metrics?.http_requests_total || '-' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-regular fa-hourglass text-warning" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total Bandwidth (KB) for this instance"></i>
+                                        {{ inst.metrics?.http_bandwidth_total_kb | number:'1.0-2' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-network-wired text-success" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Average Active Connections"></i>
+                                        {{ inst.metrics?.http_connections_avg || '-' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="sv-success-pill">
+                                            <i class="fa-regular fa-circle-check sv-metric-icon"></i>
+                                            {{ getSuccessRate(inst.metrics) }}%
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENDPOINT TAB -->
+        <div class="tab-pane fade" id="endpoint">
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="table-container">
+                    <table class="table w-full mb-0">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>HTTP Requests</th>
+                                <th>Bandwidth (KB)</th>
+                                <th>Success Rate (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="!isLoading; else tableSkeletonEndpoint">
+                            <tr *ngFor="let endpoint of nginxEndpoint">
+                                <td class="fw-medium">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-server text-primary" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Monitored API Endpoint"></i>
+                                        <span style="cursor: pointer;"
+                                            (click)="gotoNginxEndpointDetails(endpoint.endpoint)">
+                                            {{ endpoint.endpoint }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-chart-line text-primary" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total HTTP Requests for this endpoint"></i>
+                                        {{ endpoint.metrics?.http_requests_total || '-' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-regular fa-hourglass text-warning" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total Bandwidth (KB) for this endpoint"></i>
+                                        {{ endpoint.metrics?.http_bandwidth_total_kb | number:'1.0-2' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="sv-success-pill">
+                                            <i class="fa-regular fa-circle-check sv-metric-icon"></i>
+                                            {{ getSuccessRate(endpoint.metrics) }}%
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- SKELETON TEMPLATES -->
+<ng-template #kpiSkeleton>
+    <div class="col-lg-2 col-md-4 col-sm-6" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton skeleton-kpi"></div>
+    </div>
+</ng-template>
+
+<ng-template #chartSkeleton>
+    <div class="col-md-4" *ngFor="let i of [1,2,3]">
+        <div class="skeleton skeleton-chart"></div>
+    </div>
+</ng-template>
+
+<ng-template #chartSkeletonSingle>
+    <div class="col-md-4">
+        <div class="skeleton skeleton-chart"></div>
+    </div>
+</ng-template>
+
+<ng-template #tableSkeletonInstance>
+    <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+    </tr>
+</ng-template>
+
+<ng-template #tableSkeletonEndpoint>
+    <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+        <td>
+            <div class="skeleton skeleton-text"></div>
+        </td>
+    </tr>
+</ng-template>

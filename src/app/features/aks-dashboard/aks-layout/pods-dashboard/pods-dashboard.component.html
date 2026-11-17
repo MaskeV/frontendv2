@@ -1,0 +1,188 @@
+<div class="pods-container">
+
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pod Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('pod')">
+          <span>Pod Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'pod'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'pod'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="podNameSearch">
+          </div>
+          <div class="option" *ngFor="let pod of filteredPodNames()" (click)="toggleSelection(pod, selectedPodNames)">
+            <input type="checkbox" [checked]="selectedPodNames.has(pod)"
+              (click)="$event.stopPropagation(); toggleSelection(pod, selectedPodNames)">
+            <span>{{ pod }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS GRID ===== -->
+  <div class="chart-grid">
+
+    <div class="card">
+      <div class="card-title">Pod CPU Usage</div>
+      <highcharts-chart
+        *ngIf="cpuChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="cpuChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!cpuChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod Memory Usage</div>
+      <highcharts-chart
+        *ngIf="memoryChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="memoryChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!memoryChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod CPU Limit Usage</div>
+      <highcharts-chart
+        *ngIf="cpuLimitChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="cpuLimitChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!cpuLimitChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod Memory Limit Usage</div>
+      <highcharts-chart
+        *ngIf="memoryLimitChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="memoryLimitChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!memoryLimitChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod Memory Working Set Usage</div>
+      <highcharts-chart
+        *ngIf="memoryWorkingSetLimitChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="memoryWorkingSetLimitChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!memoryWorkingSetLimitChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod Network TX</div>
+      <highcharts-chart
+        *ngIf="networkTxChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="networkTxChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!networkTxChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pod Network RX</div>
+      <highcharts-chart
+        *ngIf="networkRxChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="networkRxChartOptions"
+        [oneToOne]="true">
+      </highcharts-chart>
+      <div *ngIf="!networkRxChartOptions" class="no-data">No data available</div>
+    </div>
+
+  </div>
+
+  <!-- ===== POD STATUS TABLE ===== -->
+  <div class="card">
+    <div class="card-title card-title-row">
+      <div>
+        Pod Status <span>(Metrics Kubernetes)</span>
+      </div>
+
+      <button class="btn-download" (click)="downloadPodStatus()" [disabled]="podStatusList.length === 0">
+        ⬇ Download
+      </button>
+    </div>
+
+    <div class="table-container table-container-lg">
+      <table class="pod-table">
+        <thead>
+          <tr>
+            <th>Pod Name</th>
+            <th>Phase</th>
+            <th>Ready</th>
+            <th>Scheduled</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let pod of paginatedPodStatusList">
+            <td>{{ pod.pod_name }}</td>
+            <td
+              [ngClass]="pod.phase === 'running' ? 'status-true' : 'status-false'">
+              {{ pod.phase }}
+            </td>
+            <td>{{ pod.ready }}</td>
+            <td>{{ pod.scheduled }}</td>
+          </tr>
+
+          <tr *ngIf="paginatedPodStatusList.length === 0">
+            <td colspan="4" class="no-data">No pod status data available</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== PAGINATION ===== -->
+    <!-- ===== PAGINATION ===== -->
+    <div class="pagination-controls" *ngIf="podStatusList.length > 0">
+      <button class="btn-download" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="btn-download" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </div>
+  </div>
+
+</div>

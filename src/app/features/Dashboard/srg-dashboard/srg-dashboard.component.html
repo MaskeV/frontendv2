@@ -1,0 +1,279 @@
+<main class="cdp-root">
+    <!-- ── Page Header ── -->
+    <div class="cdp-page-header">
+        <div class="cdp-page-header__left">
+            <div class="cdp-page-header__icon">
+                <i class="fa-solid fa-table-columns"></i>
+            </div>
+            <div>
+                <h1 class="cdp-page-header__title">SRG Dashboard</h1>
+                <p class="cdp-page-header__sub">Manage your applications and alerts</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ── Table Card ── -->
+    <div class="cdp-card">
+        <!-- ── Search Bar ── -->
+        <div class="cdp-toolbar">
+            <div class="cdp-search-wrap">
+                <i class="fa-solid fa-magnifying-glass cdp-search-wrap__icon"></i>
+                <input class="cdp-search-input" type="text" name="searchTextSRG" [(ngModel)]="searchTextSRG" (ngModelChange)="onSearchChange()" placeholder="Search applications...">
+                <button *ngIf="searchTextSRG" class="cdp-search-clear" (click)="searchTextSRG=''; onSearchChange()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <span class="cdp-result-count" *ngIf="!loaderStatus && pagedalertDetailsList">
+                {{ alertDetailsList?.length || 0 }} result{{ alertDetailsList?.length !== 1 ? 's' : '' }}
+            </span>
+        </div>
+        
+        <!-- Empty State (No Applications) -->
+        <div *ngIf="!loaderStatus && (!pagedalertDetailsList || pagedalertDetailsList.length === 0)" class="cdp-state cdp-state--empty">
+            <div class="cdp-state__icon"><i class="fa-regular fa-folder-open"></i></div>
+            <p class="cdp-state__title">No Applications Found</p>
+            <p class="cdp-state__sub">It looks like there are no applications registered for your account.</p>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="pagedalertDetailsList && pagedalertDetailsList.length > 0" class="cdp-table-wrap">
+            <table class="cdp-table">
+                <thead>
+                    <tr>
+                        <th class="cdp-th--sortable">
+                            Application Name
+                        </th>
+                        <th style="text-align: center;">
+                            Sub Features
+                        </th>
+                        <th style="text-align: center;">
+                            Open Alerts
+                        </th>
+                        <th style="text-align: center;">
+                            Closed Alerts
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let data of pagedalertDetailsList; let i = index">
+                        <tr class="cdp-table__row">
+                            <td class="cdp-table__cell--name">
+                                <div class="cdp-name-cell">
+                                    <a class="cdp-name-link" [routerLink]="['/tab-panel']" [queryParams]="{ appID: data.applicationId || data.appID }"
+                                        (click)="changeIcon('dashboard'); storeAppID(data.applicationName)"
+                                        [title]="data.applicationName" style="cursor: pointer;">
+                                        <i class="bi bi-bar-chart-fill cdp-name-link__icon"></i>
+                                        <span>{{ data.applicationName }}</span>
+                                    </a>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="cdp-badge" [class.cdp-badge--zero]="!(appToSubFeatureMap.get(data.applicationName)?.length)">
+                                    {{ appToSubFeatureMap.get(data.applicationName)?.length || 0 }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="javascript:void(0)" (click)="getCriticalAlertsDetails(alertMod, data.applicationId || data.appID)" style="text-decoration: none;">
+                                    <div class="legend-item" title="Open Alerts" style="display: flex; justify-content: center; align-items: center;">
+                                        <span class="legend-dot dot-critical" style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#dc3545; margin-right:5px;"></span>
+                                        <span class="text-critical" style="color:#dc3545; font-weight:500;">{{data.openAlerts}}</span>
+                                    </div>
+                                </a>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="javascript:void(0)" (click)="getNormalAlertsDetails(alertMod, data.applicationId || data.appID)" style="text-decoration: none;">
+                                    <div class="legend-item" title="Closed Alerts" style="display: flex; justify-content: center; align-items: center;">
+                                        <span class="legend-dot dot-normal" style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#28a745; margin-right:5px;"></span>
+                                        <span class="text-normal" style="color:#28a745; font-weight:500;">{{data.closedAlerts}}</span>
+                                    </div>
+                                </a>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Pagination ── -->
+        <div *ngIf="alertDetailsList?.length" class="cdp-pagination">
+            <div class="cdp-pagination__info">
+                Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ alertDetailsList.length }} entries
+            </div>
+
+            <div class="cdp-pagination__controls">
+                <button class="cdp-page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="cdp-page-btn" (click)="previousPage()" [disabled]="currentPage === 1"
+                    title="Previous page">
+                    <i class="fa-solid fa-angle-left"></i>
+                </button>
+
+                <ng-container *ngFor="let page of totalPagesArray">
+                    <button *ngIf="page !== '...' && isPageNumber(page)" class="cdp-page-btn cdp-page-btn--num" [class.cdp-page-btn--active]="page === currentPage"
+                        (click)="goToPage(page)">
+                        {{ page }}
+                    </button>
+                    <span *ngIf="page === '...'" class="cdp-page-btn cdp-page-btn--num" style="pointer-events: none;">{{ page }}</span>
+                </ng-container>
+
+                <button class="cdp-page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages"
+                    title="Next page">
+                    <i class="fa-solid fa-angle-right"></i>
+                </button>
+                <button class="cdp-page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+                    title="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+        <!-- Alert Modals -->
+        <ng-template #alertMod>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="modal-title mb-0">Alert Details</h5>
+                    <div class="searchbar">
+                        <input type="text" id="search-text"
+                            [(ngModel)]="searchText" (keyup)="search()" placeholder="Search Alert..."
+                            autofocus autocomplete="off">
+                        <i class="fas fa-search search_icon"></i>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr. No</th>
+                                <th scope="col" class="sort-header" (click)="sortBy('applicationName');">
+                                    Application Name
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('alertName');">
+                                    Health Rule Name
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('status');">
+                                    Status
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('thresholdWarningValue');">
+                                    Threshold Warning
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('thresholdCriticalValue');">
+                                    Threshold Critical
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('currentEscalatedLevel');">
+                                    Current Escalated Level
+                                </th>
+                                <th scope="col" class="sort-header" (click)="sortBy('thresholdBreachedTime');">
+                                    Threshold Breached Time
+                                </th>
+                                <th scope="col">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of alertMailBodyRows; let j = index;">
+                                <td>{{ j + 1 }}</td>
+                                <td>{{ data.applicationName }}</td>
+                                <td>{{ data.metric }}</td>
+                                <td>
+                                    <span class="status-badge" [ngClass]="{
+                                        'status-critical': data.status === 'Critical',
+                                        'status-warning': data.status === 'Warning',
+                                        'status-normal': data.status !== 'Critical' && data.status !== 'Warning'
+                                    }">
+                                        {{ data.status }}
+                                    </span>
+                                </td>
+                                <td> </td>
+                                <td> </td>
+                                <td>{{ data.label }}</td>
+                                <td>{{ data.currentValue }}</td>
+                                <td> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-right">
+                    <button type="button" class="btn btn-outline-light" (click)="cancelRequest()">Close</button>
+                </div>
+            </div>
+        </ng-template>
+
+        <div class="modal fade" id="alertBodyModal" tabindex="-1" role="dialog"
+            aria-labelledby="alertBodyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title m-0">Alert Details</h5>
+                        <button type="button" class="close text-light" style="background: transparent; border: none; font-size: 1.5rem; opacity: 0.8;" data-dismiss="modal"
+                            aria-label="Close" (click)="getPreviousModal(alertMod)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div *ngIf="!isAgentStatus" class="modal-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="sort-header" (click)="sortBy('applicationName');">
+                                            Application
+                                        </th>
+                                        <th scope="col" class="sort-header" (click)="sortBy('metric');">
+                                            Metric
+                                        </th>
+                                        <th scope="col">Metric type</th>
+                                        <th scope="col">Health Rule Name</th>
+                                        <th scope="col">Breached Value</th>
+                                        <th scope="col">IP Address</th>
+                                        <th scope="col" class="sort-header" (click)="sortBy('label');">Label</th>
+                                        <th scope="col" class="sort-header" (click)="sortBy('currentValue');">
+                                            Current Value
+                                        </th>
+                                        <th scope="col" class="sort-header" (click)="sortBy('status');">
+                                            Status
+                                        </th>
+                                        <th scope="col">Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let data of alertMailBodyRows; let j = index;">
+                                        <td>{{data.applicationName}}</td>
+                                        <td>{{data.metric}}</td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td>{{data.label}}</td>
+                                        <td>{{data.currentValue}}</td>
+                                        <td>
+                                            <span class="status-badge" [ngClass]="{
+                                                'status-critical': data.status === 'Critical',
+                                                'status-warning': data.status === 'Warning',
+                                                'status-normal': data.status !== 'Critical' && data.status !== 'Warning'
+                                            }">
+                                                {{ data.status }}
+                                            </span>
+                                        </td>
+                                        <td> </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 text-center text-info font-weight-bold" *ngIf="isAgentStatus || agentStatusMail">
+                        {{agentStatusMail}}
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</main>

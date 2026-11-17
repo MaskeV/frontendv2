@@ -1,0 +1,332 @@
+<div class="bp-main">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb bp-bc mb-0">
+      <li class="breadcrumb-item"><a routerLink="/browser">Browser Monitoring</a></li>
+      <li class="breadcrumb-item"><a routerLink="/browser/browser-service">{{ decodedServiceId }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ selectedService }}</li>
+    </ol>
+  </nav>
+
+  <div class="bp-tabs-wrap">
+    <ul class="nav nav-tabs" id="bp-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="activeTab === 'trace'" (click)="setActiveTab('trace')">Trace</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="activeTab === 'log'" (click)="setActiveTab('log')">Log</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="tab-content bp-tab-content">
+    
+    <!-- OVERVIEW TAB -->
+    <div class="tab-pane" [class.active]="activeTab === 'overview'" *ngIf="activeTab === 'overview'" id="overview">
+      <div class="p-2">
+        <div class="row g-2">
+          
+          <!-- App Load -->
+          <div class="col-lg-4">
+            <div class="card bp-card">
+              <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <span>Load of The Selected Version (CPM - calls/min)</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total number of calls per minute for this version."></i>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div id="appLoadGraph" class="bp-chart h-26"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Rate -->
+          <div class="col-lg-4">
+            <div class="card bp-card">
+              <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <span>Error Rate of The Selected Version (%)</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Percentage of requests that resulted in errors."></i>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div id="appErrorRateGraph" class="bp-chart h-26"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Count -->
+          <div class="col-lg-4">
+            <div class="card bp-card">
+              <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <span>Error Count of The Selected Version</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total number of errors recorded for this version."></i>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div id="appErrorCountGraph" class="bp-chart h-26"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACE TAB -->
+    <div class="tab-pane" [class.active]="activeTab === 'trace'" *ngIf="activeTab === 'trace'" id="trace">
+      <div class="p-2">
+
+        <!-- ====== FILTER BAR ====== -->
+        <div class="trc-filter-bar">
+          <div class="trc-criteria-wrap" style="position: relative;">
+            <div class="trc-criteria-btn" (click)="toggleDropdown()"
+              [style.pointerEvents]="allCriteriaSelected ? 'none' : 'auto'"
+              [style.opacity]="allCriteriaSelected ? '0.5' : '1'">
+              <i class="fa-solid fa-plus trc-criteria-btn__icon"></i>
+              Criteria
+              <i class="fas fa-caret-down trc-criteria-btn__caret"></i>
+            </div>
+            <ul *ngIf="dropdownOpen && !allCriteriaSelected" class="trc-dropdown">
+              <li *ngFor="let c of availableCriteria" (click)="selectCriteria(c.key)" class="trc-dropdown__item">{{ c.label }}</li>
+            </ul>
+          </div>
+          <div class="trc-filter-divider"></div>
+          <div class="trc-filters-scroll">
+            <div class="trc-filter-pill" *ngFor="let c of criteriaList" [hidden]="!shownCriteria[c.key]">
+              <label class="trc-filter-pill__label">{{ c.label }}</label>
+              <ng-container [ngSwitch]="c.key">
+                <select *ngSwitchCase="'endpoint'" [(ngModel)]="endpointTraces" class="trc-filter-pill__input" style="width:130px;">
+                  <option *ngFor="let e of endpointsTraces" [value]="e.value">{{ e.name }}</option>
+                </select>
+                <select *ngSwitchCase="'status'" [(ngModel)]="traceState" class="trc-filter-pill__input" style="width:100px;">
+                  <option value="">All</option>
+                  <option value="success">Success</option>
+                  <option value="error">Error</option>
+                </select>
+                <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceID" class="trc-filter-pill__input" style="width:150px;" placeholder="Trace ID" autocomplete="off" />
+                <input *ngSwitchCase="'minDuration'" type="number" [(ngModel)]="minDuration" class="trc-filter-pill__input" style="width:90px;" placeholder="Min" />
+                <input *ngSwitchCase="'maxDuration'" type="number" [(ngModel)]="maxDuration" class="trc-filter-pill__input" style="width:90px;" placeholder="Max" />
+              </ng-container>
+              <i class="fas fa-times trc-filter-pill__remove" (click)="removeCriteria(c.key)"></i>
+            </div>
+          </div>
+          <div class="trc-filter-divider"></div>
+          <div class="bs-search-icon-btn" (click)="search()"><i class="fas fa-search"></i></div>
+        </div>
+
+        <!-- ====== TRACE DETAILS CARD ====== -->
+        <div class="trc-details">
+          <div class="trc-details__header">
+            <span class="trc-details__title">Traces</span>
+            <span class="trc-details__count" *ngIf="totalTraces">{{ totalTraces }} results</span>
+          </div>
+          <div class="trc-table-scroll">
+            <table class="trc-table">
+              <thead>
+                <tr>
+                  <th style="width:5%">Status</th>
+                  <th style="width:20%">Endpoint ({{ totalTraces }})</th>
+                  <th style="width:12%">Duration</th>
+                  <th style="width:12%">Start Time</th>
+                  <th style="width:51%">Trace ID</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="isLoading">
+                <tr class="trc-tr" *ngFor="let i of [].constructor(8)">
+                  <td><div class="skeleton h-4 w-100"></div></td>
+                  <td><div class="skeleton h-4 w-100"></div></td>
+                  <td><div class="skeleton h-4 w-100"></div></td>
+                  <td><div class="skeleton h-4 w-100"></div></td>
+                  <td><div class="skeleton h-4 w-100"></div></td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!isLoading && paginatedTraceData.length > 0">
+                <tr class="trc-tr" *ngFor="let item of paginatedTraceData" (click)="selectItem(item)"
+                  [ngClass]="{'trc-tr--active': selectedTraceId === item.trace_id}">
+                  <td><div class="trc-status-bar" [ngClass]="item.is_error ? 'trc-status-bar--err' : 'trc-status-bar--ok'"></div></td>
+                  <td class="trc-td--link text-ellipsis" [title]="item.endpoint_id">{{ item.endpoint_id }}</td>
+                  <td><span class="trc-lat-pill" [class.trc-lat-pill--warn]="item.latency > 200">{{ item.latency }} ms</span></td>
+                  <td class="trc-td--muted">{{ formatTimeBucket(item.time_bucket) }}</td>
+                  <td class="trc-td--mono trc-td--muted text-ellipsis" [title]="item.trace_id">{{ item.trace_id }}</td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!isLoading && paginatedTraceData.length === 0">
+                <tr><td colspan="5" class="trc-empty trc-empty--table">No Data Available</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="trc-pager" *ngIf="paginatedTraceData.length !== 0">
+            <span class="trc-pager__info">{{ traceItemRange }}</span>
+            <div class="trc-pager__controls">
+              <button class="trc-pager__btn" (click)="previousTracePage()" [disabled]="currentPage === 1"><i class="fa-solid fa-angle-left"></i></button>
+              <input type="number" class="trc-pager__input" [value]="currentPage" (keydown.enter)="goToTracePage(+inputTracePage.value)" #inputTracePage min="1" [max]="totalPages" />
+              <span class="trc-pager__of">of {{ totalPages }}</span>
+              <button class="trc-pager__btn" (click)="nextTracePage()" [disabled]="currentPage === totalPages"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== VIEW SWITCHER + LIST/TREE/STAT ====== -->
+        <div class="row mt-2">
+          <div class="col">
+            <div class="trc-view-bar">
+              <div class="trc-view-bar__left"></div>
+              <div class="trc-view-bar__right">
+                <div class="trc-view-switcher">
+                  <i class="fa fa-table trc-view-btn" [class.trc-view-btn--active]="selectedView==='table'" (click)="changeView('table')" title="Table"></i>
+                  <i class="fas fa-list trc-view-btn" [class.trc-view-btn--active]="selectedView==='list'" (click)="changeView('list')" title="List"></i>
+                  <i class="fas fa-network-wired trc-view-btn" [class.trc-view-btn--active]="selectedView==='tree'" (click)="changeView('tree')" title="Tree"></i>
+                  <i class="fa fa-bar-chart trc-view-btn" [class.trc-view-btn--active]="selectedView==='stat'" (click)="changeView('stat')" title="Stats"></i>
+                </div>
+                <div class="trc-id-info">
+                  <i class="fa-solid fa-circle-info trc-id-info__icon"></i>
+                  <div class="trc-id-info__popup">
+                    <span class="trc-id-info__label">Trace ID</span>
+                    <span class="trc-id-info__val">{{ selectedTraceId }}</span>
+                    <i class="fa-regular fa-copy trc-id-info__copy" (click)="copyTraceId(selectedTraceId, $event)"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="trc-details trc-details--inner">
+              <div class="trc-details__header"><span class="trc-details__title">Trace Details</span></div>
+              <div class="trc-details__body">
+                <ng-container [ngSwitch]="selectedView">
+                  <app-table-view *ngSwitchCase="'table'" [traceMetaData]="traceMetaData" (itemSelected)="onTableRowSelected($event)"></app-table-view>
+                  <app-list-view *ngSwitchCase="'list'" [hierarchicalList]="hierarchicalList" (itemSelected)="onListItemSelected($event)"></app-list-view>
+                  <app-tree-view *ngSwitchCase="'tree'" [traceData]="traceData || []" (selectedNode)="openModal($event)"></app-tree-view>
+                  <app-stat-view *ngSwitchCase="'stat'" [traceMetaData]="traceMetaData"></app-stat-view>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MODAL ===== -->
+        <app-trace-details-modal *ngIf="showModal" [modalData]="modalData" (closeModal)="closeModal()"></app-trace-details-modal>
+
+      </div>
+    </div>
+
+    <!-- LOG TAB -->
+    <div class="tab-pane" [class.active]="activeTab === 'log'" *ngIf="activeTab === 'log'" id="log">
+      <div class="log-root p-2">
+
+        <!-- ====== FILTER BAR ====== -->
+        <div class="log-filter-bar">
+          <div class="log-criteria-wrap" style="position: relative;">
+            <div class="log-criteria-btn" (click)="toggleDropDownLogs()">
+              <i class="fa-solid fa-plus log-criteria-btn__icon"></i>
+              Criteria
+              <i class="fas fa-caret-down log-criteria-btn__caret"></i>
+            </div>
+            <ul *ngIf="dropDownOpenLogs" class="log-dropdown">
+              <li *ngFor="let c of availableCriteriaLogs" (click)="selectCriteriaLogs(c.key)" class="log-dropdown__item">{{ c.label }}</li>
+            </ul>
+          </div>
+          <div class="log-filter-divider"></div>
+          <div class="log-filters-scroll">
+            <div class="log-filter-pill" *ngFor="let c of criteriaListLogs" [hidden]="!showCriteriaLogs[c.key]">
+              <label class="log-filter-pill__label">{{ c.label }}</label>
+              <ng-container [ngSwitch]="c.key">
+                <select *ngSwitchCase="'page'" [(ngModel)]="pageIdLogs" class="log-filter-pill__input" style="width:130px;">
+                  <option *ngFor="let e of endpointsLogs" [value]="e.value">
+                    {{ e.name }}
+                  </option>
+                </select>
+                <select *ngSwitchCase="'category'" [(ngModel)]="categoryLogs" class="log-filter-pill__input" style="width:100px;">
+                  <option value="All">All</option>
+                  <option value="ajax">ajax</option>
+                  <option value="resource">resource</option>
+                  <option value="vue">vue</option>
+                  <option value="promise">promise</option>
+                  <option value="js">js</option>
+                  <option value="unknown">unknown</option>
+                </select>
+              </ng-container>
+              <i class="fas fa-times log-filter-pill__remove" (click)="removeCriteriaLogs(c.key)"></i>
+            </div>
+          </div>
+          <div class="log-filter-divider"></div>
+          <button class="log-search-btn" (click)="searchLogs()"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <!-- ====== LOGS DETAILS CARD ====== -->
+        <div class="log-card">
+          <div class="log-card__header">
+            <span class="log-card__title">Logs Details</span>
+            <span class="log-card__count" *ngIf="totalLogs">{{ totalLogs }} results</span>
+          </div>
+          <div class="log-table-scroll">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th style="width:8%">Service</th>
+                  <th style="width:6%">Version</th>
+                  <th style="width:12%">Error Page</th>
+                  <th style="width:12%">Error URL</th>
+                  <th style="width:12%">Time</th>
+                  <th style="width:14%">Message</th>
+                  <th style="width:22%">Stack</th>
+                  <th style="width:8%">Category</th>
+                  <th style="width:6%">Grade</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="loadingLogs">
+                <tr class="log-tr" *ngFor="let i of [].constructor(10)">
+                  <td colspan="9"><div class="log-skeleton"></div></td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="!loadingLogs && !noData">
+                <tr class="log-tr" *ngFor="let item of tableDataLogs">
+                  <td class="bp-log-cell">{{ item.service }}</td>
+                  <td class="bp-log-cell">{{ item.service_version }}</td>
+                  <td class="bp-log-cell bp-log-cell--clickable" (click)="openLogModal('Error Page', item.page_path)">{{ item.page_path }}</td>
+                  <td class="bp-log-cell bp-log-cell--clickable" (click)="openLogModal('Error URL', item.error_url)">{{ item.error_url }}</td>
+                  <td class="bp-log-cell">{{ item.time | date:'medium' }}</td>
+                  <td class="bp-log-cell bp-log-cell--clickable" (click)="openLogModal('Message', item.message)">{{ item.message }}</td>
+                  <td class="bp-log-cell bp-log-cell--clickable" (click)="openLogModal('Stack', item.stack)">{{ item.stack }}</td>
+                  <td class="bp-log-cell">{{ item.error_category }}</td>
+                  <td [style.color]="item.grade === 'Error' ? '#ef4444' : '#22c55e'">{{ item.grade }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="noData" class="log-empty log-empty--table">No Data Available</div>
+          </div>
+          
+          <div class="log-pager" *ngIf="tableDataLogs.length !== 0">
+            <span class="log-pager__info">{{ getStartIndex() }} - {{ getEndIndex() }} / {{ totalLogs }}</span>
+            <div class="log-pager__controls">
+              <button class="log-pager__btn" (click)="previousPage()" [disabled]="currentPageLogs === 1 || totalPagesLogs === 0"><i class="fa-solid fa-angle-left"></i></button>
+              <input class="log-pager__input" type="number" [(ngModel)]="currentPageLogs" (keydown.enter)="goToPage(currentPageLogs)" [min]="1" [max]="totalPagesLogs" />
+              <span class="log-pager__of">of {{ totalPagesLogs }}</span>
+              <button class="log-pager__btn" (click)="nextPage()" [disabled]="currentPageLogs === totalPagesLogs"><i class="fa-solid fa-angle-right"></i></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Custom Log Details Popup Modal -->
+<div class="log-details-modal-backdrop" *ngIf="showLogDetailsModal" (click)="closeLogModal()">
+  <div class="log-details-modal-content" (click)="$event.stopPropagation()">
+    <div class="log-details-modal-header">
+      <span class="log-details-modal-title">{{ logModalTitle }}</span>
+      <button class="log-details-modal-close" (click)="closeLogModal()">&times;</button>
+    </div>
+    <div class="log-details-modal-body">
+      <pre>{{ logModalContent }}</pre>
+    </div>
+  </div>
+</div>

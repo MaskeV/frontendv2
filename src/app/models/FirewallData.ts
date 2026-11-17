@@ -1,0 +1,40 @@
+import { Session } from "./session";
+
+export class FirewallRule {
+    id: any;
+    firewallConfigurationMasterId: any;
+    action: any;
+    AOEmpId: any;
+    AOName: any;
+    applicationName: any;
+    applicationStatus: any;
+    canId: any;
+    createdOn: any;
+    description: any;
+    destinationAddress: any;
+    firewall: any;
+    organization: any;
+    remark: any;
+    retainDelete: any;
+    ruleName: any;
+    ruleNo: any;
+    searchIP: any;
+    sourcePort: any;
+    destinationPort: any;
+    sourceAddress: any;
+    STLName: any;
+    STLEmpId: any;
+    teamHeadName: any;
+    teamHeadEmpId: any;
+    ruleExpiryDate: any;
+    ipProtocol: any;
+    protocol: any;
+    statetype: any;
+    quick: any;
+    sessionDTO: Session;
+    createdBy: any;
+    updatedBy: any;
+    deletedBy: any;
+    scheduleUpdate: any;
+    scheduledTime: any;
+}

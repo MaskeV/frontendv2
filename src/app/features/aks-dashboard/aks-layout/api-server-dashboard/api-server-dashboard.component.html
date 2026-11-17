@@ -1,0 +1,83 @@
+<div class="pods-container">
+
+  <!-- ================= CHART GRID ================= -->
+  <div class="chart-grid">
+
+    <!-- 1️⃣ APISERVER REQUEST RATE -->
+    <div class="card">
+      <div class="card-title">
+        Apiserver Requests Rate per Resource
+        <span class="subtitle">[Metrics Kubernetes]</span>
+      </div>
+
+      <highcharts-chart
+        *ngIf="requestRateChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="requestRateChartOptions"
+        style="width: 100%; height: 260px; display: block;">
+      </highcharts-chart>
+
+      <div *ngIf="!requestRateChartOptions" class="no-data">
+        No data available
+      </div>
+    </div>
+
+    <!-- 2️⃣ WATCH EVENTS SIZE -->
+    <div class="card">
+      <div class="card-title">
+        Apiserver Watch Events Size per Kind
+        <span class="subtitle">[Metrics Kubernetes]</span>
+      </div>
+
+      <highcharts-chart
+        *ngIf="watchEventChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="watchEventChartOptions"
+        style="width: 100%; height: 260px; display: block;">
+      </highcharts-chart>
+
+      <div *ngIf="!watchEventChartOptions" class="no-data">
+        No data available
+      </div>
+    </div>
+
+    <!-- 3️⃣ REQUESTS PER RESOURCE (BAR) -->
+    <div class="card">
+      <div class="card-title">
+        Apiserver Requests per Resource
+        <span class="subtitle">[Metrics Kubernetes]</span>
+      </div>
+
+      <highcharts-chart
+        *ngIf="resourceRequestChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="resourceRequestChartOptions"
+        style="width: 100%; height: 300px; display: block;">
+      </highcharts-chart>
+
+      <div *ngIf="!resourceRequestChartOptions" class="no-data">
+        No data available
+      </div>
+    </div>
+
+    <!-- 4️⃣ STORED OBJECTS (PIE) -->
+    <div class="card">
+      <div class="card-title">
+        Apiserver Stored Objects per Resource
+        <span class="subtitle">[Metrics Kubernetes]</span>
+      </div>
+
+      <highcharts-chart
+        *ngIf="storedObjectsChartOptions"
+        [Highcharts]="Highcharts"
+        [options]="storedObjectsChartOptions"
+        style="width: 100%; height: 300px; display: block;">
+      </highcharts-chart>
+
+      <div *ngIf="!storedObjectsChartOptions" class="no-data">
+        No data available
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<main class="main">
+  <!-- Header -->
+  <div class="p-1 rounded">
+    <header class="pb-0 mb-0">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active sm-font" aria-current="page">Network</a>
+        </li>
+      </ul>
+    </header>
+  </div>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mx-1" style="height: 7.5vh; font-size: small; margin-bottom: -30px;">
+    <ol class="breadcrumb" style="padding: 0px 5px;">
+      <li class="breadcrumb-item"><a routerLink="/network">{{serviceId}}</a></li>
+      <li class="breadcrumb-item"><a routerLink="/network/network-data">Network Data</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{tagName}}</li>
+    </ol>
+  </nav>
+
+  <!-- Container -->
+  <div class=" custom-bg " style="margin-top: 1%;">
+    <div class="tab-content rounded-3 mx-0 mb-2 px-1" style="height: 82vh; overflow-y: auto;">
+      <div>
+        <section class="network-section mb-4">
+
+          <!-- Header + Search -->
+          <div class=" d-flex justify-content-end align-items-center">
+            <!-- <h5 class="mb-0">All Network Charts</h5> -->
+            <div style="width: 20%;">
+              <!-- <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" [(ngModel)]="searchQuery" (input)="onSearch()"
+                                    style="font-size: x-small;border-right: 0;" placeholder="Search charts..." />
+                                <span class="input-group-text" style="cursor: pointer;" (click)="toggleSearch()">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div> -->
+            </div>
+          </div>
+
+          <!-- Chart Grid -->
+          <div class=" ">
+            <!-- Skeleton loader -->
+            <div class="row p-2" *ngIf="executingChartLoad">
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" *ngFor="let dummy of skeletonArray">
+                <div class="card h-100 shadow-sm border-2 skeleton-card" style="padding: 0%; border-radius: 2%;">
+                  <div class="card-header text-center ">
+                    <div class="skeleton skeleton-text w-75 mx-auto" style="height: 18px;"></div>
+                  </div>
+                  <div class="card-body p-1 d-flex justify-content-center align-items-center" style="height: 125px;">
+                    <div class="skeleton skeleton-chart" style="width: 90%; height: 100px;"></div>
+                  </div>
+                  <div class="card-footer text-center p-1 d-flex justify-content-around">
+                    <div class="skeleton skeleton-text" style="width: 20%; height: 12px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 20%; height: 12px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 20%; height: 12px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 20%; height: 12px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div *ngIf="!executingChartLoad">
+              <ng-container *ngFor="let groupName of groupOrder">
+                <div class="d-flex mb-4 align-items-start">
+                  <!-- Section Header -->
+                  <div class="section-header d-flex align-items-center justify-content-center me-2"
+                    [style.height.px]="getSectionHeaderHeight(groupedInterfaceCharts[groupName])" style="flex: 0 0 4%;">
+                    <h5 class="fw-bold mb-0 text-center" [matTooltip]="groupName">{{ groupName }}</h5>
+                  </div>
+
+                  <!-- Charts -->
+                  <div class="charts-container d-flex flex-wrap align-content-start" style="flex: 0 0 96%; gap: 0.5%;">
+                    <ng-container *ngFor="let chartOption of groupedInterfaceCharts[groupName]">
+                      <!-- Actual Chart -->
+                      <div *ngIf="!chartOption.isPlaceholder"
+                        class="chart-card w-33 px-0 custom-border border div-elem mb-3">
+
+                        <!-- 🧱 Card Header -->
+                        <div
+                          class="card-header rounded-0 d-flex justify-content-between align-items-center px-1 border-bottom custom-border"
+                          style="background-color: var(--card-header-bg); font-weight: 599;">
+                          <span style="font-size: small; font-weight: 500;">
+                            {{ (chartOption.itemName.split(':')[1] || chartOption.itemName).trim().toLowerCase() ===
+                            'speed' ? 'Maximum Speed' : (chartOption.itemName.split(':')[1] || chartOption.itemName) }}
+                          </span>
+                          <span>
+                            <i class="fa-solid fa-circle-info gradiantIcon ms-1"
+                              [matTooltip]="chartOption.description"></i>
+                          </span>
+                        </div>
+
+                        <!-- 📊 Card Body -->
+                        <div class="card-body h-33 p-0">
+                          <div *ngIf="chartOption.hasData; else noDataBlock">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="chartOption"
+                              style="width: 100%; height: 150px; display: block;"></highcharts-chart>
+                          </div>
+                          <ng-template #noDataBlock>
+                            <div class="text-center"
+                              style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                              <p>No Data</p>
+                            </div>
+                          </ng-template>
+                        </div>
+
+                        <!-- 📉 Card Footer (Stats) -->
+                        <div class="border-top custom-border text-center p-1"
+                          style="font-size: x-small; font-weight: bold;">
+                          <ng-container *ngIf="chartOption.chart?.type === 'gauge'; else normalStats">
+                            <span>Min: {{ formatBpsValue(chartOption.min) }}</span>&nbsp;&nbsp;
+                            <span>Max: {{ formatBpsValue(chartOption.max) }}</span>&nbsp;&nbsp;
+                            <span>Avg: {{ formatBpsValue(chartOption.avg) }}</span>&nbsp;&nbsp;
+                            <span>Last: {{ formatBpsValue(chartOption.last) }}</span>
+                          </ng-container>
+                          <ng-template #normalStats>
+                            <span>Min: {{ chartOption.min }}</span>&nbsp;&nbsp;
+                            <span>Max: {{ chartOption.max }}</span>&nbsp;&nbsp;
+                            <span>Avg: {{ chartOption.avg }}</span>&nbsp;&nbsp;
+                            <span>Last: {{ chartOption.last }}</span>
+                          </ng-template>
+                        </div>
+
+                      </div>
+
+
+                      <!-- Placeholder -->
+                      <div *ngIf="chartOption.isPlaceholder" class="w-33 mb-3"></div>
+                    </ng-container>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+
+
+            <!-- No Data -->
+            <p *ngIf="networkGraphItemsData && networkGraphItemsData?.length === 0"
+              class="noData d-flex justify-content-center align-items-center">
+              No Data to Display
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>

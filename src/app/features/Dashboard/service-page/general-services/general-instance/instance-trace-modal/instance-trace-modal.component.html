@@ -1,0 +1,150 @@
+<div class="modal" tabindex="-1" role="dialog" *ngIf="isVisible">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title">Trace Details Insight</h5>
+                <button type="button" class="btn-close" (click)="closeMainModal()" aria-label="Close" style="background: none; border: none; font-size: 20px; color: #718096; line-height: 1;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="scrollable">
+                    <div class="d-flex align-items-center bg-light border-bottom px-4 py-3" style="border: 1px solid #edf2f7; gap: 20px;">
+                        <div class="d-flex align-items-center" style="font-size: 15px; font-weight: 500;">
+                            <label class="mb-0 text-secondary mr-2">Status:</label>
+                            <select
+                                style="height: 36px; padding: 0 12px; font-size: 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff;"
+                                class="form-select w-auto" name="status" [(ngModel)]="status" (change)="search()">
+                                <option value="">All Transactions</option>
+                                <option value="success">Successful</option>
+                                <option value="error">Errors</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center" style="font-size: 15px; font-weight: 500; flex-grow: 1; max-width: 400px;">
+                            <input type="text" [(ngModel)]="searchQuery" placeholder="Search Trace ID or method..."
+                                style="height: 36px; padding: 0 12px; font-size: 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; width: 100%; outline: none;"
+                                (keyup.enter)="search()">
+                        </div>
+                        <button class="btn btn-sm d-flex align-items-center px-4" (click)="search()" style="background: #ebf8ff; border: 1px solid #bee3f8; border-radius: 6px; height: 36px; color: #0071A7; font-size: 14px; font-weight: 600;">
+                            <i class="fas fa-search mr-2"></i> Search
+                        </button>
+                    </div>
+                    <div class="grid-container bg-transparent overflow-hidden">
+                        <div>
+                            <div class="left d-flex flex-column h-100">
+                                <div class="flex-grow-1 overflow-auto">
+                                    <table class="table w-100 table-fixed bg-transparent mb-0" style="border-collapse: separate; border-spacing: 0;">
+                                        <thead class="bg-light sticky-top" style="z-index: 10;">
+                                            <tr style="border-bottom: 1px solid #edf2f7;">
+                                                <th class="bg-light" style="padding: 15px 20px;">
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <span style="font-size: 12px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.05em;">Trace Segments</span>
+                                                        <div class="d-flex gap-2">
+                                                            <select class="form-select form-select-sm py-0 shadow-none" (change)="getSortParameter($event)"
+                                                                style="height: 28px; font-size: 12px; width: 130px; border-radius: 6px;">
+                                                                <option value="start_time">Start Time</option>
+                                                                <option value="duration">Duration</option>
+                                                            </select>
+                                                            <select class="form-select form-select-sm py-0 shadow-none" (change)="getOrderParameter($event)"
+                                                                style="height: 28px; font-size: 12px; width: 75px; border-radius: 6px;">
+                                                                <option value="des">DESC</option>
+                                                                <option value="asc">ASC</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngIf="paginatedData?.length === 0">
+                                                <th class="text-center py-5 text-muted" scope="row">No Trace Segments Available</th>
+                                            </tr>
+                                            <tr *ngFor="let item of paginatedData" (click)="selectItem(item)"
+                                                style="cursor: pointer; border-bottom: 1px solid #f7fafc;">
+                                                <td style="padding: 15px 20px;">
+                                                    <div class="d-flex flex-column overflow-hidden">
+                                                        <span class="text-ellipsis-cell"
+                                                            [title]="decodeBase64(item.endpointId)"
+                                                            [ngStyle]="{'color': item.isError ? '#c91704' : '#0071A7'}"
+                                                            style="font-size: 15px; font-weight: 600;">
+                                                            {{ decodeBase64(item.endpointId) }}
+                                                        </span>
+                                                        <div class="d-flex align-items-center gap-3 mt-2">
+                                                            <span class="badge" style="font-size: 12px; padding: 4px 10px; background: #ebf8ff; color: #0071A7; border-radius: 4px; border: 1px solid #bee3f8;">{{ item.latency }}ms</span>
+                                                            <span class="text-muted" style="font-size: 13px;">{{ formatTimeBucket(item.timeBucket) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="border-top bg-light p-3 d-flex justify-content-center sticky-bottom" style="z-index: 10;">
+                                    <nav aria-label="Page navigation">
+                                        <ul class="custom-pagination mb-0">
+                                            <li class="page-item" [class.disabled]="currentPage === 1">
+                                                <button class="page-link shadow-none" (click)="changePage(currentPage - 1)">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </button>
+                                            </li>
+                                            <li class="page-item" *ngFor="let page of visiblePageNumbers" [class.active]="page === currentPage">
+                                                <button class="page-link shadow-none" (click)="changePage(page)">{{ page }}</button>
+                                            </li>
+                                            <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                                <button class="page-link shadow-none" (click)="changePage(currentPage + 1)">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-grid">
+                            <div class="right-top">
+                                <div class="right-top-row">
+                                    <div class="right-top-left">
+                                        <h6 style="font-size: 14px; font-weight: 700; color: #1a202c;">{{ selectedItem || 'No Data' }}</h6>
+                                        <div class="d-flex flex-column gap-1 mt-1">
+                                            <span style="font-size: 13px; color: #718096;"><strong style="color: #4a5568;">Trace ID:</strong> {{selectedTraceId}}</span>
+                                            <span style="font-size: 13px; color: #718096;"><strong style="color: #4a5568;">Duration:</strong> {{ selectedLatency }} ms</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="right-top-right">
+                                        <i title="View Related Logs" (click)="openViewLogs()" class="fa-regular fa-eye icon-btn"></i>
+                                        <i title="Table View" (click)="changeView('table')" [class.selected]="selectedView === 'table'" class="fa fa-table icon-btn"></i>
+                                        <i title="List View" (click)="changeView('list')" [class.selected]="selectedView === 'list'" class="fas fa-list icon-btn"></i>
+                                        <i title="Tree View" (click)="changeView('tree')" [class.selected]="selectedView === 'tree'" class="fas fa-network-wired icon-btn"></i>
+                                        <i title="Statistics" (click)="changeView('stat')" [class.selected]="selectedView === 'stat'" class="fa fa-bar-chart icon-btn"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right-bottom">
+                                <div class="scrollable-right p-3">
+                                    <ng-container *ngIf="selectedView === 'table'">
+                                        <app-table-view [traceMetaData]="traceMetaData"
+                                            (itemSelected)="onTableRowSelected($event)"></app-table-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'list'">
+                                        <app-list-view [hierarchicalList]="hierarchicalList"
+                                            (itemSelected)="onListItemSelected($event)"></app-list-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'tree'">
+                                        <div style="height: 100%; width: 100%;">
+                                            <app-tree-view [traceData]="traceData"
+                                                (selectedNode)="openModal($event)"></app-tree-view>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'stat'">
+                                        <app-stat-view [traceMetaData]="traceMetaData"></app-stat-view>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <app-trace-details-modal *ngIf="showModal" [modalData]="modalData" (closeModal)="closeModal()">
+                </app-trace-details-modal>
+            </div>
+        </div>
+    </div>
+</div>

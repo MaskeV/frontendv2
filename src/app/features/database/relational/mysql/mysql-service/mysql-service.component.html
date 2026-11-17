@@ -1,0 +1,943 @@
+<div class="main">
+  <div class=" p-1 rounded">
+    <header class="pb-0 mb-0 ">
+      <ul class="nav nav-tabs">
+        <li class="nav-item ">
+          <a class="nav-link active sm-font" aria-current="page" style="color: black;">My SQL</a>
+        </li>
+      </ul>
+    </header>
+
+  </div>
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mx-1" style="height: 7.5vh; font-size: small;margin-bottom: -20px;">
+    <ol class="breadcrumb" style="padding: 0px 5px;margin-top: -8px;">
+      <li class="breadcrumb-item"><a routerLink="/database">{{serviceName}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Database-Service</li>
+    </ol>
+  </nav>
+
+  <!-- Tabs -->
+
+  <div class="p-1 rounded" style="margin-bottom: -14px;">
+    <header class="pb-0 mb-0">
+      <ul class="nav nav-tabs" id="database-nav" style="font-weight: bold;font-size: small;">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#inspections"
+            (click)="loadData('inspections')">Inspections</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instances"
+            (click)="loadData('instances')">Instances</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" role="tab" href="#slow_statements"
+            (click)="loadData('slow_statements')">Queries</a>
+        </li>
+      </ul>
+    </header>
+  </div>
+
+  <!-- Scrollable Inspections Content -->
+  <div class="tab-content custom-bg p-1">
+
+    <div class="tab-pane fade in show active" id="inspections">
+      <!-- Summary Section -->
+      <!-- add justify content between if more than 4 metric boxes comes -->
+      <div class="row mr-1 gap-2" style="width: 95%;">
+        <!-- Logo container -->
+        <div class="w-8 ">
+          <img src="assets/images/mysql.png" alt="MySQL">
+        </div>
+
+
+        <div class="metric-box w-14" data-testid="avg-qps-metric" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_qps', avgqps).color === 'red' || getThresholdDisplay('meter_mysql_qps', avgqps).color === 'orange')
+          ? '1px solid ' + getThresholdDisplay('meter_mysql_qps', avgqps).color : '' }">
+          <div class="small">
+            QPS
+            <span *ngIf="getThresholdDisplay('meter_mysql_qps', avgqps).value"
+              [ngStyle]="{'color': getThresholdDisplay('meter_mysql_qps', avgqps).color == 'red' ? 'red' : 'orange'}"
+              class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+              {{ getThresholdDisplay('meter_mysql_qps', avgqps).value }}</span>
+          </div>
+          <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_qps', avgqps).color}">
+            {{ avgqps != null ? avgqps : 'N/A' }}
+          </div>
+        </div>
+
+        <div class="metric-box w-14" data-testid="avg-qps-metric" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_tps', avgtps).color === 'red' || getThresholdDisplay('meter_mysql_tps', avgtps).color === 'orange')
+          ? '1px solid ' + getThresholdDisplay('meter_mysql_tps', avgtps).color : '' }">
+          <div class="small">
+            TPS
+            <span *ngIf="getThresholdDisplay('meter_mysql_tps', avgtps).value"
+              [ngStyle]="{'color': getThresholdDisplay('meter_mysql_tps', avgtps).color == 'red' ? 'red' : 'orange'}"
+              class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+              {{ getThresholdDisplay('meter_mysql_tps', avgtps).value }}</span>
+          </div>
+          <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_tps', avgtps).color}">
+            {{ avgtps != null ? avgtps : 'N/A' }}
+          </div>
+        </div>
+
+        <div class="metric-box w-14" [ngStyle]="{
+          'border': getThresholdDisplay('meter_mysql_threads_connected', maxconnected).color === 'orange' 
+                    ? '1px solid orange' 
+                    : getThresholdDisplay('meter_mysql_threads_connected', maxconnected).color === 'red' 
+                      ? '1px solid red' 
+                      : 'none'
+        }">
+
+          <div class="small d-flex justify-content-between align-items-center">
+            <span class="d-flex align-items-center">
+              Connections
+            </span>
+
+            <span class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold"
+              *ngIf="getThresholdDisplay('meter_mysql_threads_connected', maxconnected)?.value"
+              [ngStyle]="{'color': getThresholdDisplay('meter_mysql_threads_connected', maxconnected).color== 'red' ? 'red' : 'orange'}">
+              {{ getThresholdDisplay('meter_mysql_threads_connected', maxconnected).value }}
+            </span>
+          </div>
+
+          <div class="fw-bold"
+            [ngStyle]="{'color': getThresholdDisplay('meter_mysql_threads_connected', maxconnected).color}">
+            {{ maxconnected }}
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Group: Query Volume -->
+      <div class="my-3 ps-2" style="margin-right: -2%;">
+
+        <div class="flex align-items-center mb-2 px-1">
+          <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Query Volume</h3>
+        </div>
+
+        <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 98%;">
+
+          <div class="card w-33">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  QPS
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                    aria-label="Small select example">
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.["meter_mysql_qps"]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.["meter_mysql_qps"]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.["meter_mysql_qps"]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ qpsInfo }}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="qpsChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+
+          <div class="card w-33">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  TPS
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                    aria-label="Small select example">
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.["meter_mysql_tps"]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.["meter_mysql_tps"]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.["meter_mysql_tps"]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tpsInfo }}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="tpsChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+
+
+          <div class="card w-33">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  Slow Queries Trend
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                    aria-label="Small select example">
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.["meter_mysql_slow_queries_rate"]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.["meter_mysql_slow_queries_rate"]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.["meter_mysql_slow_queries_rate"]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                      matTooltip="{{ slowQueriesInfo }}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="slowQueriesChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+
+          <div class="card w-33 mt-2">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  Read Query Trends
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                    aria-label="Small select example">
+
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.["meter_mysql_commands_select_rate"]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.["meter_mysql_commands_select_rate"]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.["meter_mysql_commands_select_rate"]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                      matTooltip="{{ commandsReadInfo}}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="readQueriesChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+
+          <div class="card w-33 mt-2">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  Write Query Trends
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched">
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+                  </select>
+                  <select [(ngModel)]="selectedWriteMetric" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched">
+                    <option value="insert">Insert</option>
+                    <option value="update">Update</option>
+                    <option value="delete">Delete</option>
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.[getWriteMetricKey()]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.[getWriteMetricKey()]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.[getWriteMetricKey()]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                      matTooltip="{{ commandsWriteInfo }}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="writeQueriesChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+          <div style="width: 33%;"></div>
+        </div>
+      </div>
+
+      <!-- Group: Connections -->
+      <div class="my-3 ps-2 " style="margin-right: -2%;">
+        <div class="flex align-items-center mb-2 px-1">
+          <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Connections</h3>
+        </div>
+
+        <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 98%;">
+
+          <div class="card w-33">
+            <div class="card-header chart-title ">
+              <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size: small;font-weight:500">
+                  Threads
+                </span>
+                <div class=" d-flex align-items-center justify-content-between">
+                  <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched">
+                    <option value="avg" selected>Average</option>
+                    <option value="threshold">Threshold</option>
+                  </select>
+                  <select [(ngModel)]="selectedThreadsMetric" style="line-height: 1.2; font-size: small; width: 100px;"
+                    class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched">
+                    <option value="connected">Conn.</option>
+                    <option value="created">Created</option>
+                    <option value="cached">Cached</option>
+                    <option value="running">Running</option>
+                  </select>
+                  <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                    style="color:#0e38f1">{{thresholds?.[getThreadsMetricKey()]?.avgBaseline}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                    style="color:#e07e23">{{thresholds?.[getThreadsMetricKey()]?.warningValue}}
+                  </div>
+                  <div *ngIf="chart_criteria=='threshold'"
+                    class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                    {{thresholds?.[getThreadsMetricKey()]?.criticalValue}}</div>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                      matTooltip="{{ threadsInfo }}"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div id="threadsChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+
+          <div class="card w-33">
+            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+              <span>Connects</span>
+              <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                matTooltip="{{ connectionsInfo }}"></i>
+            </div>
+            <div class="card-body p-0">
+              <div id="connectsChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+
+          </div>
+
+          <div class="card w-33">
+            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+              <span>Connection Errors</span>
+              <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                matTooltip="{{ connectionsErrorsInfo }}"></i>
+            </div>
+            <div class="card-body p-0">
+              <div id="connectionErrorChartContainer" style="width: 100%; height: 28vh;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Instances Tab-->
+    <div class="tab-pane fade" id="instances">
+      <div style="height: 73vh !important;">
+        <div class="card-body custom-border border rounded h-100">
+          <!-- Search bar -->
+          <div class="card-header d-flex justify-content-between align-items-center" style="margin-bottom: -2%;">
+            <h5 class="mb-0">MySql Instances</h5>
+            <div class="searchbar d-flex align-items-center" style="margin-right: 1%;">
+              <input type="text" class="form-control form-control-sm mr-2 custom-border" [(ngModel)]="searchText"
+                style="background-color: transparent;" placeholder="Search Instances..."
+                style="width: 200px;font-size: x-small;">
+              <a class="search_icon" style="margin-left:-2rem ;">
+                <i class="fas fa-lg fw-bold fa-search"></i>
+              </a>
+            </div>
+          </div>
+
+          <br>
+          <div class="border-secondary custom-border my-2" style="height: 80%; overflow-y: auto;">
+            <table class="table table-md" style="table-layout: auto !important;">
+              <thead class="thead-light">
+                <tr class="headings" style="font-size: x-small; height: 25px; text-transform: uppercase;">
+                  <th class="pointer" (click)="sortBy('instanceName')">
+                    Instance
+                    <span class="sort-icon">
+                      <i *ngIf="sortparam !== 'instanceName'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'instanceName' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'instanceName' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                    </span>
+                  </th>
+                  <th class="pointer" (click)="sortBy('upTime')">
+                    Uptime (Days)
+                    <span class="sort-icon">
+                      <i *ngIf="sortparam !== 'upTime'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'upTime' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'upTime' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                    </span>
+                  </th>
+                  <!-- <th class="pointer" (click)="sortBy('memory')">
+                    Memory
+                    <span class="sort-icon">
+                      <i *ngIf="sortparam !== 'memory'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'memory' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'memory' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                    </span>
+                  </th>
+                  <th class="pointer" (click)="sortBy('ram')">
+                    RAM
+                    <span class="sort-icon">
+                      <i *ngIf="sortparam !== 'ram'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'ram' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                      <i *ngIf="sortparam === 'ram' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                    </span>
+                  </th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let instance of instanceList | searchItem:searchText:'instanceName' | sort:sortparam:sortDirection">
+                  <!-- Instance Name -->
+                  <td class="service-cell"
+                    [ngClass]="{'no-data': !instance.instanceName, 'has-data': instance.instanceName}"
+                    (click)="setServiceInstance(instance.instanceName)">
+                    <img src="assets/img/technologies/MYSQL1.png" alt="icon" class="icon" />
+                    <span class="service-name">
+                      {{ instance.instanceName ? instance.instanceName : 'No Data' }}
+                    </span>
+                  </td>
+
+                  <!-- Uptime -->
+                  <td class="started-cell" [ngClass]="{'no-data': !instance.upTime, 'has-data': instance.upTime}">
+                    <i class="fa-regular fa-hourglass me-2" style="color: blue;"></i>
+                    {{ instance.upTime ? instance.upTime : 'No Data' }}
+                  </td>
+
+                  <!-- <td [ngClass]="{'no-data': !instance.memory, 'has-data': instance.memory}">
+                    <div class="memory-bar-wrapper">
+                      <div class="memory-bar-bg">
+                        <div *ngIf="instance.memoryUsage !== null && instance.memoryUsage !== undefined"
+                          class="memory-bar-fill" [style.width.%]="instance.memoryUsage">
+                        </div>
+                      </div>
+                      <span class="memory-label">
+                        {{ instance.memory ? instance.memory : 'No Data' }}
+                      </span>
+                    </div>
+                  </td>
+
+
+                  <td [ngClass]="{'no-data': !instance.ram, 'has-data': instance.ram}">
+                    <div class="ram-bar-wrapper">
+                      <div class="ram-bar-bg">
+                        <div *ngIf="instance.ramUsage !== null && instance.ramUsage !== undefined" class="ram-bar-fill"
+                          [style.width.%]="instance.ramUsage">
+                        </div>
+                      </div>
+                      <span class="ram-label">
+                        {{ instance.ram ? instance.ram : 'No Data' }}
+                      </span>
+                    </div>
+                  </td> -->
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- No Data Message -->
+            <div *ngIf="!instanceList || instanceList.length === 0" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                            text-align: center; color: rgb(137, 137, 137); font-size: large; margin-top: 40px;">
+              <strong>No Data</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slow Statements Tab-->
+    <div class="tab-pane fade" id="slow_statements">
+      <div class="p-1" style="height: 57vh !important;">
+        <div class="card-body border custom-border rounded h-100">
+          <div class="card-header d-flex justify-content-between align-items-center" style="margin-bottom: -0.3%;">
+            <h5 class="mb-0">Slow Statements (ms)</h5>
+            <div style="position: relative; width: 25%;">
+              <input type="text" class="form-control form-control-sm mr-2" [(ngModel)]="searchQuery"
+                (input)="onSearchSlowStatements()" style="width: 260px;font-size: x-small;"
+                placeholder="Search slow statements..." />
+              <i class="fas fa-search"
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+            </div>
+          </div>
+
+          <div class="scrollables mx-1 my-1" *ngIf="filteredSlowStatements.length; else noDataTemplate">
+            <table class="table table-md" style="table-layout: fixed !important;">
+              <thead class="thead-light">
+
+                <tr class="headings" style="font-size: x-small; height: 25px; text-transform: uppercase;">
+                  <th scope="col" class="pointer resizable" style="width: 60px;" (click)="sortBy('originalIndex')">
+                    <strong>
+                      Sr. No
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'originalIndex' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 0)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                  <th scope="col" class="pointer resizable" style="width: 155px;" (click)="sortBy('host')">
+                    <strong>
+                      Host
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'host' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 1)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                  <th scope="col" class="pointer resizable" style="width: 60px;" (click)="sortBy('user')">
+                    <strong>
+                      User
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'user' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 2)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                  <th scope="col" class="pointer resizable" style="width: 80px;" (click)="sortBy('state')">
+                    <strong>
+                      State
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'state' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 3)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                  <th scope="col" class="pointer resizable" style="text-align: left !important;"
+                    (click)="sortBy('query')">
+                    <strong>
+                      Query
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'query' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 4)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                  <th scope="col" class="pointer resizable" style="width: 85px;" (click)="sortBy('duration')">
+                    <strong>
+                      Duration
+                      <span class="sort-icon">
+                        <i class="fa"
+                          [ngClass]="sortparam === 'duration' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                      </span>
+                    </strong>
+                    <div class="resize-handle" (mousedown)="initResize($event, 5)" (click)="$event.stopPropagation()">
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let slowStatement of pagedSlowStatements; let i = index"
+                  style="font-size: small; cursor: pointer;" (click)="slowStatement.showFull = !slowStatement.showFull">
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.originalIndex }}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.host }}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.user }}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.state }}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.query }}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      [ngClass]="{'line-clamp-1': !slowStatement.showFull, 'line-clamp-none': slowStatement.showFull}"
+                      class="overflow-hidden">
+                      {{ slowStatement.duration }}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="col-12 d-flex justify-content-end" style="margin-top:-2%;">
+              <nav class="mb-1 mr-1">
+                <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+
+                  <!-- Previous -->
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage()"
+                      [disabled]="currentPage === 1">
+                      &laquo; Previous
+                    </button>
+                  </li>
+
+                  <!-- Page input -->
+                  <li class="page-item d-flex align-items-center">
+                    <span class="me-2" style="color: var(--text-color);">Page</span>
+                    <input type="number" class="form-control form-control-sm text-center"
+                      style="width:60px; font-size: x-small;" [(ngModel)]="pageInput"
+                      (keydown.enter)="goToPage(pageInput)" min="1" [max]="totalPages" aria-label="Page number input" />
+                    <span class="ms-2" style="color: var(--text-color);">of {{ totalPages }}</span>
+                  </li>
+
+                  <!-- Next -->
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage()"
+                      [disabled]="currentPage === totalPages">
+                      Next &raquo;
+                    </button>
+                  </li>
+
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-1" style="height: 57vh !important;">
+          <div class="card-body border custom-border rounded h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">DDL Statements</h5>
+              <div style="position: relative; width: 25%;">
+                <input type="text" class="form-control form-control-sm mr-2" [(ngModel)]="searchQueryDDL"
+                  (input)="onSearchDdlStatements()" style="width: 260px;font-size: x-small;"
+                  placeholder="Search DDL statements..." />
+                <i class="fas fa-search"
+                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+              </div>
+            </div>
+
+            <div class="scrollables mx-1 my-1" *ngIf="pagedDdlStatements.length; else noDataTemplate">
+              <table class="table table-md table-striped">
+                <thead class="thead-light">
+                  <tr class="headings" style="font-size: x-small; height: 30px; text-transform: uppercase;">
+                    <th scope="col">Sr. No</th>
+                    <th scope="col" (click)="sortByDDL('ddlType')" class="pointer">
+                      <strong>
+                        DDL Type
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'ddlType' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByDDL('host')" class="pointer">
+                      <strong>
+                        Host
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'host' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByDDL('user')" class="pointer">
+                      <strong>
+                        User
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'user' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByDDL('db')" class="pointer">
+                      <strong>
+                        DB
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'db' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByDDL('executionTime')" class="pointer">
+                      <strong>
+                        Execution Time
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'executionTime' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByDDL('querySnippet')" class="pointer">
+                      <strong>
+                        Query
+                        <span class="sort-icon">
+                          <i class="fa"
+                            [ngClass]="sortparamDDL === 'querySnippet' ? (sortDirectionDDL === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ddl of pagedDdlStatements; let i = index" style="font-size: small;">
+                    <td>{{ (currentPageDDL - 1) * itemsPerPageDDL + i + 1 }}</td>
+                    <td>{{ ddl.ddlType }}</td>
+                    <td>{{ ddl.host }}</td>
+                    <td>{{ ddl.user }}</td>
+                    <td>{{ ddl.db }}</td>
+                    <td>{{ ddl.executionTime }}</td>
+                    <td>{{ ddl.querySnippet }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- 🔽 Pagination Controls -->
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <button class="btn btn-sm btn-outline-primary" [disabled]="currentPageDDL === 1"
+                  (click)="previousPageDDL()">
+                  Previous
+                </button>
+
+                <div>
+                  <ng-container *ngFor="let page of totalPagesArrayDDL">
+                    <button *ngIf="page !== '...'; else dots" class="btn btn-sm"
+                      [ngClass]="{'btn-primary': page === currentPageDDL, 'btn-outline-primary': page !== currentPageDDL}"
+                      (click)="goToPageDDL(page)">
+                      {{ page }}
+                    </button>
+                    <ng-template #dots>
+                      <span class="mx-1">...</span>
+                    </ng-template>
+                  </ng-container>
+                </div>
+
+                <button class="btn btn-sm btn-outline-primary" [disabled]="currentPageDDL === totalPagesDDL"
+                  (click)="nextPageDDL()">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-1" style="height: 57vh !important;">
+          <div class="card-body border custom-border rounded h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Lock Details</h5>
+              <div style="position: relative; width: 25%;">
+                <input type="text" class="form-control form-control-sm mr-2" [(ngModel)]="searchQueryLock"
+                  (input)="onSearchLockQueries()" style="width: 260px;font-size: x-small;"
+                  placeholder="Search lock details..." />
+                <i class="fas fa-search"
+                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+              </div>
+            </div>
+
+            <div class="scrollables mx-1 my-1" *ngIf="pagedLockQueries.length; else noDataTemplate">
+              <table class="table table-md table-striped">
+                <thead class="thead-light">
+                  <tr class="headings" style="font-size: x-small; height: 30px; text-transform: uppercase;">
+                    <th scope="col">Sr. No</th>
+                    <th scope="col" (click)="sortByLock('blocked_sid')" class="pointer">
+                      <strong>
+                        Blocked SID
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'blocked_sid' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByLock('blocking_sid')" class="pointer">
+                      <strong>
+                        Blocking SID
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'blocking_sid' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByLock('locked_database')" class="pointer">
+                      <strong>
+                        Database
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'locked_database' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByLock('locked_table')" class="pointer">
+                      <strong>
+                        Table
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'locked_table' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByLock('blocked_wait_seconds')" class="pointer">
+                      <strong>
+                        Wait (sec)
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'blocked_wait_seconds' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                    <th scope="col" (click)="sortByLock('blocked_current_sql')" class="pointer">
+                      <strong>
+                        Blocked Query
+                        <span class="sort-icon">
+                          <i class="fa" [ngClass]="sortparamLock === 'blocked_current_sql' ? (sortDirectionLock === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        </span>
+                      </strong>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let lock of pagedLockQueries; let i = index" style="font-size: small;">
+                    <td>{{ (currentPageLock - 1) * itemsPerPageLock + i + 1 }}</td>
+                    <td>{{ lock.blocked_sid }}</td>
+                    <td>{{ lock.blocking_sid }}</td>
+                    <td>{{ lock.locked_database }}</td>
+                    <td>{{ lock.locked_table }}</td>
+                    <td>{{ lock.blocked_wait_seconds }}</td>
+                    <td>{{ lock.blocked_current_sql }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- 🔽 Pagination Controls -->
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <button class="btn btn-sm btn-outline-primary" [disabled]="currentPageLock === 1"
+                  (click)="previousPageLock()">
+                  Previous
+                </button>
+
+                <div>
+                  <ng-container *ngFor="let page of totalPagesArrayLock">
+                    <button *ngIf="page !== '...'; else dots" class="btn btn-sm"
+                      [ngClass]="{'btn-primary': page === currentPageLock, 'btn-outline-primary': page !== currentPageLock}"
+                      (click)="goToPageLock(page)">
+                      {{ page }}
+                    </button>
+                    <ng-template #dots>
+                      <span class="mx-1">...</span>
+                    </ng-template>
+                  </ng-container>
+                </div>
+
+                <button class="btn btn-sm btn-outline-primary" [disabled]="currentPageLock === totalPagesLock"
+                  (click)="nextPageLock()">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- DDL Statements Tab-->
+    <!-- <div class="tab-pane fade" id="ddl_statements">
+      <div class="p-3" style="height: 75vh !important;">
+        <div class="card-body border custom-border rounded h-100">
+          <div class="p-1 border-bottom custom-border">
+            <strong>DDL Statements</strong>
+          </div>
+          <div class="scrollables mx-1 my-1" *ngIf="databaseDdlStatements.length; else noDataTemplate">
+            <table class="table table-md table-striped">
+              <thead class="thead-light">
+                <tr class="headings" style="font-size: x-small; height: 30px; text-transform: uppercase;">
+                  <th scope="col">Sr. No</th>
+                  <th scope="col" (click)="sortBy('ddlType');" class="pointer"><strong>DDL Type</strong></th>
+                  <th scope="col" (click)="sortBy('host');" class="pointer"><strong>Host</strong></th>
+                  <th scope="col" (click)="sortBy('user');" class="pointer"><strong>User</strong></th>
+                  <th scope="col" (click)="sortBy('db');" class="pointer"><strong>DB</strong></th>
+                  <th scope="col" (click)="sortBy('executionTime');" class="pointer"><strong>Execution
+                      Time</strong>
+                  </th>
+                  <th scope="col" (click)="sortBy('querySnippet');" class="pointer"><strong>Query</strong>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="infra-group-table"
+                  *ngFor="let ddlstatements of databaseDdlStatements  | sort:sortparam:sortDirection let i = index;"
+                  style="font-size: small;">
+                  <td>{{i+1}}</td>
+                  <td>{{ddlstatements.ddlType}}</td>
+                  <td>{{ddlstatements.host}}</td>
+                  <td>{{ddlstatements.user}}</td>
+                  <td>{{ddlstatements.db}}</td>
+                  <td>{{ddlstatements.executionTime}}</td>
+                  <td>{{ddlstatements.querySnippet}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <pagination-controls (pageChange)="pageChange($event)"></pagination-controls> -->
+    <!-- </div>
+        </div>
+      </div>
+    </div>-->
+
+  </div>
+</div>
+
+<ng-template #noDataTemplate>
+  <div class="text-center" style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+    <p>No Data</p>
+  </div>
+</ng-template>~

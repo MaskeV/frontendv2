@@ -1,0 +1,367 @@
+<main>
+    <div class="tab-content custom-bg p-1">
+        <div class="d-flex justify-content-between align-items-center" style="width: 99%; padding-left: 10px; padding-right: 10px; padding-top: 15px; margin-bottom: 10px;">
+            <div class="d-flex align-items-center">
+                <div class="me-3" style="background: rgba(13, 110, 253, 0.1); padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-network-wired text-primary fs-5"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">Application Overview Dashboard</h3>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Service dropdown -->
+                <div style="position: relative; width: 250px;">
+                    <select class="form-control form-control-sm" [(ngModel)]="selectedService" (change)="setService()"
+                        name="service">
+                        <option *ngFor="let item of serviceNames" [ngValue]="item">{{ item.applicationName }}</option>
+                    </select>
+                    <i class="fa-solid fa-bar-chart gradiantIcon2" matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Go to service page" (click)="goToAppDashboard()"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                </div>
+            
+                <!-- Infra dropdown -->
+                <div style="position: relative; width: 200px;">
+                    <select class="form-control form-control-sm" [(ngModel)]="selectedInfra" (change)="onInfraChange()"
+                        name="infra">
+                        <option *ngFor="let infra of infraOptions" [ngValue]="infra">{{ infra.ipAddress }}</option>
+                    </select>
+                    <i class="fa-solid fa-shop gradiantIcon2" matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Go to infra page" (click)="goToInfraDashboard()"
+                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                </div>
+            
+                <!-- DB dropdown -->
+                <div style="position: relative; width: 300px;">
+                    <select class="form-control form-control-sm text-ellipsis" [(ngModel)]="selectedDb" (change)="onDbChange()" name="database">
+                        <option *ngFor="let db of dbOptions" [ngValue]="db">{{ db.dbName }}</option>
+                    </select>
+                    <i class="fa-solid fa-database gradiantIcon2" matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Go to database page" (click)="goToDBDashboard()"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                </div>
+            </div>
+
+        </div>
+        <div class="d-flex align-items-stretch my-3">
+            <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                <h5 class="fw-bold ms-3 mb-0">App.</h5>
+                <div class="pointers"></div>
+            </div>
+            <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 95%;">
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Apdex</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{apdexInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="serviceApdexTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Success Rate</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{successRateInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="successRateTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Load (call/min)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{loadInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="serviceLoadTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Latency (ms)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{latencyInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="serviceAvgResponseTimeChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Endpoint Success Rate (%)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{endpointSRInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26" style="overflow: auto;">
+                        <table class="table table-hover mb-0">
+                            <tbody *ngIf="endpointSuccessRateData">
+                                <tr *ngFor="let item of endpointSuccessRateData">
+                                    <td class="text-ellipsis"
+                                        style="width: 60%; border-right: 0.5px solid var(--border-color);"
+                                        matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{item.endpoint}}">
+                                        {{item.endpoint}}
+                                    </td>
+                                    <td style="width: 40%; border-right: 0.5px solid var(--border-color); vertical-align: middle;">
+                                        <div class="d-flex align-items-center justify-content-between w-100" style="gap: 8px;">
+                                            <div class="progress flex-grow-1" style="height: 7px; border-radius: 999px; background-color: #f1f5f9; overflow: hidden; border: none; box-shadow: none;"
+                                                matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="{{item.value}}%">
+                                                <div class="progress-bar" role="progressbar"
+                                                    [style.width.%]="getProgressWidth(item.value, endpointSuccessRateData, 'value')"
+                                                    [ngClass]="getProgressBarClass(item.status)"
+                                                    style="height: 100%; border-radius: 999px; transition: width 0.35s ease;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 10px; font-weight: 600; color: #334155; min-width: 30px; text-align: right;">
+                                                {{ item.value }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <div *ngIf="!endpointSuccessRateData" class="noData h-34">
+                                No Data Available
+                            </div>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Endpoint Latency (ms)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{endpointLatencyInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26" style="overflow: auto;">
+                        <table class="table table-hover mb-0">
+                            <tbody *ngIf="slowEndpointData?.length !== 0">
+                                <tr *ngFor="let item of slowEndpointData">
+                                    <td class="text-ellipsis"
+                                        style="width: 60%; border-right: 0.5px solid var(--border-color);"
+                                        matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{item.endpoint}}">
+                                        {{item.endpoint}}
+                                    </td>
+                                    <td style="width: 40%; border-right: 0.5px solid var(--border-color); vertical-align: middle;">
+                                        <div class="d-flex align-items-center justify-content-between w-100" style="gap: 8px;">
+                                            <div class="progress flex-grow-1" style="height: 7px; border-radius: 999px; background-color: #f1f5f9; overflow: hidden; border: none; box-shadow: none;"
+                                                matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="{{item.value}} ms">
+                                                <div class="progress-bar" role="progressbar"
+                                                    [style.width.%]="getProgressWidth(item.value, slowEndpointData, 'value')"
+                                                    [ngClass]="getProgressBarClass(item.status)"
+                                                    style="height: 100%; border-radius: 999px; transition: width 0.35s ease;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 10px; font-weight: 600; color: #334155; min-width: 30px; text-align: right;">
+                                                {{ item.value }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <div *ngIf="slowEndpointData?.length === 0" class="noData h-34">
+                                No Data Available
+                            </div>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card w-66 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Slow DB Statement</span>
+                        <div style="position: relative; width: 250px;">
+
+                            <select class="form-control form-control-sm flex-grow-1" [(ngModel)]="selectedDb2"
+                                (change)="setDb($event)" name="database" style="font-size: x-small;">
+                                <option *ngFor="let item of dbNames" [value]="item" [selected]="item === selectedDb2">{{ item }}</option>
+                            </select>
+                            <i class="fa-solid fa-database" matButton="elevated" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="database"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;    color: #888;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 h-26" style="overflow: auto;">
+                        <table class="table table-hover mb-0">
+                            <tbody *ngIf="slowStatementData?.length">
+                                <tr *ngFor="let item of slowStatementData">
+                                    <td class="text-ellipsis"
+                                        style="width: 67%; border-right: 0.5px solid var(--border-color);"
+                                        matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{item.statement}}">
+                                        {{item.statement}}
+                                    </td>
+                                    <td style="width: 25%; border-right: 0.5px solid var(--border-color); vertical-align: middle;">
+                                        <div class="d-flex align-items-center justify-content-between w-100" style="gap: 8px;">
+                                            <div class="progress flex-grow-1" style="height: 7px; border-radius: 999px; background-color: #f1f5f9; overflow: hidden; border: none; box-shadow: none;"
+                                                matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="{{item.latency}} ms">
+                                                <div class="progress-bar" role="progressbar"
+                                                    [style.width.%]="getProgressWidth(item.latency, slowStatementData, 'latency')"
+                                                    [ngClass]="getProgressBarClass(item.status)"
+                                                    style="height: 100%; border-radius: 999px; transition: width 0.35s ease;">
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 10px; font-weight: 600; color: #334155; min-width: 45px; text-align: right;">
+                                                {{ item.latency }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td style="width: 8%; text-align: center;">
+                                        <i class="fa-solid fa-copy text-link ms-3" matButton="elevated"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Copy Query Statement" style="cursor: pointer;"
+                                            (click)="copyDbStatement(item.statement, $event)"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <div *ngIf="!slowStatementData?.length" class="noData">
+                                No Data Available
+                            </div>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="w-33 mt-2"></div>
+
+            </div>
+        </div>
+
+        <div class="d-flex align-items-stretch my-3">
+            <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                <h5 class="fw-bold ms-3 mb-0">Host</h5>
+                <div class="pointers"></div>
+            </div>
+            <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 95%;">
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>CPU Usage (%)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{cpuPercentageInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="cpuAvgUsedPercentageChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Network Bandwidth (KB/s)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{networkBandwidthInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="networkBandwidthUsageChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Memory RAM (MB)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{memoryRamInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="memoryRamChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Disk R/W (KB/s)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{diskInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="diskReadWriteChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="w-66 mt-2">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex align-items-stretch my-3">
+            <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                <h5 class="fw-bold ms-3 mb-0">DB</h5>
+                <div class="pointers"></div>
+            </div>
+            <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 95%;">
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>QPS</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{qpsInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="qpsDataChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>TPS</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{tpsInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="tpsDataChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Read Write Query Trends</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{queryTrendsInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="commandTrendsDataChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Threads</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{threadsInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="threadsDataChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+                <div class="card w-33 mt-2">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>Connects</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="{{conntectsInfo}}"></i>
+                    </div>
+                    <div class="card-body p-0 h-26">
+                        <div id="connectsDataChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+
+
+                <div class="w-33 mt-2"></div>
+
+            </div>
+        </div>
+    </div>
+    <app-trace-details #traceDetails></app-trace-details>
+</main>

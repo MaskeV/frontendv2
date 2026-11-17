@@ -1,0 +1,271 @@
+<main class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img [src]="getImagePath()" class="Mongoicon" alt="elasticsearch logo" />
+                <a (click)="goToNonRelational()" class="prevPage pointer">{{decodedSelectedElasticService}}</a>
+            </li>
+            <li class="breadcrumb-item active">Elasticsearch Cluster</li>
+        </ol>
+    </nav>
+
+    <div class="content-container flex-grow-1 p-3 overflow-auto">
+
+        <!-- Cluster KPIs section -->
+        <section class="mb-4">
+            <div class="row mr-1 justify-content-between align-items-center" style="padding: 10px 10px 10px 10px; background: aliceblue; border-bottom: 1px solid #dce8f5; border-radius: 6px;">
+                <div style="width: 8%; display: flex; align-items: center; justify-content: center;">
+                    <img *ngIf="getImagePath()" [src]="getImagePath()" style="max-width: 100%; max-height: 60px; object-fit: contain;" alt="elasticsearch logo" />
+                </div>
+                <div style="width: 91%; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Cluster Health</div>
+                        <div class="fw-bold kpi-value"
+                                 [ngClass]="{
+                                    'text-success': totalKpis.health_status?.color === 'green' || totalKpis.health_status === 'green',
+                                    'text-warning': totalKpis.health_status?.color === 'yellow' || totalKpis.health_status === 'yellow',
+                                    'text-danger': totalKpis.health_status?.color === 'red' || totalKpis.health_status === 'red'
+                                 }">
+                            {{ (totalKpis.health_status?.color || totalKpis.health_status) | titlecase }}
+                        </div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Tripped Breakers</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.breakers_tripped || 0 | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">CPU Usage Avg</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.cpu_usage_avg | numericData}} <span class="mini-text" style="font-size: 12px; margin-left: 3px;">%</span></div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">JVM Memory Avg</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.jvm_memory_used_avg | numericData}} <span class="mini-text" style="font-size: 12px; margin-left: 3px;">MB</span></div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Nodes</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.nodes | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Data Nodes</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.data_nodes | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Pending Tasks</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.pending_tasks | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Open Files</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.open_files | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Primary Shards</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.active_primary_shards | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Active Shards</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.active_shards | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Init Shards</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.initializing_shards | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Unassigned Shards</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.unassigned_shards | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary" title="Delayed Unassigned Shards">Delay Unassign.</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.delayed_unassigned_shards | numericData}}</div>
+                    </div>
+                    <div class="metric-box shadow-sm border rounded-3" style="width: 13.5%; min-width: 120px;">
+                        <div class="small fw-semibold text-secondary">Relocating Shards</div>
+                        <div class="fw-bold kpi-value">{{totalKpis.relocating_shards | numericData}}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nodes Table Section -->
+        <section class="mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center p-3 bg-white border-bottom rounded-top">
+                    <h6 class="m-0 fw-bold text-dark">Nodes <span
+                            class="badge bg-primary rounded-pill ms-2">{{nodeTotalItems}}</span></h6>
+                    <div class="search-wrapper">
+                        <input type="text" class="form-control form-control-sm" placeholder="Search instances"
+                            [(ngModel)]="searchNodeText"
+                            (input)="resetNodeCurrentPage(nodeData, searchNodeText, ['name'])">
+                        <i class="fa-solid fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th (click)="sortNodeData('name')" class="pointer" style="width: 50%;">
+                                    Service Instances
+                                    <i class="fa-solid" [ngClass]="{
+                                      'fa-sort': sortNodeColumn !== 'name',
+                                      'fa-sort-up': sortNodeColumn === 'name' && sortNodeDirection === 'asc',
+                                      'fa-sort-down': sortNodeColumn === 'name' && sortNodeDirection === 'desc'
+                                  }"></i>
+                                </th>
+                                <th class="text-center" style="width: 50%;">Attributes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loading State -->
+                            <ng-container *ngIf="isNodeLoading">
+                                <tr *ngFor="let i of skeletonRows">
+                                    <td>
+                                        <div class="skeleton" style="height: 20px; width: 60%;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton" style="height: 20px; width: 40%; margin: 0 auto;"></div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+
+                            <!-- Data Rows -->
+                            <ng-container *ngIf="!isNodeLoading">
+                                <tr *ngFor="let node of nodeData 
+                                  | objectFilter: searchNodeText:['name']
+                                  | sort: sortNodeColumn:sortNodeDirection
+                                  | paginate: nodeCurrentPage:nodePageSize">
+                                    <td class="service-cell">
+                                        <span class="service-name" (click)="goToNode(node.name)">{{node.name}}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-primary pointer small fw-semibold"
+                                            *ngIf="node.attributes">View</span>
+                                        <span class="text-muted small" *ngIf="!node.attributes">-</span>
+                                    </td>
+                                </tr>
+
+                                <!-- Empty State -->
+                                <tr
+                                    *ngIf="nodeData.length === 0 || (nodeData | objectFilter:searchNodeText:['name']).length === 0">
+                                    <td colspan="2" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fa-solid fa-folder-open fs-2 mb-2"></i>
+                                            <p class="mb-0">No nodes found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end align-items-center p-2 bg-white border-top rounded-bottom"
+                    *ngIf="nodeTotalItems > 0">
+                    <div class="pagination-container">
+                        <button class="btn btn-sm page-btn" [disabled]="nodeCurrentPage === 1"
+                            (click)="nodePreviousPage()">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div class="d-flex align-items-center mx-2">
+                            <span class="small fw-semibold text-primary">Page {{nodeCurrentPage}} of
+                                {{nodeTotalPages}}</span>
+                        </div>
+                        <button class="btn btn-sm page-btn" [disabled]="nodeCurrentPage === nodeTotalPages"
+                            (click)="nodeNextPage()">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Indices Table Section -->
+        <section class="mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center p-3 bg-white border-bottom rounded-top">
+                    <h6 class="m-0 fw-bold text-dark">Indices <span
+                            class="badge bg-primary rounded-pill ms-2">{{indexTotalItems}}</span></h6>
+                    <div class="search-wrapper">
+                        <input type="text" class="form-control form-control-sm" placeholder="Search endpoints"
+                            [(ngModel)]="searchIndexText"
+                            (input)="resetIndexCurrentPage(indexData, searchIndexText, ['name'])">
+                        <i class="fa-solid fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th (click)="sortIndexData('name')" class="pointer">
+                                    Endpoints
+                                    <i class="fa-solid" [ngClass]="{
+                                      'fa-sort': sortIndexColumn !== 'name',
+                                      'fa-sort-up': sortIndexColumn === 'name' && sortIndexDirection === 'asc',
+                                      'fa-sort-down': sortIndexColumn === 'name' && sortIndexDirection === 'desc'
+                                  }"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loading State -->
+                            <ng-container *ngIf="isIndexLoading">
+                                <tr *ngFor="let i of skeletonRows">
+                                    <td>
+                                        <div class="skeleton" style="height: 20px; width: 60%;"></div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+
+                            <!-- Data Rows -->
+                            <ng-container *ngIf="!isIndexLoading">
+                                <tr *ngFor="let index of indexData 
+                                  | objectFilter: searchIndexText:['name']
+                                  | sort: sortIndexColumn:sortIndexDirection
+                                  | paginate: indexCurrentPage:indexPageSize">
+                                    <td class="service-cell">
+                                        <span class="service-name" (click)="goToIndex(index.name)">{{index.name}}</span>
+                                    </td>
+                                </tr>
+
+                                <!-- Empty State -->
+                                <tr
+                                    *ngIf="indexData.length === 0 || (indexData | objectFilter:searchIndexText:['name']).length === 0">
+                                    <td class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fa-solid fa-folder-open fs-2 mb-2"></i>
+                                            <p class="mb-0">No indices found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center p-2 bg-white border-top rounded-bottom"
+                    *ngIf="indexTotalItems > 0">
+                    <div class="small text-muted ps-2">The table shows up to {{indexPageSize}} pieces of endpoints.
+                    </div>
+                    <div class="pagination-container pe-2">
+                        <button class="btn btn-sm page-btn" [disabled]="indexCurrentPage === 1"
+                            (click)="indexPreviousPage()">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div class="d-flex align-items-center mx-2">
+                            <span class="small fw-semibold text-primary">Page {{indexCurrentPage}} of
+                                {{indexTotalPages}}</span>
+                        </div>
+                        <button class="btn btn-sm page-btn" [disabled]="indexCurrentPage === indexTotalPages"
+                            (click)="indexNextPage()">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>

@@ -1,0 +1,87 @@
+<main>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb custom-breadcrumb mb-0">
+      <li class="breadcrumb-item d-flex align-items-center gap-1">
+        <img src="assets/images/eks.png" class="icons" alt="EKS Logo" />
+        <a routerLink="/eks">EKS Applications</a>
+      </li>
+      <li class="breadcrumb-item"><a routerLink="/eks/eks-service">{{selectedService}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{selectedEndpoint}}</li>
+    </ol>
+  </nav>
+
+  <div class="tab-content custom-bg p-2">
+
+
+    <div class="bs-cards-row ps-2 pe-3 mt-3">
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>CPU Utilization</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="cpuUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Memory Utilization</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="memoryUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network TX Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Amount of memory swapped to disk due to insufficient RAM."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="networkTxChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-cards-row ps-2 pe-3 mt-2">
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network TX Error Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Number of active client connections to the database."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="networkTxErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network RX Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="networkRxChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network RX Error Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="networkRxErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

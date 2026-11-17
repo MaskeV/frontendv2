@@ -1,0 +1,159 @@
+<main>
+    <div class="card p-3 custom-border border-3 shadow-sm rounded" style="height: 89vh; overflow: auto;">
+
+        <!-- Filters -->
+        <div class="row mb-3 align-items-center justify-content-end g-2">
+
+            <div class="col-md-3">
+                <label for="application" class="form-label mb-1 small">Application</label>
+                <select class="form-select form-select-sm" id="application" [(ngModel)]="applicationNameID"
+                    (change)="getIPAddressByApplicationID()">
+                    <option value="" disabled>Select an Application</option>
+                    <option [value]="app.appID" *ngFor="let app of applicationList">{{ app.applicationName }}</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="ipAddr" class="form-label mb-1 small">IP Address</label>
+                <select class="form-select form-select-sm" id="ipAddr" [(ngModel)]="ipAddress"
+                    (change)="getCapacityPlannerData()">
+                    <option value="" disabled>Select an IP</option>
+                    <option [value]="ip.ipAddress" *ngFor="let ip of ipAddressList">{{ ip.ipAddress }}</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="type" class="form-label mb-1 small">Data Source</label>
+                <select class="form-select form-select-sm" id="type" [(ngModel)]="dataSourceType"
+                    (change)="getCapacityPlannerData()">
+                    <option value="MetricBeat">MetricBeat</option>
+                    <option value="AppDynamics">AppDynamics</option>
+                </select>
+            </div>
+
+            <!-- <div class="col-md-1 d-flex align-items-end" style="margin-top: 2rem;">
+                <button class="btn btn-outline-secondary btn-sm w-100" (click)="refreshData()" title="Refresh">
+                    <i class="fa fa-refresh me-1"></i> Refresh
+                </button>
+            </div> -->
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <div class="card custom-border border-2 shadow-sm">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Avg CPU Chart</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div *ngIf="cpuHealthCharts; else noDataBlock">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="cpuHealthCharts" [oneToOne]="true"
+                                style="height: 35vh; width: 100%; display: block;">
+                            </highcharts-chart>
+                        </div>
+                        <ng-template #noDataBlock>
+                            <div class="noData">No Data Available</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card custom-border border-2 shadow-sm">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Avg Memory Chart</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div *ngIf="memoryHealthCharts; else noDataBlock">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="memoryHealthCharts" [oneToOne]="true"
+                                style="height: 35vh; width: 100%; display: block;">
+                            </highcharts-chart>
+                        </div>
+                        <ng-template #noDataBlock>
+                            <div class="noData">No Data Available</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card custom-border border-2 shadow-sm">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Avg Disk Chart</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div *ngIf="diskHealthCharts; else noDataBlock">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="diskHealthCharts" [oneToOne]="true"
+                                style="height: 35vh; width: 100%; display: block;">
+                            </highcharts-chart>
+                        </div>
+                        <ng-template #noDataBlock>
+                            <div class="noData">No Data Available</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <div class="card-body p-2">
+                    <h5 class="mb-3">CPU Details</h5>
+
+                    <ul class="list-group list-group-flush text-sm">
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Average CPU</span>
+                            <span class="fw-semibold">{{ avgCpuValue | number:'1.2-2' }}%</span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Peak</span>
+                            <span class="fw-semibold text-danger">{{ peakCpuValue | number:'1.2-2' }}% <small class="text-muted">{{peakCpuValueTime}}</small></span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Minimum</span>
+                            <span class="fw-semibold text-success">{{minCpuValue | number:'1.2-2' }}% <small class="text-muted">{{minCpuValueTime}}</small></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card-body p-2">
+                    <h5 class="mb-3">Memory Details</h5>
+
+                    <ul class="list-group list-group-flush text-sm">
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Average Memory</span>
+                            <span class="fw-semibold">{{ avgMemoryValue | number:'1.2-2' }}%</span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Peak</span>
+                            <span class="fw-semibold text-danger">{{ avgMemoryValue | number:'1.2-2' }}% <small class="text-muted">{{peakMemoryValueTime}}</small></span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Minimum</span>
+                            <span class="fw-semibold text-success">{{ avgMemoryValue | number:'1.2-2' }}% <small class="text-muted">{{minMemoryValueTime}}</small></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card-body p-2">
+                    <h5 class="mb-3">Disk Details</h5>
+
+                    <ul class="list-group list-group-flush text-sm">
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Average Disk</span>
+                            <span class="fw-semibold">{{ avgDiskValue | number:'1.2-2' }}%</span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Peak</span>
+                            <span class="fw-semibold text-danger">{{ avgDiskValue | number:'1.2-2' }}% <small class="text-muted">{{peakDiskValueTime}}</small></span>
+                        </li>
+                        <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                            <span class="text-muted">Minimum</span>
+                            <span class="fw-semibold text-success">{{ avgDiskValue | number:'1.2-2' }}%<small class="text-muted">{{minDiskValueTime}}</small></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

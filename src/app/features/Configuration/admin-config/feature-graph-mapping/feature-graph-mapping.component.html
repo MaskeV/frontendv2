@@ -1,0 +1,1944 @@
+<div class="flex items-center justify-between mb-4 mt-2 px-2">
+    <div class="flex items-center gap-6">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white m-0">Feature Graph Mapping</h2>
+        <div *ngIf="!isTable && !isEditGraphBtn && userTypeCrudMap.create && isUploadImage && !isImageUpdate" class="flex items-center">
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" (change)="toggleUploadImage($event)" id="imageUploadSwitchTop" [(ngModel)]="isUploadImage">
+                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                <span class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">Upload Image</span>
+            </label>
+        </div>
+        <button class="fgm-back-btn" type="button" *ngIf="(isEditGraphBtn || isImageUpdate) && isEditGraph != 'true'" (click)="cancelUpdate()">
+            <i class="fa fa-arrow-left"></i> Back
+        </button>
+        <button class="fgm-back-btn" type="button" *ngIf="(isEditGraphBtn || isImageUpdate) && isEditGraph == 'true'" (click)="goToDashboard()">
+            <i class="fa fa-arrow-left"></i> Back
+        </button>
+    </div>
+    <button class="fgm-see-all-btn" type="button" (click)="showAllGraphList()" *ngIf="isForm && !isEditGraphBtn && userTypeCrudMap.create">
+        <i class="fa fa-list"></i> See All
+    </button>
+</div>
+
+<!-- Visualization block-->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-2" *ngIf="isForm && userTypeCrudMap.create">
+    <div class="col-span-12 md:col-span-8 lg:col-span-9">
+        <div class="flex flex-col gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-3 shadow-sm mb-4">
+                    <div class="flex items-center gap-6">
+                        <div *ngIf="isVisualized">
+                            <button type="button" class="flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-md px-3 py-1.5 transition-colors text-sm font-medium" (click)="showGraphColorModal()">
+                                <i class="ri-palette-line"></i> Change Graph Color
+                            </button>
+                        </div>
+                        <div *ngIf="!isTable && !isEditGraphBtn && userTypeCrudMap.create && !isUploadImage" class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" (change)="toggleUploadImage($event)" id="imageUploadSwitch" [(ngModel)]="isUploadImage">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300" *ngIf="!isImageUpdate">Upload Image</span>
+                                <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300" *ngIf="isImageUpdate">Update Image</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center flex-wrap gap-6">
+                        <div class="flex items-center gap-6 flex-wrap">
+                            <div class="flex items-center gap-3">
+                                <label for="startDate" class="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">Start Date</label>
+                                <div class="relative w-48">
+                                    <input class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-3 pr-10 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" [owlDateTime]="pickerStart" placeholder="Start Date" [(ngModel)]="startDate" [owlDateTimeTrigger]="pickerStart" [max]="max" name="startDate">
+                                    <owl-date-time #pickerStart [Hour24]="true" [showSecondsTimer]="true"></owl-date-time>
+                                    <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer p-1.5 border-none bg-transparent outline-none flex items-center justify-center" [owlDateTimeTrigger]="pickerStart">
+                                        <i class="ri-calendar-line text-slate-400 hover:text-primary transition-colors text-base"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <label for="endDate" class="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">End Date</label>
+                                <div class="relative w-48">
+                                    <input class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-3 pr-10 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" [owlDateTime]="pickerEnd" placeholder="End Date" [(ngModel)]="endDate" [owlDateTimeTrigger]="pickerEnd" [max]="max" name="endDate">
+                                    <owl-date-time #pickerEnd [Hour24]="true" [showSecondsTimer]="true"></owl-date-time>
+                                    <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer p-1.5 border-none bg-transparent outline-none flex items-center justify-center" [owlDateTimeTrigger]="pickerEnd">
+                                        <i class="ri-calendar-line text-slate-400 hover:text-primary transition-colors text-base"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        <div class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" id="legendCheck" [(ngModel)]="graphObj.isLegendEnabled">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">Enable Legends</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <!-- Visualization Div -->
+                <div class="fgm-viz-card text-center mb-2 w-full" id="test" *ngIf="isVisualized">
+                    <!-- RAG status Bar -->
+                    <div id="test-status-bar" class="row justify-content-center pt-1" *ngIf="graphObj.chartType == 'DoughNut' && graphObj.pointChildGraphs == 'RAG'">
+                        <h6 id="test-critical-legend" class="mx-2" (click)="showSelectChildGraphs('Critical')"><span class="badge mr-1" id="test-critical-count" [ngStyle]="{backgroundColor:ragPointCriticalColor}"></span>Critical</h6>
+                        <h6 id="test-warning-legend" class="mx-2" (click)="showSelectChildGraphs('Warning')"><span class="badge mr-1" id="test-warning-count" [ngStyle]="{backgroundColor:ragPointWarningColor}"></span>Warning</h6>
+                        <h6 id="test-normal-legend" class="mx-2" (click)="showSelectChildGraphs('Normal')"><span class="badge mr-1" id="test-normal-count" [ngStyle]="{backgroundColor:ragPointNormalColor}"></span>Normal</h6>
+                    </div>
+                    <div id="test-status-bar" class="row justify-content-center pt-1" *ngIf="graphObj.chartType == 'DoughNut' && graphObj.pointChildGraphs == 'RAGCOUNT_POINTGRAPHS'">
+                        <h6 id="test-critical-legend" class="mx-2"><span class="badge mr-1" id="test-critical-count" [ngStyle]="{backgroundColor:ragPointCriticalColor}">&nbsp;&nbsp;</span>Critical</h6>
+                        <h6 id="test-warning-legend" class="mx-2"><span class="badge mr-1" id="test-warning-count" [ngStyle]="{backgroundColor:ragPointWarningColor}">&nbsp;&nbsp;</span>Warning</h6>
+                        <h6 id="test-normal-legend" class="mx-2"><span class="badge mr-1" id="test-normal-count" [ngStyle]="{backgroundColor:ragPointNormalColor}">&nbsp;&nbsp;</span>Normal</h6>
+                    </div>
+                </div>
+                <!-- <div class="btn btn-outline-primary" (click)="showFrontLayer();">Check</div> -->
+                <div id="header_mask">
+                    <div id="header_mask_frontlayer">
+                        <div class="fgm-section-card">
+                            <div class="card-header">
+                                <b>Modify Header</b>[<span id="modifyHeaderID" class="m-1 text-primary"></span>]
+                            </div>
+                            <div class="card-body">
+                                <!-- <input type="color" class="form-control form-control-sm legendColorCodeClass" autocomplete="none" required [(ngModel)]="legendColorCode"> -->
+                                <!-- <input [(colorPicker)]=legendColorCode class="form-control form-control-sm legendColorCodeClass" autocomplete="none" required [(ngModel)]="legendColorCode"> -->
+                                <input type="text" class="form-control form-control-sm mt-2" id="modifyHeaderInputID" placeholder="Rename header" autocomplete="none" required [(ngModel)]="modifiedHeaderName">
+                            </div>
+                            <div class="card-footer text-muted">
+                                <input type="button" class="btn-fgm-secondary" value="Close" (click)="hideHeaderFrontLayer();" />
+                                <input type="button" class="btn-fgm-primary ml-2" value="Update" (click)="updateTableHeader();" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="key_mask">
+                    <div id="key_mask_frontlayer">
+                        <div class="fgm-section-card">
+                            <div class="card-header">
+                                <b>Modify Header</b>[<span id="modifyTextValueHeader" class="m-1 text-primary"></span>]
+                            </div>
+                            <div class="card-body">
+                                <input type="text" class="form-control form-control-sm mt-2" id="modifyTextValueHeaderInput"
+                                    placeholder="Rename Header" autocomplete="none" required [(ngModel)]="modifiedTextValueHeaderName">
+                            </div>
+                            <div class="card-footer text-muted">
+                                <input type="button" class="btn-fgm-secondary" value="Close" (click)="hideTextValueHeaderFrontLayer();" />
+                                <input type="button" class="btn-fgm-primary ml-2" value="Update"
+                                    (click)="updateTextValueHeader();" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="bg_mask">
+                    <div id="frontlayer">
+                        <div class="fgm-section-card">
+                            <div class="card-header">
+                                <b>Choose Color </b><span id="legendNameID"></span>
+                            </div>
+                            <div class="card-body">
+                                <!-- <input type="color" class="form-control form-control-sm legendColorCodeClass" autocomplete="none" required [(ngModel)]="legendColorCode"> -->
+                                <input [(colorPicker)]=legendColorCode class="form-control form-control-sm legendColorCodeClass" autocomplete="none" required [(ngModel)]="legendColorCode">
+                                <!-- <input type="text" class="form-control form-control-sm mt-2 legendColorCodeClass" placeholder="Enter Color Code" autocomplete="none" required [(ngModel)]="legendColorCode"> -->
+                            </div>
+                            <div class="card-footer text-muted">
+                                <input type="button" class="btn-fgm-secondary" value="Close" (click)="hideFrontLayer();" />
+                                <input type="button" class="btn-fgm-primary ml-2" value="Update" (click)="updateLegendColorCode();" />
+                            </div>
+                        </div>
+                        <div class="fgm-section-card">
+                            <div class="card-header">
+                                <b>Choose alias name </b><span id="aliasNameID"></span>
+                            </div>
+                            <div class="card-body">
+                                <input autocomplete="none" required [(ngModel)]="aliasName">
+                            </div>
+                            <div class="card-footer text-muted">
+                                <input type="button" class="btn-fgm-secondary" value="Close" (click)="hideFrontLayer();" />
+                                <input type="button" class="btn-fgm-primary ml-2" value="Update" (click)="updateAliasName();clearAliasName();" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- create graph form -->
+        <div class="col-span-12" *ngIf="isForm">
+            <div class="bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-xl shadow-sm overflow-hidden mt-2">
+                <div class="p-4 md:p-6 border-b border-border-light dark:border-border-dark flex items-center gap-3">
+                    <i class="ri-bar-chart-2-line text-primary text-2xl"></i>
+                    <h2 class="text-lg font-semibold flex-1">
+                        <span *ngIf="!isEditGraphBtn">Create Graph</span>
+                        <span *ngIf="isEditGraphBtn">Update Graph</span>
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" id="graphActive" value="yes" (change)="graphObj.isActive=='yes'?graphObj.isActive='no':graphObj.isActive='yes'" [checked]="graphObj.isActive=='yes'">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">{{graphObj.isActive=='yes'?'Active':'Inactive'}}</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="{{this.storedTheme}}CardBody" class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 items-start">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Name<span class="text-danger">*</span></label>
+                            <input type="text" [(ngModel)]="graphObj.chartName" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" (ngModelChange)="validateGraphName(graphObj.chartName,alert_message)" maxlength="100" autocomplete="none">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Title<span class="text-danger">*</span></label>
+                            <input type="text" [(ngModel)]="graphObj.chartTitle" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" (ngModelChange)="validateGraphTitle(graphObj.chartTitle,alert_message)" maxlength="100" autocomplete="none">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Id<span class="text-danger">*</span></label>
+                            <input type="text" [(ngModel)]="graphObj.chartId" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" (ngModelChange)="validateGraphId(graphObj.chartId,alert_message)" maxlength="100" autocomplete="none">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Type<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.chartType" tabindex="" aria-hidden="true" (change)="getMetricName(graphObj.applicationId)" (change)="blurVisualisation(graphObj.chartType)">
+                                    <option disabled selected="selected">Select</option>
+                                    <option *ngFor="let type of graphTypes" value="{{type.val}}">{{type.name}}</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    <ng-container *ngIf="graphObj.chartType!='IFrame' && graphObj.chartType!='Group'">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Data Source<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.dataSource" tabindex="" aria-hidden="true" (change)="refreshDatasource()">
+                                    <option disabled value="Select">Select</option>
+                                    <option *ngIf="graphObj.chartType !='Text'" selected value="Database">Database</option>
+                                    <option *ngIf="graphObj.chartType !='Text'" value="Elastic Search">Elastic Search</option>
+                                    <option *ngIf="graphObj.chartType=='Text'" value="NA">--NA--</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5" *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table'">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Table Type<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" data-select2-id="1" [(ngModel)]="graphObj.tableType" tabindex="" aria-hidden="true">
+                                    <option disabled value="Select">Select</option>
+                                    <option value="transpose">Transpose</option>
+                                    <option value="rowwise">Row wise</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5" *ngIf="graphObj.chartType=='Bar' || graphObj.chartType=='Column' || graphObj.chartType=='Line' || graphObj.chartType=='Stacked Bar' || graphObj.chartType=='Stacked Column'">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Data Mode<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" data-select2-id="1" [(ngModel)]="graphObj.dataMode" tabindex="" aria-hidden="true">
+                                    <option disabled value="Select">Select</option>
+                                    <option value="series">Series</option>
+                                    <option value="time">Time</option>
+                                    <option value="split">Multi Series</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5" *ngIf="graphObj.dataSource!='NA'">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Data Unit<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.unit" data-select2-id="1" tabindex="" aria-hidden="true">
+                                    <option disabled selected="selected" data-select2-id="3">Select</option>
+                                    <option *ngFor="let unit of dataUnit" value="{{unit}}">{{unit}}</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Category<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.category" data-select2-id="1" tabindex="" aria-hidden="true">
+                                    <option disabled selected="selected" data-select2-id="3">Select</option>
+                                    <option value="host">Parent</option>
+                                    <option value="node">Child</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5" *ngIf="graphObj.chartType=='Pie' || graphObj.chartType=='DoughNut'">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Point Child Graphs<span class="text-danger">*</span></label>
+                            <div class="relative">
+                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.pointChildGraphs" data-select2-id="1" tabindex="" aria-hidden="true">
+                                    <option disabled selected="selected">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option *ngIf="graphObj.chartType=='DoughNut'" value="RAG">RAG Point Graphs</option>
+                                    <option *ngIf="graphObj.chartType=='DoughNut'" value="RAGCOUNT_POINTGRAPHS">RAG Count + Point Graphs</option>
+                                    <option value="No">No</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Application Name<span class="text-danger">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" (ngModelChange)="getAllSubFeaturesByApplication($event)" [(ngModel)]="graphObj.applicationId" data-select2-id="1" tabindex="" aria-hidden="true" [disabled]="isEditGraphBtn && isEditGraph == 'true'">
+                                        <option disabled selected="selected" data-select2-id="3">Select</option>
+                                        <option *ngFor="let application of allApplications" [value]="application.applicationId">{{application.applicationName}}</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub Feature<span class="text-danger">*</span></label>
+                                    <div class="relative">
+                                        <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.subFeatureId" (change)="getAllGraphInSubfeature()" tabindex="" aria-hidden="true" [disabled]="isEditGraphBtn && isEditGraph == 'true'">
+                                            <option disabled selected="selected" data-select2-id="3">Select</option>
+                                            <option *ngFor="let subFeature of subFeatureList" value="{{subFeature.id}}">{{subFeature.featureId === 1 ? 'Dashboard' : 'Trend Dashboard'}} || {{subFeature.subFeatureName}}</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                            <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.category=='host' && graphObj.chartType!='IFrame'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Child Graph</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown
+                                        [placeholder]="'Select Child Graphs'"
+                                        [settings]="childGraphDropdownSettings"
+                                        [data]="appGraphList"
+                                        [(ngModel)]="nodeGraphIds"
+                                        name="nodeGraphId">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.category=='node' && graphObj.chartType!='IFrame'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub-Child Graph</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown
+                                        [placeholder]="'Select Sub-Child Graphs'"
+                                        [settings]="childGraphDropdownSettings"
+                                        [data]="appGraphList"
+                                        [(ngModel)]="nodeGraphIds"
+                                        name="nodeGraphId">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='RAG Table' || graphObj.chartType=='Gauge' || graphObj.chartType=='Text Value' || graphObj.chartType=='Text Value - Circle'|| graphObj.chartType=='DoughNut' || graphObj.chartType=='Gauge Meter' || graphObj.chartType=='Line'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Metric Name<span class="text-danger" *ngIf="graphObj.chartType=='RAG Table' || graphObj.chartType=='Gauge' || graphObj.pointChildGraphs == 'RAG'">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.metricID" tabindex="" aria-hidden="true">
+                                        <option [disabled]="(graphObj.chartType =='RAG Table' || graphObj.chartType == 'Gauge') ? true : false" selected="selected" value="">Select</option>
+                                        <option *ngFor="let metrics of metricList" value="{{metrics.id}}">{{metrics.module}}</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.chartType=='RAG Table'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Metric Columns</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown
+                                        [placeholder]="'Select Metric Columns'"
+                                        [settings]="tableColumnsDropdownSettings"
+                                        [data]="allTableMetricColumns"
+                                        [(ngModel)]="metricColumns"
+                                        name="metricColumns">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <!-- background Menu -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Background<span class="text-danger">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" (change)="showGraphColorModal()" [(ngModel)]="graphObj.graphBG" tabindex="" aria-hidden="true">
+                                        <option disabled selected="selected" value="Select">Select</option>
+                                        <option value="transparent">Transparent</option>
+                                        <option value="color">Color</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType == 'TopN' ">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expression</label>
+                                <input type="text" [(ngModel)]="graphObj.expression" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="200" autocomplete="none">
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='TopN' || graphObj.chartType=='Line' || graphObj.chartType=='Column' || graphObj.chartType=='Stacked Column'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timeframe</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.timeframe" tabindex="" aria-hidden="true" >
+                                        <option selected value="Select">Select</option>
+                                        <option value="Last 7 Days">Last 7 Days</option>
+                                        <option value="Current Month">Current Month</option>
+                                        <option value="Previous Month">Previous Month</option>
+                                        <option value="Previous 2 Month">Penultimate Month</option>                                       
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='DoughNut'||graphObj.chartType=='Pie' ||graphObj.chartType=='Line'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">If Bucketscript</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.ifBucketScript" tabindex="" aria-hidden="true">
+                                        <option selected value="Select" disabled>Select</option>
+                                        <option value="All">All values</option>
+                                        <option value="Single">Single value</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='DoughNut'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">On Basis</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.onBasisOf" tabindex="" aria-hidden="true">
+                                        <option selected value="Select" disabled>Select</option>
+                                        <option value="Value">Value</option>
+                                        <option value="Label">Label</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf=" graphObj.chartType=='Group'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph Category<span class="text-danger">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.category" (change)="getAllGraphInSubfeature();" tabindex="" aria-hidden="true">
+                                        <option disabled selected="selected" data-select2-id="3">Select</option>
+                                        <option value="host">Parent</option>
+                                        <option value="node">Child</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hide Table Headers</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown
+                                        [placeholder]="'Select Table Headers to Hide'"
+                                        [settings]="tableColumnsDropdownSettings"
+                                        [data]="allTableColumns"
+                                        [(ngModel)]="tableHeaders"
+                                        name="tableHeaders">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <!-- line graph area fill-->
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType == 'Line'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Line Area Fill<span class="text-danger">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.lineAreaFill" tabindex="" aria-hidden="true">
+                                        <option disabled value="Select">Select</option>
+                                        <option selected value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Allow Table Sorting<span class="text-danger">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" data-select2-id="1" [(ngModel)]="graphObj.tableSorting" (change)="checkTableSorting(graphObj.tableSorting)" tabindex="" aria-hidden="true">
+                                        <option disabled value="Select">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="(graphObj.chartType=='Table' || graphObj.chartType=='RAG Table') && graphObj.tableSorting=='Yes'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Select Table Header for Sorting</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.sortingColumns" tabindex="" (change)="sortingTypeCheck()" aria-hidden="true">
+                                        <option selected="selected" value="Select">Select</option>
+                                        <option *ngFor="let sorting of sortingColumnsList" value="{{sorting}}">{{sorting}}</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                    </ng-container>
+
+                    <ng-container>
+                            <div class="space-y-1.5" *ngIf="isSortingType && (graphObj.chartType=='Table' || graphObj.chartType=='RAG Table')">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sorting Type<span class="text-danger" *ngIf="isSortingType">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" data-select2-id="1" [(ngModel)]="graphObj.sortingType" tabindex="" aria-hidden="true">
+                                        <option [disabled]="isSortingType" value="Select">Select</option>
+                                        <option value="asc">Ascending</option>
+                                        <option value="desc">Descending</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table' ">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timeframe</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.timeframe" tabindex="" aria-hidden="true" >
+                                        <option selected value="Select">Select</option>
+                                        <option value="Last 7 Days">Last 7 Days</option>
+                                        <option value="Current Month">Current Month</option>
+                                        <option value="Previous Month">Previous Month</option>
+                                        <option value="Previous 2 Month">Penultimate Month</option>                                       
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Text Value' || graphObj.chartType=='Text Value - Circle' || graphObj.chartType=='Text'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Font Style</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.fontStyle" tabindex="" aria-hidden="true">
+                                        <option selected value="Select">Select</option>
+                                        <option *ngFor="let fontStyle of fontStyleList" [value]="fontStyle">{{fontStyle}}</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Text Value' || graphObj.chartType=='Text Value - Circle' || graphObj.chartType=='Text'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Font Size</label>
+                                <input class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" type="text" min="1" max="1000" matInput [formControl]="myControl" [matAutocomplete]="auto" [(ngModel)]="graphObj.fontSize">
+                                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                                    <mat-option value="Select">Select</mat-option>
+                                    <mat-option *ngFor="let option of fontSizeArr" [value]="option">{{option}}</mat-option>
+                                </mat-autocomplete>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Text Value' || graphObj.chartType=='Text Value - Circle' || graphObj.chartType=='Text'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Font Weight</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.fontWeight" tabindex="" aria-hidden="true">
+                                        <option selected value="Select">Select</option>
+                                        <option value="bold">Bold</option>
+                                        <option value="italic">Italic</option>
+                                        <option value="bold+italic">Bold+Italic</option>
+                                        <option value="normal">Normal</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Text Value' || graphObj.chartType=='Text'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Text Alignment</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.textAlignment" tabindex="" aria-hidden="true">
+                                        <option selected value="Select">Select</option>
+                                        <option value="center">Center</option>
+                                        <option value="start">Left</option>
+                                        <option value="end">Right</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                    </ng-container>
+                        
+                    <ng-container *ngIf="graphObj.chartType=='Text Value' || graphObj.chartType=='Text Value - Circle'">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Image/Icon</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.textImageIconType" tabindex="" aria-hidden="true" (change)="graphObj.iconName = null">
+                                        <option selected value="Select">Select</option>
+                                        <option value="url">Image URL</option>
+                                        <option value="file">Image File</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType == 'Text Value' || graphObj.chartType == 'Text Value - Circle'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expression</label>
+                                <input type="text" [(ngModel)]="graphObj.expression" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="200" autocomplete="none">
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType == 'Text Value' || graphObj.chartType == 'Text Value - Circle' ">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timeframe</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.timeframe" tabindex="" aria-hidden="true" >
+                                        <option selected value="Select">Select</option>
+                                        <option value="Last 7 Days">Last 7 Days</option>
+                                        <option value="Current Month">Current Month</option>
+                                        <option value="Previous Month">Previous Month</option>
+                                        <option value="Previous 2 Month">Penultimate Month</option>                                        
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="isIconName && graphObj.iconName">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Icon/Image Name</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" disabled [(ngModel)]="graphObj.iconName" class="flex-1 bg-slate-100 dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md px-4 py-2 outline-none cursor-not-allowed">
+                                    <button type="button" class="flex items-center justify-center w-10 h-10 bg-red-100 text-red-600 hover:bg-red-200 rounded-md transition-colors" (click)="uploadUpdatedIcon()">
+                                        <i class="ri-close-line text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2">
+                                <div *ngIf="graphObj.textImageIconType == 'url'">
+                                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">Image URL</label>
+                                    <input type="text" [(ngModel)]="graphObj.iconName" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" autocomplete="none" placeholder="Provide an URL">
+                                </div>
+                                <div *ngIf="graphObj.textImageIconType=='file'">
+                                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">Image File</label>
+                                    <div class="flex items-center gap-4">
+                                        <input type="file" hidden id="textFileImage" [(ngModel)]="graphObj.iconName" (change)="onTextImageSelect($event);showFileName($event);" accept="image/*">
+                                        <label for="textFileImage" class="cursor-pointer px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-white rounded-md transition-colors text-sm font-medium m-0">Upload file</label>
+                                        <div class="text-sm text-slate-500" id="file-upload-filename">No file selected</div>
+                                    </div>
+                                </div>
+                            </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="graphObj.chartType=='Text'">
+                            <div class="flex items-center mt-7">
+                                <input id="showTimeInHeader" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" value="yes" (change)="showTimeInHeaderChanged($event)" (change)="graphObj.timeInHeaders ? graphObj.timeInHeaders=false:graphObj.timeInHeaders=true" [checked]="graphObj.timeInHeaders">
+                                <label for="showTimeInHeader" class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">Show Time In Header</label>
+                            </div>
+                            <div class="flex items-center mt-7" *ngIf="graphObj.timeInHeaders">
+                                <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" (change)="toggleCustomDateOrCurrentDateInHeader($event)" id="customDateOrCurrentDateInHeader" [(ngModel)]="graphObj.customDateOrCurrentDateInHeader" [checked]="graphObj.customDateOrCurrentDateInHeader">
+                                <label class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300" for="customDateOrCurrentDateInHeader">{{graphObj.customDateOrCurrentDateInHeader ?'Custom Date':'Current Date'}}</label>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.timeInHeaders && graphObj.customDateOrCurrentDateInHeader">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Select Custom Date For Header<span class="text-danger">*</span></label>
+                                <input class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" [owlDateTime]="dtDD2" placeholder="Date Time" [(ngModel)]="customDateInHeader" [owlDateTimeTrigger]="dtDD2" [max]="max" name="customDateInHeader">
+                                <owl-date-time #dtDD2 [Hour24]="true" [showSecondsTimer]="true"></owl-date-time>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.timeInHeaders">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Time Format</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.timeFormatInHeader" tabindex="" aria-hidden="true">
+                                        <option selected value="Select" disabled>Select</option>
+                                        <option value="dd-MM-yyyy">dd-MM-yyyy</option>
+                                        <option value="dd-MM-yyyy hh:mm:ss aa">dd-MM-yyyy hh:mm:ss aa</option>
+                                        <option value="dd-MMMM-yyyy">dd-MMMM-yyyy</option>
+                                        <option value="dd-MMMM-yyyy hh:mm:ss aa">dd-MMMM-yyyy hh:mm:ss aa</option>
+                                        <option value="E, dd-MMM-yyyy hh:mm:ss aa">E, dd-MMM-yyyy hh:mm:ss aa</option>
+                                        <option value="E, dd-MM-yyyy hh:mm:ss aa">E, dd-MM-yyyy hh:mm:ss aa</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="graphObj.chartType=='Group'">
+                            <div class="col-span-1 md:col-span-2 lg:col-span-2 space-y-4">
+                                <div class="grid grid-cols-12 gap-4 items-end mb-2 hidden md:grid">
+                                    <div class="col-span-5"><label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Group graph Name<span class="text-danger">*</span></label></div>
+                                    <div class="col-span-5"><label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Graph title<span class="text-danger">*</span></label></div>
+                                </div>
+                                <div class="grid grid-cols-12 gap-4 items-center" *ngFor="let gd of graphObj.groupGraphWidgetList; let i = index;">
+                                    <div class="col-span-12 md:col-span-5">
+                                        <label class="md:hidden text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Group graph Name</label>
+                                        <div class="relative">
+                                            <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="gd.nodeGraphId" tabindex="">
+                                                <option disabled>Select</option>
+                                                <option *ngFor="let graph of groupgraphList" value="{{graph.id}}">{{graph.category === 'host' ? 'Parent' : 'Child'}} || {{graph.chartName}}</option>
+                                            </select>
+                                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                                <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-12 md:col-span-5">
+                                        <label class="md:hidden text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Graph title</label>
+                                        <div class="relative">
+                                            <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="gd.enableNodeTitle" tabindex="" aria-hidden="true">
+                                                <option selected value="Select">Select</option>
+                                                <option value="yes">Enable</option>
+                                                <option value="no">Disable</option> 
+                                            </select>
+                                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                                <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-12 md:col-span-2 flex gap-2">
+                                        <button type="button" class="flex-1 flex items-center justify-center bg-primary text-white hover:bg-primary-dark rounded-md px-3 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" (click)="addInputField()" [disabled]="checkValidationGroupGraphs(i, gd)">
+                                            <i class="fa fa-plus text-sm"></i>
+                                        </button>
+                                        <button type="button" class="flex-1 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 rounded-md px-3 py-2 transition-colors" (click)="removeInputField(gd)" *ngIf="i">
+                                            <i class="fa fa-trash text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                    </ng-container>
+                    <ng-container>
+                            <div class="space-y-1.5 lg:col-span-2">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Graph Description</label>
+                                <textarea [(ngModel)]="graphObj.graphDescription" class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" maxlength="300" rows="3" style="resize: none;" placeholder="Please Provide Graph Description."></textarea>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Group'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Row Item count<span class="text-danger">*</span></label>
+                                <input type="number" [(ngModel)]="graphObj.rowitems" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" (ngModelChange)="validateGraphTitle(graphObj.rowitems,alert_message)" min=1 autocomplete="none">
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='DoughNut'||graphObj.chartType=='Pie' ||graphObj.chartType=='Funnel'||graphObj.chartType=='Gauge' ||graphObj.chartType=='Text Value'||graphObj.chartType=='Text Value - Circle' ||graphObj.chartType=='TopN' || graphObj.chartType=='Gauge Meter'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">If Count</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.ifcount" tabindex="" aria-hidden="true">
+                                        <option selected value="Select" disabled>Select</option>
+                                        <option value="Latest">Latest</option>
+                                        <option value="Total">Total</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.isLegendEnabled">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Legend Position</label>
+                                <div class="relative">
+                                    <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="graphObj.legendPosition" tabindex="" aria-hidden="true">
+                                        <option selected value="">Select</option>
+                                        <option value="top">Top</option>
+                                        <option value="bottom">Bottom</option>
+                                        <option value="left">Left</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.isLegendEnabled && (graphObj.chartType=='DoughNut'||graphObj.chartType=='Pie')">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Legend Values</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown *ngIf="graphObj.onBasisOf != 'Label'"
+                                        [placeholder]="'Select Legend Values'"
+                                        [settings]="legendValuesDropdownSettings"
+                                        [data]="legendValueData"
+                                        [(ngModel)]="legendValues"
+                                        name="legendValue">
+                                    </ng-multiselect-dropdown>
+                                    <ng-multiselect-dropdown *ngIf="graphObj.onBasisOf == 'Label'"
+                                        [placeholder]="'Select Legend Values'"
+                                        [settings]="legendValuesDropdownSettings"
+                                        [data]="legendLabelData"
+                                        [(ngModel)]="legendValues"
+                                        name="legendValue">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.chartType=='DoughNut'||graphObj.chartType=='Pie'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Label Position</label>
+                                <div class="relative">
+                                    <ng-multiselect-dropdown
+                                        [placeholder]="'Select Label Position'"
+                                        [settings]="labelPositionDropdownSettings"
+                                        [data]="labelPositionData"
+                                        [(ngModel)]="labelPositions"
+                                        name="labelPosition">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Table Borders</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" name="tableBorders" id="tableBordersTrue" value="enable" [(ngModel)]="graphObj.tableBorders">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Enable</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" name="tableBorders" id="tableBordersFalse" value="disable" [(ngModel)]="graphObj.tableBorders">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Disable</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5" *ngIf="(graphObj.chartType=='Table' || graphObj.chartType=='RAG Table') && graphObj.tableSorting=='Yes'">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Pagination</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" name="pagination" id="paginationTrue" value="enable" [(ngModel)]="graphObj.pagination">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Enable</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" name="pagination" id="paginationFalse" value="disable" [(ngModel)]="graphObj.pagination">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Disable</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-2">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Graph Borders</label>
+                                <div class="flex flex-wrap gap-4 bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" name="topBorder" id="topBorder" [(ngModel)]="isTopBorder" (change)="updateBorder($event,'Top')">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Top</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" name="rightBorder" id="rightBorder" [(ngModel)]="isRightBorder" (change)="updateBorder($event,'Right')">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Right</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" name="bottomBorder" id="bottomBorder" [(ngModel)]="isBottomBorder" (change)="updateBorder($event,'Bottom')">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Bottom</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" name="leftBorder" id="leftBorder" [(ngModel)]="isLeftBorder" (change)="updateBorder($event,'Left')">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Left</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-7" *ngIf="graphObj.dataSource =='Elastic Search'">
+                                <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" (change)="toggleCreateRequestBody($event)" id="createRequestBody" [(ngModel)]="graphObj.createRequestBody">
+                                <label class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300" for="createRequestBody">Create RequestBody</label>
+                            </div>
+                    </ng-container>
+
+                        <!-- <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Image position</label><label class="text-danger">*</label>
+                                    <select class="form-control" style="width: 100%;" [(ngModel)]="graphObj.graphImagePosition" tabindex="" aria-hidden="true">
+                                        <option disabled value="Select">Select</option>
+                                        <option selected value="Top">Top</option>
+                                        <option value="Bottom">Bottom</option>
+                                        <option value="Left">Left</option>
+                                        <option value="Right">Right</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md shadow-sm overflow-hidden mb-6 mt-4 col-span-1 md:col-span-2 lg:col-span-3" *ngIf="graphObj.dataSource =='Database' || (graphObj.dataSource =='Elastic Search' && !graphObj.createRequestBody) || (graphObj.chartType == 'Table' || graphObj.chartType == 'RAG Table') || graphObj.chartType=='IFrame'">
+                            <div class="bg-slate-50 dark:bg-slate-800 border-b border-border-light dark:border-border-dark px-4 py-3 font-semibold text-slate-700 dark:text-slate-200 flex items-center">
+                                <i class="fa fa-sliders mr-2 text-primary"></i> Data Source Setting
+                            </div>
+                            <div class="p-4 md:p-6 space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                                    <div class="flex items-center" *ngIf="(graphObj.dataSource=='Elastic Search' && graphObj.createRequestBody) && (graphObj.chartType=='Table' || graphObj.chartType=='RAG Table')">
+                                        <input id="isSourceDBEnabled1" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" value="yes" (change)="graphObj.isSourceDBEnabled=='yes'?graphObj.isSourceDBEnabled='no':graphObj.isSourceDBEnabled='yes'" [checked]="graphObj.isSourceDBEnabled=='yes'">
+                                        <label for="isSourceDBEnabled1" class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                            {{graphObj.isSourceDBEnabled=='yes'?'Source Type DB Enabled':'Source Type DB Disabled'}}
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center" *ngIf="graphObj.dataSource=='Elastic Search' && !graphObj.createRequestBody">
+                                        <input id="isElasticAuthEnabled" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" value="yes" (change)="graphObj.isElasticAuthEnabled=='yes'?graphObj.isElasticAuthEnabled='no':graphObj.isElasticAuthEnabled='yes'" [checked]="graphObj.isElasticAuthEnabled=='yes'">
+                                        <label for="isElasticAuthEnabled" class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                            {{graphObj.isElasticAuthEnabled=='yes'?'Authentication Enabled':'Authentication Disabled'}}
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center" *ngIf="graphObj.dataSource=='Elastic Search'  && !graphObj.createRequestBody">
+                                        <input id="isCAcertificate" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" value="yes" (change)="graphObj.isCAcertificate=='yes'?graphObj.isCAcertificate='no':graphObj.isCAcertificate='yes'" [checked]="graphObj.isCAcertificate=='yes'">
+                                        <label for="isCAcertificate" class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                            {{graphObj.isCAcertificate=='yes'?'CA Cert':'CA Cert'}}
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center" *ngIf="(graphObj.dataSource=='Elastic Search' && !graphObj.createRequestBody) && (graphObj.chartType=='Table' || graphObj.chartType=='RAG Table')">
+                                        <input id="isSourceDBEnabled" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" type="checkbox" value="yes" (change)="graphObj.isSourceDBEnabled=='yes'?graphObj.isSourceDBEnabled='no':graphObj.isSourceDBEnabled='yes'" [checked]="graphObj.isSourceDBEnabled=='yes'">
+                                        <label for="isSourceDBEnabled" class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                            {{graphObj.isSourceDBEnabled=='yes'?'Source Type DB Enabled':'Source Type DB Disabled'}}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" *ngIf="graphObj.dataSource=='Elastic Search' && (graphObj.isElasticAuthEnabled=='yes' || graphObj.isCAcertificate=='yes') && !graphObj.createRequestBody">
+                                    <div class="space-y-1.5" *ngIf="graphObj.isElasticAuthEnabled=='yes'">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Elastic User<span class="text-danger">*</span></label>
+                                        <input type="text" placeholder="Elastic User" [(ngModel)]="graphObj.elasticUser" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="100" autocomplete="none">
+                                    </div>
+                                    <div class="space-y-1.5" *ngIf="graphObj.isElasticAuthEnabled=='yes'">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Elastic Password<span class="text-danger">*</span></label>
+                                        <div class="relative">
+                                            <input [disabled]="(displayLoader > 0)" [type]="!fieldTextType ? 'password' : 'text'" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all pr-10 disabled:opacity-50 disabled:cursor-not-allowed" name="elasticPassword" id="elasticPassword" [(ngModel)]="graphObj.elasticPassword" autocomplete="nope" placeholder="Elastic Password"/>
+                                            <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" (click)="toggleFieldTextType()">
+                                                <i class="fa" [ngClass]="{'fa-eye-slash': !fieldTextType, 'fa-eye': fieldTextType}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1.5 lg:col-span-2" *ngIf="graphObj.isCAcertificate=='yes'">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">TLS/SSL Auth Details<span class="text-danger">*</span></label>
+                                        <textarea placeholder="Please enter CA Cert Begins with -----BEGIN CERTIFICATE-----" [(ngModel)]="graphObj.caCertificate" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="65535" rows="4"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                                    <div class="space-y-1.5" *ngIf="graphObj.dataSource!=''  && !graphObj.createRequestBody">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block" *ngIf="graphObj.dataSource=='Elastic Search'">API<span class="text-danger">*</span></label>
+                                        <textarea *ngIf="graphObj.dataSource=='Elastic Search' || graphObj.chartType=='IFrame'" placeholder="URL For API" [(ngModel)]="graphObj.query" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="65535" rows="3"></textarea>
+                                    </div>
+                                    <div class="space-y-1.5" *ngIf="graphObj.dataSource=='Elastic Search'  && !graphObj.createRequestBody">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Request Body<span class="text-danger">*</span></label>
+                                        <textarea placeholder="Request Body" [(ngModel)]="graphObj.requestBody" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="65535" rows="3"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" *ngIf="graphObj.dataSource == 'Database' || graphObj.isSourceDBEnabled=='yes'|| graphObj.chartType=='IFrame'">
+                                    <div class="space-y-1.5" *ngIf="graphObj.dbType=='MySql' || graphObj.dbType=='Select'">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">IP Address<span class="text-danger">*</span></label>
+                                        <input type="text" [(ngModel)]="graphObj.ipAddress" (ngModelChange)="validateIP($event,alert_message)" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="100" autocomplete="none">
+                                    </div>
+                                    <div class="space-y-1.5" *ngIf="graphObj.dbType=='Oracle'">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">IP Address<span class="text-danger">*</span></label>
+                                        <input type="text" [(ngModel)]="graphObj.ipAddress" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="100" autocomplete="none">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Port<span class="text-danger">*</span></label>
+                                        <input type="text" [(ngModel)]="graphObj.port" (ngModelChange)="validatePort($event,alert_message)" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="5" autocomplete="none">
+                                        <small *ngIf="!validateNumber(graphObj.port) || !validatePort(graphObj.port)" class="text-danger text-xs mt-1 block">Invalid Port Number !!</small>
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">DB Name/SID<span class="text-danger">*</span></label>
+                                        <input type="text" [(ngModel)]="graphObj.dbName" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="100" autocomplete="none">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Database Type<span class="text-danger">*</span></label>
+                                        <div class="relative">
+                                            <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" name="select1" aria-hidden="true" [(ngModel)]="graphObj.dbType">
+                                                <option selected="selected" value="Select" disabled>Select</option>
+                                                <option value="MySql">MySql</option>
+                                                <option value="Oracle">Oracle</option>
+                                            </select>
+                                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                                <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Username<span class="text-danger">*</span></label>
+                                        <input type="text" [(ngModel)]="graphObj.dbUsername" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" autocomplete="none">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Password<span class="text-danger">*</span></label>
+                                        <div class="relative">
+                                            <input [disabled]="(displayLoader > 0)" [(ngModel)]="graphObj.dbPassword" [type]="!fieldTextType1 ? 'password' : 'text'" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all pr-10 disabled:opacity-50 disabled:cursor-not-allowed" name="dbPassword" id="dbPassword" autocomplete="nope" />
+                                            <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" (click)="toggleFieldTextType1()">
+                                                <i class="fa" [ngClass]="{'fa-eye-slash': !fieldTextType1, 'fa-eye': fieldTextType1}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1.5 lg:col-span-2">
+                                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Query<span class="text-danger">*</span></label>
+                                        <textarea placeholder="Query For Source Type Database" [(ngModel)]="graphObj.dbQuery" class="w-full bg-slate-50 dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" maxlength="65535" rows="3"></textarea>
+                                    </div>
+                                    <div class="flex items-end lg:col-span-1 pb-1">
+                                        <button type="button" class="flex items-center justify-center gap-2 bg-white dark:bg-slate-950 border border-primary text-primary hover:bg-primary hover:text-white rounded-md px-4 py-2 font-medium transition-colors w-full md:w-auto" (click)="testConnection(alert_message)" [disabled]="buttonDisable">
+                                            <i class="fa fa-plug"></i> Test Connection
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md shadow-sm overflow-hidden mb-6 mt-4 col-span-1 md:col-span-2 lg:col-span-3" *ngIf="graphObj.dataSource=='Elastic Search' && graphObj.createRequestBody">
+                            <div class="bg-slate-50 dark:bg-slate-800 border-b border-border-light dark:border-border-dark px-4 py-3 font-semibold text-slate-700 dark:text-slate-200 flex items-center">
+                                <i class="fa fa-sliders mr-2 text-primary"></i> Create Request Body
+                            </div>
+                            <div class="p-4 md:p-6 space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div class="col-span-12 md:col-span-8 flex flex-wrap gap-4 items-end">
+                                        <div class="flex-grow space-y-1.5" *ngIf="!isImageUpdate">
+                                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Datasource<span class="text-danger">*</span></label>
+                                            <div class="relative">
+                                                <select class="w-full bg-white dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-4 pr-10 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="datasourceId" (change)="getfieldByDatasource(alert_message)" data-select2-id="1" tabindex="" aria-hidden="true">
+                                                    <option disabled selected="selected" value ="" data-select2-id="3">Select</option>
+                                                    <option *ngFor="let datasource of allDatasourceList" value={{datasource.id}}>{{datasource.datasourceName}}</option>
+                                                </select>
+                                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                                    <i class="ri-arrow-down-s-line text-slate-400"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-md px-4 py-2 transition-colors border border-border-light dark:border-border-dark h-10 mb-0.5" (click)="refreshRequestBody(alert_message,queryObjList)">
+                                            <i class="fa fa-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                        <div *ngFor="let queryObj of queryObjList; let j = index;">
+                                            <div class="row">
+                                                <div class="col-md-12 d-flex">
+                                                    <div class="col-md-8">
+                                                        <div class="form-group">
+                                                            <label class="mt-2"><strong>Query {{j+1}}</strong></label>
+                                                            <input type="text" [(ngModel)]="queryObj.luceneQuery" style="width: 80%;"
+                                                                *ngIf="!queryObj.isQueryRawData"
+                                                                class="form-control my-colorpicker1 colorpicker-element" maxlength="300"
+                                                                placeholder="Lucene Query" autocomplete="none">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 ml-3 mt-3" *ngIf="!queryObj.isQueryRawData">
+                                                        <button type="button" class="btn-fgm-secondary btn-sm mx-2 float-right mt-4"
+                                                            (click)="removeQueryObj(alert_message,queryObj)" *ngIf="j">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-primary btn-sm mx-2 float-right mt-4"
+                                                            (click)="addQueryObj()">
+                                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" *ngFor="let metricObj of queryObj.queryMetricList;index as q;">
+                                                <div class="col-md-12 d-flex">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Metric</label><label *ngIf="q == 0 " class="text-danger">*</label>
+                                                            <select class="form-control select2 select2-hidden-accessible"
+                                                                [(ngModel)]="metricObj.metricType" (focus)="queryMetricTypeFocused(metricObj)"
+                                                                (change)="queryMetricTypeChanged(queryObj,metricObj,q)" style="width: 100%;"
+                                                                data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                <option disabled selected="selected">Select</option>
+                                                                <option value="Count">Count</option>
+                                                                <option value="Average">Average</option>
+                                                                <option value="Sum">Sum</option>
+                                                                <option value="Max">Max</option>
+                                                                <option value="Min">Min</option>
+                                                                <option value="RawData">Raw Data</option>
+                                                                <option *ngIf="q > 0" value="BucketScript">Bucket Script</option>
+                                                                <option *ngIf="q > 0" value="Derivative">Derivative</option><button class="fa-eye"></button>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3" *ngIf="queryObj.isQueryRawData">
+                                                        <div class="form-group">
+                                                            <label>Size</label>
+                                                            <input type="text" class="form-control my-colorpicker1 colorpicker-element"
+                                                                [(ngModel)]="queryObj.rawDataSize" maxlength="6" autocomplete="none">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3"
+                                                        *ngIf="!queryObj.isQueryRawData  && metricObj.metricType !='Count' && metricObj.metricType !='Derivative' && metricObj.metricType !='BucketScript'">
+                                                        <div class="form-group">
+                                                            <label>Select Field</label>
+                                                            <label class="text-danger">*</label>
+                                                            <select [(ngModel)]="metricObj.metricField" (change)="metricFieldChanged(queryObj,metricObj)" (focus)="metricFieldFoused(metricObj)"
+                                                                class="form-control select2 select2-hidden-accessible" style="width: 100%;"
+                                                                data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                <option disabled selected="selected">Select</option>
+                                                                <option *ngFor="let metric of fieldMetricList" value={{metric}}>{{metric}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3"
+                                                        *ngIf="!queryObj.isQueryRawData  && metricObj.metricType !='Count' && metricObj.metricType =='Derivative'">
+                                                        <div class="form-group">
+                                                            <label>Select Field</label>
+                                                            <label class="text-danger">*</label>
+                                                            <select [(ngModel)]="metricObj.derivateField" (change)="metricFieldChanged(queryObj,metricObj)"
+                                                                class="form-control select2 select2-hidden-accessible" style="width: 100%;"
+                                                                data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                <option disabled selected="selected">Select</option>
+                                                                <ng-container *ngFor="let derivateField of queryObj.derivativeFieldList ; let a = index"
+                                                                   ><option *ngIf="(a < q)" value={{derivateField}}>{{derivateField}}</option></ng-container>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3"
+                                                        *ngIf="!queryObj.isQueryRawData && metricObj.metricType =='Derivative'">
+                                                        <div class="form-group">
+                                                            <label>Unit</label>
+                                                            <input type="text" class="form-control my-colorpicker1 colorpicker-element"
+                                                                [(ngModel)]="metricObj.derivateUnit" maxlength="6" autocomplete="none">
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!queryObj.isQueryRawData && metricObj.metricType =='BucketScript'" class = "col-md-6">
+                                                        <div *ngFor="let bucketScriptObj of metricObj.metricBucketScriptList;let x = index" class = "d-flex">
+                                                            <div class="col-md-4.5">
+                                                                <div class="form-group">
+                                                                    <label>Variables</label>
+                                                                    <input type="text" class="form-control my-colorpicker1 colorpicker-element"
+                                                                        [(ngModel)]="bucketScriptObj.bucketScriptVariable"
+                                                                        autocomplete="none">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="form-group">
+                                                                    <label>Select Field</label>
+                                                                    <label class="text-danger">*</label>
+                                                                    <select [(ngModel)]="bucketScriptObj.bucketScriptField"
+                                                                        class="form-control select2 select2-hidden-accessible" (change) = "bucketScriptFieldChanged(queryObj,metricObj,bucketScriptObj)"
+                                                                        style="width: 100%;" data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                        <option disabled selected="selected">Select</option>
+                                                                        <ng-container *ngFor="let derivateField of queryObj.derivativeFieldList ; let b = index"
+                                                                        ><option *ngIf="(b < q)" value={{derivateField}}>{{derivateField}}</option></ng-container>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3 mt-4">
+                                                                <button type="button" class="btn btn-outline-primary btn-sm mx-2 mt-2"
+                                                                    (click)="addBucketScriptVariable(metricObj)">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <button type="button" class="btn-fgm-secondary btn-sm mx-2 mt-2"
+                                                                    (click)=" removeBucketScriptVariable(metricObj,bucketScriptObj)" *ngIf="x">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 pl-0">
+                                                            <div class="form-group">
+                                                                <label>Script Value</label>
+                                                                <input type="text" class="form-control my-colorpicker1 colorpicker-element" placeholder="params.var1 / param.var2"
+                                                                    [(ngModel)]="metricObj.bucketScriptValue" autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 mt-4" *ngIf="!queryObj.isQueryRawData">
+                                                        <button type="button" class="btn btn-outline-primary btn-sm mx-2 mt-2"
+                                                            (click)="addMetric(queryObj,metricObj,q)">
+                                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                                        </button>
+                                                        <button type="button" class="btn-fgm-secondary btn-sm mx-2 mt-2"
+                                                            (click)=" removeMetric(queryObj,metricObj)" *ngIf="q">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngFor="let queryGroupByObj of queryObj.queryGroupByList; let k = index;">
+                                                <div class="row mt-1" *ngIf="!queryObj.isQueryRawData">
+                                                    <div class="col-md-12 d-flex">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label *ngIf="k == 0">Group By</label>
+                                                                <label *ngIf="k > 0"> Then By</label>
+                                                                <select class="form-control select2 select2-hidden-accessible"
+                                                                    (change)="queryGroupByChanged(queryGroupByObj)"
+                                                                    [(ngModel)]="queryGroupByObj.groupBy" style="width: 100%;"
+                                                                    data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                    <option disabled selected="selected">Select</option>
+                                                                    <option value="Terms">Terms</option>
+                                                                    <option value="Filters">Filters</option>
+                                                                    <option value="DateHistogram">Date Histogram</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isTerms">
+                                                            <div class="form-group">
+                                                                <label>Select Field</label>
+                                                                <label class="text-danger">*</label>
+                                                                <select class="form-control select2 select2-hidden-accessible"
+                                                                    style="width: 100%;" [(ngModel)]="queryGroupByObj.termsField"
+                                                                    data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                    <option disabled selected="selected">Select</option>
+                                                                    <option *ngFor="let termfield of fieldtermsList" value={{termfield}}>
+                                                                        {{termfield}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isTerms">
+                                                            <div class="form-group">
+                                                                <label>Order</label>
+                                                                <select class="form-control select2 select2-hidden-accessible"
+                                                                    style="width: 100%;" [(ngModel)]="queryGroupByObj.termsOrder"
+                                                                    data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                    <option value="Top" selected="selected">Top</option>
+                                                                    <option value="Bottom">Bottom</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isTerms">
+                                                            <div class="form-group">
+                                                                <label>Size</label>
+                                                                <input type="text" [(ngModel)]="queryGroupByObj.termsSize"
+                                                                    class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                    autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isFilters">
+                                                            <div class="form-group">
+                                                                <label>Query</label>
+                                                                <label class="text-danger">*</label>
+                                                                <input type="text" [(ngModel)]="queryGroupByObj.filtersQuery"
+                                                                    placeholder="Filter Query"
+                                                                    class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                    autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isFilters">
+                                                            <div class="form-group">
+                                                                <label>Label</label>
+                                                                <input type="text" [(ngModel)]="queryGroupByObj.filtersLabel"
+                                                                    placeholder="Filter Label"
+                                                                    class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                    autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="queryGroupByObj.isDateHistogram">
+                                                            <div class="form-group">
+                                                                <label>Timestamp</label>
+                                                                <label class="text-danger">*</label>
+                                                                <select class="form-control select2 select2-hidden-accessible"
+                                                                    style="width: 100%;" [(ngModel)]="queryGroupByObj.dateHistogramField"
+                                                                    data-select2-id="1" tabindex="" aria-hidden="true">
+                                                                    <option disabled selected="selected">Select</option>
+                                                                    <option *ngFor="let dateHistogramField of fielddateHistogramList"
+                                                                        value={{dateHistogramField}}>{{dateHistogramField}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2" *ngIf="queryGroupByObj.isDateHistogram">
+                                                            <div class="form-group">
+                                                                <label>Min Doc Count</label>
+                                                                <input type="text" [(ngModel)]="queryGroupByObj.dateHistogramMinDocCount"
+                                                                    class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                    autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2" *ngIf="queryGroupByObj.isDateHistogram">
+                                                            <div class="form-group">
+                                                                <label>Interval</label>
+                                                                <input type="text" [(ngModel)]="queryGroupByObj.interval"
+                                                                    class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                    autocomplete="none">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 mt-4" *ngIf="!queryGroupByObj.isTerms">
+                                                            <button type="button" class="btn btn-outline-primary btn-sm mx-2 mt-2"
+                                                                (click)="addThenBy(queryObj)">
+                                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                            <button type="button" class="btn-fgm-secondary btn-sm mx-2 mt-2"
+                                                                (click)="removeThenBy(queryGroupByObj,queryObj)" *ngIf="k">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="queryGroupByObj.isTerms && !queryObj.isQueryRawData">
+                                                    <div class="row mt-1">
+                                                        <div class="col-md-12 d-flex">
+                                                            <div class="col-md-3">
+                                                                <div class="form-group">
+                                                                    <label>Min Doc Count</label>
+                                                                    <input type="text" [(ngModel)]="queryGroupByObj.termsMinDocCount"
+                                                                        class="form-control my-colorpicker1 colorpicker-element" maxlength="100"
+                                                                        autocomplete="none">
+                                                                </div>
+                                                            </div>
+                        
+                                                            <div class="col-md-3 mt-4">
+                                                                <button type="button" class="btn btn-outline-primary btn-sm mx-2 mt-2"
+                                                                    (click)="addThenBy(queryObj)">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <button type="button" class="btn-fgm-secondary btn-sm mx-2 mt-2"
+                                                                    (click)="removeThenBy(queryGroupByObj,queryObj)" *ngIf="k">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- closes grid -->
+                    
+                    <!-- Action Buttons stack -->
+                    <div class="flex flex-wrap justify-center gap-4 mt-8 pt-4 border-t border-border-light dark:border-border-dark col-span-1 md:col-span-2 lg:col-span-2 w-full">
+                        <button id="{{this.storedTheme}}button" type="submit" *ngIf="!isEditGraphBtn" class="flex items-center justify-center bg-primary text-white hover:bg-primary-dark rounded-md px-6 py-2 transition-colors font-medium shadow-sm text-sm" (click)="submitFeatureGraphMap(alert_message)">
+                            <i class="ri-check-line mr-1"></i> Create
+                        </button>
+                        <button id="{{this.storedTheme}}button_discard" type="button" *ngIf="!isEditGraphBtn" class="flex items-center justify-center bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md px-6 py-2 transition-colors font-medium text-sm shadow-sm" (click)="discardForm()">
+                            <i class="ri-delete-bin-line mr-1"></i> Discard
+                        </button>
+                        <button id="{{this.storedTheme}}button" type="submit" *ngIf="isEditGraphBtn" class="flex items-center justify-center bg-primary text-white hover:bg-primary-dark rounded-md px-6 py-2 transition-colors font-medium shadow-sm text-sm" (click)="updateFeatureGraphMap(alert_message)">
+                            <i class="ri-check-line mr-1"></i> Update
+                        </button>
+                        <button id="{{this.storedTheme}}button" type="Reset" *ngIf="isEditGraphBtn && isEditGraph != 'true'" class="flex items-center justify-center bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md px-6 py-2 transition-colors font-medium text-sm" (click)="cancelUpdate()">
+                            <i class="ri-close-line mr-1"></i> Cancel
+                        </button>
+                        <button id="{{this.storedTheme}}button" type="Reset" *ngIf="(isEditGraphBtn || isImageUpdate) && isEditGraph == 'true'" class="flex items-center justify-center bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md px-6 py-2 transition-colors font-medium text-sm" (click)="goToDashboard()">
+                            <i class="ri-arrow-go-back-line mr-1"></i> Cancel
+                        </button>
+                    </div>
+                </div> <!-- closes CardBody -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Visualization Card-->
+    <div class="col-span-12 md:col-span-4 lg:col-span-3">
+        <div class="bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-md shadow-sm overflow-hidden sticky top-6">
+            <div class="bg-slate-50 dark:bg-slate-800 border-b border-border-light dark:border-border-dark px-4 py-3 font-semibold text-slate-700 dark:text-slate-200 text-sm tracking-widest flex items-center">
+                <i class="ri-bar-chart-2-line mr-2 text-primary"></i> VISUALIZATION
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-900/50">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isGraph? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : { 'pointer-events': 'auto'}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Graph" (click)="getLineGraph(alert_message)" title="Click to visualise the Graph">
+                            <img class="w-6 h-6 object-contain" src="assets/images/icn-graph-panel.svg" alt="Graph">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Graph</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isDonut? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item DoughNut" (click)="getDonutGraph(alert_message)" title="Click to visualise the DoughNut">
+                            <img class="w-6 h-6 object-contain rounded-full" src="assets/images/donut_chart.jpg" alt="DoughNut">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">DoughNut</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isGauge? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Gauge" (click)="getGaugeGraph(alert_message)" title="Click to visualise the Gauge">
+                            <img class="w-6 h-6 object-contain" src="assets/images/icon_gauge.svg" alt="Gauge">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Gauge</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isStackBar? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Stack Bar" (click)="getStackedGraph(alert_message)" title="Click to visualise the Stack Bar">
+                            <img class="w-6 h-6 object-contain" src="assets/images/icon_bar_gauge.svg" alt="Stack Bar">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Stack Bar</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isTableChart? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Table" (click)="getTableGraph(alert_message)" title="Click to visualise the Table">
+                            <img class="w-6 h-6 object-contain" src="assets/images/icn-table-panel.svg" alt="Table">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Table</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isText? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Text" (click)="getSingleValuedGraph(alert_message)" title="Click to visualise the Text">
+                            <img class="w-6 h-6 object-contain" src="assets/images/icn-text-panel.svg" alt="Text">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Text</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isFunnel? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Funnel" (click)="getFunnelGraph(alert_message)" title="Click to visualise the Funnel">
+                            <img class="w-6 h-6 object-contain rounded-md" src="assets/images/funnel.jpg" alt="Funnel">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Funnel</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 transition-transform hover:scale-105" [ngStyle]="isPie? { 'pointer-events': 'none', 'opacity': '0.3', 'filter': 'grayscale(100%)'} : {}">
+                        <div class="bg-white dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md p-2 flex flex-col items-center justify-center gap-1 cursor-pointer shadow-sm hover:border-primary dark:hover:border-primary transition-colors text-center" aria-label="Plugin visualization item Pie" (click)="getPieGraph(alert_message)" title="Click to visualise the Pie">
+                            <img class="w-6 h-6 object-contain rounded-full" src="assets/images/pie_chart.jpg" alt="Pie">
+                            <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full">Pie</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Upload Modal Template -->
+<ng-template #uploadImageModalTemplate>
+  <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-t-xl">
+    <div class="flex items-center gap-3">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 tracking-wide">
+            <span *ngIf="!isImageUpdate"><i class="fa fa-picture-o mr-2"></i>Upload Image</span>
+            <span *ngIf="isImageUpdate"><i class="fa fa-picture-o mr-2"></i>Update Image</span>
+        </h3>
+    </div>
+    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" (click)="closeUploadImageModal()">
+        <i class="ri-close-line text-2xl"></i>
+    </button>
+  </div>
+  <div class="modal-body bg-slate-50 dark:bg-slate-950 p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Left Side: Form -->
+        <div class="bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-xl p-5 shadow-sm flex flex-col h-full space-y-6">
+            
+            <!-- Active Toggle -->
+            <div class="flex justify-end">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="graphActiveModal" value="yes" (change)="imageUploadObj.isActive=='yes'?imageUploadObj.isActive='no':imageUploadObj.isActive='yes'" [checked]="imageUploadObj.isActive=='yes'">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">{{graphObj.isActive=='yes'?'Active':'Inactive'}}</span>
+                </label>
+            </div>
+
+            <!-- Form Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 flex-1">
+                
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Image Name<span class="text-danger ml-1">*</span></label>
+                    <input type="text" [(ngModel)]="imageUploadObj.imageTitle" class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" maxlength="25" autocomplete="none">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Image Id<span class="text-danger ml-1">*</span></label>
+                    <input type="text" [(ngModel)]="imageUploadObj.imageId" class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" autocomplete="none">
+                </div>
+
+                <div class="space-y-1.5" *ngIf="!isImageUpdate">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Application Name<span class="text-danger ml-1">*</span></label>
+                    <div class="relative">
+                        <select class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" (ngModelChange)="getAllSubFeaturesByApplication($event)" [(ngModel)]="imageUploadObj.applicationId">
+                            <option disabled selected="selected" value="undefined">Select</option>
+                            <option *ngFor="let application of allApplications" [value]="application.applicationId">{{application.applicationName}}</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                            <i class="ri-arrow-down-s-line text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5" *ngIf="isImageUpdate">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Application Name<span class="text-danger ml-1">*</span></label>
+                    <div class="relative">
+                        <select class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" (change)="getUpdatedSubFeaturesByApplication(imageUploadObj.applicationId)" [(ngModel)]="imageUploadObj.applicationId">
+                            <option disabled selected="selected" value="undefined">Select</option>
+                            <option *ngFor="let application of allApplications" [value]="application.applicationId">{{application.applicationName}}</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                            <i class="ri-arrow-down-s-line text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Sub Feature<span class="text-danger ml-1">*</span></label>
+                    <div class="relative">
+                        <select class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="imageUploadObj.subFeatureId">
+                            <option disabled selected="selected" value="undefined">Select</option>
+                            <option *ngFor="let subFeature of subFeatureList" value="{{subFeature.id}}">
+                                {{subFeature.featureId === 1 ? 'Dashboard' : 'Trend Dashboard'}} || {{subFeature.subFeatureName}}
+                            </option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                            <i class="ri-arrow-down-s-line text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5 md:col-span-2" *ngIf="isImageUpdate">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">File Name</label>
+                    <input type="text" class="w-full bg-slate-100 dark:bg-slate-800 border border-border-light dark:border-border-dark rounded-md px-3 py-2 text-sm text-slate-500 shadow-sm cursor-not-allowed" [(ngModel)]="imageUploadObj.imageName" disabled>
+                </div>
+
+                <div class="space-y-1.5 md:col-span-2 mt-2" *ngIf="isImageUpdate">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" id="uploadUpdatedImageSwitch" [(ngModel)]="uploadSameImage" (change)="toggleUploadUpdatedImage($event)">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                        <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">Upload Same Image</span>
+                    </label>
+                </div>
+
+                <div class="space-y-1.5 md:col-span-2" *ngIf="!uploadSameImage || !isImageUpdate">
+                    <div class="mt-2">
+                        <input type="file" id="file-upload" (change)="onImageSelect($event);showFileName($event);" accept="image/*" class="hidden">
+                        <label for="file-upload" class="inline-flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-md px-4 py-2 cursor-pointer transition-colors text-sm font-medium shadow-sm w-full md:w-auto">
+                            <i class="ri-upload-cloud-2-line mr-2 text-lg"></i> Upload file
+                        </label>
+                        <div id="file-upload-filename" class="text-xs text-slate-500 dark:text-slate-400 mt-2">No file selected</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-center mt-6 pt-4 border-t border-border-light dark:border-border-dark">
+                <button type="submit" *ngIf="!isImageUpdate" class="flex items-center justify-center bg-primary text-white hover:bg-primary-dark rounded-md px-8 py-2.5 transition-colors font-medium shadow-sm text-sm" (click)="uploadImage(alert_message)">
+                    Upload Image
+                </button>
+                <button type="submit" *ngIf="isImageUpdate" class="flex items-center justify-center bg-primary text-white hover:bg-primary-dark rounded-md px-8 py-2.5 transition-colors font-medium shadow-sm text-sm" (click)="updateImage(alert_message)">
+                    Update Image
+                </button>
+            </div>
+            
+        </div>
+
+        <!-- Right Side: Preview Image -->
+        <div class="bg-white dark:bg-slate-900 border border-border-light dark:border-border-dark rounded-xl shadow-sm flex flex-col overflow-hidden h-full min-h-[400px]">
+            <div class="bg-slate-50 dark:bg-slate-800 border-b border-border-light dark:border-border-dark px-4 py-3 text-center">
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest"><i class="ri-image-line mr-2"></i>Image Preview</span>
+            </div>
+            <div class="flex-1 p-6 relative flex items-center justify-center bg-slate-50/50 dark:bg-slate-900/50" id="image_container">
+                <h1 id="PreviewText" class="text-3xl md:text-5xl font-light text-slate-300 dark:text-slate-600 uppercase tracking-widest text-center select-none pointer-events-none">
+                    Preview<br>Image
+                </h1>
+                <!-- Uncomment below when previewImage binding is ready -->
+                <!-- <img [src]='previewImage' alt="Preview Image" class="absolute inset-0 w-full h-full object-contain p-4 drop-shadow-md"/> -->
+            </div>
+        </div>
+
+    </div>
+  </div>
+</ng-template>
+<!-- END :: Image Upload Modal -->
+
+<ng-template #seeAllModalTemplate>
+  <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-t-xl">
+    <div class="flex items-center gap-3">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 m-0 tracking-wide">All Graphs</h3>
+    </div>
+    <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-transparent border-none outline-none focus:outline-none" (click)="closeSeeAllModal()">
+      <i class="ri-close-line text-2xl"></i>
+    </button>
+  </div>
+  <div class="modal-body p-0 bg-slate-50 dark:bg-slate-900 rounded-b-xl overflow-hidden">
+<div class="fgm-list-panel bg-transparent m-0" style="box-shadow: none; border: none;">
+
+    <!-- Filter Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div class="flex flex-wrap items-center gap-4">
+            <button class="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" type="button" *ngIf="isTable || isEditGraphBtn" (click)="closeSeeAllModal()">
+                <i class="fa fa-arrow-left"></i> Back
+            </button>
+
+            <div class="flex items-center gap-2">
+                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">App</label>
+                <div class="relative w-40 md:w-48">
+                    <select class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" (ngModelChange)="getAllSubFeatureByAppId($event)" [(ngModel)]="viewGraphObj.applicationId">
+                        <option disabled selected value="undefined">Select</option>
+                        <option *ngFor="let application of allApplications" [value]="application.applicationId">{{application.applicationName}}</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub Feature</label>
+                <div class="relative w-40 md:w-48">
+                    <select class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer shadow-sm" [(ngModel)]="viewGraphObj.subFeatureId" (ngModelChange)="isDefaultEnable()">
+                        <option value="" selected>Select</option>
+                        <option *ngFor="let subFeature of subFeatureList" value="{{subFeature.id}}">{{subFeature.subFeatureName}}</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                        <i class="ri-arrow-down-s-line text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center ml-2 border-l border-slate-200 dark:border-slate-700 pl-4">
+                <label class="relative inline-flex items-center cursor-pointer" [ngClass]="{'opacity-50': !isSetPreferenceEnable}">
+                    <input type="checkbox" class="sr-only peer" id="editDashboard" [(ngModel)]="editSeeAllPage" (change)="toggleEditSeeAllPage($event);isDefaultEnable()" [disabled]="!isSetPreferenceEnable">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">My Preference</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <button class="w-9 h-9 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-primary hover:border-primary hover:bg-primary/5 transition-all shadow-sm flex-shrink-0" type="button" title="Export to Excel" (click)="exportAsXLSX()">
+                <i class="ri-file-excel-line text-lg"></i>
+            </button>
+            <div class="relative flex-1 md:w-64">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="ri-search-line text-slate-400"></i>
+                </div>
+                <input type="text" class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-10 pr-4 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" id="search-text" [(ngModel)]="searchText" (keyup)="search()" placeholder="Search graphs…" autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <!-- Default / All Graphs Table -->
+    <div class="flex flex-col h-full" *ngIf="isDefault">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-sm text-left text-slate-600 dark:text-slate-400 whitespace-nowrap" aria-label="Graph list">
+                <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('chartTitle')">Graph Title</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('category')">Category</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('dataSource')">Data Source</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('dataMode')">Data Mode</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('unit')">Data Unit</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('chartType')">Graph Type</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('tableType')">Table Type</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('createdOn')">Created On</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('createdBy')">Created By</th>
+                        <th class="px-4 py-3 font-semibold text-right" *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors bg-white dark:bg-slate-900" *ngFor="let graph of graphList
+                        | grdFilter: {applicationName: searchText, chartTitle: searchText, featureId: searchText, subFeatureName: searchText, chartType: searchText, tableType: searchText, category: searchText, dataSource: searchText, dataMode: searchText, unit: searchText, createdBy: searchText}
+                        | sort:[sortparam,sortDirection]
+                        | paginate: {id: 'graph-pagination', itemsPerPage: 10, currentPage: p};
+                        index as i;">
+                        <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{graph.chartTitle}}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium" [ngClass]="graph.category=='host' ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'">
+                                {{graph.category == 'host' ? 'Parent' : 'Child'}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-600 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
+                                {{graph.dataSource}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.chartType == 'Bar' || graph.chartType == 'Column' || graph.chartType == 'Stacked Bar' || graph.chartType == 'Stacked Column' || graph.chartType == 'Line' ? graph.dataMode == 'time' ? 'Time' : 'Series' : '---'}}</td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.unit}}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                                {{graph.chartType == 'Bar' ? 'H Bar' : graph.chartType == 'Column' ? 'V Bar' : graph.chartType == 'Stacked Bar' ? 'H Stack Bar' : graph.chartType == 'Stacked Column' ? 'V Stack Bar' : graph.chartType}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.chartType == 'Table' || graph.chartType == 'RAG Table' ? graph.tableType == 'rowwise' ? 'Row wise' : 'Transpose' : '---'}}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{{graph.createdOn | date:'dd-MM-yyyy HH:mm'}}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{{graph.createdBy}}</td>
+                        <td class="px-4 py-3 text-right" *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete">
+                            <div class="flex items-center justify-end gap-2">
+                                <button class="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10 transition-colors" type="button" title="Edit" (click)="showEditForm(graph)" *ngIf="userTypeCrudMap.edit && graph.chartType!='Image'">
+                                    <i class="ri-pencil-line text-lg"></i>
+                                </button>
+                                <button class="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10 transition-colors" type="button" title="Edit Image" (click)="showUpdateImage(graph);showImagePreviewOnUpdateForm(graph)" *ngIf="userTypeCrudMap.edit && graph.chartType=='Image'">
+                                    <i class="ri-pencil-line text-lg"></i>
+                                </button>
+                                <button class="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors" type="button" title="Delete" (click)="openDeleteGraphModel(graph,template)" *ngIf="userTypeCrudMap.delete">
+                                    <i class="ri-delete-bin-line text-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex justify-end p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 mt-auto">
+            <pagination-controls (pageChange)="pageChange($event)" id="graph-pagination" class="my-pagination {{this.storedTheme}}text"></pagination-controls>
+        </div>
+    </div>
+
+    <!-- Preference Table -->
+    <div class="flex flex-col h-full" *ngIf="isPrefrence">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-sm text-left text-slate-600 dark:text-slate-400 whitespace-nowrap" aria-label="Preference graph list">
+                <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold">
+                            <input type="checkbox" [(ngModel)]="selectAll" (change)="checkAll($event)" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700">
+                        </th>
+                        <th class="px-4 py-3 font-semibold">#</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('chartTitle')">Graph Title</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('category')">Category</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('parentName')">Parent Name</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('dataSource')">Data Source</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('dataMode')">Data Mode</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('unit')">Data Unit</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('chartType')">Graph Type</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('tableType')">Table Type</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('createdOn')">Created On</th>
+                        <th class="px-4 py-3 font-semibold cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" (click)="sortBy('createdBy')">Created By</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors bg-white dark:bg-slate-900" *ngFor="let graph of graphList
+                        | grdFilter: {applicationName: searchText, chartTitle: searchText, featureId: searchText, subFeatureName: searchText, chartType: searchText, tableType: searchText, category: searchText, dataSource: searchText, dataMode: searchText, unit: searchText, createdBy: searchText}
+                        | sort:[sortparam,sortDirection]
+                        | paginate: {id: 'graph-pagination', itemsPerPage: 10, currentPage: p};
+                        index as i;">
+                        <td class="px-4 py-3">
+                            <input [ngClass]="{'enabled': graph.enable}" type="checkbox" [(ngModel)]="graph.enable" (change)="updatePreferenceList($event, graph)" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700">
+                        </td>
+                        <td class="px-4 py-3 text-xs text-slate-400">{{i+1}}</td>
+                        <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{graph.chartTitle}}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium" [ngClass]="graph.category=='host' ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'">
+                                {{graph.category == 'host' ? 'Parent' : 'Child'}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.parentName == null || graph.parentName == "" ? '---' : graph.parentName}}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-600 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
+                                {{graph.dataSource}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.chartType == 'Bar' || graph.chartType == 'Column' || graph.chartType == 'Stacked Bar' || graph.chartType == 'Stacked Column' || graph.chartType == 'Line' ? graph.dataMode == 'time' ? 'Time' : 'Series' : '---'}}</td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.unit}}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                                {{graph.chartType == 'Bar' ? 'H Bar' : graph.chartType == 'Column' ? 'V Bar' : graph.chartType == 'Stacked Bar' ? 'H Stack Bar' : graph.chartType == 'Stacked Column' ? 'V Stack Bar' : graph.chartType}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-500 dark:text-slate-400">{{graph.chartType == 'Table' || graph.chartType == 'RAG Table' ? graph.tableType == 'rowwise' ? 'Row wise' : 'Transpose' : '---'}}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{{graph.createdOn | date:'dd-MM-yyyy HH:mm'}}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{{graph.createdBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 mt-auto">
+            <div>
+                <button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-md font-medium shadow-sm hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm" type="button" *ngIf="!isEditGraphBtn && !isDefault"
+                    (click)="savePreference(alert_message)" [disabled]="isSetPreferenceButtonEnable">
+                    <i class="ri-check-line text-lg"></i> Set Preference
+                </button>
+            </div>
+            <div class="m-0 flex items-center">
+                <pagination-controls (pageChange)="pageChange($event)" class="my-pagination {{this.storedTheme}}text" id="graph-pagination"></pagination-controls>
+            </div>
+        </div>
+    </div>
+
+</div>
+  </div>
+</ng-template>
+
+<!-- Select Child Graph Modal -->
+<ng-template #childModalTemplate>
+    <div class="bg-white dark:bg-slate-900 rounded-lg shadow-xl overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border-light dark:border-border-dark bg-slate-50 dark:bg-slate-950">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white flex items-center m-0">
+                <i class="fa fa-code-fork text-primary mr-2"></i> Select Child Graphs - {{pointName}}
+            </h3>
+            <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors focus:outline-none" (click)="childModalRef.hide()" aria-label="Close">
+                <i class="fa fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 overflow-y-auto" style="max-height: 60vh;">
+            <!-- Search bar -->
+            <div class="mb-4 flex items-center justify-between">
+                <div class="relative w-full max-w-sm">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fa fa-search text-slate-400"></i>
+                    </div>
+                    <input type="text" class="w-full bg-slate-50 dark:bg-slate-950 border border-border-light dark:border-border-dark rounded-md pl-10 pr-4 py-1.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" [(ngModel)]="pointSearchText" placeholder="Search child graphs…" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="w-full overflow-x-auto border border-border-light dark:border-border-dark rounded-lg shadow-sm">
+                <table class="w-full text-sm text-left whitespace-nowrap">
+                    <thead class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 uppercase border-b border-border-light dark:border-border-dark">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-center w-12">
+                                <input type="checkbox" class="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer" [(ngModel)]="selectAllPointGraphs" (change)="updateAllPointGraphs($event)">
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold">Sr.No</th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('chartTitle')">
+                                <div class="flex items-center gap-1">Graph Title <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('dataSource')">
+                                <div class="flex items-center gap-1">Data Source <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('dataMode')">
+                                <div class="flex items-center gap-1">Data Mode <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('unit')">
+                                <div class="flex items-center gap-1">Data Unit <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('chartType')">
+                                <div class="flex items-center gap-1">Graph Type <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                            <th scope="col" class="px-4 py-3 font-semibold cursor-pointer hover:text-primary transition-colors" (click)="sortBy('tableType')">
+                                <div class="flex items-center gap-1">Table Type <i class="fa fa-sort text-slate-400 ml-1"></i></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-light dark:divide-border-dark">
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors" *ngFor="let graph of pointGraphList | grdFilter: {chartTitle: pointSearchText, dataSource: pointSearchText, dataMode: pointSearchText, unit: pointSearchText, chartType: pointSearchText, tableType: pointSearchText} | sort:[sortparam,sortDirection] | paginate: {id: 'child-graph-pagination', itemsPerPage: 7, currentPage: pChild}; index as i;">
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer" [(ngModel)]="graph.pointGraph" (change)="updatePointChild($event,graph)">
+                            </td>
+                            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">{{(pChild - 1) * 7 + i + 1}}</td>
+                            <td class="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">{{graph.chartTitle}}</td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{graph.dataSource}}</td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-400">
+                                <span class="px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                    {{graph.chartType == 'Bar' || graph.chartType == 'Column' || graph.chartType == 'Stacked Bar' || graph.chartType == 'Stacked Column' || graph.chartType == 'Line' ? graph.dataMode == 'time' ? 'Time' : 'Series' : '---'}}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{graph.unit}}</td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-400">
+                                <span class="px-2 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
+                                    {{graph.chartType == 'Bar' ? 'H Bar' : graph.chartType == 'Column' ? 'V Bar' : graph.chartType == 'Stacked Bar' ? 'H Stack Bar' : graph.chartType == 'Stacked Column' ? 'V Stack Bar' : graph.chartType}}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{graph.chartType == 'Table' || graph.chartType == 'RAG Table' ? graph.tableType == 'rowwise' ? 'Row wise' : 'Transpose' : '---'}}</td>
+                        </tr>
+                        <tr *ngIf="pointGraphList?.length === 0 || (pointGraphList | grdFilter: {chartTitle: pointSearchText, dataSource: pointSearchText, dataMode: pointSearchText, unit: pointSearchText, chartType: pointSearchText, tableType: pointSearchText})?.length === 0">
+                            <td colspan="8" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                                <div class="flex flex-col items-center justify-center">
+                                    <i class="fa fa-inbox text-4xl mb-2 text-slate-300 dark:text-slate-600"></i>
+                                    <p>No child graphs found</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="mt-4 flex items-center justify-end">
+                <pagination-controls (pageChange)="pChild = $event" id="child-graph-pagination" class="my-pagination"></pagination-controls>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-border-light dark:border-border-dark bg-slate-50 dark:bg-slate-950 flex items-center justify-end gap-3">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors shadow-sm" (click)="childModalRef.hide()">
+                Cancel
+            </button>
+            <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors shadow-sm flex items-center gap-2" (click)="setPointGraphs()">
+                <i class="fa fa-check"></i> Set Child Graphs
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #alert_message>
+    <div class="modal-body text-center">
+        <p>{{alertMessage}}</p>
+        <button type="button" class="btn btn-danger" *ngIf="isError" (click)="cancelRequest()">Close</button>&nbsp;
+        <button type="button" class="btn btn-success" *ngIf="isSuccess" (click)="cancelRequest()">Close</button>&nbsp;
+    </div>
+</ng-template>
+
+<ng-template #template>
+    <div class="modal-body text-center" id="graphDeleteDiv">
+        <!-- <p>Are you sure you want to delete the role?</p> -->
+        <p>{{alertMessage}}</p>
+        <button type="button" class="btn btn-success" (click)="deleteGraph(alert_message)">Yes, proceed</button>&nbsp;
+        <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+    </div>
+</ng-template>
+
+<ng-template #visualizationtemplate>
+    <div class="modal-body text-center">
+        <!-- <p>visualizationtemplate called</p> -->
+        <!-- <button type="button " class="btn btn-outline-primary float-right " (click)="cancelRequest() ">Close</button>&nbsp; -->
+        <div class="row ">
+            <div class="col-md-10 offset-md-1">
+                <div #charts id="test"></div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- change background modal -->
+<ng-template #bgcolorTemplate>
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <h3 class="text-lg font-semibold text-slate-800 flex items-center m-0">
+                <i class="fa fa-paint-brush text-primary mr-2"></i> Graph Colors
+            </h3>
+            <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors focus:outline-none" data-dismiss="modal" aria-label="Close" (click)="cancelRequest();clearBgColor();">
+                <i class="fa fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="px-6 py-5 space-y-6 bg-white">
+            
+            <!-- Background Color -->
+            <div class="p-4 rounded-md border border-slate-200 shadow-sm bg-slate-50" *ngIf="graphObj.graphBG=='color'">
+                <label class="block text-sm font-medium text-slate-700 mb-3">Background Color</label>
+                <div class="flex items-center gap-4">
+                    <div class="relative w-24 h-10 rounded-md overflow-hidden border border-slate-300 shadow-inner flex-shrink-0 cursor-pointer bg-white">
+                        <input [(colorPicker)]="graphBgColor" [style.background]="graphBgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" readonly="readonly" />
+                        <div class="absolute inset-0 pointer-events-none" [style.background]="graphBgColor"></div>
+                    </div>
+                    <div class="flex-grow relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">#</span>
+                        <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all uppercase outline-none" placeholder="FFFFFF" autocomplete="none" required [(ngModel)]="graphBgColor">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Title Font Color -->
+            <div class="p-4 rounded-md border border-slate-200 shadow-sm bg-slate-50">
+                <label class="block text-sm font-medium text-slate-700 mb-3">Title Font Color</label>
+                <div class="flex items-center gap-4">
+                    <div class="relative w-24 h-10 rounded-md overflow-hidden border border-slate-300 shadow-inner flex-shrink-0 cursor-pointer bg-white">
+                        <input [(colorPicker)]="graphTitleFontColor" [style.background]="graphTitleFontColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" readonly="readonly" />
+                        <div class="absolute inset-0 pointer-events-none" [style.background]="graphTitleFontColor"></div>
+                    </div>
+                    <div class="flex-grow relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">#</span>
+                        <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all uppercase outline-none" placeholder="FFFFFF" autocomplete="none" required [(ngModel)]="graphTitleFontColor">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Font Color -->
+            <div class="p-4 rounded-md border border-slate-200 shadow-sm bg-slate-50">
+                <label class="block text-sm font-medium text-slate-700 mb-3">General Font Color</label>
+                <div class="flex items-center gap-4">
+                    <div class="relative w-24 h-10 rounded-md overflow-hidden border border-slate-300 shadow-inner flex-shrink-0 cursor-pointer bg-white">
+                        <input [(colorPicker)]="graphFontColor" [style.background]="graphFontColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" readonly="readonly" />
+                        <div class="absolute inset-0 pointer-events-none" [style.background]="graphFontColor"></div>
+                    </div>
+                    <div class="flex-grow relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">#</span>
+                        <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all uppercase outline-none" placeholder="FFFFFF" autocomplete="none" required [(ngModel)]="graphFontColor">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Graph Options -->
+            <ng-container *ngIf="graphObj.chartType=='Table' || graphObj.chartType=='RAG Table'">
+                <div class="p-4 rounded-md border border-indigo-100 shadow-sm bg-indigo-50/30 space-y-5 mt-6">
+                    <h4 class="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2 m-0 flex items-center">
+                        <i class="fa fa-table mr-2"></i> Table Specific Colors
+                    </h4>
+                    
+                    <!-- Table Header Background Color -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Header Background Color</label>
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-24 h-10 rounded-md overflow-hidden border border-slate-300 shadow-inner flex-shrink-0 cursor-pointer bg-white">
+                                <input [(colorPicker)]="tableHeaderBgColor" [style.background]="tableHeaderBgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" readonly="readonly" />
+                                <div class="absolute inset-0 pointer-events-none" [style.background]="tableHeaderBgColor"></div>
+                            </div>
+                            <div class="flex-grow relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">#</span>
+                                <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all uppercase outline-none" placeholder="FFFFFF" autocomplete="none" required [(ngModel)]="tableHeaderBgColor">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Header Font Color -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Header Font Color</label>
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-24 h-10 rounded-md overflow-hidden border border-slate-300 shadow-inner flex-shrink-0 cursor-pointer bg-white">
+                                <input [(colorPicker)]="tableHeaderFontColor" [style.background]="tableHeaderFontColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" readonly="readonly" />
+                                <div class="absolute inset-0 pointer-events-none" [style.background]="tableHeaderFontColor"></div>
+                            </div>
+                            <div class="flex-grow relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">#</span>
+                                <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all uppercase outline-none" placeholder="FFFFFF" autocomplete="none" required [(ngModel)]="tableHeaderFontColor">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            
+        </div>
+        
+        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+            <button type="button" class="px-5 py-2 text-sm font-semibold text-black bg-white border border-slate-300 rounded-md hover:bg-slate-100 hover:text-black focus:outline-none focus:ring-2 focus:ring-slate-200 transition-all shadow-sm" data-dismiss="modal" (click)="cancelRequest();clearBgColor();">
+                Close
+            </button>
+            <button type="button" class="px-5 py-2 text-sm font-semibold text-black bg-primary/20 border border-primary/30 rounded-md hover:bg-primary/40 hover:text-black hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm" (click)="updateBgColor();">
+                Update
+            </button>
+        </div>
+    </div>
+</ng-template>

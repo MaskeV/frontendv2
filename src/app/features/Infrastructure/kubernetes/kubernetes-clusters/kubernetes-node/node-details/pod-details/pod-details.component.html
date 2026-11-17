@@ -1,0 +1,774 @@
+<div class="page-scroll">
+    <div class="pod-details">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-icon">◆</span>
+                <span class="brand-name">netraa</span>
+            </div>
+
+            <nav class="breadcrumbs">
+                <span class="crumb-icon" (click)="onBreadcrumbClick('Kubernetes')" style="cursor: pointer;"
+                    title="Kubernetes">⌂</span>
+                <ng-container *ngFor="let crumb of breadcrumbs">
+                    <a class="crumb" (click)="onBreadcrumbClick(crumb)">{{ crumb }}</a>
+                    <span class="sep">›</span>
+                </ng-container>
+                <span class="crumb current">{{ podName }}</span>
+            </nav>
+        </header>
+
+        <!-- Pod header -->
+        <section class="pod-header">
+            <div class="pod-header-left">
+                <div class="pod-icon">▣</div>
+                <div class="pod-header-text">
+                    <div class="pod-title-row">
+                        <h1>{{ podName }}</h1>
+                        <span class="badge badge-running">● {{ status.state }}</span>
+                    </div>
+                    <div class="pod-subtitle">Overview of the Pod</div>
+                    <div class="pod-meta">
+                        <span><strong>Namespace:</strong> <a (click)="onNamespaceClick(podMeta.namespace)"
+                                style="cursor: pointer; color: #2563eb; text-decoration: none;">{{ podMeta.namespace
+                                }}</a></span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>Workload:</strong> {{ podMeta.workload }}</span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>Type:</strong> {{ podMeta.type }}</span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>Node:</strong> <a class="link">{{ podMeta.node }}</a></span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>IP:</strong> {{ podMeta.ip }}</span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>Created:</strong> {{ podMeta.created }}</span>
+                        <span class="meta-sep">|</span>
+                        <span><strong>Age:</strong> {{ podMeta.age }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary cards (Strictly in one line as in image) -->
+        <section class="summary-cards">
+            <div class="summary-card" [title]="'CPU Allocated: ' + cpuAllocated.value + ' ' + cpuAllocated.unit + ' (Usage ' + cpuAllocated.usagePct + '%)'">
+                <div class="summary-icon tone-blue">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                        <rect x="9" y="9" width="6" height="6" />
+                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">CPU (Allocated)</div>
+                    <div class="summary-value">{{ cpuAllocated.value }} <span class="unit">{{ cpuAllocated.unit
+                            }}</span></div>
+                    <div class="summary-sub">↓ Usage {{ cpuAllocated.usagePct }}%</div>
+                </div>
+            </div>
+
+            <div class="summary-card" [title]="'Memory Allocated: ' + memAllocated.value + ' ' + memAllocated.unit + ' (Usage ' + memAllocated.usagePct + '%)'">
+                <div class="summary-icon tone-purple">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 19v-3M10 19v-3M14 19v-3M18 19v-3M6 8V5M10 8V5M14 8V5M18 8V5" />
+                        <rect x="2" y="8" width="20" height="8" rx="2" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">Memory (Allocated)</div>
+                    <div class="summary-value">{{ memAllocated.value }} <span class="unit">{{ memAllocated.unit
+                            }}</span></div>
+                    <div class="summary-sub">↓ Usage {{ memAllocated.usagePct }}%</div>
+                </div>
+            </div>
+
+            <div class="summary-card" [title]="'Containers Ready: ' + containersSummary.ready + ' of ' + containersSummary.total + ' (' + containersSummary.status + ')'">
+                <div class="summary-icon tone-blue">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">Containers</div>
+                    <div class="summary-value">{{ containersSummary.ready }} / {{ containersSummary.total }}</div>
+                    <div class="summary-sub">{{ containersSummary.status }}</div>
+                </div>
+            </div>
+
+            <div class="summary-card" [title]="'Pod Restarts: ' + restarts.count + ' in ' + restarts.window">
+                <div class="summary-icon tone-orange">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                        <path d="M21 3v5h-5" />
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                        <path d="M8 16H3v5" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">Restarts</div>
+                    <div class="summary-value">{{ restarts.count }}</div>
+                    <div class="summary-sub">{{ restarts.window }}</div>
+                </div>
+            </div>
+
+            <div class="summary-card" [title]="'Status: ' + status.state + ' (' + status.detail + ')'">
+                <div class="summary-icon tone-green">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" fill="currentColor" stroke="none" />
+                        <path d="m8 12.5 2.8 2.8L16 9.5" stroke="#fff" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">Status</div>
+                    <div class="summary-value status-val">{{ status.state }}</div>
+                    <div class="summary-sub">{{ status.detail }}</div>
+                </div>
+            </div>
+
+            <div class="summary-card" [title]="'Node: ' + node.name + ' (IP ' + node.ip + ')'">
+                <div class="summary-icon tone-blue">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="6" rx="1.5" />
+                        <rect x="2" y="14" width="20" height="6" rx="1.5" />
+                        <line x1="6" y1="7" x2="6.01" y2="7" />
+                        <line x1="6" y1="17" x2="6.01" y2="17" />
+                    </svg>
+                </div>
+                <div class="summary-body">
+                    <div class="summary-label">Node</div>
+                    <div class="summary-value node-val">{{ node.name }}</div>
+                    <div class="summary-sub">{{ node.ip }}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resource analysis -->
+        <section class="card section-card">
+            <div class="section-header">
+                <div>
+                    <h2>Resource analysis</h2>
+                    <p class="section-subtitle">Pod resource usage as a percentage of allocated resources.</p>
+                </div>
+                <div class="section-controls">
+                    <span class="control-label">View as</span>
+                    <button class="dropdown-btn small">% of allocated <span class="chev">▾</span></button>
+                    <button class="dropdown-btn small">No aggregation <span class="chev">▾</span></button>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <!-- CPU Usage chart -->
+                <div class="chart-box">
+                    <div class="chart-title"><span class="chart-icon cpu-i">🖳</span> CPU Usage (% of allocated)</div>
+                    <div class="chart-plot-wrap" (mousemove)="onChartMouseMove($event, 'cpu')" (mouseleave)="onChartMouseLeave()">
+                        <!-- Tooltip Box (Animated: appears on graph hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="chartHover.hovered && chartHover.activeChart === 'cpu'"
+                            [style.left.%]="chartHover.tooltipLeft" *ngIf="chartHover.hovered && chartHover.activeChart === 'cpu'">
+                            <div class="tooltip-time-header">{{ chartHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #2563eb;"></span>
+                                <span class="tooltip-metric">CPU usage</span>
+                                <span class="tooltip-value">{{ chartHover.cpu.usage }}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #a855f7;"></span>
+                                <span class="tooltip-metric">CPU requests</span>
+                                <span class="tooltip-value">{{ chartHover.cpu.requests }}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #ec4899;"></span>
+                                <span class="tooltip-metric">CPU limits</span>
+                                <span class="tooltip-value">{{ chartHover.cpu.limits }}%</span>
+                            </div>
+                        </div>
+
+                        <svg viewBox="0 0 520 170" class="line-chart" preserveAspectRatio="none">
+                            <line *ngFor="let t of cpuYTicks" x1="0" [attr.y1]="150 - (t/cpuYMax)*150" x2="500"
+                                [attr.y2]="150 - (t/cpuYMax)*150" class="grid-line"></line>
+                            <polygon [attr.points]="buildAreaPath(cpuUsageSeries, cpuYMax)" class="area-fill blue-fill">
+                            </polygon>
+                            <polyline [attr.points]="buildPolyline(cpuUsageSeries, cpuYMax)" class="line-stroke blue-line">
+                            </polyline>
+                            <line x1="0" [attr.y1]="lineY(cpuRequestsLine, cpuYMax)" x2="500"
+                                [attr.y2]="lineY(cpuRequestsLine, cpuYMax)" class="dashed-line purple-dash"></line>
+                            <line x1="0" [attr.y1]="lineY(cpuLimitsLine, cpuYMax)" x2="500"
+                                [attr.y2]="lineY(cpuLimitsLine, cpuYMax)" class="dashed-line pink-dash"></line>
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="chartHover.hovered" class="chart-guide-line" [attr.x1]="chartHover.hoverCursorX"
+                                [attr.x2]="chartHover.hoverCursorX" y1="0" y2="150" />
+
+                            <!-- Active dot on CPU curve -->
+                            <circle *ngIf="chartHover.hovered" class="chart-active-dot" [attr.cx]="chartHover.hoverCursorX"
+                                [attr.cy]="chartHover.cpu.y" r="4.5" fill="#2563eb" stroke="#ffffff" stroke-width="2" />
+                        </svg>
+                    </div>
+                    <div class="y-labels">
+                        <span *ngFor="let t of [360,240,120,0]">{{ t }} %</span>
+                    </div>
+                    <div class="x-labels">
+                        <span *ngFor="let l of xLabels">{{ l }}</span>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><i class="dot blue-dot"></i>CPU usage (% of allocated)</span>
+                        <span class="legend-item"><i class="dash purple-dot"></i>CPU requests (% of allocated)</span>
+                        <span class="legend-item"><i class="dash pink-dot"></i>CPU limits (% of allocated)</span>
+                    </div>
+                </div>
+
+                <!-- Memory Usage chart -->
+                <div class="chart-box">
+                    <div class="chart-title"><span class="chart-icon mem-i">▦</span> Memory Usage (% of allocated)</div>
+                    <div class="chart-plot-wrap" (mousemove)="onChartMouseMove($event, 'mem')" (mouseleave)="onChartMouseLeave()">
+                        <!-- Tooltip Box (Animated: appears on graph hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="chartHover.hovered && chartHover.activeChart === 'mem'"
+                            [style.left.%]="chartHover.tooltipLeft" *ngIf="chartHover.hovered && chartHover.activeChart === 'mem'">
+                            <div class="tooltip-time-header">{{ chartHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #16a34a;"></span>
+                                <span class="tooltip-metric">Memory usage</span>
+                                <span class="tooltip-value">{{ chartHover.mem.usage }}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #a855f7;"></span>
+                                <span class="tooltip-metric">Memory requests</span>
+                                <span class="tooltip-value">{{ chartHover.mem.requests }}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #ec4899;"></span>
+                                <span class="tooltip-metric">Memory limits</span>
+                                <span class="tooltip-value">{{ chartHover.mem.limits }}%</span>
+                            </div>
+                        </div>
+
+                        <svg viewBox="0 0 520 170" class="line-chart" preserveAspectRatio="none">
+                            <line *ngFor="let t of memYTicks" x1="0" [attr.y1]="150 - (t/memYMax)*150" x2="500"
+                                [attr.y2]="150 - (t/memYMax)*150" class="grid-line"></line>
+                            <polygon [attr.points]="buildAreaPath(memUsageSeries, memYMax)" class="area-fill green-fill">
+                            </polygon>
+                            <polyline [attr.points]="buildPolyline(memUsageSeries, memYMax)" class="line-stroke green-line">
+                            </polyline>
+                            <line x1="0" [attr.y1]="lineY(memRequestsLine, memYMax)" x2="500"
+                                [attr.y2]="lineY(memRequestsLine, memYMax)" class="dashed-line purple-dash"></line>
+                            <line x1="0" [attr.y1]="lineY(memLimitsLine, memYMax)" x2="500"
+                                [attr.y2]="lineY(memLimitsLine, memYMax)" class="dashed-line pink-dash"></line>
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="chartHover.hovered" class="chart-guide-line" [attr.x1]="chartHover.hoverCursorX"
+                                [attr.x2]="chartHover.hoverCursorX" y1="0" y2="150" />
+
+                            <!-- Active dot on Memory curve -->
+                            <circle *ngIf="chartHover.hovered" class="chart-active-dot" [attr.cx]="chartHover.hoverCursorX"
+                                [attr.cy]="chartHover.mem.y" r="4.5" fill="#16a34a" stroke="#ffffff" stroke-width="2" />
+                        </svg>
+                    </div>
+                    <div class="y-labels">
+                        <span *ngFor="let t of [180,120,60,0]">{{ t }} %</span>
+                    </div>
+                    <div class="x-labels">
+                        <span *ngFor="let l of xLabels">{{ l }}</span>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><i class="dot green-dot"></i>Memory usage (% of allocated)</span>
+                        <span class="legend-item"><i class="dash purple-dot"></i>Memory requests (% of allocated)</span>
+                        <span class="legend-item"><i class="dash pink-dot"></i>Memory limits (% of allocated)</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Breakdown donuts & Network I/O -->
+        <section class="donuts-row">
+            <div class="card donut-card">
+                <div class="section-header small-header">
+                    <div class="chart-title"><span class="chart-icon cpu-i">🖳</span> CPU Breakdown</div>
+                </div>
+                <div class="donut-body">
+                    <div class="donut" [style.background]="conicGradient(cpuBreakdown)"
+                        [title]="'CPU Breakdown: User (' + cpuBreakdown[0].value + '), System (' + cpuBreakdown[1].value + ')'">
+                        <div class="donut-hole">
+                            <div class="donut-center-value">{{ cpuBreakdownCenter.value }}</div>
+                            <div class="donut-center-unit">{{ cpuBreakdownCenter.unit }}</div>
+                            <div class="donut-center-pct">{{ cpuBreakdownCenter.pct }}</div>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="donut-legend-row" *ngFor="let seg of cpuBreakdown" [title]="seg.label + ': ' + seg.value">
+                            <span class="legend-item"><i class="dot" [style.background]="seg.color"></i>{{ seg.label
+                                }}</span>
+                            <span class="legend-value">{{ seg.value }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card donut-card">
+                <div class="section-header small-header">
+                    <div class="chart-title"><span class="chart-icon mem-i">▦</span> Memory Breakdown</div>
+                </div>
+                <div class="donut-body">
+                    <div class="donut" [style.background]="conicGradient(memBreakdown)"
+                        [title]="'Memory Breakdown: Used (' + memBreakdown[0].value + '), Cache (' + memBreakdown[1].value + ')'">
+                        <div class="donut-hole">
+                            <div class="donut-center-value">{{ memBreakdownCenter.value }}</div>
+                            <div class="donut-center-unit">{{ memBreakdownCenter.unit }}</div>
+                            <div class="donut-center-pct">{{ memBreakdownCenter.pct }}</div>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="donut-legend-row" *ngFor="let seg of memBreakdown" [title]="seg.label + ': ' + seg.value">
+                            <span class="legend-item"><i class="dot" [style.background]="seg.color"></i>{{ seg.label
+                                }}</span>
+                            <span class="legend-value">{{ seg.value }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card donut-card">
+                <div class="section-header small-header">
+                    <div class="chart-title"><span class="chart-icon fs-i">▥</span> Filesystem Usage</div>
+                </div>
+                <div class="donut-body">
+                    <div class="donut" [style.background]="conicGradient(filesystemBreakdown)"
+                        [title]="'Filesystem Usage: Used (' + filesystemBreakdown[0].value + '), Available (' + filesystemBreakdown[1].value + ')'">
+                        <div class="donut-hole">
+                            <div class="donut-center-value">{{ filesystemCenter.value }}</div>
+                            <div class="donut-center-unit">{{ filesystemCenter.unit }}</div>
+                            <div class="donut-center-pct">{{ filesystemCenter.pct }}</div>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="donut-legend-row" *ngFor="let seg of filesystemBreakdown" [title]="seg.label + ': ' + seg.value">
+                            <span class="legend-item"><i class="dot" [style.background]="seg.color"></i>{{ seg.label
+                                }}</span>
+                            <span class="legend-value">{{ seg.value }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network I/O chart in filesystem usage row -->
+            <div class="card donut-card chart-donut-card">
+                <div class="section-header small-header">
+                    <div class="chart-title"><span class="chart-icon net-i">▤</span> Network I/O (Mbps)</div>
+                </div>
+                <div class="chart-card-body">
+                    <div class="chart-plot-wrap" (mousemove)="onChartMouseMove($event, 'net')" (mouseleave)="onChartMouseLeave()">
+                        <!-- Tooltip Box (Animated: appears on graph hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="chartHover.hovered && chartHover.activeChart === 'net'"
+                            [style.left.%]="chartHover.tooltipLeft" *ngIf="chartHover.hovered && chartHover.activeChart === 'net'">
+                            <div class="tooltip-time-header">{{ chartHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #f97316;"></span>
+                                <span class="tooltip-metric">Incoming</span>
+                                <span class="tooltip-value">{{ chartHover.net.incoming }} Mbps</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background: #16a0ae;"></span>
+                                <span class="tooltip-metric">Outgoing</span>
+                                <span class="tooltip-value">{{ chartHover.net.outgoing }} Mbps</span>
+                            </div>
+                        </div>
+
+                        <svg viewBox="0 0 520 170" class="line-chart" preserveAspectRatio="none">
+                            <line *ngFor="let t of networkYTicks" x1="0" [attr.y1]="150 - (t/networkYMax)*150" x2="500"
+                                [attr.y2]="150 - (t/networkYMax)*150" class="grid-line"></line>
+                            <polyline [attr.points]="buildPolyline(networkIncoming, networkYMax)"
+                                class="line-stroke orange-line"></polyline>
+                            <polyline [attr.points]="buildPolyline(networkOutgoing, networkYMax)"
+                                class="line-stroke teal-line"></polyline>
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="chartHover.hovered" class="chart-guide-line" [attr.x1]="chartHover.hoverCursorX"
+                                [attr.x2]="chartHover.hoverCursorX" y1="0" y2="150" />
+
+                            <!-- Active dots on Network curves -->
+                            <circle *ngIf="chartHover.hovered" class="chart-active-dot" [attr.cx]="chartHover.hoverCursorX"
+                                [attr.cy]="chartHover.net.incomingY" r="4.5" fill="#f97316" stroke="#ffffff" stroke-width="2" />
+                            <circle *ngIf="chartHover.hovered" class="chart-active-dot" [attr.cx]="chartHover.hoverCursorX"
+                                [attr.cy]="chartHover.net.outgoingY" r="4.5" fill="#16a0ae" stroke="#ffffff" stroke-width="2" />
+                        </svg>
+                    </div>
+                    <div class="y-labels">
+                        <span *ngFor="let t of [200,100,0]">{{ t }}</span>
+                    </div>
+                    <div class="x-labels">
+                        <span *ngFor="let l of xLabels">{{ l }}</span>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><i class="dot orange-dot"></i>Incoming (Mbps)</span>
+                        <span class="legend-item"><i class="dot teal-dot"></i>Outgoing (Mbps)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Containers + Processes -->
+        <section class="two-col-row">
+            <div class="card table-card">
+                <div class="section-header small-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Containers</h3>
+                        <p class="section-subtitle">Contains {{ filteredContainers.length }} containers.</p>
+                    </div>
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="containerSearch"
+                            (ngModelChange)="containerPage = 1" />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Image</th>
+                                <th>State</th>
+                                <th>Ready</th>
+                                <th>Restarts</th>
+                                <th>CPU usage</th>
+                                <th>Memory usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let c of pagedContainers">
+                                <td class="link">{{ c.name }}</td>
+                                <td class="muted">{{ c.image }}</td>
+                                <td><span class="badge badge-running small">● {{ c.state }}</span></td>
+                                <td>{{ c.ready }}</td>
+                                <td>{{ c.restarts }}</td>
+                                <td>{{ c.cpuUsage }}</td>
+                                <td>{{ c.memUsage }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ containerStartIndex }} to {{ containerEndIndex }} of {{ filteredContainers.length }}
+                        containers
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <input type="number" min="1" [(ngModel)]="containerItemsPerPage"
+                                (ngModelChange)="onContainerItemsPerPageChange()" />
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousContainerPage()"
+                                [disabled]="containerPage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let p of containerTotalPagesArray"
+                                [class.active]="containerPage === p" (click)="p !== '...' && goToContainerPage(p)"
+                                [disabled]="p === '...'">
+                                {{ p }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextContainerPage()"
+                                [disabled]="containerPage === totalContainerPages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <div class="section-header small-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Processes</h3>
+                        <p class="section-subtitle">Top 5 processes running in this pod.</p>
+                    </div>
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="procSearch"
+                            (ngModelChange)="procPage = 1" />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Process</th>
+                                <th>CPU</th>
+                                <th>Memory</th>
+                                <th>% CPU</th>
+                                <th>% Memory</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of pagedProcesses">
+                                <td>{{ p.pid }}</td>
+                                <td class="link">{{ p.process }}</td>
+                                <td>{{ p.cpu }}</td>
+                                <td>{{ p.memory }}</td>
+                                <td>{{ p.cpuPct }}</td>
+                                <td>{{ p.memPct }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ procStartIndex }} to {{ procEndIndex }} of {{ filteredProcesses.length }} processes
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <input type="number" min="1" [(ngModel)]="procItemsPerPage"
+                                (ngModelChange)="onProcItemsPerPageChange()" />
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousProcPage()" [disabled]="procPage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let p of procTotalPagesArray"
+                                [class.active]="procPage === p" (click)="p !== '...' && goToProcPage(p)"
+                                [disabled]="p === '...'">
+                                {{ p }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextProcPage()"
+                                [disabled]="procPage === totalProcPages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Volume mounts + Pod events + Logs -->
+        <section class="three-col-row">
+            <div class="card table-card">
+                <div class="section-header small-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Volume mounts</h3>
+                        <p class="section-subtitle">Contains {{ filteredVolumeMounts.length }} Volume mounts.</p>
+                    </div>
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="vmSearch"
+                            (ngModelChange)="vmPage = 1" />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Mount path</th>
+                                <th>Type</th>
+                                <th>Source</th>
+                                <th>Read only</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let v of pagedVolumeMounts">
+                                <td class="link">{{ v.name }}</td>
+                                <td>{{ v.path }}</td>
+                                <td>{{ v.type }}</td>
+                                <td>{{ v.source }}</td>
+                                <td>{{ v.readOnly }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ vmStartIndex }} to {{ vmEndIndex }} of {{ filteredVolumeMounts.length }} volume
+                        mounts
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <input type="number" min="1" [(ngModel)]="vmItemsPerPage"
+                                (ngModelChange)="onVmItemsPerPageChange()" />
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousVmPage()" [disabled]="vmPage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let p of vmTotalPagesArray"
+                                [class.active]="vmPage === p" (click)="p !== '...' && goToVmPage(p)"
+                                [disabled]="p === '...'">
+                                {{ p }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextVmPage()" [disabled]="vmPage === totalVmPages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <div class="section-header small-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Pod events</h3>
+                        <p class="section-subtitle">Contains {{ filteredPodEvents.length }} events.</p>
+                    </div>
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="peSearch"
+                            (ngModelChange)="pePage = 1" />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Reason</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of pagedPodEvents">
+                                <td class="muted">{{ e.timestamp }}</td>
+                                <td>{{ e.type }}</td>
+                                <td>{{ e.reason }}</td>
+                                <td class="muted truncate">{{ e.message }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ peStartIndex }} to {{ peEndIndex }} of {{ filteredPodEvents.length }} events
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <input type="number" min="1" [(ngModel)]="peItemsPerPage"
+                                (ngModelChange)="onPeItemsPerPageChange()" />
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousPePage()" [disabled]="pePage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let p of peTotalPagesArray"
+                                [class.active]="pePage === p" (click)="p !== '...' && goToPePage(p)"
+                                [disabled]="p === '...'">
+                                {{ p }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextPePage()" [disabled]="pePage === totalPePages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <div class="section-header small-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Logs</h3>
+                        <p class="section-subtitle">View logs for containers in this pod.</p>
+                    </div>
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="logSearch"
+                            (ngModelChange)="logPage = 1" />
+                    </div>
+                </div>
+                <div class="logs-controls">
+                    <label class="logs-select-label">Container</label>
+                    <select class="logs-select">
+                        <option>{{ logContainer }}</option>
+                    </select>
+                    <input class="logs-search" placeholder="Search logs..." [(ngModel)]="logSearch"
+                        (ngModelChange)="logPage = 1" />
+                    <button class="dropdown-btn small">▽ Filter by</button>
+                    <button class="run-query-btn">▷ Run query</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table logs-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Log message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let l of pagedLogs">
+                                <td class="muted">{{ l.timestamp }}</td>
+                                <td class="muted">{{ l.message }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ logStartIndex }} to {{ logEndIndex }} of {{ filteredLogs.length }} logs
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <input type="number" min="1" [(ngModel)]="logItemsPerPage"
+                                (ngModelChange)="onLogItemsPerPageChange()" />
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousLogPage()" [disabled]="logPage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let p of logTotalPagesArray"
+                                [class.active]="logPage === p" (click)="p !== '...' && goToLogPage(p)"
+                                [disabled]="p === '...'">
+                                {{ p }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextLogPage()"
+                                [disabled]="logPage === totalLogPages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>

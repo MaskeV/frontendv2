@@ -1,0 +1,319 @@
+<div class="row mb-2 see-all-button-responsive">
+  <div class="col-md-12">
+    <button type="button" class="btn btn-outline-primary btn-sm float-left update-back-button-responsive"
+      *ngIf="isUpdation" (click)="showForm()"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+    <button type="button" class="btn btn-outline-primary btn-sm float-right" style="float:right;" (click)="showTable()"
+      *ngIf="isCreation && isForm && userTypeCrudMap.create"><i class="fa fa-list" aria-hidden="true"></i> See
+      All</button>
+  </div>
+</div>
+
+<div class="d-flex gap-1">
+  <div style="width: 60%;">
+    <div class="card mt-2 card-responsive" *ngIf="isForm && userTypeCrudMap.create">
+      <div class="card-header text-center ">
+        <span style="font-size: 0.8rem;" *ngIf="!isTable && isCreation"><i class="fa fa-feed"
+            aria-hidden="true"></i>&nbsp;<strong>Configure Application & IP Address</strong></span>
+        <span style="font-size: 0.8rem;" *ngIf="!isTable && isUpdation"><i class="fa fa-feed"
+            aria-hidden="true"></i>&nbsp;<strong>Update Application & IP Address</strong></span>
+      </div>
+      <div class="card-body" style="font-size: small;">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group mb-4 application-name-div-responsive d-flex align-items-center" style="width: 100%;">
+              <div class="mr-3" style="width: 40%;">
+                <label class="font-size-when-responsive">Application Name<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" [(ngModel)]="applicationName"
+                  placeholder="Enter application name" maxlength="40" autocomplete="none" appSanitizeInput>
+                <small *ngIf="!validateAlphanumericUnderscore(applicationName);" class="text-danger">Application name
+                  should include alphabets, numbers, space, ':', '-' and '_' only !! [V2]</small>
+              </div>
+
+              <div style="width: 50%;">
+                <label class="font-size-when-responsive">Application Type<span class="text-danger">*</span></label>
+                <select class="form-control" [(ngModel)]="applicationType">
+                  <option selected="selected" value="" disabled>-- Select --</option>
+                  <option *ngFor="let product of availableProducts" [value]="product">{{product}}</option>
+                </select>
+              </div>
+            </div>
+            <!-- ================= AKS NODE  ================= -->
+
+            <div class="row mt-3" *ngIf="applicationType === 'AKS'">
+              <div class="col-md">
+                <label class="font-size-when-responsive">
+                  Node<span class="text-danger">*</span>
+                </label>
+
+                <!-- Tag Container -->
+                <div class="form-control py-1 d-flex flex-wrap align-items-center" style=" cursor: text;">
+
+                  <!-- Existing Nodes as Chips -->
+                  <span *ngFor="let n of node; let i = index"
+                    class="badge badge-primary text-dark mr-2 mb-1 d-flex align-items-center">
+                    {{ n }}
+                    <i class="fa fa-times ml-2" style="cursor: pointer;" (click)="removeNode(i)">
+                    </i>
+                  </span>
+
+                  <!-- Text Input -->
+                  <input type="text" [(ngModel)]="nodeInputValue" (keydown)="handleNodeKeydown($event)"
+                    placeholder="Type node and press Enter"
+                    style="border: none; outline: none; flex: 1; min-width: 120px;" appSanitizeInput />
+                </div>
+
+                <small class="text-muted">
+                  Press <b>Enter</b> or <b>,</b> to add node
+                </small>
+              </div>
+            </div>
+
+
+            <div>
+              <div class="row hide-label-row-responsive">
+                <div class="form-group col-md-3 mb-0">
+                  <label>IP Address<span class="text-danger">*</span></label>
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                  <label>IP Type<span class="text-danger">*</span></label>
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                  <label>Environment<span class="text-danger">*</span></label>
+                </div>
+              </div>
+              <div class="row" *ngFor="let ipObjArray of ipObjArrayList; let i = index;" style="align-items: baseline;">
+                <small *ngIf="!validateIP(ipObjArray.ipAddress);" class="text-danger col-md-12">Enter valid IP
+                  Address!!</small>
+                <div class="form-group col-md-3">
+                  <label class="hide-label-when-not-responsive show-label-when-responsive font-size-when-responsive">IP
+                    Address<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="ipObjArray.ipAddress"
+                    placeholder="Enter IP Address" name="ipAddress_{{i+1}}" autocomplete="none" appSanitizeInput>
+                </div>
+                <div class="form-group col-md-3">
+                  <label class="hide-label-when-not-responsive show-label-when-responsive font-size-when-responsive">IP
+                    Type<span class="text-danger">*</span></label>
+                  <select class="form-control" style="width: 100%;" tabindex="" aria-hidden="true"
+                    [(ngModel)]="ipObjArray.ipType" [disabled]="!ipObjArray.ipAddress">
+                    <option selected="selected" value="" disabled>-- Select --</option>
+                    <option value="WEB" *ngIf="applicationType!='HOST'">WEB</option>
+                    <option value="Application" *ngIf="applicationType!='HOST'">Application</option>
+                    <option value="LINUX" *ngIf="applicationType=='HOST'">Linux</option>
+                    <option value="WINDOWS" *ngIf="applicationType=='HOST'">Windows</option>
+                    <option value="CONTAINER" *ngIf="applicationType=='HOST'">Container</option>
+                    <option value="DB" *ngIf="applicationType!='HOST'">DB</option>
+                    <option value="ORACLE" *ngIf="applicationType!='HOST'">ORACLE</option>
+                    <option value="Others" *ngIf="applicationType!='HOST'">Others</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-3">
+                  <label
+                    class="hide-label-when-not-responsive show-label-when-responsive font-size-when-responsive">Environment<span
+                      class="text-danger">*</span></label>
+                  <select class="form-control" style="width: 100%;" tabindex="" aria-hidden="true"
+                    [(ngModel)]="ipObjArray.environment" [disabled]="!ipObjArray.ipAddress">
+                    <option selected="selected" value="" disabled>-- Select --</option>
+                    <option value="Production">Production</option>
+                    <option value="DR">DR</option>
+                    <option value="CUG">CUG</option>
+                    <option value="UAT">UAT</option>
+                    <option value="Others">Others</option>
+                  </select>
+                </div>
+                <div class="col-md-2 mt-1" style="text-align: right;">
+                  <button type="button" class="btn btn-outline-primary btn-sm mx-2" (click)="addIPAddrInputField()"
+                    [disabled]="checkValidationIPs(i, ipObjArray.ipAddress, ipObjArray.ipType, ipObjArray.environment)">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm mx-2"
+                    (click)="removeInputField(alert_message,ipObjArray)" *ngIf="i">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <label>Index Pattern</label>
+              <div class="row" *ngFor="let indexpobj of indexPatternList; let j = index;">
+                <div class="form-group col-md-3 mb-1">
+                  <label class="hide-label-when-not-responsive show-label-when-responsive font-size-when-responsive">IP
+                    Address<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="indexpobj.indexPatternName"
+                    placeholder="Enter index Pattern" name="IndexPattern_{{j+1}}" autocomplete="none" appSanitizeInput>
+                </div>
+                <div class="col-md-3 mt-1">
+                  <button *ngIf="indexpobj.indexPatternName && j === indexPatternList.length - 1" type="button"
+                    class="btn btn-outline-primary btn-sm mx-2" (click)="addIndexInputField()">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm mx-2"
+                    (click)="removeIndexField(alert_message,indexpobj)" *ngIf="j">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <small *ngIf="isIPProper && ipObjArrayList.length>1" class="text-danger">IP Address(s) and their
+                respective IP Type should be unique.</small>
+            </div>
+            <button type="submit" class="btn btn-outline-primary btn-sm" (click)="createIPAddressMapping(alert_message)"
+              *ngIf="isCreation">Create</button>
+            <button type="submit" class="btn btn-outline-primary btn-sm"
+              (click)="updateApplicationIPMapping(alert_message)" *ngIf="isUpdation">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 40%;">
+    <div class="card mt-2 card-responsive" *ngIf="isForm && userTypeCrudMap.create">
+      <div class="card-header text-center ">
+        <strong>Configured Application & IP Mapping</strong>
+      </div>
+      <div class="card-body text-center" style="padding: 0.75rem;">
+        <table class="table table-sm" aria-describedby="">
+          <thead class="thead-light">
+            <tr class="headings" style="font-size: x-small; text-transform: uppercase; height: 20px;">
+              <th scope="col" style="width: 15%;">Sr. No</th>
+              <th scope="col" style="width: 40%;" (click)="sortBy('applicationName');">Application Name</th>
+              <th scope="col" style="width: 20%;" (click)="sortBy('technologyType');">Tech Type</th>
+              <th scope="col" style="width: 25%;">View IP Address(s)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="height :0.5vh; font-size: small;"
+              *ngFor="let a of allApplicationsUnique | grdFilter: searchText|sort:[sortparam,sortDirection] 
+                          | paginate: { id:'appIP-adminConfig-pagination', itemsPerPage: 10, currentPage: p}; let i = index;">
+              <td style="width: 15%;">{{i+1}}</td>
+              <td style="width: 40%; word-wrap: break-word;">{{a['applicationName']}}</td>
+              <td style="width: 20%; word-wrap: break-word;">{{a['technologyType']}}</td>
+              <td style="width: 25%;">
+                <i class="fa fa-eye" (click)="openIpAddressTemplateModal(ipAddressTemplate,a['applicationName'])"
+                  style="font-size: medium; color: #d93f3c; cursor: pointer;"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls style="font-size: small;" (pageChange)="pageChange($event)"
+          id="appIP-adminConfig-pagination">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="isTable || userTypeCrudMap.view && !userTypeCrudMap.create">
+  <div class="col-md-12 mt-2">
+    <div class="row justify-content-between mb-1 row-responsive">
+      <div class="col-md-9 back-button-div-when-responsive">
+        <i class="fa fa-arrow-left" *ngIf="isTable" (click)="showForm()"
+          style="font-size: medium; cursor: pointer;"></i>
+      </div>
+      <div class="col-md-3 d-flex align-items-end justify-content-end export-searchbox-div-when-responsive">
+        <input type="text" class="form-control searchbox-when-responsive" id="search-text" [(ngModel)]="searchText"
+          placeholder="Search Application" (keyup)="search()" aria-describedby="search-text" autofocus
+          autocomplete="off" style="font-size: small; padding: 2px 10px; height: 30px; width: 235px;" appSanitizeInput>
+        <i class="fa fa-file-excel-o" (click)="exportAsXLSX()"
+          style="font-size: 18px; cursor: pointer; color: #013263; margin-right: 2px;"></i>
+      </div>
+    </div>
+
+    <div class="">
+      <table class="table table-sm" aria-describedby="">
+        <thead class="thead-light">
+          <tr class="headings" style="font-size: x-small; height: 30px; text-transform: uppercase; ">
+            <th scope="col">Sr. No</th>
+            <th scope="col" (click)="sortBy('apm.applicationName');">Application Name</th>
+            <th scope="col" (click)="sortBy('apm.technologyType');">Tech Type</th>
+            <th scope="col" (click)="sortBy('createdOn');"><strong>Created On</strong></th>
+            <th scope="col" (click)="sortBy('apm.createdByUserName');"><strong>Created By</strong></th>
+            <th scope="col" (click)="sortBy('ipAddress');">IP Address</th>
+            <th scope="col" (click)="sortBy('ipType');">Type Name</th>
+            <th scope="col" (click)="sortBy('environment');">Environment Type</th>
+            <th scope="col" style="text-align: right;" *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete">Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of allIPAddressMapping 
+        | grdFilter: searchText|sort:[sortparam,sortDirection] 
+        | paginate: { id:'appIP-adminConfig-pagination', itemsPerPage: 10, currentPage: p}; let i = index;"
+            style="font-size: small;">
+            <td>{{i+1}}</td>
+            <td>{{a['apm'] ? a['apm']['applicationName'] : ''}}</td>
+            <td>{{a['apm'] ? a['apm']['technologyType'] : ''}}</td>
+            <td>{{a['createdOn'] |date:'dd-MM-yyyy HH:mm:ss'}}</td>
+            <td>{{a['apm'] ? (a['apm']['createdByUserName'] || a['createdBy']) : a['createdBy']}}</td>
+            <td>{{a['ipAddress']}}</td>
+            <td>{{a['ipType']}}</td>
+            <td>{{a['environment']}}</td>
+            <td *ngIf="userTypeCrudMap.edit || userTypeCrudMap.delete" class="td-actions-when-responsive"
+              style="text-align: right;">
+              <i class="fa-solid fa-pen-to-square" id='downtime'
+                style="font-size: small; color: #013263; cursor: pointer;" (click)="openUpdateApplication(a['apm'])"
+                *ngIf="userTypeCrudMap.edit"></i> &nbsp;&nbsp;
+              <i class="fa-solid fa-trash" id='downtime' style="font-size: small; color: #d93f3c; cursor: pointer;"
+                (click)="openDeleteApplication(applicationTemplate, a['apm'])" *ngIf="userTypeCrudMap.delete"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination-controls style="font-size: small; text-align: center;" (pageChange)="pageChange($event)"
+        id="appIP-adminConfig-pagination">
+      </pagination-controls>
+    </div>
+  </div>
+</div>
+
+<ng-template #alert_message>
+  <div class="modal-body text-center">
+    <p>{{alertMessage}}</p>
+    <button type="button" *ngIf="isError" class="btn btn-danger" (click)="cancelRequest()">OK</button>&nbsp;
+    <button type="button" *ngIf="isSuccess" class="btn btn-success" (click)="cancelRequest()">OK</button>&nbsp;
+  </div>
+</ng-template>
+
+<ng-template #applicationIPConfigTemplate let-ipObj="ipObj">
+  <div class="modal-body text-center">
+    <p>Are you sure you want to delete the Application-IP mapping configuration?</p>
+    <button type="button" class="btn btn-success" (click)="deleteApplicationIPMapping(alert_message,ipObj)">Yes,
+      proceed</button>&nbsp;
+    <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+  </div>
+</ng-template>
+
+<ng-template #applicationTemplate>
+  <div class="modal-body text-center" id="applicationDeleteDiv">
+    <div>Are you sure you want to delete the Application : {{applicationIPobj.applicationName}} ?</div>
+    <div>All the IPs configured to this Application would also get deleted..</div>
+    <button type="button" class="btn btn-success" (click)="deleteApplication(alert_message)">Yes, proceed</button>&nbsp;
+    <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+  </div>
+</ng-template>
+
+<ng-template #ipAddressTemplate>
+  <div class="modal-body text-center">
+    <div class="table-responsive">
+      <span class="badge float-left" style="font-size: 14px">Application Name : {{applicationName}}</span>
+      <input type="text" class="form-control" id="search-text" aria-describedby="search-text" [(ngModel)]="searchText1"
+        placeholder="search IP Address" class="col-md-3 m-2 float-right" autofocus autocomplete="off" appSanitizeInput>
+      <table class="table table-sm" aria-describedby="">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col"><strong>Sr. No</strong></th>
+            <th scope="col"><strong>IP Address</strong></th>
+            <th scope="col"><strong>IP Type</strong></th>
+            <th scope="col"><strong>Environment Type</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of ipAddressMappingDataList | grdFilter: searchText1; let i = index;">
+            <td>{{i+1}}</td>
+            <td>{{data['ipAddress']}}</td>
+            <td>{{data['ipType']}}</td>
+            <td>{{data['environment']}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button type="button" class="btn btn-info float-right" (click)="cancelRequest()">Close</button>&nbsp;
+  </div>
+</ng-template>

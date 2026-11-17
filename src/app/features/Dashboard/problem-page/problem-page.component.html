@@ -1,0 +1,1231 @@
+<div class="mt-2">
+
+    <!-- BREADCRUMB -->
+    <nav *ngIf="isNavigatedFromInfra" aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item cursor-pointer" style="color: blue;" (click)="goToHost()">Host Root</li>
+            <li class="breadcrumb-item active cursor-pointer" style="color: blue;" (click)="goToHostService()">
+                <a *ngIf="isLinux">
+                    <i class="fa-brands fa-linux" style="color: black;"></i>
+                    {{selectedHostIp}}
+                </a>
+                <a *ngIf="isWindow" class="d-flex">
+                    <div class="winlogo mt-1">
+                        <img src="assets/images/windows.png" alt="Windows">
+                    </div>{{selectedHostIp}}
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">What went wrong?</li>
+        </ol>
+    </nav>
+
+    <nav *ngIf="!isNavigatedFromInfra" aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item cursor-pointer" style="color: blue;" (click)="goToApmosysAPM()">ApMoSys APM</li>
+            <li class="breadcrumb-item cursor-pointer" aria-current="page" style="color: blue;"
+                (click)="goToServicePage()">
+                {{selectedAPMService}}</li>
+            <li class="breadcrumb-item active" aria-current="page">What went wrong?</li>
+        </ol>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div #scrollContainer class="mx-2 main-container" (scroll)="onScroll(scrollContainer)">
+
+        <!-- SCROLL DIV -->
+        <div class="col-10">
+            <div class="scrollspy-example position-relative">
+
+                <!-- APPLICATION -->
+                <div class="cardStyle py-1" id="list-item-1">
+
+                    <h4 class="mx-2 mt-1 heading-style" *ngIf="!isApplicationHealthy">Application</h4>
+
+                    <div class="gradient-line mx-2" *ngIf="!isApplicationHealthy"></div>
+
+                    <div class="badge border me-1 rounded-0 p-1 mx-2 mt-1 mb-0 cursor-pointer"
+                        *ngIf="!isApplicationHealthy">
+                        {{selectedAPMService}}
+                    </div>
+
+                    <!-- WHEN APP HEALTH IS GOOD -->
+                    <div *ngIf="isApplicationHealthy" class="text-center my-2">
+                        <div class="hex-row" *ngFor="let row of getRows(getHealthItems()); let i = index"
+                            [class.shifted]="i % 2 !== 0">
+                            <span class="pt-2" style="font-weight: 400;">Application Health :</span>
+                            <div *ngFor="let item of row" class="hex"
+                                [style.cursor]="item.type === 'Infra' || item.type === 'Database' ? 'pointer' : 'default'"
+                                [style.background]="getColor2(100)" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ item.type }}: {{ item.name }}">
+                                <div class="hex-content">
+                                    <div class="hex-value">{{ item.value | number:'1.0-2' }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WHEN ANY PROBLEM EXISTS IN APP -->
+                    <div id="list-item-1-1" class="my-1 px-2 appContainer" *ngIf="!isApplicationHealthy">
+                        <div class="w-100 d-flex flex-wrap gap-1">
+                            <!-- SUCCESS RATE CHART -->
+                            <div class="card w-49" [style.display]="isSuccessRateBreached ? 'block' : 'none'">
+                                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                    <span>Success Rate (%)</span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.5;"
+                                            class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'"
+                                            class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                            style="color:#0e38f1; background-color: var(--bg-color);">
+                                            {{ successRate }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                            style="color:#e07e23; background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_sla"]?.warningValue }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                            style="background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_sla"]?.criticalValue }}</div>
+
+                                        <i class="fa-solid fa-circle-info ms-1 gradiantIcon" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" matButton="elevated"
+                                            title="{{ successRateInfo }}"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body h-26 p-0">
+                                    <div id="successRateTimeValueChartContainer" style="width: 100%; height: 26vh;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- APDEX -->
+                            <div class="card w-49" [style.display]="isApdexChart ? 'block' : 'none'">
+                                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                    <span>Apdex</span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.5;"
+                                            class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'"
+                                            class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                            style="color:#0e38f1; background-color: var(--bg-color);">
+                                            {{ apdexValue }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                            style="color:#e07e23; background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_apdex"]?.warningValue }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                            style="background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_apdex"]?.criticalValue }}</div>
+
+                                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{{ apdexInfo }}"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body h-26 p-0">
+                                    <div id="serviceApdexTimeValueChartContainer" style="width: 100%; height: 26vh;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- LOAD -->
+                            <div class="card w-49" [style.display]="isServiceLoadBreached ? 'block' : 'none'">
+                                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                    <span>Load (call/min)</span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.5;"
+                                            class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'"
+                                            class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                            style="color:#0e38f1; background-color: var(--bg-color);">
+                                            {{ avgLoadValue }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                            style="color:#e07e23; background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_cpm"]?.warningValue }}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                            style="background-color: var(--bg-color);">
+                                            {{ appThreshold?.["service_cpm"]?.criticalValue }}</div>
+
+                                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ loadInfo }}"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body h-26 p-0">
+                                    <div id="serviceLoadTimeValueChartContainer" style="width: 100%; height: 26vh;">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- INFRASTRUCTURE -->
+                <div class="cardStyle" id="list-item-2">
+
+                    <h4 class="mx-2 mt-1 pt-1 heading-style" *ngIf="!isInfrastructureHealthy">Infrastructure</h4>
+
+                    <div class="gradient-line mx-2" *ngIf="!isInfrastructureHealthy"></div>
+
+                    <!-- WHEN INFRA HEALTH IS GOOD -->
+                    <div *ngIf="isInfrastructureHealthy" class="text-center my-2 py-3">
+                        <div class="hex-row" *ngFor="let row of getRows(getHealthItems()); let i = index"
+                            [class.shifted]="i % 2 !== 0">
+                            <span class="pt-2" style="font-weight: 400;">Infrastructure Health :</span>
+                            <div *ngFor="let item of row" class="hex"
+                                [style.cursor]="item.type === 'Infra' || item.type === 'Database' ? 'pointer' : 'default'"
+                                [style.background]="getColor2(100)" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ item.type }}: {{ item.name }}">
+                                <div class="hex-content">
+                                    <div class="hex-value">{{ item.value | number:'1.0-2' }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WHEN ANY PROBLEM EXISTS IN INFRA -->
+                    <ng-container *ngIf="!isInfrastructureHealthy">
+                        <div *ngFor="let infra of mappedInfra">
+
+                            <div class="badge border me-1 rounded-0 p-1 mx-2 mt-1 mb-0 threshold cursor-pointer">
+                                {{ infra.ipAddress }}
+                            </div>
+
+                            <div id="list-item-2-1" class="my-1 px-2 pb-2 appContainer">
+                                <div class="w-100 d-flex flex-wrap gap-1">
+                                    <!-- Memory RAM Card -->
+                                    <div class="card w-49"
+                                        [style.display]="isMemoryRamGraph[infra.ipAddress] ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                            style="background-color: #afcbff; font-weight: 500; font-size: small; text-wrap: wrap;">
+                                            Memory RAM(MB)
+                                            <span class="d-flex ">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chartData_criteriaForMemoryRam"
+                                                        (ngModelChange)="updateChartVisibility('MemoryRam', infra.ipAddress)"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                                        aria-label="Small select example"
+                                                        style="line-height: 1.2; font-size: x-small;">
+
+                                                        <option value="all" selected>All</option>
+                                                        <option value="available">Available</option>
+                                                        <option value="buff">Buff/Cache</option>
+                                                        <option value="used">Used</option>
+
+                                                    </select>
+                                                    <select *ngIf="chartData_criteriaForMemoryRam!='all'"
+                                                        [(ngModel)]="chart_criteriaForMemoryRam"
+                                                        (ngModelChange)="updateChartVisibility('MemoryRam', infra.ipAddress)"
+                                                        style="line-height: 1.2; font-size: x-small"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold"
+                                                            *ngIf="chartData_criteriaForMemoryRam!='buff'">
+                                                            Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteriaForMemoryRam=='avg' && chartData_criteriaForMemoryRam!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1; font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesRam.avg | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForMemoryRam=='threshold' && chartData_criteriaForMemoryRam!='all' && chartData_criteriaForMemoryRam!='buff' "
+                                                        class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23; font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesRam.warning | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForMemoryRam=='threshold' && chartData_criteriaForMemoryRam!='all' && chartData_criteriaForMemoryRam!='buff' "
+                                                        class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold"
+                                                        style="font-size:x-small;line-height: 1.2">
+                                                        {{ chartValuesRam.critical | number:'1.0-2' }}
+                                                    </div>
+                                                </div>
+                                                <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1"
+                                                    matButton="elevated" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Shows total, used, available memory, and buffers/cache. Helps track memory pressure, optimize performance, and prevent out-of-memory issues."></i>
+                                            </span>
+                                        </div>
+
+                                        <div
+                                            class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+                                            <div style="width: 98%;height: 150px;"
+                                                [hidden]="memoryRamChart[infra.ipAddress]==null"
+                                                id="memoryRamChart_{{ sanitizeIp(infra.ipAddress) }}"></div>
+                                            <div *ngIf="memoryRamChart[infra.ipAddress]==null"
+                                                style="color: rgb(155,154,154); font-size: small;">No Data Available
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Memory Swap Card -->
+                                    <div class="card w-49"
+                                        [style.display]="isMemorySwapGraph[infra.ipAddress] ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                            style="background-color: #afcbff; font-weight: 500; font-size: small; text-wrap: wrap;">
+                                            Memory Swap(MB)
+                                            <span class="d-flex align-items-center position-relative">
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chartData_criteriaForMemorySwap"
+                                                        (ngModelChange)="updateChartVisibility('MemorySwap', infra.ipAddress)"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm"
+                                                        aria-label="Small select example">
+
+                                                        <option value="all" selected>All</option>
+                                                        <option value="totalSwap">Total</option>
+                                                        <option value="free">Free</option>
+                                                        <option value="usedSwap">Used</option>
+
+                                                    </select>
+                                                    <select *ngIf="chartData_criteriaForMemorySwap!='all'"
+                                                        [(ngModel)]="chart_criteriaForMemorySwap"
+                                                        style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold"
+                                                            *ngIf="chartData_criteriaForMemorySwap!='totalSwap'">
+                                                            Threshold
+                                                        </option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteriaForMemorySwap=='avg' && chartData_criteriaForMemorySwap!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{ chartValuesSwap?.avg | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForMemorySwap=='threshold' && chartData_criteriaForMemorySwap!='all'"
+                                                        class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{ chartValuesSwap?.warning | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForMemorySwap=='threshold' && chartData_criteriaForMemorySwap!='all'"
+                                                        class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{ chartValuesSwap?.critical | number:'1.0-2' }}
+                                                    </div>
+                                                </div>
+
+                                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Shows total and free swap space. High swap usage may indicate insufficient RAM and potential system slowdowns."></i>
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+                                            <div [hidden]="memorySwapChart[infra.ipAddress]==null"
+                                                style="width: 98%;height:160px;"
+                                                id="memorySwapChart_{{ sanitizeIp(infra.ipAddress) }}"></div>
+                                            <div *ngIf="memorySwapChart[infra.ipAddress]==null"
+                                                style="color: rgb(155,154,154); font-size: small;">No Data Available
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- CPU Load Card -->
+                                    <div class="card w-49"
+                                        [style.display]="isCpuLoadGraph[infra.ipAddress] ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                            style="background-color: #afcbff; font-weight: 500; font-size: small; text-wrap: wrap;">
+                                            CPU Load
+                                            <span class="d-flex">
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chartData_criteriaForCpuLoad"
+                                                        (ngModelChange)="updateChartVisibility('CpuLoad', infra.ipAddress)"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                                        aria-label="Small select example"
+                                                        style="line-height: 1.2; font-size: x-small;">
+
+                                                        <option value="all" selected>All</option>
+                                                        <option value="load_1">load_1</option>
+                                                        <option value="load_5">load_5</option>
+                                                        <option value="load_15">load_15</option>
+
+                                                    </select>
+                                                    <select *ngIf="chartData_criteriaForCpuLoad!='all'"
+                                                        [(ngModel)]="chart_criteriaForCpuLoad"
+                                                        style="line-height: 1.2; font-size: x-small"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteriaForCpuLoad=='avg' && chartData_criteriaForCpuLoad!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1; font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesCpuLoad.avg | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForCpuLoad=='threshold' && chartData_criteriaForCpuLoad!='all'"
+                                                        class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23;font-size: x-small;line-height: 1.2; cursor: default;"
+                                                        matButton="elevated" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title="Warning">
+                                                        {{ logicalCoresMap[infra.ipAddress]*0.75 }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForCpuLoad=='threshold' && chartData_criteriaForCpuLoad!='all'"
+                                                        class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold"
+                                                        style="font-size: x-small;line-height: 1.2; cursor: default;"
+                                                        matButton="elevated" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title="Critical">
+                                                        {{ logicalCoresMap[infra.ipAddress]*1.0 }}
+                                                    </div>
+                                                </div>
+                                                <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1"
+                                                    matButton="elevated" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Shows 1,5 and 15-minute load averages. Indicates the number of processes waiting for CPU resources, helping assess system performance and saturation."></i>
+                                            </span>
+                                        </div>
+
+                                        <div
+                                            class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+                                            <div [hidden]="avgCpuLoadChart[infra.ipAddress]==null"
+                                                style="width: 98%;height: 150px;"
+                                                id="avgCpuLoadChart_{{ sanitizeIp(infra.ipAddress) }}"></div>
+                                            <div *ngIf="avgCpuLoadChart[infra.ipAddress]==null"
+                                                style="color: rgb(155,154,154); font-size: small;">No Data Available
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Network Bandwidth -->
+                                    <div class="card w-49"
+                                        [style.display]="isNetworkBandwidthGraph[infra.ipAddress] ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                            style="background-color: #afcbff; font-weight: 500; font-size: small; text-wrap: wrap;">
+                                            Network Bandwidth (KB/s)
+                                            <span class="d-flex">
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chartData_criteriaForNetworkBandwidth"
+                                                        (ngModelChange)="updateChartVisibility('NetworkBandwidth', infra.ipAddress)"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                                        aria-label="Small select example"
+                                                        style="line-height: 1.2; font-size: x-small;">
+
+                                                        <option value="all" selected>All</option>
+                                                        <option value="receive">receive</option>
+                                                        <option value="transmit">transmit</option>
+                                                        <option value="traffic">traffic</option>
+
+                                                    </select>
+                                                    <select *ngIf="chartData_criteriaForNetworkBandwidth!='all'"
+                                                        [(ngModel)]="chart_criteriaForNetworkBandwidth"
+                                                        style="line-height: 1.2; font-size: x-small"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='avg' && chartData_criteriaForNetworkBandwidth!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1; font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesNetworkBandwidth.avg | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='threshold' && chartData_criteriaForNetworkBandwidth!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23; font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesNetworkBandwidth.warning | number:'1.0-2' }}
+                                                    </div>
+
+                                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='threshold' && chartData_criteriaForNetworkBandwidth!='all'"
+                                                        class="bg-white rounded-2 me-1 px-1 text-danger chart-threshold fw-bold"
+                                                        style=" font-size: x-small;line-height: 1.2">
+                                                        {{ chartValuesNetworkBandwidth.critical | number:'1.0-2' }}
+                                                    </div>
+
+                                                </div>
+                                                <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1"
+                                                    matButton="elevated" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="It measures data transmitted and received per second, giving insight into overall network load, traffic patterns, and potential bottlenecks."></i>
+                                            </span>
+                                        </div>
+
+                                        <div
+                                            class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+                                            <div [hidden]="networkBandwidthUsageChart[infra.ipAddress]==null"
+                                                style="width: 98%; height: 150px;"
+                                                id="networkBandwidthUsageChart_{{ sanitizeIp(infra.ipAddress) }}"></div>
+                                            <div *ngIf="networkBandwidthUsageChart[infra.ipAddress]==null"
+                                                style="color: rgb(155,154,154); font-size: small;">No Data Available
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                </div>
+
+                <!-- DATABASE -->
+                <div class="cardStyle" id="list-item-3">
+
+                    <h4 class="mx-2 mt-1 pt-1 heading-style" *ngIf="!isDatabaseHealthy">Database</h4>
+                    <div class="gradient-line mx-2" *ngIf="!isDatabaseHealthy"></div>
+
+                    <!-- WHEN DB HEALTH IS GOOD -->
+                    <div *ngIf="isDatabaseHealthy" class="text-center my-2 py-3">
+                        <div class="hex-row" *ngFor="let row of getRows(getHealthItems()); let i = index"
+                            [class.shifted]="i % 2 !== 0">
+                            <span class="pt-2" style="font-weight: 400;">Database Health :</span>
+                            <div *ngFor="let item of row" class="hex"
+                                [style.cursor]="item.type === 'Infra' || item.type === 'Database' ? 'pointer' : 'default'"
+                                [style.background]="getColor2(100)" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{ item.type }}: {{ item.name }}">
+                                <div class="hex-content">
+                                    <div class="hex-value">{{ item.value | number:'1.0-2' }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WHEN ANY PROBLEM EXISTS IN DATABASE -->
+                    <ng-container *ngIf="!isDatabaseHealthy">
+                        <!-- Loop through each DB dynamically -->
+                        <div *ngFor="let db of mappedDatabases" class="mb-3">
+
+                            <div class="badge border me-1 rounded-0 p-1 mx-2 mt-1 mb-1 threshold cursor-pointer">
+                                {{db.dbName}}
+                            </div>
+
+                            <!-- MYSQL SECTION -->
+                            <div *ngIf="db.dbName.toLowerCase().startsWith('mysql')" class="px-2 pb-2 appContainer"
+                                id="list-item-3-1">
+
+                                <div class="w-100 d-flex flex-wrap gap-1">
+
+                                    <!-- QPS -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isQpsBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    QPS
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_qps" style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_qps=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1"> {{
+                                                        dbThresholdMap[db.dbName]?.['meter_mysql_qps']?.avgBaseline }}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_qps"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_qps"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ qpsInfo }}"></i>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="current_qps_graph" class="card-body h-33 p-0">
+                                            <div *ngIf="!currentQPSdata.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slow Queries Trend -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isSlowQueriesBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    Slow Queries Trend
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_slowQueries"
+                                                        style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_slowQueries=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{dbThresholdMap[db.dbName]?.['meter_mysql_slow_queries_rate']?.avgBaseline
+                                                        }}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_slow_queries_rate"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_slow_queries_rate"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ slowQueriesInfo }}"></i>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div id="slow_queries_trend" class="card-body h-33 p-0">
+                                            <div *ngIf="!slowQueriesTrendData.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--  Read Query Trends -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isReadQueriesBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    Read Query Trends
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_readQuery"
+                                                        style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_readQuery=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_commands_select_rate"]?.avgBaseline}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_commands_select_rate"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mysql_commands_select_rate"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ commandsReadInfo}}"></i>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div id="commands_trend" class="card-body h-33 p-0">
+                                            <div *ngIf="!commandTrendData.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- MSSQL SECTION -->
+                            <div *ngIf="db.dbName.toLowerCase().startsWith('mssql')" class="px-2 appContainer"
+                                id="list-item-3-1">
+
+                                <div class="w-100 d-flex flex-wrap gap-1">
+
+                                    <!-- QPS -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isQpsMssqlBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    QPS
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_qps" style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_qps=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_qps"]?.avgBaseline}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_qps"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_qps"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ qpsInfo }}"></i>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div id="current_qps_graph" class="card-body h-33 p-0">
+                                            <div *ngIf="!currentQPSdata.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slow Queries Trend -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isSlowQueriesMssqlBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    Slow Queries Trend
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_slowQueries"
+                                                        style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_slowQueries=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_slow_queries_rate"]?.avgBaseline}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_slow_queries_rate"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_slow_queries_rate"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ slowQueriesInfo }}"></i>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div id="slow_queries_trend" class="card-body h-33 p-0">
+                                            <div *ngIf="!slowQueriesTrendData.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Read Query Trends -->
+                                    <div class="w-49 px-0 custom-border border div-elem"
+                                        [style.display]="isReadQueriesMssqlBreached ? 'block' : 'none'">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style=" background-color: var(--card-header-bg); font-weight: 599;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span style="font-size: small;font-weight:500">
+                                                    Read Query Trends
+                                                </span>
+                                                <div class=" d-flex align-items-center justify-content-between">
+                                                    <select [(ngModel)]="chart_criteria_readQuery"
+                                                        style="line-height: 1.2;"
+                                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                                        aria-label="Small select example">
+
+                                                        <option value="avg" selected>Average</option>
+                                                        <option value="threshold">Threshold</option>
+
+                                                    </select>
+                                                    <div *ngIf="chart_criteria_readQuery=='avg'"
+                                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                                        style="color:#0e38f1">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_commands_select_rate"]?.avgBaseline}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                                        style="color:#e07e23">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_commands_select_rate"]?.warningValue}}
+                                                    </div>
+                                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                                        {{dbThresholdMap[db.dbName]?.["meter_mssql_commands_select_rate"]?.criticalValue}}
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            matButton="elevated" matTooltip="{{ commandsReadInfo}}"></i>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div id="commands_trend" class="card-body h-33 p-0">
+                                            <div *ngIf="!commandTrendData.length" class="text-center"
+                                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                                <p>No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </ng-container>
+
+                </div>
+
+                <!-- PROBLEM TABLE -->
+                <div class="cardStyle" id="list-item-4">
+
+                    <h4 class="mx-2 mt-1 pt-1 heading-style">Problems</h4>
+                    <div class="gradient-line mx-2 mb-3"></div>
+
+                    <div class="d-flex">
+                        <!-- Sidebar Filters -->
+                        <div class="problem-sidebar p-3 border-right bg-light" style="width: 220px; min-height: 85vh;">
+                            <div class="filter-section mb-4">
+                                <span class="filter-title status-title">STATUS</span>
+                                <div class="filter-options">
+                                    <label *ngFor="let option of problemStatusOptions" class="filter-item">
+                                        <input type="radio" name="status" [value]="option.value"
+                                            [(ngModel)]="selectedProblemStatus"
+                                            (change)="onProblemStatusChange(option.value)" />
+                                        <span>{{ option.label }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-grow-1 p-3 bg-white d-flex flex-column" style="overflow: hidden;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center gap-3">
+                                    <button *ngIf="preZoomTimeframe" (click)="resetZoom()"
+                                        class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 py-1 px-2 rounded-pill"
+                                        style="font-size: 11px; font-weight: 600;">
+                                        <i class="fa fa-undo"></i> Reset Zoom
+                                    </button>
+                                    <div class="search-container">
+                                        <input type="text" class="search-input" placeholder="Search problems..."
+                                            [(ngModel)]="searchText" (keyup)="filterProblems()">
+                                        <i class="fa fa-search search-icon"></i>
+                                    </div>
+                                    <span
+                                        class="badge bg-light text-secondary border d-flex align-items-center gap-1 py-1 px-2 rounded-pill"
+                                        style="font-size: 11px;">
+                                        <i class="fa fa-search-plus text-primary"></i> Drag on chart to zoom / crop
+                                        timeline
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <div class="status-card total shadow-xs border">
+                                        <div class="status-icon-wrapper"><i class="fa fa-list-ul"></i></div>
+                                        <div class="status-info">
+                                            <span class="status-label">TOTAL</span>
+                                            <span class="status-val text-dark">{{totalCount}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="status-card open shadow-xs border" [class.alert-glow]="openCount > 0">
+                                        <div class="status-icon-wrapper text-danger"><i
+                                                class="fa fa-exclamation-triangle"></i></div>
+                                        <div class="status-info">
+                                            <span class="status-label text-danger">OPEN</span>
+                                            <span class="status-val text-danger">{{openCount}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="status-card closed shadow-xs border">
+                                        <div class="status-icon-wrapper text-success"><i class="fa fa-check-circle"></i>
+                                        </div>
+                                        <div class="status-info">
+                                            <span class="status-label text-secondary">CLOSED</span>
+                                            <span class="status-val text-secondary">{{closedCount}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="red-gradient-line mb-3"></div>
+
+                            <div id="problemTimelineChart" style="width: 100%; min-height: 250px;"
+                                class="mb-3 flex-shrink-0"></div>
+
+                            <!-- Scrollable Table -->
+                            <div class="table-container shadow-sm rounded border flex-grow-1" style="overflow-y: auto;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th style="width: 5px; padding: 0;"></th>
+                                            <th>PROBLEM</th>
+                                            <th>IMPACTED</th>
+                                            <th>COMPONENT TYPE</th>
+                                            <th class="text-center">STATUS</th>
+                                            <th class="text-center sortable-header cursor-pointer select-none"
+                                                (click)="toggleSort('severity')">
+                                                SEVERITY
+                                                <i class="fa ms-1" [ngClass]="{
+                                                    'fa-sort-up': sortKey === 'severity' && sortDirection === 'asc',
+                                                    'fa-sort-down': sortKey === 'severity' && sortDirection === 'desc',
+                                                    'fa-sort text-muted opacity-50': sortKey !== 'severity'
+                                                }"></i>
+                                            </th>
+                                            <th class="text-center sortable-header cursor-pointer select-none"
+                                                (click)="toggleSort('startDate')">
+                                                START TIME
+                                                <i class="fa ms-1" [ngClass]="{
+                                                    'fa-sort-up': sortKey === 'startDate' && sortDirection === 'asc',
+                                                    'fa-sort-down': sortKey === 'startDate' && sortDirection === 'desc',
+                                                    'fa-sort text-muted opacity-50': sortKey !== 'startDate'
+                                                }"></i>
+                                            </th>
+                                            <th class="text-center">
+                                                END TIME
+                                            </th>
+                                            <th class="text-center sortable-header cursor-pointer select-none"
+                                                (click)="toggleSort('duration')">
+                                                DURATION
+                                                <i class="fa ms-1" [ngClass]="{
+                                                    'fa-sort-up': sortKey === 'duration' && sortDirection === 'asc',
+                                                    'fa-sort-down': sortKey === 'duration' && sortDirection === 'desc',
+                                                    'fa-sort text-muted opacity-50': sortKey !== 'duration'
+                                                }"></i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 12px;">
+                                        <ng-container *ngFor="let row of pagedData">
+                                            <tr [class.open-row]="row.problemStatus === 'open'"
+                                                [class.closed-row]="row.problemStatus === 'closed'">
+                                                <td class="status-indicator"></td>
+                                                <td>
+                                                    <div class="fw-bold"
+                                                        [style.color]="row.problemStatus === 'open' ? '#e11d48' : '#334155'"
+                                                        style="font-size: 12.5px;">
+                                                        {{row.problem || ('PID-' + row.details.pid)}}
+                                                    </div>
+                                                    <div style="font-size: 11px; font-weight: 600; margin-top: 2px;"
+                                                        [style.color]="row.problemStatus === 'open' ? '#f87171' : '#64748b'">
+                                                        PID-{{row.details.pid || '-'}}
+                                                    </div>
+                                                </td>
+                                                <td class="fw-bold">{{row.impacted}}</td>
+                                                <td class="fw-bold">{{row.applicationType}}</td>
+                                                <td class="text-center">
+                                                    <span class="status-badge" [ngClass]="row.problemStatus">
+                                                        {{row.problemStatus}}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="severity-badge"
+                                                        [ngClass]="row.severity?.toLowerCase()">
+                                                        {{row.severity}}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    {{row.startDate}}
+                                                </td>
+
+                                                <td class="text-center">
+                                                    {{row.endDate || '-'}}
+                                                </td>
+
+                                                <td class="text-center fw-bold">
+                                                    {{row.duration}}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                        <tr *ngIf="pagedData.length === 0">
+                                            <td colspan="9" class="text-center py-5 text-muted">No problems found.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <div *ngIf="filteredTableData.length > 0" class="col-12 d-flex justify-content-between p-2 mt-2 shadow-sm rounded border flex-shrink-0"
+                                style="background-color: var(--card-bg-color, white);">
+                                <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                                    {{ (currentPage - 1) * itemsPerPage + 1 }} - {{
+                                    (currentPage * itemsPerPage) > filteredTableData.length ?
+                                    filteredTableData.length : (currentPage * itemsPerPage) }}
+                                    of {{ filteredTableData.length }}
+                                </span>
+                                <nav class="mb-1 mr-1">
+                                    <ul class="pagination justify-content-center align-items-center mb-0"
+                                        style="font-size: small; gap: 0.5rem;">
+                                        <li class="page-item" [class.disabled]="currentPage === 1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                (click)="previousPage()"
+                                                [disabled]="currentPage === 1" tabindex="0">
+                                                &laquo; Previous
+                                            </button>
+                                        </li>
+
+                                        <li class="page-item d-flex align-items-center">
+                                            <input type="number" class="form-control form-control-sm text-center"
+                                                style="width:60px" [value]="currentPage"
+                                                (keydown.enter)="goToPage(inputPage.value)"
+                                                #inputPage min="1" [max]="totalPages"
+                                                aria-label="Page number input" />
+                                            <span class="ms-2"> of {{ totalPages }}</span>
+                                        </li>
+
+                                        <li class="page-item"
+                                            [class.disabled]="currentPage === totalPages">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                (click)="nextPage()"
+                                                [disabled]="currentPage === totalPages" tabindex="0">
+                                                Next &raquo;
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SIDEBAR DIV -->
+        <div class="col-2">
+            <div id="list-example" class="list-group pt-2" style="position: fixed; right: 16px;">
+                <ng-container *ngFor="let section of sections">
+                    <ng-container>
+                        <a class="HoverColor list-group-item sm-font  rounded-0 py-1"
+                            [ngClass]="{'active-parent': activeParentSection === section.id}" href="#"
+                            (click)="scrollTo($event, section.id)" style="font-weight: 500;">
+                            {{ section.title }}
+                        </a>
+
+                        <ng-container *ngIf="section.children && section.children.length > 0">
+                            <ng-container *ngFor="let child of section.children">
+
+                                <ng-container>
+                                    <a class="HoverColor list-group-item ps-4 py-1 heading-style"
+                                        style="font-size: small;" [ngClass]="{
+                                 'active-child': activeSection === child.id,
+                                 'bold-parent-child': activeChildParentBold === child.id
+                               }" href="#" (click)="scrollTo($event, child.id)">
+                                        <i class="fa-solid fa-circle-dot mx-1"
+                                            style="font-size: 7px; background-color: var(--custom-bg-color);"></i>
+                                        {{ child.title }}
+                                    </a>
+
+                                    <ng-container *ngIf="child.children && child.children.length > 0">
+                                        <a *ngFor="let grand of child.children"
+                                            class="HoverColor list-group-item ps-5 py-1" style="font-size: smaller;"
+                                            [ngClass]="{'active-child': activeSection === grand.id}" href="#"
+                                            (click)="scrollTo($event, grand.id)">
+                                            <i class="fa-solid fa-circle-dot mx-2"
+                                                style="font-size: 7px; background-color: var(--custom-bg-color);"></i>
+                                            {{ grand.title }}
+                                        </a>
+                                    </ng-container>
+
+                                </ng-container>
+
+                            </ng-container>
+                        </ng-container>
+
+                    </ng-container>
+                </ng-container>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-container">
+        <div class="modal-header" *ngIf="isRcaResponseAvailable">
+            <h5>Problem Details</h5>
+            <button class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+
+            <div *ngIf="isRcaResponseAvailable && isTraceIdInRcaAvailable">
+                <div class="rca-container">
+                    <h3 class="text-primary mb-3">Root Cause Analysis Details</h3>
+
+                    <!-- Summary -->
+                    <div class="rca-section mb-4" *ngIf="relevantData.summary.length">
+                        <h5 class="rca-title">🧩 Summary</h5>
+                        <ul class="list-group">
+                            <li *ngFor="let item of relevantData.summary" class="list-group-item"
+                                style="font-size: small;">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Technical Analysis -->
+                    <div class="rca-section mb-4" *ngIf="relevantData.technicalAnalysis.length">
+                        <h5 class="rca-title">⚙️ Technical Analysis</h5>
+                        <ul class="list-group">
+                            <li *ngFor="let item of relevantData.technicalAnalysis" class="list-group-item"
+                                style="font-size: small;">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Impacted Components -->
+                    <div class="rca-section mb-4" *ngIf="relevantData.impactedComponents.length">
+                        <h5 class="rca-title">💥 Impacted Components</h5>
+                        <ul class="list-group">
+                            <li *ngFor="let item of relevantData.impactedComponents" class="list-group-item"
+                                style="font-size: small;">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="rca-section" *ngIf="relevantData.recommendations.length">
+                        <h5 class="rca-title">💡 Recommendations</h5>
+                        <ul class="list-group">
+                            <li *ngFor="let item of relevantData.recommendations" class="list-group-item"
+                                style="font-size: small;">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="alert-card" *ngIf="withoutRca && alertDetails">
+                <div class="alert-header">
+                    <div class="alert-title">
+                        <span class="alert-id">Alert ID: {{alertDetails.alertId}}</span>
+                        <h2>{{alertDetails.alertName}}</h2>
+                    </div>
+                    <span class="alert-app">{{alertDetails.application}}</span>
+                </div>
+
+                <div class="alert-section">
+                    <h3>Monitoring Period</h3>
+                    <div class="alert-row">
+                        <span>Start Time:</span>
+                        <strong>{{alertDetails.startTime}}</strong>
+                    </div>
+                    <div class="alert-row">
+                        <span>End Time:</span>
+                        <strong>{{alertDetails.endTime}}</strong>
+                    </div>
+                </div>
+
+                <div class="alert-section">
+                    <h3>Monitored Metric</h3>
+                    <p>{{alertDetails.metric}}</p>
+                </div>
+
+                <div class="alert-section">
+                    <h3>Thresholds</h3>
+                    <div class="alert-row">
+                        <span>Warning Threshold:</span>
+                        <strong>{{alertDetails.warning}}</strong>
+                    </div>
+                    <div class="alert-row">
+                        <span>Critical Threshold:</span>
+                        <strong>{{alertDetails.critical}}</strong>
+                    </div>
+                </div>
+
+                <div class="alert-section">
+                    <h3>Alert Trigger Frequency</h3>
+                    <p>{{alertDetails.frequency}}</p>
+                </div>
+            </div>
+
+
+            <div *ngIf="!isRcaResponseAvailable && !withoutRca">
+                <span style="text-align: center; justify-content: center; color: gray;"> No Data Available</span>
+            </div>
+
+            <div *ngIf="!isTraceIdInRcaAvailable && isRcaResponseAvailable">
+                <span style="text-align: center; justify-content: center; color: gray;"> No Trace Id Available in
+                    RCA</span>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-primary" (click)="closeModal()">Close</button>
+        </div>
+    </div>
+</div>

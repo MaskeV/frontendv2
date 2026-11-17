@@ -1,0 +1,169 @@
+<div class="dashboard-container">
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content" [style.margin-right.px]="isSidebarOpen ? sidebarWidth : 0">
+
+    <div class="logs-dashboard">
+      <!-- ===== HISTOGRAM ===== -->
+      <div class="card">
+        <!-- <div class="card-title">Logs Chart</div> -->
+        <highcharts-chart *ngIf="logsChartOptions" [Highcharts]="Highcharts" [options]="logsChartOptions"
+          class="chart-full">
+        </highcharts-chart>
+        <div *ngIf="!logsChartOptions" class="no-data">
+          No logs data available
+        </div>
+      </div>
+
+      <!-- ===== FILTERS & SEARCH ===== -->
+      <div class="filters-container card">
+
+        <!-- HEADER -->
+        <div class="filter-header">
+          <h4 class="filter-title">Search & Filters</h4>
+
+          <div class="header-actions">
+            <button (click)="addFilter()" class="btn-secondary">
+              + Add Filter
+            </button>
+            <button (click)="applyFilters()" class="btn-primary">
+              Apply
+            </button>
+          </div>
+        </div>
+
+        <!-- FILTER ROWS -->
+        <div class="filter-row" *ngFor="let filter of filters; let i = index">
+
+          <!-- LEFT INPUTS -->
+          <div class="filter-input-group">
+            <input type="text" placeholder="Key (e.g. log.level)" [(ngModel)]="filter.key" class="filter-input">
+
+            <input type="text" placeholder="Value (e.g. warn)" [(ngModel)]="filter.value" class="filter-input">
+          </div>
+
+          <!-- RIGHT CLOSE -->
+          <button class="btn-remove" title="Remove filter" (click)="removeFilter(i)">
+            ✕
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ================= DOCUMENTS TABLE ================= -->
+      <div class="card logs-table">
+
+        <div class="table-head">
+          <div></div>
+          <div>&#64;timestamp</div>
+          <div>Level</div>
+          <div>Summary</div>
+        </div>
+
+        <div *ngIf="logs.length === 0" class="no-logs">
+          No logs found.
+        </div>
+
+        <div class="table-row" *ngFor="let log of logs" (click)="toggleRow(log)" [class.selected]="selectedLog === log">
+
+          <div class="expand-icon-wrapper" [class.open]="selectedLog === log">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h6v6"></path>
+              <path d="M14 10l7-7"></path>
+              <path d="M9 21H3v-6"></path>
+              <path d="M10 14l-7 7"></path>
+            </svg>
+          </div>
+          <div class="timestamp">{{ log['@timestamp'] | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+          <div class="log-level">
+            <!-- If level exists and is not '-', show pill -->
+            <span *ngIf="log['log.level'] && log['log.level'] !== '-'"
+              class="metric-pill"
+              [ngClass]="{
+                'pill-warn': log['log.level'] === 'warn' || log['log.level'] === 'warning',
+                'pill-error': log['log.level'] === 'error' || log['log.level'] === 'err',
+                'pill-info': log['log.level'] !== 'warn' && log['log.level'] !== 'warning' && log['log.level'] !== 'error' && log['log.level'] !== 'err'
+              }">
+              {{ log['log.level'] }}
+            </span>
+            <!-- Else show plain dash -->
+            <span *ngIf="!log['log.level'] || log['log.level'] === '-'">-</span>
+          </div>
+          <div class="summary-text">{{ log.message }}</div>
+        </div>
+      </div>
+
+      <!-- ================= PAGINATION ================= -->
+      <div class="pagination-controls">
+        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" class="btn-page">Previous</button>
+        <span class="page-info">Page {{ currentPage }} of {{ Math.ceil(totalHits / pageSize) }} (Total Hits: {{
+          totalHits }})</span>
+        <button (click)="changePage(currentPage + 1)" [disabled]="(currentPage * pageSize) >= totalHits"
+          class="btn-page">Next</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar-container" *ngIf="isSidebarOpen" [style.width.px]="sidebarWidth">
+
+    <div class="resizer" (mousedown)="startResize($event)"></div>
+
+    <div class="sidebar-content">
+      <div class="sidebar-header">
+        <div class="sidebar-tabs">
+          <div class="sidebar-tab" [class.active]="sidebarTab === 'table'" (click)="switchSidebarTab('table')">
+            Table
+          </div>
+          <div class="sidebar-tab" [class.active]="sidebarTab === 'json'" (click)="switchSidebarTab('json')">
+            JSON
+          </div>
+        </div>
+        <button class="close-btn" (click)="closeSidebar()">×</button>
+      </div>
+
+      <div class="sidebar-body">
+
+        <!-- TABLE TAB -->
+        <div *ngIf="sidebarTab === 'table'" class="sidebar-table-view">
+
+          <div class="field-search">
+            <input type="text" placeholder="Search field names or values" [(ngModel)]="fieldSearch"
+              (ngModelChange)="onFieldSearchChange()">
+          </div>
+
+          <div class="field-table">
+            <div class="field-row header">
+              <div class="field-key">Field</div>
+              <div class="field-value">Value</div>
+            </div>
+
+            <div class="field-row" *ngFor="let field of displayedFields">
+              <div class="field-key" title="{{field.key}}">{{ field.key }}</div>
+              <div class="field-value" title="{{field.value}}">{{ field.value }}</div>
+            </div>
+          </div>
+
+          <div class="pagination-controls">
+            <button (click)="changeFieldPage(fieldPage - 1)" [disabled]="fieldPage === 1" class="btn-download">Previous</button>
+            <span>{{ fieldPage }} / {{ Math.ceil(totalFields / fieldPageSize) || 1 }}</span>
+            <button (click)="changeFieldPage(fieldPage + 1)"
+              [disabled]="fieldPage * fieldPageSize >= totalFields" class="btn-download">Next</button>
+          </div>
+
+        </div>
+
+        <!-- JSON TAB -->
+        <div *ngIf="sidebarTab === 'json'" class="sidebar-json-view">
+          <pre [innerHTML]="getFormattedLog()"></pre>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

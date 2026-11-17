@@ -1,0 +1,749 @@
+<div class="app-shell">
+  <div class="body-wrap">
+    <div class="content">
+      <!-- Tabs and Breadcrumb Header -->
+      <app-kubernetes-tab-header activeTab="node" [selectedCluster]="selectedCluster"></app-kubernetes-tab-header>
+
+      <!-- KPI Summary Cards (5 Cards) -->
+      <!-- KPI Summary Cards (5 Cards Matching Cluster Overview) -->
+      <div class="summary-grid">
+
+        <!-- Card 1: Total Nodes -->
+        <div class="summary-card donut-card">
+          <div class="tile-main-content">
+            <div class="tile-left">
+              <div class="tile-icon-box bg-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="4" rx="1.5"></rect>
+                  <rect x="2" y="10" width="20" height="4" rx="1.5"></rect>
+                  <rect x="2" y="16" width="20" height="4" rx="1.5"></rect>
+                  <circle cx="6" cy="6" r="0.8" fill="#2563eb"></circle>
+                  <circle cx="6" cy="12" r="0.8" fill="#2563eb"></circle>
+                  <circle cx="6" cy="18" r="0.8" fill="#2563eb"></circle>
+                </svg>
+              </div>
+              <div class="tile-info">
+                <span class="tile-title">Nodes</span>
+                <span class="tile-value">{{ totalNodes }}</span>
+                <span class="tile-sub">Total Nodes</span>
+              </div>
+            </div>
+            <div class="tile-bottom-left">
+              <div class="tile-dots">
+                <span class="dot-item"><span class="dot green"></span>{{ healthyNodes }} Ready</span>
+                <span class="dot-item"><span class="dot red"></span>{{ nodesWithIssues }} Issues</span>
+              </div>
+              <div class="tile-bar-track">
+                <div class="tile-bar-fill green" [style.width.%]="healthyNodesPct"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tile-donut-wrap">
+            <div class="tile-donut">
+              <svg viewBox="0 0 36 36">
+                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                <circle class="donut-fill green" cx="18" cy="18" r="15.9155"
+                  [attr.stroke-dasharray]="healthyNodesPct + ' 100'"></circle>
+              </svg>
+              <span class="donut-text">{{ healthyNodesPct.toFixed(0) }}%</span>
+            </div>
+            <span class="donut-sub">Ready</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Healthy Nodes -->
+        <div class="summary-card donut-card">
+          <div class="tile-main-content">
+            <div class="tile-left">
+              <div class="tile-icon-box bg-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path
+                    d="M12 8a2.3 2.3 0 0 0-3.3 0 2.3 2.3 0 0 0 0 3.3l3.3 3.3 3.3-3.3a2.3 2.3 0 0 0 0-3.3 2.3 2.3 0 0 0-3.3 0z">
+                  </path>
+                </svg>
+              </div>
+              <div class="tile-info">
+                <span class="tile-title">Healthy</span>
+                <span class="tile-value">{{ healthyNodes }}</span>
+                <span class="tile-sub">{{ healthyNodesPct }}% of total</span>
+              </div>
+            </div>
+            <div class="tile-bottom-left">
+              <div class="tile-dots">
+                <span class="dot-item"><span class="dot green"></span>{{ healthyNodes }} Passing</span>
+                <span class="dot-item"><span class="dot gray"></span>{{ totalNodes - healthyNodes }} NotReady</span>
+              </div>
+              <div class="tile-bar-track">
+                <div class="tile-bar-fill green" [style.width.%]="healthyNodesPct"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tile-donut-wrap">
+            <div class="tile-donut">
+              <svg viewBox="0 0 36 36">
+                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                <circle class="donut-fill green" cx="18" cy="18" r="15.9155"
+                  [attr.stroke-dasharray]="healthyNodesPct + ' 100'"></circle>
+              </svg>
+              <span class="donut-text">{{ healthyNodesPct.toFixed(0) }}%</span>
+            </div>
+            <span class="donut-sub">Healthy</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Nodes with Issues -->
+        <div class="summary-card donut-card">
+          <div class="tile-main-content">
+            <div class="tile-left">
+              <div class="tile-icon-box bg-orange">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                  </path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <circle cx="12" cy="17" r="0.8" fill="#ea580c"></circle>
+                </svg>
+              </div>
+              <div class="tile-info">
+                <span class="tile-title">Issues</span>
+                <span class="tile-value" style="color: #ef4444">{{ nodesWithIssues }}</span>
+                <span class="tile-sub">{{ nodesWithIssuesPct }}% of total</span>
+              </div>
+            </div>
+            <div class="tile-bottom-left">
+              <div class="tile-dots">
+                <span class="dot-item"><span class="dot red"></span>1 NotReady</span>
+                <span class="dot-item"><span class="dot yellow"></span>1 Unknown</span>
+              </div>
+              <div class="tile-bar-track">
+                <div class="tile-bar-fill orange" [style.width.%]="nodesWithIssuesPct"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tile-donut-wrap">
+            <div class="tile-donut">
+              <svg viewBox="0 0 36 36">
+                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                <circle class="donut-fill orange" cx="18" cy="18" r="15.9155"
+                  [attr.stroke-dasharray]="nodesWithIssuesPct + ' 100'"></circle>
+              </svg>
+              <span class="donut-text">{{ nodesWithIssuesPct.toFixed(0) }}%</span>
+            </div>
+            <span class="donut-sub">Warning</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Total Pods -->
+        <div class="summary-card donut-card">
+          <div class="tile-main-content">
+            <div class="tile-left">
+              <div class="tile-icon-box bg-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                  </path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <div class="tile-info">
+                <span class="tile-title">Total Pods</span>
+                <span class="tile-value">{{ totalPods }}</span>
+                <span class="tile-sub">Across all nodes</span>
+              </div>
+            </div>
+            <div class="tile-bottom-left">
+              <div class="tile-dots">
+                <span class="dot-item"><span class="dot green"></span>{{ podsRunning }} Running</span>
+                <span class="dot-item"><span class="dot red"></span>{{ podsFailed }} Failed</span>
+              </div>
+              <div class="tile-bar-track">
+                <div class="tile-bar-fill purple" style="width: 95%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tile-donut-wrap">
+            <div class="tile-donut">
+              <svg viewBox="0 0 36 36">
+                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                <circle class="donut-fill purple" cx="18" cy="18" r="15.9155" stroke-dasharray="95 100"></circle>
+              </svg>
+              <span class="donut-text">95%</span>
+            </div>
+            <span class="donut-sub">Running</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Pod Capacity -->
+        <div class="summary-card donut-card">
+          <div class="tile-main-content">
+            <div class="tile-left">
+              <div class="tile-icon-box bg-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                  <path d="M21 5v6c0 1.66-4 3-9 3s-9-1.34-9-3V5"></path>
+                  <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"></path>
+                </svg>
+              </div>
+              <div class="tile-info">
+                <span class="tile-title">Pod Capacity</span>
+                <span class="tile-value">{{ podCapacity }}</span>
+                <span class="tile-sub">{{ podCapacityUtilizedPct }}% utilized</span>
+              </div>
+            </div>
+            <div class="tile-bottom-left">
+              <div class="tile-dots">
+                <span class="dot-item"><span class="dot blue"></span>{{ totalPods }} Used</span>
+                <span class="dot-item"><span class="dot gray"></span>{{ podCapacity - totalPods }} Free</span>
+              </div>
+              <div class="tile-bar-track">
+                <div class="tile-bar-fill blue" [style.width.%]="podCapacityUtilizedPct"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tile-donut-wrap">
+            <div class="tile-donut">
+              <svg viewBox="0 0 36 36">
+                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                <circle class="donut-fill blue" cx="18" cy="18" r="15.9155"
+                  [attr.stroke-dasharray]="podCapacityUtilizedPct + ' 100'"></circle>
+              </svg>
+              <span class="donut-text">{{ podCapacityUtilizedPct.toFixed(0) }}%</span>
+            </div>
+            <span class="donut-sub">Utilized</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resource Analysis Section (Cluster Nodes Resource Usage) -->
+      <section class="panel-card resource-analysis-section">
+        <div class="resource-header">
+          <div class="resource-header-left">
+            <h2 class="resource-title">Resource analysis</h2>
+            <p class="resource-subtitle">Cluster nodes resource usage (as % of allocatable).</p>
+          </div>
+          <div class="resource-header-actions">
+            <button class="action-btn-pill" type="button" aria-label="Collapse section"
+              (click)="toggleResourceCollapsed()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"
+                [style.transform]="resourceCollapsed ? 'rotate(180deg)' : 'none'"
+                style="transition: transform 0.25s ease;">
+                <polyline points="18 15 12 9 6 15" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="resource-charts-grid" *ngIf="!resourceCollapsed">
+          <!-- Left Chart: CPU Usage -->
+          <div class="analysis-chart-card">
+            <div class="analysis-chart-header">
+              <div class="chart-header-title">
+                <div class="chart-type-icon bg-blue-subtle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <rect x="9" y="9" width="6" height="6" />
+                    <line x1="9" y1="1" x2="9" y2="4" />
+                    <line x1="15" y1="1" x2="15" y2="4" />
+                    <line x1="9" y1="20" x2="9" y2="23" />
+                    <line x1="15" y1="20" x2="15" y2="23" />
+                    <line x1="20" y1="9" x2="23" y2="9" />
+                    <line x1="20" y1="14" x2="23" y2="14" />
+                    <line x1="1" y1="9" x2="4" y2="9" />
+                    <line x1="1" y1="14" x2="4" y2="14" />
+                  </svg>
+                </div>
+                <span>CPU Usage (% of allocatable)</span>
+              </div>
+            </div>
+
+            <!-- SVG Chart Area (Interactive Hover) -->
+            <div class="svg-chart-wrapper" (mousemove)="onChartMouseMove($event, 'cpu')"
+              (mouseleave)="onChartMouseLeave()">
+
+              <!-- Tooltip Box (Animated: Only appears on graph hover) -->
+              <div class="chart-tooltip-box cpu-tooltip-pos" [class.visible]="cpuHovered"
+                [style.left.%]="cpuTooltipLeft" *ngIf="cpuHovered">
+                <div class="tooltip-time-header">{{ cpuHoverTime }}</div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-sky"></span>
+                  <span class="tooltip-metric">CPU usage (% of allocatable)</span>
+                  <span class="tooltip-value">{{ cpuHoverUsage }} %</span>
+                </div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-purple"></span>
+                  <span class="tooltip-metric">CPU requests (% of allocatable)</span>
+                  <span class="tooltip-value">{{ cpuRequestsPctVal }} %</span>
+                </div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-blue"></span>
+                  <span class="tooltip-metric">CPU limits (% of allocatable)</span>
+                  <span class="tooltip-value">{{ cpuLimitsPct }} %</span>
+                </div>
+              </div>
+
+              <svg class="chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="cpuAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3" />
+                    <stop offset="60%" stop-color="#38bdf8" stop-opacity="0.12" />
+                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.01" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Y Axis Grid lines -->
+                <line x1="52" y1="20" x2="525" y2="20" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="61.7" x2="525" y2="61.7" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="103.3" x2="525" y2="103.3" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="145" x2="525" y2="145" stroke="#e2e8f0" stroke-width="1" />
+
+                <!-- Y Axis Labels -->
+                <text x="44" y="24" text-anchor="end" class="chart-axis-label">360 %</text>
+                <text x="44" y="65" text-anchor="end" class="chart-axis-label">240 %</text>
+                <text x="44" y="107" text-anchor="end" class="chart-axis-label">120 %</text>
+                <text x="44" y="148" text-anchor="end" class="chart-axis-label">0 %</text>
+
+                <!-- CPU Limits Reference Line (Dashed Blue at 309%) -->
+                <line x1="52" [attr.y1]="cpuLimitsY" x2="525" [attr.y2]="cpuLimitsY" stroke="#3b82f6"
+                  stroke-dasharray="6 4" stroke-width="1.6" />
+
+                <!-- CPU Requests Reference Line (Dashed Purple at 87.7%) -->
+                <line x1="52" [attr.y1]="cpuRequestsY" x2="525" [attr.y2]="cpuRequestsY" stroke="#a855f7"
+                  stroke-dasharray="6 4" stroke-width="1.6" />
+
+                <!-- Area fill under curve -->
+                <path [attr.d]="cpuAreaPath" fill="url(#cpuAreaGradient)" />
+
+                <!-- Wave line -->
+                <path [attr.d]="cpuLinePath" fill="none" stroke="#0284c7" stroke-width="2" class="chart-wave-path" />
+
+                <!-- Vertical guide line (Animated: only on hover) -->
+                <line *ngIf="cpuHovered" class="chart-guide-line" [class.visible]="cpuHovered"
+                  [attr.x1]="cpuHoverCursorX" y1="20" [attr.x2]="cpuHoverCursorX" y2="145" stroke="#38bdf8"
+                  stroke-dasharray="4 3" stroke-width="1.5" />
+
+                <!-- Active points on vertical line (Animated: only on hover) -->
+                <circle *ngIf="cpuHovered" class="chart-active-dot" [class.visible]="cpuHovered"
+                  [attr.cx]="cpuHoverCursorX" [attr.cy]="cpuLimitsY" r="4.5" fill="#3b82f6" stroke="#ffffff"
+                  stroke-width="1.5" />
+                <circle *ngIf="cpuHovered" class="chart-active-dot" [class.visible]="cpuHovered"
+                  [attr.cx]="cpuHoverCursorX" [attr.cy]="cpuRequestsY" r="4.5" fill="#a855f7" stroke="#ffffff"
+                  stroke-width="1.5" />
+                <circle *ngIf="cpuHovered" class="chart-active-dot pulse-dot" [class.visible]="cpuHovered"
+                  [attr.cx]="cpuHoverCursorX" [attr.cy]="cpuHoverUsageY" r="5" fill="#0ea5e9" stroke="#ffffff"
+                  stroke-width="2" />
+              </svg>
+
+              <!-- X Axis Labels -->
+              <div class="chart-x-labels-row">
+                <span *ngFor="let t of resourceTimeLabels">{{ t }}</span>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="chart-legend-row">
+              <div class="legend-item">
+                <span class="legend-diamond bg-sky"></span>
+                <span class="legend-label">CPU usage (% of allocatable)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dash border-purple"></span>
+                <span class="legend-label">CPU requests (% of allocatable)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dash border-blue"></span>
+                <span class="legend-label">CPU limits (% of allocatable)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Chart: Memory Usage -->
+          <div class="analysis-chart-card">
+            <div class="analysis-chart-header">
+              <div class="chart-header-title">
+                <div class="chart-type-icon bg-blue-subtle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                    <line x1="12" y1="18" x2="12.01" y2="18" />
+                  </svg>
+                </div>
+                <span>Memory Usage (% of allocatable)</span>
+              </div>
+            </div>
+
+            <!-- SVG Chart Area (Interactive Hover) -->
+            <div class="svg-chart-wrapper" (mousemove)="onChartMouseMove($event, 'mem')"
+              (mouseleave)="onChartMouseLeave()">
+
+              <!-- Tooltip Box (Animated: Only appears on graph hover) -->
+              <div class="chart-tooltip-box mem-tooltip-pos" [class.visible]="memHovered"
+                [style.left.%]="memTooltipLeft" *ngIf="memHovered">
+                <div class="tooltip-time-header">{{ memHoverTime }}</div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-green"></span>
+                  <span class="tooltip-metric">Memory usage (% of allocatable)</span>
+                  <span class="tooltip-value">{{ memHoverUsage }} %</span>
+                </div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-purple"></span>
+                  <span class="tooltip-metric">Memory requests (% of allocatable)</span>
+                  <span class="tooltip-value">{{ memRequestsPctVal }} %</span>
+                </div>
+                <div class="tooltip-row">
+                  <span class="tooltip-dot bg-blue"></span>
+                  <span class="tooltip-metric">Memory limits (% of allocatable)</span>
+                  <span class="tooltip-value">{{ memLimitsPct }} %</span>
+                </div>
+              </div>
+
+              <svg class="chart-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="memAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#22c55e" stop-opacity="0.25" />
+                    <stop offset="60%" stop-color="#22c55e" stop-opacity="0.1" />
+                    <stop offset="100%" stop-color="#22c55e" stop-opacity="0.01" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Y Axis Grid lines -->
+                <line x1="52" y1="20" x2="525" y2="20" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="61.7" x2="525" y2="61.7" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="103.3" x2="525" y2="103.3" stroke="#f1f5f9" stroke-width="1" />
+                <line x1="52" y1="145" x2="525" y2="145" stroke="#e2e8f0" stroke-width="1" />
+
+                <!-- Y Axis Labels -->
+                <text x="44" y="24" text-anchor="end" class="chart-axis-label">180 %</text>
+                <text x="44" y="65" text-anchor="end" class="chart-axis-label">120 %</text>
+                <text x="44" y="107" text-anchor="end" class="chart-axis-label">60 %</text>
+                <text x="44" y="148" text-anchor="end" class="chart-axis-label">0 %</text>
+
+                <!-- Memory Limits Reference Line (Dashed Blue at 162.3%) -->
+                <line x1="52" [attr.y1]="memLimitsY" x2="525" [attr.y2]="memLimitsY" stroke="#3b82f6"
+                  stroke-dasharray="6 4" stroke-width="1.6" />
+
+                <!-- Memory Requests Reference Line (Dashed Purple at 71.6%) -->
+                <line x1="52" [attr.y1]="memRequestsY" x2="525" [attr.y2]="memRequestsY" stroke="#a855f7"
+                  stroke-dasharray="6 4" stroke-width="1.6" />
+
+                <!-- Area fill under curve -->
+                <path [attr.d]="memAreaPath" fill="url(#memAreaGradient)" />
+
+                <!-- Wave line -->
+                <path [attr.d]="memLinePath" fill="none" stroke="#16a34a" stroke-width="2" class="chart-wave-path" />
+
+                <!-- Vertical guide line (Animated: only on hover) -->
+                <line *ngIf="memHovered" class="chart-guide-line" [class.visible]="memHovered"
+                  [attr.x1]="memHoverCursorX" y1="20" [attr.x2]="memHoverCursorX" y2="145" stroke="#38bdf8"
+                  stroke-dasharray="4 3" stroke-width="1.5" />
+
+                <!-- Active points on vertical line (Animated: only on hover) -->
+                <circle *ngIf="memHovered" class="chart-active-dot" [class.visible]="memHovered"
+                  [attr.cx]="memHoverCursorX" [attr.cy]="memLimitsY" r="4.5" fill="#3b82f6" stroke="#ffffff"
+                  stroke-width="1.5" />
+                <circle *ngIf="memHovered" class="chart-active-dot" [class.visible]="memHovered"
+                  [attr.cx]="memHoverCursorX" [attr.cy]="memRequestsY" r="4.5" fill="#a855f7" stroke="#ffffff"
+                  stroke-width="1.5" />
+                <circle *ngIf="memHovered" class="chart-active-dot pulse-green" [class.visible]="memHovered"
+                  [attr.cx]="memHoverCursorX" [attr.cy]="memHoverUsageY" r="5" fill="#22c55e" stroke="#ffffff"
+                  stroke-width="2" />
+              </svg>
+
+              <!-- X Axis Labels -->
+              <div class="chart-x-labels-row">
+                <span *ngFor="let t of resourceTimeLabels">{{ t }}</span>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="chart-legend-row">
+              <div class="legend-item">
+                <span class="legend-dot bg-green"></span>
+                <span class="legend-label">Memory usage (% of allocatable)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dash border-purple"></span>
+                <span class="legend-label">Memory requests (% of allocatable)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dash border-blue"></span>
+                <span class="legend-label">Memory limits (% of allocatable)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Section: Utilization + Node Health -->
+      <section class="middle-panels-section">
+        <!-- Panel 2: Node Health -->
+        <div class="panel-card health-panel">
+          <div class="panel-header">
+            <svg class="panel-title-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <h2 class="panel-title">Node Health</h2>
+          </div>
+
+          <div class="health-panel-body">
+            <!-- 3 Horizontal status cards -->
+            <div class="health-status-row">
+              <div class="health-status-item" *ngFor="let h of nodeHealth">
+                <div class="health-status-header">
+                  <span class="status-dot-indicator" [style.background]="h.color"></span>
+                  <span class="status-header-text">{{ h.label }}</span>
+                </div>
+                <div class="health-status-ratio">
+                  <span class="ratio-bold">{{ h.count }}</span>
+                  <span class="ratio-faint">/ {{ h.total }}</span>
+                </div>
+                <div class="health-status-percentage">{{ h.pct }}%</div>
+              </div>
+            </div>
+
+            <!-- Node Conditions Column -->
+            <div class="conditions-column">
+              <h3 class="conditions-title">Node Conditions</h3>
+              <div class="conditions-items-grid">
+                <div class="condition-row-item" *ngFor="let c of nodeConditions">
+                  <div class="condition-label-group">
+                    <span class="cond-dot-indicator" [ngClass]="conditionDotClass(c.label)"></span>
+                    <span class="cond-label-text">{{ c.label }}</span>
+                  </div>
+                  <span class="cond-count-text">{{ c.ready }} / {{ c.total }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Kubernetes Nodes Table Panel -->
+      <section class="panel-card table-card-section">
+        <div class="table-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg class="table-title-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="6" rx="1.5" />
+              <rect x="2" y="14" width="20" height="6" rx="1.5" />
+              <line x1="6" y1="7" x2="6.01" y2="7" />
+              <line x1="6" y1="17" x2="6.01" y2="17" />
+            </svg>
+            <h2 class="panel-title" style="margin: 0;">Kubernetes Nodes ({{ totalNodes }})</h2>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="k8s-table-search">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Search nodes..." [(ngModel)]="searchTerm"
+                (ngModelChange)="currentPage = 1" />
+            </div>
+
+            <!-- Export Dropdown -->
+            <div class="k8s-export-wrap">
+              <button type="button" class="k8s-export-btn" (click)="toggleExportMenu(); $event.stopPropagation()" title="Download nodes table">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Export</span>
+              </button>
+              <div class="k8s-export-menu" *ngIf="exportMenuOpen" (click)="$event.stopPropagation()">
+                <button type="button" class="k8s-export-item" (click)="exportNodes('xlsx')">
+                  <span class="k8s-export-badge xlsx">XLSX</span>
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" class="k8s-export-item" (click)="exportNodes('csv')">
+                  <span class="k8s-export-badge csv">CSV</span>
+                  <span>Download CSV</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="k8s-nodes-table">
+            <thead>
+              <tr>
+                <th class="th-sortable">
+                  <div class="th-flex">
+                    <span>NODE NAME</span>
+                    <span class="sort-arrows">⇅</span>
+                  </div>
+                </th>
+                <th class="th-filter-col">
+                  <div class="th-flex th-filter-wrap status-filter-wrap">
+                    <span>STATUS</span>
+                    <button type="button" class="th-filter-trigger" [class.active]="statusFilter !== 'All'"
+                      (click)="toggleStatusMenu(); $event.stopPropagation()" title="Filter by status">
+                      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                      </svg>
+                    </button>
+
+                    <div class="th-filter-popup" *ngIf="statusMenuOpen" (click)="$event.stopPropagation()">
+                      <div class="th-filter-option" *ngFor="let opt of statusOptions"
+                        [class.selected]="statusFilter === opt" (click)="setStatusFilter(opt)">
+                        <span class="th-filter-check">
+                          <svg *ngIf="statusFilter === opt" viewBox="0 0 24 24" width="12" height="12" fill="none"
+                            stroke="currentColor" stroke-width="3">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        </span>
+                        <span class="th-filter-label">{{ opt }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </th>
+                <th class="th-sortable">
+                  <div class="th-flex">
+                    <span>ROLE</span>
+                    <span class="sort-arrows">⇅</span>
+                  </div>
+                </th>
+                <th class="th-sortable">
+                  <div class="th-flex">
+                    <span>KUBERNETES VERSION</span>
+                    <span class="sort-arrows">⇅</span>
+                  </div>
+                </th>
+                <th class="th-sortable">
+                  <div class="th-flex">
+                    <span>PODS</span>
+                    <span class="sort-arrows">⇅</span>
+                  </div>
+                </th>
+                <th>CPU USAGE</th>
+                <th>MEMORY USAGE</th>
+                <th>CPU REQUESTS</th>
+                <th>MEMORY REQUESTS</th>
+                <th>CONDITIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let n of pagedNodes" class="table-row">
+                <!-- Node Name -->
+                <td class="cell-node-name">
+                  <span class="name-link" (click)="onNodeClick(n)">{{ n.name }}</span>
+                </td>
+
+                <!-- Status -->
+                <td class="cell-status">
+                  <span class="status-badge" [ngClass]="statusPillClass(n.status)">
+                    <span class="badge-dot" [ngClass]="statusDotClass(n.status)"></span>
+                    <span class="badge-text">{{ n.status }}</span>
+                  </span>
+                </td>
+
+                <!-- Role -->
+                <td class="cell-role">{{ n.role }}</td>
+
+                <!-- Kubernetes Version -->
+                <td class="cell-version">{{ n.version }}</td>
+
+                <!-- Pods -->
+                <td class="cell-pods">{{ n.podsUsed }} / {{ n.podsTotal }}</td>
+
+                <!-- CPU Usage -->
+                <td class="cell-metric-bar">
+                  <div class="metric-bar-wrapper">
+                    <div class="metric-track">
+                      <div class="metric-fill" [style.width.%]="n.cpuUsage"
+                        [style.background]="cpuUsageBarColor(n.cpuUsage)">
+                      </div>
+                    </div>
+                    <span class="metric-pct-label">{{ n.cpuUsage }}%</span>
+                  </div>
+                </td>
+
+                <!-- Memory Usage -->
+                <td class="cell-metric-bar">
+                  <div class="metric-bar-wrapper">
+                    <div class="metric-track">
+                      <div class="metric-fill" [style.width.%]="n.memoryUsage"
+                        [style.background]="memoryUsageBarColor(n.memoryUsage)">
+                      </div>
+                    </div>
+                    <span class="metric-pct-label">{{ n.memoryUsage }}%</span>
+                  </div>
+                </td>
+
+                <!-- CPU Requests -->
+                <td class="cell-metric-bar">
+                  <div class="metric-bar-wrapper">
+                    <div class="metric-track">
+                      <div class="metric-fill" [style.width.%]="n.cpuRequests"
+                        [style.background]="cpuRequestsBarColor(n.cpuRequests)">
+                      </div>
+                    </div>
+                    <span class="metric-pct-label">{{ n.cpuRequests }}%</span>
+                  </div>
+                </td>
+
+                <!-- Memory Requests -->
+                <td class="cell-metric-bar">
+                  <div class="metric-bar-wrapper">
+                    <div class="metric-track">
+                      <div class="metric-fill" [style.width.%]="n.memoryRequests"
+                        [style.background]="memoryRequestsBarColor(n.memoryRequests)">
+                      </div>
+                    </div>
+                    <span class="metric-pct-label">{{ n.memoryRequests }}%</span>
+                  </div>
+                </td>
+
+                <!-- Conditions -->
+                <td class="cell-condition">
+                  <div class="condition-flex">
+                    <span class="cond-dot-small" [ngClass]="conditionDotClass(n.condition)"></span>
+                    <span class="cond-title">{{ n.condition }}</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Pagination Footer (Identical to Cluster Overview) -->
+        <div class="mrum-pagination-container">
+          <div class="mrum-showing-text">
+            Showing {{ startIndex }} to {{ endIndex }} of {{ filteredNodes.length }} nodes
+          </div>
+          <div class="mrum-pagination-controls">
+            <div class="mrum-per-page">
+              <input type="number" min="1" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange()" />
+              <span>per page</span>
+            </div>
+            <div class="mrum-pager">
+              <button class="mrum-pager-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <button class="mrum-pager-btn" *ngFor="let page of totalPagesArray" [class.active]="currentPage === page"
+                (click)="page !== '...' && goToPage(page)" [disabled]="page === '...'">
+                {{ page }}
+              </button>
+              <button class="mrum-pager-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

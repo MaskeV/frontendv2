@@ -1,0 +1,204 @@
+.container {
+  margin: 0;
+  padding: 0px 2px;
+  width: 100%;
+}
+
+.button-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.card {
+  padding: 0;
+  width: 200px;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  border: 1px solid rgba(7, 7, 7, 0.2);
+  border-radius: 4px;
+  color: black;
+  /* ✅ Text in black */
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.card1 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+.card2 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+
+  border-radius: 4px;
+  color: black;
+  /* ✅ Text in black */
+}
+
+.box1 {
+  background-color: #e0dada45;
+  color: black;
+  /* ✅ Text in black */
+  font-family: 'Poppins';
+  /* border-bottom: 1px solid rgba(161, 35, 35, 0.2); */
+}
+
+.box2 {
+  background-color: white;
+  /* border-top: 1px solid rgba(161, 35, 35, 0.2); */
+  padding: 0px;
+}
+
+.custom-tabs {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: black;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  border-bottom: 1px solid rgba(37, 35, 161, 0.2);
+}
+
+.tab-buttons button {
+  flex: 1;
+  font-size: 11px;
+  padding: 4px 0;
+  background-color: white;
+  color: black;
+  /* ✅ Text in black */
+  border: none;
+  border-bottom: 2px solid rgb(46, 46, 46);
+  ;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 24px;
+}
+
+.tab-buttons button.active {
+  background-color: blue;
+  /* ✅ Red background */
+  color: white;
+  /* ✅ White text on red */
+  border-bottom: 2px solid blue;
+}
+
+.tab-buttons button:hover:not(.active) {
+  background-color: rgba(175, 182, 190, 0.1);
+  color: black;
+}
+
+.tab-content {
+  background-color: white;
+  padding: 5px;
+
+  border-top: none;
+  color: black;
+}
+
+.list-group-item {
+  background-color: white;
+  border-bottom: 1px solid rgb(240, 240, 240);
+  padding: 4px 8px;
+  font-size: 12px;
+  color: black;
+  /* ✅ Black list text */
+
+}
+
+.list-group-item:hover {
+  background-color: rgba(35, 64, 161, 0.1);
+  color: black;
+  cursor: pointer;
+}
+
+
+.apply-btn {
+  padding: 0px 6px;
+  background: #d3d3d3bd;
+  height: 19px;
+
+
+  border-radius: 2px;
+  font-size: 10px;
+}
+
+.apply-btn:hover {
+  color: blue;
+  transform: scale(1.05);
+  transition: all 0.1s ease-in-out;
+  border-radius: 4px;
+
+}
+
+
+.inline-toast-right {
+  background-color: #dcdcdd;
+  color: #4b4848;
+  border: 1px solid #dcdcdd;
+  padding: 2px 3px;
+  border-radius: 1px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  /* gap: 1px; */
+  max-width: 350px;
+  animation: fadeIn 0.3s ease;
+  position: absolute;
+  top: 40%;
+  right: 0;
+  margin-top: 1px;
+  z-index: 10;
+  line-height: normal;
+}
+
+.close-btn {
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sm-font {
+  font-size: small;
+}
+
+.smm-font {
+  font-size: smaller;
+}
+
+.xsm-font {
+  font-size: x-small;
+
+}
+
+button {
+    font-family: 'Noto Sans';
+}
+
+.custom-date{
+  font-size: 1.1em
+
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

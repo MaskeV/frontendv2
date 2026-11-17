@@ -1,0 +1,87 @@
+<!-- Chatbot Toggle Button -->
+<!-- <button class="chatbot-button" id="chatbotToggle" (click)="toggleChatbot()" cdkDrag cdkDragRootElement=".chatbot"
+    cdkDragBoundary="body">
+    <i class="fas fa-comments" cdkDragHandle></i>
+</button> -->
+
+<!-- Chatbot Container -->
+<div class="chatbot" *ngIf="isChatbotVisible" [class.maximized]="isMaximized" cdkDrag cdkDragRootElement=".chatbot"
+    cdkDragBoundary="body">
+    <div class="chatbot-header" cdkDragHandle
+        style="color: white; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 16px 16px 0 0;">
+        <span style="color: white; font-weight: 600; letter-spacing: 0.5px;">Netraa AI Assistant</span>
+        <div class="chatbot-header-button" style="display: flex; gap: 10px;">
+            <button (click)="toggleMaximize()"
+                style="background: transparent; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; justify-content: center; align-items: center;">
+                <i class="fas" [ngClass]="isMaximized ? 'fa-compress' : 'fa-expand'"
+                    style="color: white; font-size: 16px;"></i>
+            </button>
+            <button (click)="closeChat()"
+                style="background: transparent; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; justify-content: center; align-items: center;">
+                <i class="fas fa-times" style="color: white; font-size: 16px;"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <div class="chatbot-body" #chatbotBody>
+        <!-- Initial Bot Message -->
+        <div class="bot-message" style=" min-height: 6vh; font-size: 14px;">
+            <i style="padding-right: 7px; font-size: small;" class="fas fa-comments"></i>Hi there! Select a question
+            below to get
+            started:
+        </div>
+
+        <!-- Dynamic Conversation -->
+        <ng-container *ngFor="let msg of chatMessages" style="font-size: small;">
+            <div *ngIf="msg.type === 'bot'" class="bot-message" [innerHTML]="msg.text"></div>
+            <div *ngIf="msg.type === 'user'" class="user-message" [innerHTML]="msg.text"></div>
+        </ng-container>
+
+        <!-- Dynamic Question List -->
+        <div class="question-list" *ngIf="!showAddButton">
+            <div class="question-row" *ngFor="let q of questions; let i = index">
+                <div class="question-text" style="font-size: small;">
+                    <ng-container *ngFor="let part of q.parts">
+
+                        <!-- NON-VARIABLE TEXT (use innerHTML so <br> renders) -->
+                        <ng-container *ngIf="!part.isVariable">
+                            <span [innerHTML]="getPartHtml(part.text)"></span>
+                          </ng-container>
+
+                        <!-- VARIABLE FIELDS -->
+                        <ng-container *ngIf="part.isVariable">
+                            <span *ngIf="!['input','url','tab','start','end','trace','instance','problemId','day'].includes(part.type!)"
+                                class="variable" [attr.data-type]="part.type" (click)="onVariableClick(i, part, $event)"
+                                #questionVariable>
+                                {{ part.value }}
+                            </span>
+
+                            <input *ngIf="['input','url','tab','start','end','trace','instance','problemId','day'].includes(part.type!)"
+                                type="text" [(ngModel)]="part.value" [placeholder]="part.placeholder" />
+                        </ng-container>
+
+                    </ng-container>
+
+                </div>
+                <button class="send-btn" (click)="onSendClick(i)">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Question Button -->
+    <button class="add-question-btn" *ngIf="showAddButton" (click)="addQuestions()">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+
+<!-- Dropdown for Variables -->
+<div class="variable-dropdown" *ngIf="dropdownVisible" [style.left.px]="dropdownPosition.x"
+    [style.top.px]="dropdownPosition.y" #variableDropdown>
+    <div *ngFor="let option of dropdownOptions" (click)="selectOption(option)" style="font-size: x-small;">
+        {{ option }}
+    </div>
+    <!-- fixed -->
+</div>

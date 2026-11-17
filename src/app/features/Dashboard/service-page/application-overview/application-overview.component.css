@@ -1,0 +1,175 @@
+.tab-content {
+  margin-top: -1%;
+  width: 99.6%;
+  height: 86vh;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+}
+
+.custom-bg {
+  background-color: #F8FAFC;
+}
+
+.text-ellipsis {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.strong {
+  font-weight: 500;
+}
+
+.appDetailsItem{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: small;
+}
+
+/* No Data */
+
+.noData {
+  height: 26vh;
+}
+
+/* Height and Width */
+
+.h-26 {
+  height: 26vh;
+}
+
+.w-33 {
+  width: 33%;
+}
+
+.w-66 {
+  width: 66%;
+}
+
+.w-49{
+  width: 49.5%;
+}
+
+/* Card */
+
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px -3px #0000000d;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  overflow: hidden;
+  padding: 0%;
+}
+
+.card:hover {
+  border-color: #60A5FA !important;
+  box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+.card-header {
+  padding: 7px 6px 3px 7px;
+  border: none;
+  border-radius: 0%;
+  font-size: small;
+  font-weight: 100;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.chart-title {
+  font-weight: 500;
+  color: var(--text-color);
+  background-color: white;
+}
+
+/* Icon */
+
+.gradiantIcon {
+  background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.gradiantIcon2 {
+  background: linear-gradient(to right bottom, #d235e2, #7a5ad5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Side Badge */
+
+.section-header {
+  background-color: var(--custom-card-color);
+  word-wrap: break-word;
+  white-space: break-spaces;
+  text-align: center;
+  font-size: small;
+  font-family: sans-serif;
+  width: 5vw;
+}
+
+.pointers {
+  position: relative;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-left: 18px solid var(--custom-card-color);
+  left: 7px;
+  z-index: 1;
+}
+
+/* Table */
+
+.table-responsive {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.table th {
+  padding: 2px;
+  font-size: x-small;
+  font-family: system-ui;
+  text-align: left;
+}
+
+.table tr {
+  text-align: center;
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table td {
+  text-align: center;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  font-size: x-small;
+  text-align: left;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.table tbody {
+  overflow-y: auto;
+  display: block;
+}
+
+/* Endpoint progress bar */
+
+.bg-normal-bar {
+  background-color: #22c55e !important;
+}
+
+.bg-warning-bar {
+  background-color: #eab308 !important;
+}
+
+.bg-danger-bar {
+  background-color: #ef4444 !important;
+}

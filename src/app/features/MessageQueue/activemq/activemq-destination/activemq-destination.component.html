@@ -1,0 +1,166 @@
+<div class="h-100 overflow-auto" style="background-color: #F8FAFC;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-dark mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img [src]="getImagePath()" class="icons" alt="activemq logo" title="activemq" (error)="onImageError($event)" /><a
+                    routerLink="/activemq" class="text-decoration-none">ActiveMQ-Clusters</a>
+            </li>
+            <li class="breadcrumb-item"><a href="javascript:void(0)" class="text-decoration-none"
+                    routerLink="/activemq/overview">{{clusterName}}</a></li>
+            <li class="breadcrumb-item active">{{destinationName}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-2">
+        <!-- Row 1: Producer, Consumer, Memory -->
+        <div class="row g-2 mb-2">
+            <!-- Producer Count -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Producer Count</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="Number of producers attached to this destination."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="producer-count-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consumer Count -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Consumer Count</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="Number of consumers subscribed to this destination."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="consumer-count-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Usage -->
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Memory Usage</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle me-2" style="cursor: pointer;" title="Info"
+                                matTooltip="Memory used by undelivered messages in bytes."
+                                matTooltipPosition="above"></i>
+                            <i class="fa fa-ellipsis-v" style="cursor: pointer;" title="Options"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="memory-usage-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Queue Size, Message Count -->
+        <div class="row g-2 mb-2">
+            <!-- Queue Size -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Queue Size</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="The number of messages that have not been acknowledged by a consumer."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="queue-size-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Count -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Message Count</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="The count of enqueue/dequeue/dispatch/expired/inflignt messages."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="message-count-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Avg Enqueue Time, Max Enqueue Time -->
+        <div class="row g-2">
+            <!-- Avg Enqueue Time -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Average Enqueue Time(s)</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="The average time a message was held on this destination."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="avg-enqueue-time-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Max Enqueue Time -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm border rounded-3 h-100 overflow-hidden">
+                    <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="small fw-semibold text-secondary">Max Enqueue Time(s)</span>
+                        <div class="text-secondary">
+                            <i class="fa fa-info-circle" style="cursor: pointer;" title="Info"
+                                matTooltip="The max time a message was held on this destination."
+                                matTooltipPosition="above"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="chart-wrapper-sm">
+                            <div id="max-enqueue-time-chart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

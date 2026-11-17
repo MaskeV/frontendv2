@@ -1,0 +1,786 @@
+<!-- Reusable: green check (status) -->
+<ng-template #ok>
+    <svg class="ok" viewBox="0 0 16 16">
+        <circle cx="8" cy="8" r="8" />
+        <path d="M4.5 8.2l2.4 2.3 4.6-4.8" />
+    </svg>
+</ng-template>
+
+<!-- Reusable: line chart card -->
+<ng-template #lineChart let-c>
+    <div class="chart-card">
+        <div class="cc-head">
+            <span class="cc-title">
+                <svg class="ic" [style.color]="c.color" viewBox="0 0 24 24">
+                    <path [attr.d]="icons[c.icon]" />
+                </svg>
+                {{ c.title }}
+            </span>
+        </div>
+        <div class="lc">
+            <div class="lc-y"><span *ngFor="let y of c.y">{{ y }}</span></div>
+            <div class="lc-plot" (mousemove)="onChartMouseMove($event, c)" (mouseleave)="onChartMouseLeave(c)">
+
+                <!-- Tooltip Box (Animated: appears on graph hover) -->
+                <div class="chart-tooltip-box" [class.visible]="c.hovered" [style.left.%]="c.tooltipLeft"
+                    [style.border-color]="c.color || '#38bdf8'" *ngIf="c.hovered">
+                    <div class="tooltip-time-header">{{ c.hoverTime }}</div>
+                    <div class="tooltip-row" *ngFor="let s of c.series">
+                        <span class="tooltip-dot" [style.background]="s.color"></span>
+                        <span class="tooltip-metric">{{ s.name }}</span>
+                        <span class="tooltip-value">{{ s.hoverVal }}{{ c.unit ? ' ' + c.unit : '' }}</span>
+                    </div>
+                </div>
+
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <line *ngFor="let g of gridLines" x1="0" x2="100" [attr.y1]="g" [attr.y2]="g" class="grid"
+                        vector-effect="non-scaling-stroke" />
+                    <ng-container *ngFor="let s of c.series">
+                        <path *ngIf="s.areaD" [attr.d]="s.areaD" [attr.fill]="s.color" fill-opacity="0.14" />
+                        <path [attr.d]="s.d" fill="none" [attr.stroke]="s.color"
+                            [attr.stroke-dasharray]="s.dashed ? '6 4' : null" stroke-width="1.4"
+                            vector-effect="non-scaling-stroke" />
+                    </ng-container>
+
+                    <!-- Vertical guide line (Animated: only on hover) -->
+                    <line *ngIf="c.hovered" class="chart-guide-line" [class.visible]="c.hovered"
+                        [attr.x1]="c.hoverCursorX" y1="0" [attr.x2]="c.hoverCursorX" y2="100"
+                        [attr.stroke]="c.color || '#38bdf8'" stroke-dasharray="4 3" stroke-width="1.2"
+                        vector-effect="non-scaling-stroke" />
+                </svg>
+
+                <!-- Active points on vertical line (HTML overlays for perfect circular dots) -->
+                <ng-container *ngIf="c.hovered">
+                    <div *ngFor="let s of c.series; let idx = index" class="chart-active-dot"
+                        [class.pulse-dot]="idx === 0" [style.left.%]="c.hoverCursorX" [style.top.%]="s.hoverY"
+                        [style.background]="s.color">
+                    </div>
+                </ng-container>
+            </div>
+            <div></div>
+            <div class="lc-x"><span *ngFor="let x of c.x">{{ x }}</span></div>
+        </div>
+        <div class="legend">
+            <span class="lg" *ngFor="let s of c.series">
+                <i class="mk" [class.dash]="s.dashed" [class.pt]="s.marker" [style.color]="s.color"></i>{{ s.name }}
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Reusable: donut card -->
+<ng-template #donutCard let-d>
+    <div class="chart-card">
+        <div class="cc-head">
+            <span class="cc-title">
+                <svg class="ic" [style.color]="d.color" viewBox="0 0 24 24">
+                    <path [attr.d]="icons[d.icon]" />
+                </svg>
+                {{ d.title }}
+            </span>
+        </div>
+        <div class="donut-body">
+            <div class="donut">
+                <svg viewBox="0 0 100 100">
+                    <circle class="dn-track" cx="50" cy="50" r="40" />
+                    <circle *ngFor="let s of d.segs" class="dn-seg" cx="50" cy="50" r="40" [attr.stroke]="s.color"
+                        [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset" />
+                </svg>
+                <div class="dn-center">
+                    <b>{{ d.big }}</b>
+                    <span>{{ d.unit }}</span>
+                    <span>{{ d.sub }}</span>
+                </div>
+            </div>
+            <ul class="dn-legend">
+                <li *ngFor="let l of d.legend">
+                    <i class="dot" [style.background]="l.color"></i>
+                    <span class="l">{{ l.label }}</span>
+                    <span class="v">{{ l.value }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</ng-template>
+
+<div class="nsd">
+    <!-- Top bar -->
+    <header class="topbar">
+        <div class="tb-left">
+            <div class="logo">
+                <svg class="logo-mark" viewBox="0 0 32 32">
+                    <path d="M16 2l12 7v14l-12 7L4 23V9z" fill="#f26b21" />
+                    <path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="#fff" />
+                </svg>
+                <span>netraa</span>
+            </div>
+            <nav class="crumbs" aria-label="Breadcrumb">
+                <svg class="ic play" viewBox="0 0 24 24" (click)="onBreadcrumbClick('Kubernetes')"
+                    style="cursor: pointer;" title="Kubernetes">
+                    <path [attr.d]="icons['play']" />
+                </svg>
+                <ng-container *ngFor="let c of crumbs">
+                    <a (click)="onBreadcrumbClick(c)" style="cursor: pointer;">{{ c }}</a>
+                    <svg class="ic chev" viewBox="0 0 24 24">
+                        <path [attr.d]="icons['chevRight']" />
+                    </svg>
+                </ng-container>
+                <span class="cur">{{ ns.name }}</span>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Namespace header -->
+    <section class="ns-head">
+        <div class="ns-icon">
+            <svg class="ic-cube" viewBox="0 0 24 24">
+                <path [attr.d]="icons['cube']" />
+            </svg>
+        </div>
+        <div class="ns-info">
+            <div class="ns-title-row">
+                <h1>{{ ns.name }}</h1>
+                <span class="badge-active">
+                    <span class="status-dot"></span>
+                    {{ ns.status }}
+                </span>
+            </div>
+            <div class="ns-kind">Kubernetes Namespace</div>
+            <div class="ns-meta">
+                <span class="meta-item">
+                    <span class="meta-label">Cluster:</span>
+                    <a class="meta-link" (click)="onBreadcrumbClick(ns.cluster)" style="cursor: pointer;">{{ ns.cluster }}</a>
+                </span>
+                <span class="sep"></span>
+                <span class="meta-item">
+                    <span class="meta-label">Created:</span>
+                    <b class="meta-val">{{ ns.created }}</b>
+                </span>
+                <span class="sep"></span>
+                <span class="meta-item">
+                    <span class="meta-label">Age:</span>
+                    <b class="meta-val">{{ ns.age }}</b>
+                </span>
+                <span class="sep"></span>
+                <span class="meta-item labels-item">
+                    <span class="meta-label">Labels:</span>
+                    <div class="label-chips" *ngIf="labelList.length > 0">
+                        <span class="k8s-chip" *ngFor="let l of labelList">
+                            <span class="chip-k">{{ l.key }}</span><span class="chip-eq" *ngIf="l.val">=</span><span class="chip-v" *ngIf="l.val">{{ l.val }}</span>
+                        </span>
+                    </div>
+                    <b class="meta-val" *ngIf="labelList.length === 0">-</b>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary cards -->
+    <section class="stats">
+        <div class="stat" *ngFor="let s of stats">
+            <div class="stat-ic" [style.background]="s.bg" [style.color]="s.color">
+                <svg class="ic" viewBox="0 0 24 24">
+                    <path [attr.d]="icons[s.icon]" />
+                </svg>
+            </div>
+            <div class="stat-tx">
+                <span class="stat-l">{{ s.label }}</span>
+                <strong>{{ s.value }}</strong>
+                <span class="stat-s" [class.muted]="!s.ok">
+                    <ng-container *ngIf="s.ok"><ng-container *ngTemplateOutlet="ok"></ng-container></ng-container>
+                    {{ s.sub }}
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resource analysis -->
+    <section class="panel ra">
+        <div class="ra-head">
+            <div>
+                <h2>Resource analysis</h2>
+                <p>Namespace resource usage as a percentage of cluster allocatable resources.</p>
+            </div>
+            <div class="ra-ctrl">
+                <label for="nsd-view">View as</label>
+                <select id="nsd-view" class="sel w-view">
+                    <option>% of allocatable</option>
+                    <option>Absolute values</option>
+                </select>
+                <select class="sel w-agg" aria-label="Aggregation">
+                    <option>No aggregation</option>
+                    <option>Average</option>
+                    <option>Maximum</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row3">
+            <ng-container *ngTemplateOutlet="lineChart; context: { $implicit: cpuChart }"></ng-container>
+            <ng-container *ngTemplateOutlet="lineChart; context: { $implicit: memChart }"></ng-container>
+            <ng-container *ngTemplateOutlet="lineChart; context: { $implicit: podsChart }"></ng-container>
+        </div>
+
+        <div class="row4">
+            <ng-container *ngTemplateOutlet="donutCard; context: { $implicit: cpuDonut }"></ng-container>
+            <ng-container *ngTemplateOutlet="donutCard; context: { $implicit: memDonut }"></ng-container>
+            <ng-container *ngTemplateOutlet="donutCard; context: { $implicit: fsDonut }"></ng-container>
+            <ng-container *ngTemplateOutlet="lineChart; context: { $implicit: netChart }"></ng-container>
+        </div>
+    </section>
+
+    <!-- Workloads + Services -->
+    <div class="row2">
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic solid" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['cube']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Workloads</h3>
+                        <p>Contains {{ filteredWorkloads.length }} workloads.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="wlSearch" (ngModelChange)="wlPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('workloads'); $event.stopPropagation()" title="Download workloads table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'workloads'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportWorkloads('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportWorkloads('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Pods <span class="sort">⇅</span></th>
+                            <th>CPU usage <span class="sort">⇅</span></th>
+                            <th>Memory usage <span class="sort">⇅</span></th>
+                            <th>Age</th>
+                            <th>Status <span class="sort">⇅</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let w of pagedWorkloads">
+                            <td><a class="lnk" href="javascript:void(0)" (click)="onWorkloadClick(w)">{{ w.name }}</a></td>
+                            <td>{{ w.type }}</td>
+                            <td>{{ w.pods }}</td>
+                            <td>{{ w.cpu }}</td>
+                            <td>{{ w.mem }}</td>
+                            <td>{{ w.age }}</td>
+                            <td><span class="st"><ng-container *ngTemplateOutlet="ok"></ng-container> {{ w.status }}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ wlStartIndex }} to {{ wlEndIndex }} of {{ filteredWorkloads.length }} workloads
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="wlItemsPerPage"
+                            (ngModelChange)="onWlItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousWlPage()" [disabled]="wlPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of wlTotalPagesArray" [class.active]="wlPage === p"
+                            (click)="p !== '...' && goToWlPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextWlPage()" [disabled]="wlPage === wlTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['network']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Services</h3>
+                        <p>Contains {{ filteredServices.length }} services.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="svcSearch" (ngModelChange)="svcPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('services'); $event.stopPropagation()" title="Download services table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'services'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportServices('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportServices('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Cluster IP</th>
+                            <th>External IP</th>
+                            <th>Ports</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let s of pagedServices">
+                            <td><a class="lnk" href="javascript:void(0)" (click)="onServiceClick(s)">{{ s.name }}</a></td>
+                            <td>{{ s.type }}</td>
+                            <td>{{ s.clusterIp }}</td>
+                            <td>{{ s.externalIp }}</td>
+                            <td>{{ s.ports }}</td>
+                            <td>{{ s.age }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ svcStartIndex }} to {{ svcEndIndex }} of {{ filteredServices.length }} services
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="svcItemsPerPage"
+                            (ngModelChange)="onSvcItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousSvcPage()" [disabled]="svcPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of svcTotalPagesArray"
+                            [class.active]="svcPage === p" (click)="p !== '...' && goToSvcPage(p)"
+                            [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextSvcPage()" [disabled]="svcPage === svcTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PVC / Quotas / Events / Logs -->
+    <div class="bottom">
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic solid" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['database']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Persistent volume claims</h3>
+                        <p>Contains {{ filteredPvcs.length }} persistent volume claims.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="pvcSearch" (ngModelChange)="pvcPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('pvcs'); $event.stopPropagation()" title="Download PVCs table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'pvcs'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportPvcs('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportPvcs('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Capacity</th>
+                            <th>Used</th>
+                            <th>Storage class</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of pagedPvcs">
+                            <td><a class="lnk" href="javascript:void(0)">{{ p.name }}</a></td>
+                            <td class="good">{{ p.status }}</td>
+                            <td>{{ p.capacity }}</td>
+                            <td>{{ p.used }}</td>
+                            <td>{{ p.storageClass }}</td>
+                            <td>{{ p.age }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ pvcStartIndex }} to {{ pvcEndIndex }} of {{ filteredPvcs.length }} persistent volume claims
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="pvcItemsPerPage"
+                            (ngModelChange)="onPvcItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousPvcPage()" [disabled]="pvcPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of pvcTotalPagesArray"
+                            [class.active]="pvcPage === p" (click)="p !== '...' && goToPvcPage(p)"
+                            [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextPvcPage()" [disabled]="pvcPage === pvcTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['pie']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Quotas</h3>
+                        <p>Contains {{ filteredQuotas.length }} quota objects.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="quotaSearch" (ngModelChange)="quotaPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('quotas'); $event.stopPropagation()" title="Download quotas table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'quotas'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportQuotas('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportQuotas('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Used</th>
+                            <th>Hard</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let q of pagedQuotas">
+                            <td>{{ q.name }}</td>
+                            <td>{{ q.type }}</td>
+                            <td>{{ q.used }}</td>
+                            <td>{{ q.hard }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ quotaStartIndex }} to {{ quotaEndIndex }} of {{ filteredQuotas.length }} quota objects
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="quotaItemsPerPage"
+                            (ngModelChange)="onQuotaItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousQuotaPage()" [disabled]="quotaPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of quotaTotalPagesArray"
+                            [class.active]="quotaPage === p" (click)="p !== '...' && goToQuotaPage(p)"
+                            [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextQuotaPage()"
+                            [disabled]="quotaPage === quotaTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['bell']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Events</h3>
+                        <p>Contains {{ filteredEvents.length }} events.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="evSearch" (ngModelChange)="evPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('events'); $event.stopPropagation()" title="Download events table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'events'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportEvents('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportEvents('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl xs">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Type</th>
+                            <th>Reason</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let e of pagedEvents">
+                            <td class="nowrap">{{ e.time }}</td>
+                            <td [class.warn]="e.type === 'Warning'">{{ e.type }}</td>
+                            <td>{{ e.reason }}</td>
+                            <td class="msg" [title]="e.message">{{ e.message }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ evStartIndex }} to {{ evEndIndex }} of {{ filteredEvents.length }} events
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="evItemsPerPage"
+                            (ngModelChange)="onEvItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousEvPage()" [disabled]="evPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of evTotalPagesArray" [class.active]="evPage === p"
+                            (click)="p !== '...' && goToEvPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextEvPage()" [disabled]="evPage === evTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="p-head" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="p-ic"><svg class="ic" viewBox="0 0 24 24">
+                            <path [attr.d]="icons['file']" />
+                        </svg></span>
+                    <div class="p-tt">
+                        <h3>Logs</h3>
+                        <p>View logs for this namespace.</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="k8s-table-search">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.35-4.35" />
+                        </svg>
+                        <input type="text" placeholder="Search..." [(ngModel)]="logSearch" (ngModelChange)="logPage = 1" />
+                    </div>
+                    <!-- Export Dropdown -->
+                    <div class="k8s-export-wrap">
+                        <button type="button" class="k8s-export-btn" (click)="toggleExportMenu('logs'); $event.stopPropagation()" title="Download logs table">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <div class="k8s-export-menu" *ngIf="openExportMenu === 'logs'" (click)="$event.stopPropagation()">
+                            <button type="button" class="k8s-export-item" (click)="exportLogs('xlsx')">
+                                <span class="k8s-export-badge xlsx">XLSX</span>
+                                <span>Download Excel</span>
+                            </button>
+                            <button type="button" class="k8s-export-item" (click)="exportLogs('csv')">
+                                <span class="k8s-export-badge csv">CSV</span>
+                                <span>Download CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl xs logs">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Log message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let l of pagedLogs">
+                            <td class="nowrap">{{ l.time }}</td>
+                            <td class="code">{{ l.msg }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ logStartIndex }} to {{ logEndIndex }} of {{ filteredLogs.length }} logs
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="logItemsPerPage"
+                            (ngModelChange)="onLogItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousLogPage()" [disabled]="logPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of logTotalPagesArray"
+                            [class.active]="logPage === p" (click)="p !== '...' && goToLogPage(p)"
+                            [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextLogPage()" [disabled]="logPage === logTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

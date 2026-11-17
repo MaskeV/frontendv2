@@ -1,0 +1,67 @@
+.tab-content {
+  margin-top: -1%;
+  width: 99.6%;
+  height: 86vh;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+}
+
+.custom-bg {
+  background-color: #F8FAFC;
+}
+
+/* Height and Width */
+
+.h-26 {
+  height: 26vh;
+}
+
+.w-33 {
+  width: 33%;
+}
+
+.w-49{
+  width: 49.5%;
+}
+
+/* Card */
+
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px -3px #0000000d;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  overflow: hidden;
+  padding: 0%;
+}
+
+.card:hover {
+  border-color: #60A5FA !important;
+  box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+.card-header {
+  padding: 7px 6px 3px 7px;
+  border: none;
+  border-radius: 0%;
+  font-size: small;
+  font-weight: 100;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.chart-title {
+  font-weight: 500;
+  color: var(--text-color);
+  background-color: white;
+}
+
+/* Icon */
+
+.gradiantIcon {
+  background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  cursor: pointer;
+}

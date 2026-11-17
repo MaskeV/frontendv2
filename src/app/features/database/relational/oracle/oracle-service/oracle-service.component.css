@@ -1,0 +1,448 @@
+.tab-content {
+  width: 99.6%;
+  height: 75vh;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+}
+
+.custom-bg {
+  background-color: var(--custom-bg-color);
+}
+
+.text-link {
+  color: var(--accent-dark-blue);
+}
+
+/* Nav Tab */
+
+.nav-tabs {
+  background-color: transparent;
+  display: flex;
+  border: 0;
+  margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link {
+  position: relative;
+  color: #000000;
+  font-weight: normal;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F);
+  transition: width 0.4s ease;
+  z-index: 1;
+}
+
+.nav-tabs .nav-link.active::after {
+  width: 100%;
+}
+
+.nav-tabs .nav-link.active {
+  color: #000000;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #60b6d3;
+}
+
+/* Width */
+
+.w-14 {
+  width: 15%;
+}
+
+.w-33 {
+  width: 33%;
+}
+
+.uptim1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  font-size: 1.3rem;
+  padding-top: 10px;
+}
+
+/* Metric Box Cards */
+.metric-box {
+  /* background-color: var(--bg-color); */
+  border-radius: 4px;
+  padding: 3px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  background-color: #fff;
+  transition: transform .2s, box-shadow .2s;
+
+}
+
+.metric-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.metric-box .small {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: small;
+  font-weight: 500;
+  width: 100%;
+  padding: 6px;
+  margin: 0;
+  /* background-color: var(--card-header-bg); */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  /* border-bottom: 0.5px solid var(--border-color-dark); */
+}
+
+.metric-box .fw-bold {
+  color: var(--primary-color);
+  font-size: 1.9rem;
+  height: 100%;
+  width: 100%;
+  padding: 0px 0px 0px 6px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  /* background-color: #faf4b633; */
+}
+
+.kpi-value {
+  font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif;
+}
+
+/* Card */
+
+.card-slowQueryDur {
+  padding: 0%;
+  border-radius: 0%;
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+}
+
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px -3px #0000000d;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: #60A5FA !important;
+  box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+.card-header {
+  padding: 7px 6px 3px 7px;
+  border: none;
+  border-radius: 0%;
+  font-size: small;
+  font-weight: 100;
+  /* border-bottom: 1px solid var(--border-color); */
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.chart-title {
+  font-weight: 500;
+  color: var(--text-color);
+  background-color: white;
+}
+
+.card-body {
+  height: 26vh;
+}
+
+/* Table */
+
+/* Ensure the main table respects fixed layout and allows borders */
+.table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse; /* Better border rendering */
+}
+
+/* Remove the display hacks from tr and tbody */
+.table tr {
+  text-align: center;
+  /* Removed: display: table; width: 100%; */
+}
+
+.table tbody {
+  /* Removed: display: block; overflow-y: auto; */
+}
+
+/* Sticky Header Implementation */
+.table thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--card-header-bg, #f8f9fa); /* Use your theme variable, fallback to light gray */
+  z-index: 10; /* Keep header above scrolling rows */
+  padding: 4px 8px;
+  font-size: x-small;
+  font-family: system-ui;
+  text-align: left;
+  /* Optional: Ensure border stays visible when scrolling */
+  box-shadow: 0 1px 0 var(--border-color, #dee2e6); 
+}
+
+.table td {
+  padding: 4px 8px;
+  font-size: smaller;
+  text-align: left;
+  letter-spacing: 0.5px;
+  word-wrap: break-word;
+  word-break: break-word;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+
+/* Icon */
+
+.gradiantIcon {
+  background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* No Data */
+
+.noData {
+  height: 25vh;
+}
+
+/* Form-control */
+
+.form-control {
+  font-size: x-small;
+  padding: 2px 6px;
+}
+
+/* Duration Range */
+
+.duration-container {
+  padding: 4px 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg-color);
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.duration-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.label {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-color);
+  flex-shrink: 0;
+  font-size: small;
+}
+
+.range-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ranges-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.chip {
+  background: #f3f4f6;
+  padding: 5px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.range-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.range-input {
+  width: 100px;
+}
+
+.add-btn {
+  padding: 4px 6px;
+  border: 1px solid #aaa;
+  background: #ebebeb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: small;
+  opacity: 0.8;
+}
+
+.generate-btn {
+  padding: 4px 6px;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: small;
+  opacity: 0.8;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+
+.add-btn:hover {
+  opacity: 1;
+}
+
+.generate-btn:hover {
+  opacity: 1;
+}
+
+/* Modal */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: #fff;
+  width: 90%;
+  max-width: 1200px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-weight: 500;
+  font-size: small;
+  color: var(--text-color);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal-body {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* SKELETON */
+.slow-chart-skeleton {
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* Chart container */
+.skeleton-chart {
+  height: 22vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Bars */
+.skeleton-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+  height: 100%;
+}
+
+.skeleton-bars .bar {
+  width: 18px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #e0e0e0 0%, #f2f2f2 100%);
+  transform-origin: bottom;
+  animation: growUp 2.8s ease-in-out infinite;
+}
+
+/* Different heights for realism */
+.skeleton-bars .bar:nth-child(odd) { height: 60%; animation-delay: 0s; }
+.skeleton-bars .bar:nth-child(even) { height: 40%; animation-delay: 0.2s; }
+.skeleton-bars .bar:nth-child(3n) { height: 75%; animation-delay: 0.4s; }
+.skeleton-bars .bar:nth-child(4n) { height: 50%; animation-delay: 0.6s; }
+
+/* X-axis */
+.skeleton-x-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.skeleton-x-axis span {
+  width: 30px;
+  height: 8px;
+  border-radius: 4px;
+  background: #e0e0e0;
+}
+
+/* Bottom-to-top animation */
+@keyframes growUp {
+  0% {
+    transform: scaleY(0.2);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.2);
+    opacity: 0.6;
+  }
+}
+
+/* Slow shimmer */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}

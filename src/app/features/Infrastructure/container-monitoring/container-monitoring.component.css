@@ -1,0 +1,78 @@
+.containerHeader {
+    font-size: small;
+    font-family: "Raleway", sans-serif;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F) 1;
+    border-image-slice: 1;
+    border-image-width: 0 0 2px 0;
+    border-image-outset: 0;
+}
+
+.card-header {
+    padding: 2px 6px;
+    border: none;
+}
+
+/* TABLE START */
+
+.table-responsive {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.table th {
+    padding: 2px;
+    font-size: small;
+    font-family: system-ui;
+    text-align: left;
+    background-color: white;
+    color: #219ebc;
+}
+
+.table tr {
+    text-align: center;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table td {
+    text-align: center;
+    padding: 8px 5px;
+    font-size: small;
+    text-align: left;
+    letter-spacing: 0.5px;
+    background-color: #FAFAFA;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.table tbody {
+    max-height: 68vh;
+    overflow-y: auto;
+    display: block;
+}
+
+/* TABLE END */
+
+.fas {
+    cursor: pointer;
+}
+
+.form-control {
+    font-size: x-small;
+    padding: 2px 4px;
+    transition: opacity 0.3s linear, width 0.3s linear;
+    opacity: 1;
+}
+
+.page-link {
+    font-size: x-small;
+}
+
+.noData {
+    height: 65vh;
+}
+
+.custom-shadow {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}

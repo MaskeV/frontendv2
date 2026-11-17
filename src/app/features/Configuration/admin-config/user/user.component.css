@@ -1,0 +1,223 @@
+/* Global styles and tailwind directives should be in styles.css */
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+.status-pill {
+    /* @apply px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border whitespace-nowrap; */
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-width: 1px;
+    white-space: nowrap;
+}
+
+.btn-sm {
+    margin-top: 5px;
+}
+
+.input-select::-ms-expand {
+    display: none;
+}
+
+.input-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 2px 30px 2px 13px;
+    border: none;
+}
+
+.no-native-arrow {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+    background-color: transparent;
+}
+
+.no-native-arrow::-ms-expand {
+    display: none;
+}
+
+.mobile-no {
+    max-width: 76px ! important;
+}
+
+.user-id {
+    max-width: 100px ! important;
+}
+
+.mail-id {
+    max-width: 100px ! important;
+}
+
+.full-name {
+    max-width: 96px ! important;
+}
+
+.created-by {
+    max-width: 100px ! important;
+    word-break: break-all
+}
+
+.authentication {
+    max-width: 85px ! important;
+}
+
+.created-on {
+    max-width: 78px ! important;
+}
+
+.sr-no {
+    max-width: 29px ! important;
+}
+
+.user-type {
+    max-width: 71px ! important;
+}
+
+.action {
+    max-width: 102px ! important;
+}
+
+.grafanatext::ng-deep .ngx-pagination :hover {
+    background-color: #2199EB !important;
+    ;
+}
+
+.grafanatext::ng-deep .ngx-pagination a {
+    color: #fff !important;
+}
+
+.defaulttext::ng-deep .ngx-pagination .current {
+    background: #2199EB !important;
+    color: #fefefe;
+    cursor: default;
+}
+
+.defaulttext::ng-deep .ngx-pagination :hover {
+    background-color: #2199EB !important;
+}
+
+.axistext::ng-deep .ngx-pagination .current {
+    background: #97144D !important;
+    color: #fefefe;
+    cursor: default;
+}
+
+.axistext::ng-deep .ngx-pagination :hover {
+    background-color: #97144D !important;
+}
+
+
+/* Responsive Table Wrapper */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure table maintains readable width on small screens */
+.table {
+    min-width: 1000px;
+}
+
+/* Consolidated Media Queries */
+@media screen and (max-width: 1280px) {
+    .td-actions-when-responsive {
+        display: flex;
+    }
+
+    .created-by {
+        max-width: none !important;
+        word-break: normal;
+    }
+}
+
+@media screen and (max-width: 894px) {
+    .row-responsive {
+        flex-wrap: inherit !important;
+    }
+}
+
+.line {
+    border-bottom: 2px solid rgb(249, 248, 248);
+    margin-top: -4px;
+    width: 96%;
+    float: right;
+    margin: 0 auto;
+    margin-left: 15px;
+    margin-right: 25px;
+}
+
+.headings {
+    height: 40px;
+}
+
+.form-group {
+    font-size: small;
+}
+
+.form-group select {
+    font-size: small;
+    padding: 2px;
+    height: 30px;
+}
+
+.form-group input {
+    font-size: small;
+    padding: 2px;
+    height: 30px;
+}
+
+.table th {
+    font-size: small;
+    text-transform: uppercase;
+}
+
+.table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    font-size: small;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.table tbody {
+    height: 58vh;
+    overflow-y: auto;
+    display: block;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}

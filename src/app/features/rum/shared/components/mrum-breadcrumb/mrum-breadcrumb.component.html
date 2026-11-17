@@ -1,0 +1,31 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb custom-breadcrumb mb-2" style="padding: 5px 10px; font-size: 13px;">
+    <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+      <li class="breadcrumb-item" [class.active]="last" [attr.aria-current]="last ? 'page' : null" 
+          [ngStyle]="last ? {'color': '#219ebc', 'font-weight': '700'} : {}">
+        
+        <!-- Standard Route Link -->
+        <a *ngIf="!last && crumb.url" 
+           [routerLink]="crumb.url" 
+           [queryParams]="crumb.queryParams" 
+           [queryParamsHandling]="crumb.queryParamsHandling || ''"
+           class="text-decoration-none" 
+           style="color: #64748b; font-weight: 500;">
+          {{ crumb.label }}
+        </a>
+
+        <!-- Clickable Back Link (triggers output event instead of routing directly) -->
+        <a *ngIf="!last && !crumb.url && crumb.isClickableBack" 
+           (click)="onBackClick($event)"
+           style="cursor: pointer; color: #64748b; font-weight: 500; text-decoration: none;">
+          {{ crumb.label }}
+        </a>
+
+        <!-- Last Item (Active Page) -->
+        <ng-container *ngIf="last">
+          {{ crumb.label }}
+        </ng-container>
+      </li>
+    </ng-container>
+  </ol>
+</nav>

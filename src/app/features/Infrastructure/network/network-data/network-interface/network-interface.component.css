@@ -1,0 +1,286 @@
+.card-header {
+    padding: 3px 1px;
+    border: none;
+    background-color: var(--card-header-bg);
+    font-weight: 599;
+}
+
+
+.table th {
+    /* padding: 2px; */
+    font-size: small;
+    text-transform: uppercase;
+}
+
+.table tr {
+    text-align: center;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table td {
+    text-align: center;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    font-size: small;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.table tbody {
+    max-height: 65vh;
+    overflow-y: auto;
+    display: block;
+}
+
+.fas {
+    cursor: pointer;
+}
+
+.form-control {
+    font-size: x-small;
+    border: none;
+    padding: 2px 4px;
+    transition: opacity 0.3s linear, width 0.3s linear;
+    opacity: 1;
+}
+
+
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+}
+
+.noData {
+    height: 65vh;
+    font-size: large;
+}
+
+.custom-shadow {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+
+.scroll {
+    overflow-y: scroll;
+    height: 90vh;
+}
+
+.custom-bg {
+    background-color: white;
+}
+.custom-card {
+    padding: 1rem;
+    background-color: var(--custom-card-color);
+}
+
+.nav-tabs {
+    background-color: transparent;
+    /* border-bottom: 0.5px solid var(--border-color); */
+    display: flex;
+    border: 0;
+    margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link {
+    position: relative;
+    color: #529cb576;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    font-weight: 600;
+
+}
+
+/* Underline setup */
+.nav-tabs .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F);
+    transition: width 0.4s ease;
+    z-index: 1;
+    /* border-radius: 2px; */
+}
+
+/* Active link triggers the underline animation */
+.nav-tabs .nav-link.active::after {
+    width: 100%;
+}
+
+.nav-tabs .nav-link.active {
+    color: #529cb5;
+    /* Active deep red */
+    font-weight: 600;
+}
+
+/* Optional: hover style */
+.nav-tabs .nav-link:hover {
+    color: #60b6d3;
+    /* Hover tint */
+}
+
+
+.tab-content {
+    background-color: white;
+    /* padding: 1rem; */
+    scrollbar-color: var(--scroll-bg-color-thumb) var(--scroll-bg-color);
+    scrollbar-width: thin;
+}
+
+.tab-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-bg-color-thumb);
+    border-radius: 4px;
+}
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+}
+
+
+.sm-font {
+    font-size: small;
+}
+
+.smm-font {
+    font-size: smaller;
+}
+
+.xsm-font {
+    font-size: x-small;
+
+}
+
+.fontStyle-heading {
+    font-family: system-ui;
+
+}
+
+.custom-border {
+    border-color: var(--border-color) !important;
+
+}
+
+.gradiantIcon {
+    background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    padding: 0px;
+    font-size: small;
+}
+
+
+.div-elem {
+    height: 100%;
+    font-size: x-small;
+    background-color: var(--card-bg-color);
+    margin: 0; /* Remove if previously added margin */
+    /* padding: 0.5rem; */
+    /* border-radius: 0.5rem; */
+    box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.10),
+    0 12px 24px rgba(0, 0, 0, 0.1); /* Enhanced layered shadow */
+    
+    transition: box-shadow 0.5s ease, transform 0.3s ease;
+  }
+  
+  .div-elem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
+  }
+  
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Always 3 per row */
+    gap: 12px; /* space between cards */
+  }
+  
+  .chart-card {
+    width: 100%;
+  }
+
+.w-33 {
+    width: 33%;
+  }
+  
+  /* No Data */
+  
+  .noData {
+    height: 33vh;
+  }
+  
+  /* Side Badge */
+  
+  .section-header {
+    background-color: var(--custom-card-color);
+  }
+  
+  .pointers {
+    position: relative;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+    border-left: 18px solid var(--custom-card-color);
+    left: 7px;
+    z-index: 1;
+  }
+  .section-header {
+    background-color: var(--custom-card-color);
+    text-align: center;
+    box-sizing: border-box;
+  margin-top: -0.5px;  
+  }
+  
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+  }
+  
+  .chart-card {
+    width: 32%; /* 3 per row */
+    box-sizing: border-box;
+    vertical-align: top;
+  }
+  
+  .no-data-card {
+    height: 150px;
+    color: rgb(137, 137, 137);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  h5.fw-bold {
+    font-size: 0.7rem;
+    color: var(--card-headder);
+  }
+  
+  
+  
+  
+  
+  

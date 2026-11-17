@@ -1,0 +1,340 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;" class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-dark mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page" (click)="goToClusterList()">
+                <img [src]="getImagePath()" class="icons" alt="activemq logo" title="activemq" (error)="onImageError($event)" /><a
+                    routerLink="/message-queue/activemq-service">ActiveMQ-Clusters</a>
+            </li>
+            <li class="breadcrumb-item active">{{clusterName}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="cluster-nav">
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'overview'" (click)="loadData('overview')"
+                        href="javascript:void(0)">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'broker'" (click)="loadData('broker')"
+                        href="javascript:void(0)">Broker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'destination'" (click)="loadData('destination')"
+                        href="javascript:void(0)">Destination</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+
+
+    <div class="tab-content overflow-auto" *ngIf="selectedTab === 'overview'">
+        <!-- Overview TAB -->
+        <div id="overview" class="tab-pane fade show active">
+
+            <!-- Top Section: System Health -->
+            <section class="mt-1 p-2">
+                <div class="row g-2">
+                    <!-- Top Row: Load & Thread -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small fw-semibold text-secondary">System Load Average</span>
+                                <span class="text-muted" matTooltip="The average system load"
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="system-load-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small fw-semibold text-secondary">Thread Count</span>
+                                <span class="text-muted" matTooltip="Threads currently used by the JVM"
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="thread-count-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Row: Heap Memory -->
+                    <div class="col-md-2">
+                        <div
+                            class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Heap Memory(INIT)</span>
+                                <span class="text-muted" matTooltip="The initial amount of heap memory available."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="fw-bold fs-3 text-center my-3">{{ heapMemoryInit }} MB</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div
+                            class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Heap Memory(COMMITTED)</span>
+                                <span class="text-muted"
+                                    matTooltip="The memory is guaranteed to be available for the JVM to use."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="fw-bold fs-3 text-center my-3">{{ heapMemoryCommitted }} MB</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div
+                            class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Heap Memory(MAX)</span>
+                                <span class="text-muted" matTooltip="The maximum possible size of the heap memory."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="fw-bold fs-3 text-center my-3">{{ heapMemoryMax }} MB</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small fw-semibold text-secondary">Heap Memory(USED)</span>
+                                <span class="text-muted" matTooltip="The amount of JVM heap memory currently in use."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-xxsm" style="height: 12vh;">
+                                <div id="heap-memory-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Section: Enqueue Times -->
+            <section class="mt-1 p-2">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small fw-semibold text-secondary">Average Enqueue
+                                    Time(s)</span>
+                                <span class="text-muted"
+                                    matTooltip="The average time a message was held on this cluster."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper">
+                                <div id="avg-enqueue-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small fw-semibold text-secondary">Max Enqueue Time(s)</span>
+                                <span class="text-muted" matTooltip="The max time a message was held on this cluster."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper">
+                                <div id="max-enqueue-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Middle Section: 8 Grid Charts -->
+            <section class="mt-1 p-2">
+                <div class="row g-2">
+                    <!-- Row 1 of Grid -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">GC Young Collection
+                                    Count</span>
+                                <span class="text-muted" matTooltip="The GC count of Young Generation."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="gc-young-count-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">GC Old Collection
+                                    Count</span>
+                                <span class="text-muted" matTooltip="The GC count of Old Generation."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="gc-old-count-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">GC Young Collection
+                                    Time(ms)</span>
+                                <span class="text-muted"
+                                    matTooltip="The GC time spent in Young Generation in milliseconds."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="gc-young-time-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">GC Old Collection
+                                    Time(ms)</span>
+                                <span class="text-muted"
+                                    matTooltip="The GC time spent in Old Generation in milliseconds."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="gc-old-time-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 of Grid -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">Enqueue Count/s</span>
+                                <span class="text-muted"
+                                    matTooltip="Number of messages that have been sent to the cluster per second."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="enqueue-rate-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">Dequeue Count/s</span>
+                                <span class="text-muted"
+                                    matTooltip="Number of messages that have been acknowledged or discarded on the cluster per second."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="dequeue-rate-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">Dispatch Count/s</span>
+                                <span class="text-muted"
+                                    matTooltip="Number of messages that has been delivered to consumers per second."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="dispatch-rate-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="small fw-semibold text-secondary">Expired Count/s</span>
+                                <span class="text-muted"
+                                    matTooltip="Number of messages that have been expired per second."
+                                    matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                            </div>
+                            <div class="chart-wrapper-sm">
+                                <div id="expired-rate-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <div class="tab-content overflow-auto" *ngIf="selectedTab === 'broker'">
+        <div class="card shadow-sm border rounded-3 m-2">
+            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                <div class="input-group mb-3" style="max-width: 400px;">
+                    <input type="text" class="form-control form-control-sm" placeholder="Please input instance name"
+                        aria-label="Search" [(ngModel)]="searchTextBroker">
+                    <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col" class="border-0 text-secondary small fw-semibold ps-4">Service
+                                Instances
+                            </th>
+                            <th scope="col" class="border-0 text-secondary small fw-semibold text-end pe-4">
+                                Attributes
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let broker of brokers | objectFilter : searchTextBroker : ['name']">
+                            <td class="ps-4">
+                                <a href="javascript:void(0)" style="text-decoration: none;"
+                                    (click)="goToBroker(broker.name)">{{broker.name}}</a>
+                            </td>
+                            <td class="text-end pe-5">
+                                <a href="javascript:void(0)" style="text-decoration: none;"
+                                    (click)="goToBroker(broker.name)">View</a>
+                            </td>
+                        </tr>
+                        <tr *ngIf="brokers.length === 0">
+                            <td colspan="2" class="text-center py-4 text-muted">No brokers found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content overflow-auto" *ngIf="selectedTab === 'destination'">
+        <div class="row m-2">
+            <!-- Left Column: Destination List -->
+            <div class="col-12">
+                <div class="card shadow-sm border rounded-3 h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                        <span class="small fw-semibold text-secondary">Destination List</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-2 border-bottom d-flex gap-2">
+                            <div class="input-group input-group-sm" style="max-width: 300px;">
+                                <input type="text" class="form-control" placeholder="Search for more endpoints"
+                                    [(ngModel)]="searchTextDestination">
+                                <span class="input-group-text bg-white"><i class="fa fa-search"></i></span>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h6 class="text-secondary fw-bold small mb-3">Endpoints</h6>
+                            <div class="d-flex flex-column gap-3">
+                                <a href="javascript:void(0)" class="text-decoration-none small"
+                                    *ngFor="let dest of destinations | objectFilter : searchTextDestination : ['name']"
+                                    (click)="goToDestination(dest.name)">{{dest.name}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</main>

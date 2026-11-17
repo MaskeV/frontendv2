@@ -1,0 +1,104 @@
+<!-- New UI For Admin-Config Starts From Here -->
+<div class="admin-header">
+  <h5 class="mx-3 mt-2 pb-2" style="font-weight: 450; font-size: 20px;">
+    <i class="fa-solid" [ngClass]="isSidebarCollapsed ? 'fa-bars' : 'fa-angle-left'" (click)="toggleSidebar()"
+      style="cursor: pointer; margin-right: 12px;"></i>
+
+    Admin Configuration
+  </h5>
+</div>
+
+<hr />
+
+
+<div class="admin-container" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- LEFT MENU -->
+  <aside class="admin-sidenav">
+
+    <a *ngIf="userTypeCrudMapList?.applicationIpMapping?.tabVisibility === 'true'"
+      [routerLink]="['/admin-config/application-ip-mapping']" routerLinkActive="active">
+      Application & IP Mapping
+    </a>
+
+    <a *ngIf="userTypeCrudMapList?.feature?.tabVisibility === 'true'" [routerLink]="['/admin-config/features']"
+      routerLinkActive="active">
+      Features
+    </a>
+
+
+    <a *ngIf="userTypeCrudMapList?.user?.tabVisibility === 'true'" [routerLink]="['/admin-config/user']"
+      routerLinkActive="active">
+      User Creation
+    </a>
+
+    <a *ngIf="userTypeCrudMapList?.interfaceConfig?.tabVisibility === 'true'"
+      [routerLink]="['/admin-config/interface-config']" routerLinkActive="active">
+      Interface Configuration
+    </a>
+
+    <a *ngIf="isVisible('controlZone')" [routerLink]="['/admin-config/control-zone']"
+      routerLinkActive="active">
+      Control Zone
+    </a>
+
+    <a *ngIf="isVisible('criticalFlow')" [routerLink]="['/admin-config/critical-flow']" routerLinkActive="active">
+      Critical Flow
+    </a>
+
+
+    <a *ngIf="userTypeCrudMapList?.dataSource?.tabVisibility === 'true'" [routerLink]="['/admin-config/datasource']"
+      routerLinkActive="active">
+      Data Source
+    </a>
+
+
+    <a *ngIf="isVisible('network-config')" [routerLink]="['/admin-config/network-config']" routerLinkActive="active">
+      Network Configuration
+    </a>
+
+
+    <a *ngIf="userTypeCrudMapList?.role?.tabVisibility === 'true'" [routerLink]="['/admin-config/role']"
+      routerLinkActive="active">
+      Role
+    </a>
+
+    <a *ngIf="userTypeCrudMapList?.client?.tabVisibility === 'true'" [routerLink]="['/admin-config/client']"
+      routerLinkActive="active">
+      Client
+    </a>
+
+    <a *ngIf="userTypeCrudMapList?.LicenseGeneration?.tabVisibility === 'true'"
+      [routerLink]="['/admin-config/license-generation']" routerLinkActive="active">
+      License Generation
+    </a>
+
+    <a *ngIf="userTypeCrudMapList?.['resource-mapping']?.tabVisibility === 'true'"
+      [routerLink]="['/admin-config/resource-mapping']" routerLinkActive="active">
+      Resource Mapping
+    </a>
+
+    <a *ngIf="isVisible('proxy-config')" [routerLink]="['/admin-config/proxy-config']" routerLinkActive="active">
+      Proxy Configuration
+    </a>
+
+    <a *ngIf="isVisible('log-retention-archiving')" [routerLink]="['/admin-config/log-retention-archiving']"
+      routerLinkActive="active">
+      Log Retention & Archiving
+    </a>
+
+    <a *ngIf="isVisible('feature-graph-mapping')" [routerLink]="['/admin-config/feature-graph-mapping']"
+      routerLinkActive="active">
+      Feature Graph Mapping
+    </a>
+
+  </aside>
+  <!-- RIGHT CONTENT -->
+  <section class="admin-content">
+
+    <router-outlet></router-outlet>
+
+
+  </section>
+
+</div>

@@ -1,0 +1,600 @@
+<main class="d-flex flex-column my-2 overflow-auto">
+    <!-- Breadcrum -->
+    <nav aria-label="breadcrumb" class="mx-2">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img src="assets/img/technologies/kafka.png" class="icons" alt="kafka logo" title="kafka" /><a
+                    routerLink="/message-queue/kafka-service">Kafka-Clusters</a>
+            </li>
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <a [routerLink]="getClusterRouterLink(clusterId)" [queryParams]="{ tab: 'broker' }">{{clusterName}}</a>
+            </li>
+            <li class="breadcrumb-item active">{{brokerName}}</li>
+        </ol>
+    </nav>
+
+    <div>
+        <main class="flex-fill p-2 d-flex flex-column gap-2">
+            <section class="mb-1">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center my-2 px-1">
+                    <h2 class="text-uppercase fw-semibold text-secondary ls-wider small">
+                        Critical Indicators
+                    </h2>
+                </div>
+
+                <!-- Critical Indicators -->
+                <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-5">
+
+                    <!-- ISR Shrinks -->
+                    <div class="col">
+                        <div
+                            class="card p-2 rounded-2 shadow-sm border d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-capitalize small fw-semibold text-secondary ls-wider">
+                                    ISR Shrinks
+                                </span>
+                                <mat-icon class="icon-sm text-warning">compress</mat-icon>
+                            </div>
+                            <div class="d-flex align-items-end gap-2">
+                                <span class="fs-lg fw-bold text-dark">{{brokerKPI.isr_shrinks | shortNumber:0 }}</span>
+                                <span class="text-muted small fw-medium mb-1" *ngIf="brokerKPI.isr_shrinks != null">/
+                                    sec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ISR Expands -->
+                    <div class="col">
+                        <div
+                            class="card p-2 rounded-2 shadow-sm border d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-capitalize small fw-semibold text-secondary ls-wider">
+                                    ISR Expands
+                                </span>
+                                <mat-icon class="icon-sm text-success">expand</mat-icon>
+                            </div>
+                            <div class="d-flex align-items-end gap-2">
+                                <span class="fs-lg fw-bold text-dark">{{brokerKPI.isr_expands | shortNumber:0}}</span>
+                                <span class="text-muted small fw-medium mb-1" *ngIf="brokerKPI.isr_expands != null">/
+                                    sec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Under Min ISR -->
+                    <div class="col">
+                        <div
+                            class="card p-2 rounded-2 border shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-capitalize small fw-semibold text-secondary ls-wider">
+                                    Under Min ISR
+                                </span>
+                                <mat-icon class="icons text-warning">warning</mat-icon>
+                            </div>
+                            <div class="d-flex align-items-end gap-2">
+                                <span class="fs-lg fw-bold text-dark value-hover">{{brokerKPI.min_isr_partition_count |
+                                    shortNumber:0}}</span>
+                                <span class="text-muted small fw-medium mb-1"
+                                    *ngIf="brokerKPI.min_isr_partition_count != null">partitions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Under Replicated -->
+                    <div class="col">
+                        <div
+                            class="card p-2 rounded-2 border shadow-sm d-flex flex-column justify-content-between h-100 overflow-hidden">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-capitalize small fw-semibold text-secondary ls-wider">
+                                    Under Replicated
+                                </span>
+                                <mat-icon class="icon-sm text-danger">error</mat-icon>
+                            </div>
+                            <div class="d-flex align-items-end gap-2">
+                                <span class="fs-lg fw-bold text-danger">{{brokerKPI.under_replicated_partitions |
+                                    shortNumber:0}}</span>
+                                <span class="small fw-medium text-danger mb-1"
+                                    *ngIf="brokerKPI.under_replicated_partitions != null">partitions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Max Lag -->
+                    <div class="col">
+                        <div
+                            class="card p-2 rounded-2 border shadow-sm d-flex flex-column justify-content-between h-100 overflow-hidden">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-capitalize small fw-bold text-secondary ls-wider">
+                                    Max Lag
+                                </span>
+                                <mat-icon class="icon-sm text-warning">schedule</mat-icon>
+                            </div>
+                            <div class="d-flex align-items-end gap-2">
+                                <span class="fs-lg fw-bold text-dark">{{brokerKPI.max_lag | shortNumber:0}}</span>
+                                <span class="small text-muted fw-medium mb-1"
+                                    *ngIf="brokerKPI.max_lag != null">messages</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section>
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-1 px-1">
+                    <h2 class="text-uppercase fw-semibold text-secondary small ls-wider">
+                        System Health
+                    </h2>
+
+                    <span class="fw-bold rounded-pill px-2 py-1 border text-success small"
+                        style="background:#e6f4ea; border-color:#b7e0c2;">
+                        Healthy
+                    </span>
+                </div>
+
+                <!-- System Health -->
+                <div class="row g-3">
+
+                    <!-- Up Time -->
+                    <div class="col-6 col-lg-3 col-md-3">
+                        <div
+                            class="card p-2 rounded-3 border shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <mat-icon class="icon-sm text-success">check_circle</mat-icon>
+                                <span class="text-secondary small fw-medium">Uptime</span>
+                            </div>
+                            <span class="fs-lg fw-bold text-dark">{{uptime | stringData}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Controller -->
+                    <div class="col-6 col-lg-3 col-md-3">
+                        <div
+                            class="card p-2 rounded-3 border shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <mat-icon class="icon-sm text-primary">memory</mat-icon>
+                                <span class="text-secondary small fw-medium">
+                                    Active Controller
+                                </span>
+                            </div>
+                            <span class="fs-lg fw-bold text-dark">{{isActiveController | stringData}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Throughput -->
+                    <div class="col-12 col-lg-6 col-md-6">
+                        <div id="throughput-div" class="card p-2 rounded-3 bg-primary shadow-sm h-100">
+                            <div class="row">
+                                <div class="col-9">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <mat-icon class="icon-sm text-warning">speedometer</mat-icon>
+                                        <span class="text-white small fw-medium">
+                                            Total Throughput
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-end gap-2">
+                                        <span class="fs-lg fw-bold text-white">{{throughput | bytes:true}}</span>
+                                        <span class="text-white small fw-medium mb-1">{{throughput |
+                                            bytes:false:true:'/s':2:''}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 pt-2">
+                                    <svg id="throughput-svg" viewBox="0 0 100 40" class="w-100 overflow-visible">
+                                        <path d="M0 30 Q 15 25, 25 15 T 50 20 T 75 10 T 100 25" fill="none"
+                                            stroke="white" stroke-linecap="round" stroke-width="2.5" />
+                                        <circle cx="100" cy="25" r="3" fill="white" />
+                                    </svg>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="mb-2">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center my-2 px-1">
+                    <h2 class="text-uppercase fw-semibold small text-secondary ls-wider">
+                        Broker Metrics
+                    </h2>
+                </div>
+
+                <!-- Main Stack -->
+                <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-3">
+
+                    <!-- CPU Usage -->
+                    <div class="col">
+                        <div class="card border shadow-sm p-2 rounded-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                        CPU Usage
+                                    </h6>
+                                    <div class="fs-lg fw-bold text-dark">{{cpuUsage | numericData}}
+                                        <span class="text-muted small fw-medium" *ngIf="cpuUsage!=null">%</span>
+                                    </div>
+                                </div>
+                                <div class="p-1 rounded bg-primary bg-opacity-10 d-flex">
+                                    <mat-icon class="icon-sm text-primary">developer_board</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- cpu usage chart -->
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="cpu-usage-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage -->
+                    <div class="col">
+                        <div class="card border shadow-sm p-2 rounded-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                        Memory Usage
+                                    </h6>
+                                    <div class="fs-lg fw-bold text-dark">
+                                        {{memoryUsageMetaData?.kpi?.jvm_memory_used_bytes?.avg | bytes:true}}
+                                        <span
+                                            class="text-muted small fw-medium">{{memoryUsageMetaData?.kpi?.jvm_memory_used_bytes?.avg
+                                            | bytes:false:true:'':2:''}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-1 rounded d-flex" (click)="toggleMemoryChart()"
+                                    style="background-color: #8a5cf618;">
+                                    <mat-icon class="icon-sm text-purple" id="memory-toggle"
+                                        [class.rotate]="memoryToggle">data_usage</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- Memory Usage Progress Bar -->
+                            <div class="mt-4" *ngIf="!memoryToggle">
+                                <div class="progress rounded-pill mb-2 h-75">
+                                    <div class="progress-bar bg-purple progress-animate" role="progressbar"
+                                        [style.width.%]="memoryUsageMetaData?.kpi?.memory_usage_percentage?.avg"
+                                        aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between text-uppercase fw-bold small text-muted">
+                                    <span>Used: {{memoryUsageMetaData?.kpi?.memory_usage_percentage?.avg |
+                                        numericData:'%'}}</span>
+                                    <span>Total: {{memoryUsageMetaData?.kpi?.jvm_memory_max_bytes?.avg | bytes}}</span>
+                                </div>
+                            </div>
+
+                            <!-- Memory Usage line graoh -->
+                            <div class="bg-white chart-wrapper-sm" *ngIf="memoryToggle">
+                                <div id="memory-usage-chart" class="h-100"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- GC Count -->
+                    <div class="col">
+                        <div class="card border rounded-2 shadow-sm p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                        GC Count
+                                    </h6>
+                                    <div class="fs-lg fw-bold text-dark">
+                                        {{gcCount | shortNumber:0}}
+                                        <span class="text-muted small fw-medium">/Sec</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-1 rounded d-flex" style="background-color: #ffc10729;">
+                                    <mat-icon class="icon-sm text-warning">delete_sweep</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- GC Count line graoh -->
+                            <div class="p-1 bg-white chart-wrapper-sm">
+                                <div id="gc-count-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages In -->
+                    <div class="col">
+                        <div class="card border shadow-sm p-2 rounded-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                        Messages In
+                                    </h6>
+                                    <!-- <div class="fs-lg fw-bold text-dark">
+                                        {{messagesInPerSec | shortNumber:0}}
+                                        <span class="text-muted small fw-medium" *ngIf="messagesInPerSec != null">/
+                                            sec</span>
+                                    </div> -->
+                                </div>
+                                <div class="p-1 rounded bg-primary bg-opacity-10 d-flex">
+                                    <mat-icon class="icon-sm text-primary">forum</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- Messages In chart -->
+                            <div class="p-1 bg-white chart-wrapper-sm">
+                                <div id="messages-in-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic Throughput -->
+                    <div class="col">
+                        <div class="card border p-2 shadow-sm rounded-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                    Topic Throughput
+                                </h6>
+                                <div class="p-1 rounded bg-primary bg-opacity-10 d-flex">
+                                    <mat-icon class="icon-sm text-muted">swap_vert</mat-icon>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column gap-4">
+
+                                <!-- Bytes In -->
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 rounded" style="background:#d1fae5; color:#059669;">
+                                        <mat-icon class="icon d-block">arrow_downward</mat-icon>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span class="text-muted fw-medium">Bytes In</span>
+                                            <span class="fw-bold text-dark">{{bytesIn | bytes : false :
+                                                false:'/s'}}</span>
+                                        </div>
+
+                                        <div class="progress" style="height: 1.15rem;">
+                                            <div class="progress-bar" style="background-color:#10b981;"
+                                                [style.width.%]="bytesInPct">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bytes Out -->
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 rounded" style="background:#e0f2fe; color:#0284c7;">
+                                        <mat-icon class="icon d-block">arrow_upward</mat-icon>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span class="text-muted fw-medium">Bytes Out</span>
+                                            <span class="fw-bold text-dark">{{bytesOut | bytes : false: false
+                                                :'/s'}}</span>
+                                        </div>
+
+                                        <div class="progress" style="height: 1.15em;">
+                                            <div class="progress-bar" style="background-color:#0ea5e9;"
+                                                [style.width.%]="bytesOutPct">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Request Rates -->
+                    <div class="col">
+                        <div class="card p-2 shadow-sm border rounded-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <h6 class="text-uppercase fw-semibold text-secondary small mb-1">
+                                    Request Rates
+                                </h6>
+                                <div class="p-1 rounded bg-primary bg-opacity-10 d-flex">
+                                    <mat-icon class="icon-sm text-primary">sync_alt</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- Metrics -->
+                            <div class="row g-3">
+                                <!-- Fetch -->
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded border">
+                                        <div class="text-uppercase fw-bold text-muted small mb-1">
+                                            Fetch
+                                        </div>
+                                        <div class="fw-bold fs-lg text-dark">
+                                            {{topicFetchReqPerSec | shortNumber:0}}
+                                        </div>
+                                        <div class="text-success small fw-semibold">
+                                            req/s
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Produce -->
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded border">
+                                        <div class="text-uppercase fw-bold text-muted small mb-1">
+                                            Produce
+                                        </div>
+                                        <div class="fw-bold fs-lg text-dark">
+                                            {{topicProduceReqPerSec | shortNumber:0}}
+                                        </div>
+                                        <div class="text-success small fw-semibold">
+                                            req/s
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Max Lag Time -->
+                    <div class="col">
+                        <div class="card rounded-3  p-2 shadow-sm border h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase fw-semibold text-secondary small mb-1">
+                                        Max Lag
+                                    </h6>
+                                    <div class="fs-lg fw-bold text-danger">
+                                        {{maxLag | shortNumber:0}}
+                                        <span class="text-muted small fw-medium"
+                                            *ngIf="maxLag != null">partitions</span>
+                                    </div>
+                                </div>
+                                <div class="p-1 rounded d-flex" style="background-color: #ffc10729;">
+                                    <mat-icon class="icon-sm text-warning">warning_amber</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- Max Lag chart -->
+                            <div class="p-1 bg-white chart-wrapper-sm">
+                                <div id="max-lag-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Partition Count -->
+                    <div class="col">
+                        <div class="card rounded-2 border shadow-sm p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="text-uppercase text-secondary fw-semibold small mb-1">
+                                        Partition Count
+                                    </h6>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-baseline gap-2">
+                                            <span class="fs-lg fw-bold text-dark">{{brokerKPI.partition_count | shortNumber:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-1 rounded bg-primary bg-opacity-10 d-flex">
+                                    <mat-icon class="icon-sm text-primary">horizontal_split</mat-icon>
+                                </div>
+                            </div>
+
+
+                            <!-- Progress Bar -->
+                            <div class="mt-4">
+                                <div class="progress rounded-pill" style="height: 1rem;">
+                                    <div class="progress-bar bg-primary" [style.width.%]="healthyPartitionPct"></div>
+                                    <div class="progress-bar bg-warning" [style.width.%]="underReplicatedPartitionPct"></div>
+                                </div>
+                            </div>
+
+                            <!-- Labels -->
+                            <div class="d-flex justify-content-between mt-2 text-uppercase fw-bold small text-muted">
+                                <span>Online: {{healthyPartition | shortNumber:0}}</span>
+                                <span>URP: {{brokerKPI.under_replicated_partitions | shortNumber:0}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Queue Time -->
+                    <div class="col">
+                        <div class="card rounded-2 shadow-sm border p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <h6 class="text-uppercase small text-muted fw-semibold mb-1">
+                                        Queue Time
+                                    </h6>
+                                    <div class="fs-lg fw-bold text-dark">
+                                        {{queueTime | numericData}}
+                                        <span class="text-muted small fw-medium" *ngIf="queueTime != null">ms</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex p-1 rounded" style="background:#d1fae5; color:#059669;">
+                                    <mat-icon class="icon-sm">timer</mat-icon>
+                                </div>
+                            </div>
+
+                            <!-- Queue Time chart -->
+                            <div class="p-1 bg-white chart-wrapper-sm">
+                                <div id="queue-time-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Throughput Monitor -->
+                    <div class="col-12 col-md-12 col-lg-12">
+                        <div class="card shadow-sm border rounded-2 p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h6 class="text-uppercase text-muted fw-semibold small">
+                                    Throughput Monitor
+                                </h6>
+                            </div>
+                            <div class="row g-3">
+                                <!-- Incoming -->
+                                <div class="col-4 text-center">
+                                    <p class="text-uppercase small text-secondary mb-1">Incoming</p>
+                                    <h6 class="fs-lg fw-bold text-dark mb-1">{{messagesInPerSec | shortNumber:0:'No Data':' msg/s'}}</h6>
+
+                                    <div class="d-flex align-items-end justify-content-center bg-light rounded overflow-hidden"
+                                        style="height:32px;gap:1px;">
+                                        <div class="bg-primary" style="width:4px;height:40%"></div>
+                                        <div class="bg-primary" style="width:4px;height:60%"></div>
+                                        <div class="bg-primary" style="width:4px;height:30%"></div>
+                                        <div class="bg-primary" style="width:4px;height:80%"></div>
+                                        <div class="bg-primary" style="width:4px;height:50%"></div>
+                                        <div class="bg-primary" style="width:4px;height:70%"></div>
+                                        <div class="bg-primary" style="width:4px;height:40%"></div>
+                                        <div class="bg-primary" style="width:4px;height:90%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Replication In -->
+                                <div class="col-4 text-center border-start border-end">
+                                    <p class="text-uppercase small text-secondary mb-1">Replication Ingress Rate</p>
+                                    <h6 class="fs-lg fw-bold text-dark mb-1">{{replicationThroughput?.['replication_bytes_in_per_second']?.avg | bytes:false:false:'/s'}}</h6>
+
+                                    <div class="d-flex align-items-end justify-content-center bg-light rounded overflow-hidden"
+                                        style="height:32px;gap:1px;">
+                                        <div class="bg-info" style="width:4px;height:20%"></div>
+                                        <div class="bg-info" style="width:4px;height:40%"></div>
+                                        <div class="bg-info" style="width:4px;height:30%"></div>
+                                        <div class="bg-info" style="width:4px;height:50%"></div>
+                                        <div class="bg-info" style="width:4px;height:40%"></div>
+                                        <div class="bg-info" style="width:4px;height:60%"></div>
+                                        <div class="bg-info" style="width:4px;height:50%"></div>
+                                        <div class="bg-info" style="width:4px;height:70%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Replication Out-->
+                                <div class="col-4 text-center">
+                                    <p class="text-uppercase small text-secondary mb-1">Replication Egress Rate
+                                    </p>
+                                    <h6 class="fs-lg fw-bold text-dark mb-1">{{replicationThroughput?.['replication_bytes_out_per_second']?.avg | bytes:false:false:'/s'}}</h6>
+
+                                    <div class="d-flex align-items-end justify-content-center bg-light rounded overflow-hidden"
+                                        style="height:32px;gap:1px;">
+                                        <div class="bg-purple" style="width:4px;height:30%"></div>
+                                        <div class="bg-purple" style="width:4px;height:30%"></div>
+                                        <div class="bg-purple" style="width:4px;height:40%"></div>
+                                        <div class="bg-purple" style="width:4px;height:50%"></div>
+                                        <div class="bg-purple" style="width:4px;height:40%"></div>
+                                        <div class="bg-purple" style="width:4px;height:30%"></div>
+                                        <div class="bg-purple" style="width:4px;height:20%"></div>
+                                        <div class="bg-purple" style="width:4px;height:40%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+</main>

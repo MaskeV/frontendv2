@@ -1,0 +1,211 @@
+<main>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb custom-breadcrumb mb-0">
+      <li class="breadcrumb-item d-flex align-items-center gap-1">
+        <img src="assets/images/rds.png" class="icons" alt="RDS Logo" />
+        <a routerLink="/rds">RDS Applications</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{selectedService}}</li>
+    </ol>
+  </nav>
+
+  <div class="tab-content custom-bg p-2">
+
+
+    <!-- Performance Section -->
+    <div class="bs-section mt-3 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">Perf.</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>CPU Utilization</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="cpuUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Freeable Memory</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="freeableMemoryChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>RDS Swap Usage</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Amount of memory swapped to disk due to insufficient RAM."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="rdsSwapUsageChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-section mt-2 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">Perf.</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Database Connections</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Number of active client connections to the database."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="databaseConnectionsChartsContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="w-66"></div>
+      </div>
+    </div>
+
+    <!-- Storage Section -->
+    <div class="bs-section mt-3 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">Storage</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Free Storage Space</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Amount of unused disk storage available to the RDS instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="freeStorageSpaceChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Disk Queue Depth</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Number of pending I/O requests waiting to be processed by storage."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="diskQueueDepthChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Read Latency</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Average time taken to complete disk read operations."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="readLatencyChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- I/O Section -->
+    <div class="bs-section mt-3 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">I/O</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Read IOPS</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Number of disk read operations performed per second."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="readIopsChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Write IOPS</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Number of disk write operations performed per second."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="writeIopsChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Read Throughput</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Amount of data read from disk per second."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="readThroughputChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-section mt-2 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">I/O</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Write Throughput</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Amount of data write from disk per second."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="writeThroughputChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="w-66"></div>
+      </div>
+    </div>
+
+    <!-- Network Section -->
+    <div class="bs-section mt-3 ps-2 pe-3">
+      <div class="bs-section__side">
+        <span class="bs-section__title">Net.</span>
+      </div>
+      <div class="bs-section__content bs-cards-row">
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network Receive Throughput</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Rate of incoming network data to the RDS instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkReceiveThroughputChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="bs-card w-33">
+          <div class="bs-card__header">
+            <span>Network Transmit Throughput</span>
+            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Rate of outgoing network data to the RDS instance."></i>
+          </div>
+          <div class="bs-card__body h-26 p-0">
+            <div id="networkTransmitThroughputChartContainer" style="width: 100%; height: 26vh;"></div>
+          </div>
+        </div>
+
+        <div class="w-33"></div>
+      </div>
+    </div>
+
+  </div>
+</main>

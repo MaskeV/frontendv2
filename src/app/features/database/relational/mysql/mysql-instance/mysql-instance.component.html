@@ -1,0 +1,441 @@
+<div class="main">
+    <div class="p-1 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active sm-font" aria-current="page">My SQL</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <!-- Breadcrumb -->
+    <!-- Container with Flexbox to align both sections in one row -->
+    <div class="d-flex justify-content-between align-items-center px-3" style="height: 7.5vh;margin-top: -15px;">
+
+        <!-- Breadcrumb (Left Side) -->
+        <nav aria-label="breadcrumb" style="font-size: small;">
+            <ol class="breadcrumb mb-0" style="padding: 0;">
+                <li class="breadcrumb-item"><a routerLink="/database">{{ serviceName }}</a></li>
+                <li class="breadcrumb-item"><a routerLink="/database/service">Database-Service</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ instanceName }}</li>
+            </ol>
+        </nav>
+
+        <!-- Service & Instance Section (Right Side) -->
+        <div class="d-flex align-items-center gap-2" style="font-size: smaller;margin-right: 1%;">
+            <span class="fw-medium text-muted small">Service:</span>
+            <span class="small">{{ serviceName }}</span>
+
+            <span class="fw-medium text-muted small">Instance:</span>
+            <select class="form-select form-select-sm border-secondary small" [(ngModel)]="instanceName"
+                (change)="loadInstanceData()" style="width: auto; min-width: 40%; font-size: x-small;">
+                <option selected value="" *ngIf="!instanceList.length" disabled>
+                    {{ instanceName ? instanceName : 'No data' }}
+                </option>
+                <option *ngFor="let instance of instanceList" [value]="instance">
+                    {{ instance }}
+                </option>
+            </select>
+        </div>
+
+    </div>
+
+
+    <!-- Main Tab Section -->
+    <div class="tab-content custom-bg p-1">
+        <div class="tab-pane fade in show active" id="inspections">
+
+            <!-- Summary Section -->
+            <div class="row mr-1 gap-2 flex-nowrap align-items-center" style="width: 100%;">
+                <!-- Logo container -->
+                <div class="w-8">
+                    <img src="assets/images/mysql.png" alt="MySQL">
+                </div>
+
+                <!-- Uptime -->
+                <div class="metric-box w-14">
+                    <div class="small">
+                        Uptime
+                    </div>
+                    <div class="fw-bold kpi-value truncate">
+                        <ng-container *ngIf="upTime != null; else noDataUptime">
+                            {{ upTime | daysFormat }}
+                        </ng-container>
+                        <ng-template #noDataUptime>
+                            N/A
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- Available Connections -->
+                <div class="metric-box w-14" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).color === 'red' || getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).color === 'orange')
+                    ? '1px solid ' + getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).color : '' }">
+                    <div class="small">
+                        Available Connections
+                        <span *ngIf="getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).value"
+                            [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).color == 'red' ? 'red' : 'orange'}"
+                            class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+                            {{ getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).value }}</span>
+                    </div>
+                    <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_threads_connected', +avlConnections!).color}">
+                        <ng-container *ngIf="maxConnections != null && avlConnections != null ; else maxConFallback">
+                            {{ avlConnections }}&nbsp;/&nbsp;{{ maxConnections }}
+                        </ng-container>
+                        <ng-template #maxConFallback>
+                            N/A
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- Innodb Buffer Pool Size -->
+                <div class="metric-box w-14">
+                    <div class="small">
+                        Buffer Pool Size
+                        <i class="fa" [ngClass]="innoDbBufferSizeShowFull ? 'fa-eye-slash' : 'fa-eye'"
+                            (click)="innoDbBufferSizeShowFull = !innoDbBufferSizeShowFull"
+                            style="cursor:pointer; font-size:0.75rem; color:#0d6efd; margin-left: 0.5rem;"></i>
+                    </div>
+                    <div class="fw-bold kpi-value">
+                        <ng-container *ngIf="innoDbBufferSize != null; else bufferFallback">
+                            <ng-container *ngIf="innoDbBufferSizeShowFull; else abbreviated">
+                                {{ innoDbBufferSize }} MB
+                            </ng-container>
+                            <ng-template #abbreviated>
+                                <ng-container *ngIf="(+innoDbBufferSize | dataSize) as sizeStr">
+                                    {{ sizeStr }}
+                                </ng-container>
+                            </ng-template>
+                        </ng-container>
+                        <ng-template #bufferFallback>
+                            N/A
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- Thread Cache Size -->
+                <div class="metric-box w-14" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).color === 'red' || getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).color === 'orange')
+                    ? '1px solid ' + getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).color : '' }">
+                    <div class="small">
+                        Thread Cache
+                        <span *ngIf="getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).value"
+                            [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).color == 'red' ? 'red' : 'orange'}"
+                            class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+                            {{ getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).value }}</span>
+                    </div>
+                    <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_threads_cached', +threadCacheSize!).color}">
+                        <ng-container *ngIf="threadCacheSize != null; else threadFallback">
+                            {{ threadCacheSize}}
+                        </ng-container>
+                        <ng-template #threadFallback>
+                            N/A
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- QPS -->
+                <div class="metric-box w-14" data-testid="avg-qps-metric" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_instance_qps', avgqps).color === 'red' || getThresholdDisplay('meter_mysql_instance_qps', avgqps).color === 'orange')
+                    ? '1px solid ' + getThresholdDisplay('meter_mysql_instance_qps', avgqps).color : '' }">
+                    <div class="small">
+                        QPS
+                        <span *ngIf="getThresholdDisplay('meter_mysql_instance_qps', avgqps).value"
+                            [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_qps', avgqps).color == 'red' ? 'red' : 'orange'}"
+                            class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+                            {{ getThresholdDisplay('meter_mysql_instance_qps', avgqps).value }}</span>
+                    </div>
+                    <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_qps', avgqps).color}">
+                        {{ avgqps != null ? avgqps : 'N/A' }}
+                    </div>
+                </div>
+
+                <!-- TPS -->
+                <div class="metric-box w-14" data-testid="avg-tps-metric" [ngStyle]="{'border': (getThresholdDisplay('meter_mysql_instance_tps', avgtps).color === 'red' || getThresholdDisplay('meter_mysql_instance_tps', avgtps).color === 'orange')
+                    ? '1px solid ' + getThresholdDisplay('meter_mysql_instance_tps', avgtps).color : '' }">
+                    <div class="small">
+                        TPS
+                        <span *ngIf="getThresholdDisplay('meter_mysql_instance_tps', avgtps).value"
+                            [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_tps', avgtps).color == 'red' ? 'red' : 'orange'}"
+                            class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold">
+                            {{ getThresholdDisplay('meter_mysql_instance_tps', avgtps).value }}</span>
+                    </div>
+                    <div class="fw-bold kpi-value" [ngStyle]="{'color': getThresholdDisplay('meter_mysql_instance_tps', avgtps).color}">
+                        {{ avgtps != null ? avgtps : 'N/A' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group: Query Volume -->
+            <div class="d-flex align-items-stretch my-3 ps-2" style="margin-right: -2%;">
+                <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                    <h5 class="fw-bold ms-3 mb-0" matTooltip="Query Volume">Query Vol..</h5>
+                    <div class="pointers"></div>
+                </div>
+                <div class="ml-1 d-flex flex-wrap justify-content-start gap-1" style="width: 93%;">
+                    <div class="w-33 card">
+                        <div class="p-1 border-bottom"
+                            style="font-weight: 599;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-size: small;font-weight:500">
+                                    QPS
+                                </span>
+                                <div class=" d-flex align-items-center justify-content-between">
+                                    <select [(ngModel)]="chart_criteria_qps" style="line-height: 1.2;"
+                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                        aria-label="Small select example">
+
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold">Threshold</option>
+
+                                    </select>
+                                    <div *ngIf="chart_criteria_qps=='avg'"
+                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                        style="color:#0e38f1">{{thresholds?.["meter_mysql_instance_qps"]?.avgBaseline}}
+                                    </div>
+                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold" style="color:#e07e23">
+                                        {{thresholds?.["meter_mysql_instance_qps"]?.warningValue}}
+                                    </div>
+                                    <div *ngIf="chart_criteria_qps=='threshold'"
+                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                        {{thresholds?.["meter_mysql_instance_qps"]?.criticalValue}}</div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                            matTooltip="{{ qpsInfo }}"></i>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="current_qps_graph" class="card-body h-33 p-0">
+                            <div *ngIf="!currentQPSdata.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card w-33">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>TPS</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ tpsInfo }}"></i>
+                        </div>
+                        <div id="current_tps_graph" class="card-body h-33 p-0">
+                            <div *ngIf="!currentTPSdata.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="card w-33">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Slow Queries Trend (queries per second)</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ slowQueriesInfo }}"></i>
+                        </div>
+                        <div id="slow_queries_trend" class="card-body h-33 p-0">
+                            <div *ngIf="!slowQueriesTrendData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="w-33 card">
+                        <div class="p-1 border-bottom"
+                            style="font-weight: 599;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-size: small;font-weight:500">
+                                    Slow Queries Trend
+                                </span>
+                            </div>
+                        </div>
+                        <div id="slow_queries_trend" class="card-body h-33 p-0">
+                            <div *ngIf="!slowQueriesTrendData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- <div class="card w-33 mt-2">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Read Query Trends
+                            </span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ commandsReadInfo }}"></i>
+                        </div>
+                        <div id="commands_trend" class="card-body h-33 p-0">
+                            <div *ngIf="!commandTrendData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="w-33 card mt-2">
+                        <div class="p-1 border-bottom "
+                            style="font-weight: 599;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-size: small;font-weight:500">
+                                    Read Query Trends
+                                </span>
+                                <div class=" d-flex align-items-center justify-content-between">
+                                    <select [(ngModel)]="chart_criteria_readQuery" style="line-height: 1.2;"
+                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                        aria-label="Small select example">
+
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold">Threshold</option>
+
+                                    </select>
+                                    <div *ngIf="chart_criteria_readQuery=='avg'"
+                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                        style="color:#0e38f1">
+                                        {{thresholds?.["meter_mysql_instance_commands_select_rate"]?.avgBaseline}}
+                                    </div>
+                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                        class="bg-white rounded-2  px-1 chart-threshold fw-bold" style="color:#e07e23">
+                                        {{thresholds?.["meter_mysql_instance_commands_select_rate"]?.warningValue}}
+                                    </div>
+                                    <div *ngIf="chart_criteria_readQuery=='threshold'"
+                                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                        {{thresholds?.["meter_mysql_instance_commands_select_rate"]?.criticalValue}}</div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                            matTooltip="{{ commandsReadInfo}}"></i>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="commands_trend" class="card-body h-33 p-0">
+                            <div *ngIf="!commandTrendData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card w-33 mt-2">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Write Query Trends
+                            </span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ commandsWriteInfo }}"></i>
+                        </div>
+                        <div id="commands_trend_write" class="card-body h-33 p-0">
+                            <div *ngIf="!commandTrendWriteData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Performance -->
+
+            <div class="d-flex align-items-stretch my-3 ps-2" style="margin-right: -2%;">
+                <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                    <h5 class="fw-bold mb-0" matTooltip="Performance">Perf..</h5>
+                </div>
+                <div class="ml-2 d-flex flex-wrap justify-content-start gap-1" style="width: 93%;">
+                    <!-- Charts -->
+                    <div class="card w-49">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>InnoDb Buffer Pool Usage</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ innodbBufferPoolUsage }}"></i>
+                        </div>
+                        <div id="innoDb_BufferPool_usage" class="card-body h-33 p-0">
+                            <div *ngIf="!InnodbBufferPoolUsageData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card w-49">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>InnoDb Buffer Pool Metrics</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ innodbBufferPoolMetrics }}"></i>
+                        </div>
+                        <div id="innoDb_BufferPool_metrics" class="card-body h-33 p-0">
+                            <div *ngIf="!InnodbBufferPoolMetricsData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group: Connections -->
+            <div class="d-flex align-items-stretch my-3 ps-2" style="margin-right: -2%;">
+                <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+                    <h5 class="fw-bold mb-0" matTooltip="Connections">Conns..</h5>
+                </div>
+
+
+                <div class="ml-1 d-flex flex-wrap justify-content-start gap-1" style="width: 93%;">
+
+                    <div class="card w-33">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Threads</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ threadsInfo }}"></i>
+                        </div>
+                        <div id="trends" class="graph pe-1">
+                            <div *ngIf="!trendsData.length" class="card-body h-33 p-0"
+                                style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card w-33">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Connects</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ connectionsInfo }}"></i>
+                        </div>
+                        <div id="connects" class="card-body h-33 p-0"></div>
+                        <div *ngIf="!connectsData.length" class="text-center"
+                            style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                            <p>No Data</p>
+                        </div>
+
+                    </div>
+                    <div class="card w-33">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Connection Errors</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                matTooltip="{{ connectionsErrorsInfo }}"></i>
+                        </div>
+                        <div id="connection_errors" class="card-body h-33 p-0">
+                            <div *ngIf="!connectionErrorsData.length" class="text-center"
+                                style="color: rgb(137, 137, 137); font-weight: bold;">
+                                <p>No Data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Fallback template -->
+    <ng-template #noDataTemplate>
+        <div class="text-center text-muted fw-bold" style="padding: 85px;">
+            <p>No Data</p>
+        </div>
+    </ng-template>
+</div> <!-- ✅ final closing for .main -->

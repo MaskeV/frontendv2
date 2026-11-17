@@ -1,0 +1,115 @@
+.waterfall-wrapper {
+  overflow-x: auto;
+  padding: 10px;
+  width: 91vw;
+  font-family: sans-serif;
+  background-color: #ffffff;
+}
+
+.waterfall-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #222;
+  font-size: 13px;
+}
+
+.waterfall-table th,
+.waterfall-table td {
+  text-align: left;
+  border: none;
+  vertical-align: middle;
+}
+
+.bar-label {
+  white-space: nowrap;
+  cursor: pointer;
+  color: #444 !important;
+}
+
+.self-bar-container {
+  position: relative;
+  background-color: #f1f1f1;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.self-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.self-label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #000;
+  line-height: 20px;
+}
+
+/* Ticks in ruler */
+.waterfall-table thead div[style*='background-color: white'] {
+  background-color: #888 !important;
+}
+
+.waterfall-table thead div[style*='color: white'] {
+  color: #555 !important;
+}
+
+.collapse-expand-icon {
+  color: #0077b6;
+  font-size: small;
+}
+
+
+.sidebar {
+ 
+    flex: 1;
+    background: #f8f8f8;
+    padding: 4px 11px;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+    font-size: 12px;
+    padding-top: 0px;
+}
+
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+  font-size: small;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+   font-size: small;
+}
+
+.color-box {
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+}
+
+.span-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exec-time {
+  margin-left: 8px;
+  font-weight: bold;
+}

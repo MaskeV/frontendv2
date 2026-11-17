@@ -1,0 +1,96 @@
+input,
+select {
+  font-size: 12px;
+  height: 23px;
+  width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+input::placeholder,
+select {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+select {
+  text-align: left;
+  appearance: none;
+  padding-right: 1.5rem;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+.present-time-btn {
+  width: 7rem;
+  height: 26px;
+  font-size: small;
+  padding-top: 2px;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-right: 0.5vw;
+}
+
+.start-time {
+  width: 10.1rem;
+  height: 26px;
+  font-size: small;
+}
+
+.end-time {
+  width: 10.1rem;
+  height: 26px;
+  font-size: small;
+  margin-left: 0.5vw;
+}
+
+.set {
+  color: rgb(255, 255, 255);
+  font-size: 21px;
+  height: 24px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  border: none;
+}
+
+.custom-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: 86%;
+  left: 0;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  width: 95.2%;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  z-index: 1000;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.custom-dropdown-menu li {
+  padding-left: 7%;
+  padding-top: 6%;
+  padding-bottom: 2%;
+  cursor: pointer;
+  color: #212529;
+  margin-top: -2%;
+  margin-bottom: 3%;
+  white-space: nowrap;
+}
+
+.custom-dropdown-menu li:hover {
+  background-color: #f8f9fa;
+}

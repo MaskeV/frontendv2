@@ -1,0 +1,240 @@
+<div class="modal" tabindex="-1" role="dialog" *ngIf="isVisible">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="height: 10px;">
+                <h5 class="modal-title"> Trace Details </h5>
+                <button type="button" style="margin-left: 91%;" class="close" aria-label="Close"
+                    (click)="closeMainModal()">
+                    <span style="font-size: 25px;" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow-x: auto;">
+                <div class="row align-items-center bg-white mx-1"
+                    style="font-size: x-small; padding: 2px 0px; border: 1px solid #d6d6d6cf;">
+                    <!-- Criteria Dropdown -->
+                    <div class="col-md-1 px-1" style="position: relative;">
+                        <!-- Card style button -->
+                        <div #criteriaCard class="criteria-card" (click)="toggleDropdown()" tabindex="0"
+                            [style.pointerEvents]="allCriteriaSelected ? 'none' : 'auto'"
+                            [style.opacity]="allCriteriaSelected ? '0.5' : '1'">
+                            <strong class="me-1">+ </strong> Citeria
+                            <i class="fas fa-caret-down ms-1" style="float: right; margin-top: 2px;"></i>
+                        </div>
+
+                        <!-- Dropdown menu -->
+                        <ul *ngIf="dropdownOpen && !allCriteriaSelected" #criteriaDropdown class="criteria-dropdown">
+                            <li *ngFor="let c of availableCriteria" (click)="selectCriteria(c.key)" class="">
+                                {{ c.label }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Apply Button -->
+                    <div class="col-md-11 d-flex align-items-center justify-content-between"
+                        style="font-size: x-small; gap: 12px;">
+
+                        <!-- Scrollable Filters -->
+                        <div class="criteria-wrapper d-flex " style="overflow-x: auto; gap: 12px; flex-shrink: 0;">
+                            <div class="criteria" *ngFor="let c of criteriaList" [hidden]="!shownCriteria[c.key]">
+                                <label style="color: #0b3b4f; white-space: nowrap; margin: 0;">
+                                    {{ c.label }}:</label>
+
+                                <ng-container [ngSwitch]="c.key">
+
+                                    <select *ngSwitchCase="'status'" [(ngModel)]="traceState"
+                                        class="form-control form-control-sm"
+                                        style="font-size: xx-small; height: 22px; border-radius: 4px; width: 100px;">
+                                        <option value="">All</option>
+                                        <option value="success">Success</option>
+                                        <option value="error">Error</option>
+                                    </select>
+
+                                    <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDTrace"
+                                        class="form-control form-control-sm"
+                                        style="font-size: xx-small; height: 22px; border-radius: 4px; width: 150px;"
+                                        autocomplete="off">
+
+                                    <input *ngSwitchCase="'minDuration'" type="number" [(ngModel)]="minDuration"
+                                        class="form-control form-control-sm"
+                                        style="font-size: xx-small; height: 22px; border-radius: 4px; width: 100px;"
+                                        autocomplete="off">
+
+                                    <input *ngSwitchCase="'maxDuration'" type="number" [(ngModel)]="maxDuration"
+                                        class="form-control form-control-sm"
+                                        style="font-size: xx-small; height: 22px; border-radius: 4px; width: 100px;"
+                                        autocomplete="off">
+                                </ng-container>
+                                <div class="d-flex justify-content-end ">
+                                    <i class="fas fa-times remove-criteria" (click)="removeCriteria(c.key)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" my-0 py-1 px-2" style="border-left: 1px solid #97a5b2;">
+                            <i class="fas fa-search" style="flex-shrink: 0; cursor: pointer;"
+                                (click)="searchTrace()"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-1">
+                    <div class="card-body p-0" style="max-height: 45vh; overflow: auto;">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%" (click)="toggleSort('isError')">Status &nbsp;<i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th style="width: 20%">Endpoint ({{totalHitsTrace}})</th>
+                                        <th style="width: 12%" (click)="toggleSort('duration')">Duration &nbsp;<i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th style="width: 12%" (click)="toggleSort('start_time')">Start Time &nbsp;<i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th style="width: 12%">Method</th>
+                                        <th style="width: 35%">Trace ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="loadingTrace">
+                                    <tr *ngFor="let i of [].constructor(8)">
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!loadingTrace" style="max-height: 20vh;">
+                                    <tr *ngFor="let item of traceNames;" (click)="selectItem(item)"
+                                        [ngClass]="{'active-row': selectedTraceId?.trim() === item.traceId?.trim()}">
+                                        <td style="width: 5%;">
+                                            <div [ngClass]="item.isError ? 'bg-danger' : 'bg-success'"
+                                                [ngStyle]="{  'width': '5px','height': '20px','margin-right': '8px', 'margin-left': '8px','border-radius': '1px'}">
+                                            </div>
+                                        </td>
+                                        <td style="width: 20%" class="text-ellipsis text-link"
+                                            [ngClass]="item.isError ? 'text-danger' : 'text-link'"
+                                            [title]="decodeBase64(item.endpointId)">{{ decodeBase64(item.endpointId) }}
+                                        </td>
+                                        <td style="width: 12%">{{item.latency}} ms</td>
+                                        <td style="width: 12%">{{item.startTime | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                                        <td style="width: 12%">{{ formatEndpointId(decodeBase64(item.endpointId)) }}
+                                        </td>
+                                        <td style="width: 35%">{{item.traceId}}</td>
+                                    </tr>
+                                </tbody>
+                                <div *ngIf="!loadingTrace && traceNames?.length === 0" class="noData"
+                                    style="height: 35vh;">
+                                    No Data Available
+                                </div>
+                                <div *ngIf="traceNames?.length !== 0" class="col-12 d-flex justify-content-between">
+                                    <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                                        {{traceItemRange}}
+                                    </span>
+                                    <nav class="mb-1 mr-1">
+                                        <ul class="pagination justify-content-center align-items-center"
+                                            style="font-size: small; gap: 0.5rem;">
+
+                                            <li class="page-item" [class.disabled]="currentPageTrace === 1">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary border-none"
+                                                    (click)="previousTracePage()" [disabled]="currentPageTrace === 1"
+                                                    tabindex="0">
+                                                    <i aria-hidden="true" class="fa-solid fa-angle-left"></i>
+                                                </button>
+                                            </li>
+
+                                            <li class="page-item d-flex align-items-center">
+                                                <input type="number" class="form-control form-control-sm text-center"
+                                                    style="width: 60px" [value]="currentPageTrace"
+                                                    (keydown.enter)="goToTracePage(+inputTracePage.value)"
+                                                    #inputTracePage min="1" [max]="totalPagesTrace"
+                                                    aria-label="Page number input" />
+                                                <span class="ms-2">of {{ totalPagesTrace }}</span>
+                                            </li>
+
+                                            <li class="page-item"
+                                                [class.disabled]="currentPageTrace === totalPagesTrace">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary border-none"
+                                                    (click)="nextTracePage()"
+                                                    [disabled]="currentPageTrace === totalPagesTrace" tabindex="0">
+                                                    <i aria-hidden="true" class="fa-solid fa-angle-right"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-1" #traceDetailsSection>
+                    <div class="col">
+                        <div class="mb-2">
+                            <div style="word-wrap: break-word; word-break: break-word;">
+                                <div class="d-flex container justify-content-between align-items-center">
+                                    <div class="w-75"></div>
+                                    <div class="d-flex w-25 container justify-content-between align-items-center">
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Table" [class.selected]="selectedView === 'table'"
+                                            (click)="changeView('table')" class="fa fa-table icon-btn"></i>
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Logs" (click)="changeView('list')"
+                                            [class.selected]="selectedView === 'list'" class="fas fa-list icon-btn"></i>
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Tree" (click)="changeView('tree')"
+                                            [class.selected]="selectedView === 'tree'"
+                                            class="fas fa-network-wired icon-btn"></i>
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Statistics" (click)="changeView('stat')"
+                                            [class.selected]="selectedView === 'stat'"
+                                            class="fa fa-bar-chart icon-btn"></i>
+                                        <i class="fa-solid fa-circle-info custom-tooltip-container">
+                                            <span class="custom-tooltip">
+                                                Trace Id - <span class=""
+                                                    style="font-family: 'Font Awesome 5 Free';">{{selectedTraceId}}</span>
+                                                <i class="fa-regular fa-copy ml-2 cursor-pointer" title="Copy Trace Id"
+                                                    (click)="copyTraceId(selectedTraceId, $event)">
+                                                </i>
+                                            </span>
+                                        </i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card rounded-0 mt-1">
+                                <div style="height: 40vh; overflow: auto">
+                                    <ng-container *ngIf="selectedView === 'table'">
+                                        <app-table-view [traceMetaData]="traceMetaData"
+                                            (itemSelected)="onTableRowSelected($event)"></app-table-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'list'">
+                                        <app-list-view [hierarchicalList]="hierarchicalList"
+                                            (itemSelected)="onListItemSelected($event)"></app-list-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'tree'">
+                                        <div style="height: 100%; width: 100%;">
+                                            <app-tree-view [traceData]="traceData"
+                                                (selectedNode)="openModal($event)"></app-tree-view>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'stat'">
+                                        <app-stat-view [traceMetaData]="traceMetaData"></app-stat-view>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <app-trace-details-modal *ngIf="showModal" [modalData]="modalData" (closeModal)="closeModal()">
+            </app-trace-details-modal>
+        </div>
+    </div>
+</div>

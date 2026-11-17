@@ -1,0 +1,1053 @@
+<main class="main">
+
+    <!-- Breadcrumb + Tabs Header -->
+    <div class="mx-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active sm-font" aria-current="page">Network Data</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <!-- Breadcrumb + Header Flex -->
+    <div class="d-flex justify-content-between align-items-center px-3">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" style="font-size: small;">
+            <ol class="breadcrumb mb-0" style="padding: 0;">
+                <li class="breadcrumb-item"><a routerLink="/network">{{ serviceId }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Network Data</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-content custom-bg p-1 rounded shadow-sm" style="height: 85vh; overflow-x: hidden;">
+        <ul class="nav nav-tabs mb-0 mx-2" id="network-nav" style="font-size: small;">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#port">Port</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" role="tab" href="#metric">Metric</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" role="tab" href="#log">Logs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" role="tab" href="#properties">Properties</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" style="margin-top: 0.5%;">
+            <!-- =============================================================ss========
+     PORT TAB — paste inside your tab-content wrapper
+     ===================================================================== -->
+            <div class="tab-pane fade in active show" id="port" role="tabpanel">
+                <div class="pt-root">
+
+                    <!-- ══════════════════════════════════════════
+         TOOLBAR — Search + View Toggle
+         ══════════════════════════════════════════ -->
+                    <div class="pt-toolbar">
+
+                        <!-- Search -->
+                        <div class="pt-search-wrap">
+                            <i class="fas fa-search pt-search-wrap__icon"></i>
+                            <input type="text" class="pt-search-input" [(ngModel)]="searchText"
+                                placeholder="Search interfaces…" autocomplete="off" />
+                        </div>
+
+                        <!-- View toggle -->
+                        <div class="pt-toggle" role="group">
+                            <button class="pt-toggle__btn" [class.pt-toggle__btn--active]="portViewMode === 'table'"
+                                (click)="portViewMode = 'table'" title="Table View">
+                                <i class="fas fa-table-list"></i>
+                                <span class="pt-toggle__label">Table</span>
+                            </button>
+                            <button class="pt-toggle__btn" [class.pt-toggle__btn--active]="portViewMode === 'diagram'"
+                                (click)="portViewMode = 'diagram'; renderPortTilemap()" title="Honeycomb View">
+                                <i class="fas fa-border-all"></i>
+                                <span class="pt-toggle__label">Honeycomb</span>
+                            </button>
+                            <button class="pt-toggle__btn" [class.pt-toggle__btn--active]="portViewMode === 'cards'"
+                                (click)="portViewMode = 'cards'" title="Cards View">
+                                <i class="fas fa-id-card"></i>
+                                <span class="pt-toggle__label">Cards</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════
+         TABLE VIEW
+         ══════════════════════════════════════════ -->
+                    <div class="pt-panel" *ngIf="portViewMode === 'table'">
+                        <div class="pt-table-wrap">
+                            <table class="pt-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Send <span class="pt-th-unit"></span></th>
+                                        <th>Receive <span class="pt-th-unit"></span></th>
+                                        <th>Throughput <span class="pt-th-unit"></span></th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="networkGraphItemsData && networkGraphItemsData.length > 0">
+                                    <tr class="pt-tr"
+                                        *ngFor="let item of networkGraphItemsData | networkSearch: searchText">
+
+                                        <!-- Name -->
+                                        <td class="pt-td--name">
+                                            <div class="pt-avatar">
+                                                <img src="assets/img/technologies/NIC.png"
+                                                    alt="Network Interface Port icon" class="pt-avatar__img" />
+                                            </div>
+                                            <a href="javascript:void(0)" (click)="navigateWithGraphData(item)"
+                                                class="pt-link-name">
+                                                {{ item?.tagName || 'NA' }}
+                                            </a>
+                                        </td>
+
+                                        <!-- Send -->
+                                        <td>
+                                            <span class="pt-metric pt-metric--send">
+                                                <i class="fas fa-upload pt-metric__icon"></i>
+                                                {{ item?.send | formatKbps }}
+                                            </span>
+                                        </td>
+
+                                        <!-- Receive -->
+                                        <td>
+                                            <span class="pt-metric pt-metric--recv">
+                                                <i class="fas fa-download pt-metric__icon"></i>
+                                                {{ item?.receive | formatKbps }}
+                                            </span>
+                                        </td>
+
+                                        <!-- Throughput -->
+                                        <td>
+                                            <span class="pt-metric pt-metric--thru">
+                                                <i class="fas fa-arrows-left-right pt-metric__icon"></i>
+                                                {{ item?.total | formatKbps }}
+                                            </span>
+                                        </td>
+
+                                        <!-- Status -->
+                                        <td>
+                                            <span class="pt-status-pill" [ngClass]="{
+  'pt-status-pill--down'    : item?.status === 'Down',
+
+  'pt-status-pill--danger'  :
+    item?.status === 'Up' &&
+    (+item?.total || 0) === 0,
+
+  'pt-status-pill--healthy' :
+    item?.status === 'Up' &&
+    (+item?.total || 0) > 0,
+
+  'pt-status-pill--unknown' :
+    !item?.status ||
+    (item?.status !== 'Up' && item?.status !== 'Down')
+}">
+                                                <ng-container [ngSwitch]="item?.status">
+                                                    <i *ngSwitchCase="'Up'" class="fas fa-circle-check"
+                                                        style="font-size:9px;"></i>
+                                                    <i *ngSwitchCase="'Down'" class="fas fa-circle-xmark"
+                                                        style="font-size:9px;"></i>
+                                                    <i *ngSwitchDefault class="fas fa-circle-minus"
+                                                        style="font-size:9px;"></i>
+                                                </ng-container>
+                                                {{ item?.status || 'Unknown' }}
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Empty state -->
+                            <div *ngIf="networkGraphItemsData && networkGraphItemsData.length === 0" class="pt-empty">
+                                <div class="pt-empty__container">
+                                    <i class="fas fa-network-wired pt-empty__icon"></i>
+                                    <p class="pt-empty__text">No Data Available</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════
+         DIAGRAM (HONEYCOMB) VIEW
+         ══════════════════════════════════════════ -->
+                    <div class="pt-panel pt-panel--diagram" *ngIf="portViewMode === 'diagram'">
+                        <button class="pt-fullscreen-btn" (click)="openTilemapFullscreen()"
+                            title="Expand to fullscreen">
+                            <i class="fas fa-expand"></i>
+                            <span>Fullscreen</span>
+                        </button>
+                        <div class="pt-diagram-scroll">
+                            <div id="portTilemapContainer"></div>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════
+         CARDS VIEW
+         ══════════════════════════════════════════ -->
+                    <div class="pt-panel pt-panel--cards" *ngIf="portViewMode === 'cards'">
+
+                        <div class="pt-cards-grid" *ngIf="networkGraphItemsData && networkGraphItemsData.length > 0">
+
+                            <div class="pt-card" *ngFor="let item of networkGraphItemsData | networkSearch: searchText"
+                                (click)="navigateWithGraphData(item)">
+
+                                <!-- Status stripe -->
+                                <div class="pt-card__stripe" [ngClass]="{
+  'pt-card__stripe--down'    : item?.status === 'Down',
+
+  'pt-card__stripe--danger'  :
+    item?.status === 'Up' &&
+    (+item?.total || 0) === 0,
+
+  'pt-card__stripe--healthy' :
+    item?.status === 'Up' &&
+    (+item?.total || 0) > 0,
+
+  'pt-card__stripe--unknown' :
+    !item?.status ||
+    (item?.status !== 'Up' && item?.status !== 'Down')
+}">
+                                </div>
+
+                                <!-- Card header -->
+                                <div class="pt-card__header">
+                                    <div class="pt-card__identity">
+                                        <div class="pt-card__icon-wrap" [ngClass]="{
+  'pt-card__icon-wrap--down'    : item?.status === 'Down',
+
+  'pt-card__icon-wrap--danger'  :
+    item?.status === 'Up' &&
+    (+item?.total || 0) === 0,
+
+  'pt-card__icon-wrap--healthy' :
+    item?.status === 'Up' &&
+    (+item?.total || 0) > 0,
+
+  'pt-card__icon-wrap--unknown' :
+    !item?.status ||
+    (item?.status !== 'Up' && item?.status !== 'Down')
+}">
+                                            <i class="fas fa-network-wired"></i>
+                                        </div>
+                                        <span class="pt-card__name" [title]="item?.tagName || 'NA'">{{ item?.tagName ||
+                                            'NA' }}</span>
+                                    </div>
+
+                                    <!-- Status badge -->
+                                    <span class="pt-status-pill" [ngClass]="{
+  'pt-status-pill--down'    : item?.status === 'Down',
+
+  'pt-status-pill--danger'  :
+    item?.status === 'Up' &&
+    (+item?.total || 0) === 0,
+
+  'pt-status-pill--healthy' :
+    item?.status === 'Up' &&
+    (+item?.total || 0) > 0,
+
+  'pt-status-pill--unknown' :
+    !item?.status ||
+    (item?.status !== 'Up' && item?.status !== 'Down')
+}">
+                                        <ng-container [ngSwitch]="item?.status">
+                                            <i *ngSwitchCase="'Up'" class="fas fa-circle-check"
+                                                style="font-size:9px;"></i>
+                                            <i *ngSwitchCase="'Down'" class="fas fa-circle-xmark"
+                                                style="font-size:9px;"></i>
+                                            <i *ngSwitchDefault class="fas fa-circle-minus" style="font-size:9px;"></i>
+                                        </ng-container>
+                                        <ng-container [ngSwitch]="item?.status">
+                                            <ng-container *ngSwitchCase="'Up'">Up</ng-container>
+                                            <ng-container *ngSwitchCase="'Down'">Down</ng-container>
+                                            <ng-container *ngSwitchDefault>{{ item?.status || 'Unknown'
+                                                }}</ng-container>
+                                        </ng-container>
+                                    </span>
+                                </div>
+
+                                <!-- Metrics grid -->
+                                <div class="pt-card__metrics">
+                                    <div class="pt-metric-tile pt-metric-tile--send">
+                                        <div class="pt-metric-tile__label">
+                                            <i class="fas fa-upload"></i> Send
+                                        </div>
+                                        <div class="pt-metric-tile__value">{{ item?.send | formatKbps }}</div>
+                                        <div class="pt-metric-tile__unit"></div>
+                                    </div>
+                                    <div class="pt-metric-tile pt-metric-tile--recv">
+                                        <div class="pt-metric-tile__label">
+                                            <i class="fas fa-download"></i> Receive
+                                        </div>
+                                        <div class="pt-metric-tile__value">{{ item?.receive | formatKbps }}</div>
+                                        <div class="pt-metric-tile__unit"></div>
+                                    </div>
+                                    <div class="pt-metric-tile pt-metric-tile--thru">
+                                        <div class="pt-metric-tile__label">
+                                            <i class="fas fa-arrows-left-right"></i> Throughput
+                                        </div>
+                                        <div class="pt-metric-tile__value">{{ item?.total | formatKbps }}</div>
+                                        <div class="pt-metric-tile__unit"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Card footer -->
+                                <div class="pt-card__footer">
+                                    <span class="pt-card__footer-label">
+                                        <i class="fas fa-ethernet"></i>
+                                        Network Interface
+                                    </span>
+                                    <i class="fas fa-chevron-right pt-card__footer-arrow"></i>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div class="pt-empty" *ngIf="!networkGraphItemsData || networkGraphItemsData.length === 0">
+                            <div class="pt-empty__container">
+                                <i class="fas fa-network-wired pt-empty__icon"></i>
+                                <p class="pt-empty__text">No Data Available</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════════════════════════════════════════
+     FULLSCREEN OVERLAY
+     Place OUTSIDE the tab-pane div — exact TS bindings same
+     ══════════════════════════════════════════════════════════ -->
+            <div id="tilemapFullscreenOverlay" class="pt-fs-overlay">
+
+                <!-- Fullscreen header bar -->
+                <div class="pt-fs-header">
+                    <div class="pt-fs-header__left">
+                        <i class="fas fa-border-all pt-fs-header__icon"></i>
+                        <span class="pt-fs-header__title">Network Ports — Honeycomb View</span>
+                    </div>
+                    <button class="pt-fs-header__close" (click)="closeTilemapFullscreen()" title="Exit Fullscreen">
+                        <i class="fas fa-compress"></i>
+                        <span>Exit Fullscreen</span>
+                    </button>
+                </div>
+
+                <!-- Chart area — overflow hidden → no scroll at all -->
+                <div class="pt-fs-body">
+                    <div id="portTilemapFullscreen" style="width: 98%; margin: auto;"></div>
+                </div>
+
+            </div>
+
+            <!-- Other Tabs -->
+            <div class="tab-pane fade" id="metric" role="tabpanel">
+                <div class="row metrics-container"
+                    style="width: 100%; margin-top: 1%; margin-bottom: 2%; margin-left: 0;">
+
+                    <!-- Logo container -->
+                    <div class="logo-box" *ngIf="metricsData.logo">
+                        <div class="logo-content">
+                            <img [src]="metricsData.logo.src" [alt]="metricsData.logo.alt || ''" />
+                            <div class="logo-label">{{ metricsData.logo.label }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Metric boxes -->
+                    <ng-container *ngFor="let metric of metricsData.metrics">
+                        <div class="metric-box" *ngIf="+metric.value > 0"
+                            [style.flex]="'0 0 ' + (100 / metricsData.metrics.length) + '%'">
+
+                            <div class="small">
+                                {{ metric.title }}
+                                <i class="fa-solid fa-circle-info gradiantIcon"
+                                    [matTooltip]="metric.tooltip || metric.title"></i>
+                            </div>
+
+                            <div class="fw-bold">{{ metric.value }}</div>
+                        </div>
+                    </ng-container>
+
+
+                </div>
+
+
+                <!-- <ng-container *ngFor="let groupName of groupOrder"> 
+                    <div class="d-flex align-items-center section-header mb-2">
+                        <h5 class="fw-bold mb-0" [matTooltip]="groupName">{{ groupName }}</h5>
+                        <div class="pointers ms-2"></div>
+                    </div> 
+                    <div class="d-flex flex-wrap justify-content-around mb-4"> <ng-container
+                            *ngFor="let chartOption of groupedCharts[groupName]"> 
+                            <div *ngIf="!chartOption.isPlaceholder"
+                                class="w-33 px-0 custom-border border div-elem mt-2">
+                                <div class="p-1 border-bottom custom-border"
+                                    style="background-color: var(--card-header-bg); font-weight: 599;">
+                                    <div class="d-flex justify-content-between align-items-center"> <span
+                                            style="font-size: small; font-weight: 500">{{ chartOption.itemName }}</span>
+                                        <span> <i class="fa-solid fa-circle-info gradiantIcon ms-1" matButton="elevated"
+                                                [matTooltip]="chartOption.description"></i> </span> </div>
+                                </div>
+                                <div class="card-body h-33 p-0">
+                                    <div *ngIf="chartOption.hasData"> <highcharts-chart [Highcharts]="Highcharts"
+                                            [options]="chartOption" style="width: 100%; height: 150px; display: block;">
+                                        </highcharts-chart> </div>
+                                    <div *ngIf="!chartOption.hasData" class="text-center"
+                                        style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                                        <p>No Data</p>
+                                    </div>
+                                </div>
+                                <div class="border-top custom-border text-center p-1"
+                                    style="font-size: x-small; font-weight: bold;"> <span>Min: {{ chartOption.min
+                                        }}</span>&nbsp;&nbsp; <span>Max: {{ chartOption.max }}</span>&nbsp;&nbsp;
+                                    <span>Avg: {{ chartOption.avg }}</span>&nbsp;&nbsp; <span>Last: {{ chartOption.last
+                                        }}</span> </div>
+                            </div>
+                            <div *ngIf="chartOption.isPlaceholder" class="w-33 mt-2"></div>
+                        </ng-container> </div>
+                </ng-container> -->
+
+
+                <ng-container *ngFor="let groupName of groupOrder">
+                    <div class="d-flex mb-4 align-items-start">
+
+                        <!-- Section Header -->
+                        <div class="section-header d-flex align-items-center justify-content-center me-2"
+                            [style.height.px]="getSectionHeaderHeight(groupedCharts[groupName])" style="flex: 0 0 4%;">
+                            <h5 class="fw-bold mb-0 text-center" [matTooltip]="groupName">{{ groupName }}</h5>
+                        </div>
+
+                        <!-- Charts Container -->
+                        <div class="charts-container d-flex flex-wrap align-content-start"
+                            style="flex: 0 0 96%;gap: 0.5%;">
+                            <ng-container *ngFor="let chartOption of groupedCharts[groupName]">
+
+                                <!-- Real Chart -->
+                                <div *ngIf="!chartOption.isPlaceholder"
+                                    class="chart-card w-33 px-0 custom-border border div-elem mb-3">
+                                    <div class="p-1 border-bottom"
+                                        style="background-color: var(--card-header-bg); font-weight: 599;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span style="font-size: small; font-weight: 500">{{ chartOption.itemName
+                                                }}</span>
+                                            <span>
+                                                <i class="fa-solid fa-circle-info gradiantIcon ms-1"
+                                                    matButton="elevated" [matTooltip]="chartOption.description"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body h-33 p-0">
+                                        <div *ngIf="chartOption.hasData">
+                                            <highcharts-chart [Highcharts]="Highcharts" [options]="chartOption"
+                                                style="width: 100%; height: 150px; display: block;">
+                                            </highcharts-chart>
+                                        </div>
+                                        <div *ngIf="!chartOption.hasData" class="no-data-card text-center">
+                                            <p class="mb-0">No Data</p>
+                                        </div>
+
+                                    </div>
+                                    <div class="border-top text-center p-1"
+                                        style="font-size: x-small; font-weight: bold;">
+                                        <span>Min: {{ chartOption.min }}</span>&nbsp;&nbsp;
+                                        <span>Max: {{ chartOption.max }}</span>&nbsp;&nbsp;
+                                        <span>Avg: {{ chartOption.avg }}</span>&nbsp;&nbsp;
+                                        <span>Last: {{ chartOption.last }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Placeholder -->
+                                <div *ngIf="chartOption.isPlaceholder" class="w-33 mb-3"></div>
+
+                            </ng-container>
+                        </div>
+
+                    </div>
+                </ng-container>
+
+
+            </div>
+
+
+            <div class="tab-pane fade" id="log" role="tabpanel">
+                <div class="table-container">
+                    <div class="mx-2 my-2 mb-2" style="height: 70vh; overflow: auto;">
+
+                        <div class="row mb-4">
+                            <div class="d-flex align-items-center mb-3 gap-7 flex-wrap filter-row neumorphic-glass">
+                                <!-- Weight dropdown -->
+                                <div class="filter-item">
+                                    <label class="filter-label">Weight By :</label>
+                                    <select class="form-select form-select-sm rounded-pill shadow-sm"
+                                        [(ngModel)]="selectedWeight" (change)="updateSankey()">
+                                        <option value="count">Count</option>
+                                        <option value="packetLength">Packet Length</option>
+                                    </select>
+                                </div>
+
+                                <!-- Top-N dropdown -->
+                                <div class="filter-item">
+                                    <label class="filter-label">Top Network Flow :</label>
+                                    <select class="form-select form-select-sm rounded-pill shadow-sm" [(ngModel)]="topN"
+                                        (change)="updateSankey()">
+                                        <option [value]="5">Top 5</option>
+                                        <option [value]="10">Top 10</option>
+                                        <option [value]="20">Top 20</option>
+                                    </select>
+                                </div>
+
+                                <!-- Source IP dropdown -->
+                                <div class="filter-item">
+                                    <label class="filter-label">Source :</label>
+                                    <select class="form-select form-select-sm rounded-pill shadow-sm"
+                                        [(ngModel)]="selectedSrc" (change)="updateSankey()">
+                                        <option value="">All</option>
+                                        <option *ngFor="let src of uniqueSources" [value]="src">{{ src }}</option>
+                                    </select>
+                                </div>
+
+                                <!-- Destination IP dropdown -->
+                                <div class="filter-item">
+                                    <label class="filter-label">Destination :</label>
+                                    <select class="form-select form-select-sm rounded-pill shadow-sm"
+                                        [(ngModel)]="selectedDst" (change)="updateSankey()">
+                                        <option value="">All</option>
+                                        <option *ngFor="let dst of uniqueDestinations" [value]="dst">{{ dst }}</option>
+                                    </select>
+                                </div>
+
+                                <!-- Minimum threshold slider -->
+                                <div class="filter-item slider-container">
+                                    <label class="filter-label">Min Flow :</label>
+                                    <input type="range" [(ngModel)]="minThreshold" min="0" max="50000" step="1000"
+                                        (input)="updateSankey()" class="slider" />
+                                    <span class="slider-value">{{ minThreshold }}</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill shadow-sm"
+                                        type="button" [disabled]="isDefaultFilters()" (click)="resetFilters()">
+                                        Reset Filters
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+                            <!-- <div id="sankeyContainer" [style.width.%]="100" [style.height.px]="sankyHeight"
+                                style="margin-bottom: 5%;">
+
+                            </div> -->
+
+
+                            <!-- Src → Dst Counts -->
+                            <!-- <div class="col-md-4">
+                                <h5 class="fw-bold text-primary">Src → Dst IP Counts</h5>
+                                <table class="table table-bordered table-hover align-middle text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Src → Dst</th>
+                                            <th>Count</th>
+                                            <th>Size (bytes)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of topSrcDestCounts">
+                                            <td>{{ item.src_dst }}</td>
+                                            <td><span class="badge bg-info text-dark">{{ item.count }}</span></td>
+                                            <td>{{ item.packetLength }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> -->
+
+                            <div class="col-md-4">
+                                <h5 class="fw-bold text-primary">Src → Dst IP Counts</h5>
+                                <div class="table2-container">
+
+                                    <table class="table2 table2-bordered table2-hover align-middle text-center"
+                                        style="table-layout: fixed !important;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="pointer resizable" style="width: 165px;">Src →
+                                                    Dst
+                                                    <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                        matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                        (click)="$event.stopPropagation()">
+                                                    </div>
+                                                </th>
+
+                                                <!-- Count Sorting -->
+                                                <th (click)="sortFlowTable('count')" class="sortable">
+                                                    Count
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortFlowColumn !== 'count'" class="fas fa-sort"></i>
+                                                        <i *ngIf="sortFlowColumn === 'count' && sortFlowDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortFlowColumn === 'count' && sortFlowDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+
+                                                </th>
+
+                                                <!-- Size Sorting -->
+                                                <th (click)="sortFlowTable('packetLength')" class="sortable">
+                                                    Size (bytes)
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortFlowColumn !== 'packetLength'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortFlowColumn === 'packetLength' && sortFlowDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortFlowColumn === 'packetLength' && sortFlowDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr *ngFor="let item of topSrcDestCountsSorted" style="font-size: small;"
+                                                (click)="item.showFull = !item.showFull">
+                                                <td>
+                                                    <div [ngClass]="{'line-clamp-1': !item.showFull, 'line-clamp-none': item.showFull}"
+                                                        class="overflow-hidden" matButton="elevated"
+                                                        data-bs-toggle="tooltip" title="{{item.src_dst}}">
+                                                        {{ item.src_dst }}
+                                                    </div>
+                                                </td>
+                                                <!-- Count Pill -->
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-info"
+                                                            [style.width.%]="(item.count / maxCount) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ item.count }}</span>
+                                                    </div>
+                                                </td>
+
+                                                <!-- Size Pill -->
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-success"
+                                                            [style.width.%]="(item.packetLength / maxPacketLength) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ item.packetLength }}</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!topSrcDestCountsSorted.length">
+                                                <td colspan="3" class="text-center text-muted">No data available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Top Src IPs -->
+                            <div class="col-md-4">
+                                <h5 class="fw-bold text-success">Top Src IPs</h5>
+                                <div class="table2-container">
+
+                                    <table class="table2 table2-bordered table2-hover align-middle text-center"
+                                        style="table-layout: fixed !important;">
+
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="pointer resizable" style="width: 165px;">Src →
+                                                    <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                        (click)="$event.stopPropagation()">
+                                                    </div>
+                                                </th>
+                                                <th (click)="sortTopSrcIPTable('count')" class="sortable">
+                                                    Count
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortTopSrcIPColumn !== 'count'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopSrcIPColumn === 'count' && sortTopSrcIPDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopSrcIPColumn === 'count' && sortTopSrcIPDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+
+                                                </th>
+                                                <th (click)="sortTopSrcIPTable('packetLength')" class="sortable">
+                                                    Size (bytes)
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortTopSrcIPColumn !== 'packetLength'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopSrcIPColumn === 'packetLength' && sortTopSrcIPDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopSrcIPColumn === 'packetLength' && sortTopSrcIPDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let src of topSrcAndDestCounts?.src_ips"
+                                                style="font-size: small;" (click)="src.showFull = !src.showFull">
+                                                <td>
+                                                    <div [ngClass]="{'line-clamp-1': !src.showFull, 'line-clamp-none': src.showFull}"
+                                                        class="overflow-hidden">
+                                                        {{ src.ip }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-info"
+                                                            [style.width.%]="(src.count / maxCount) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ src.count }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-success"
+                                                            [style.width.%]="(src.packetLength / maxPacketLength) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ src.packetLength }}</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!topSrcAndDestCounts?.src_ips?.length">
+                                                <td colspan="3" class="text-center text-muted">No data available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Top Dst IPs -->
+                            <div class="col-md-4">
+                                <h5 class="fw-bold text-primary">Top Dst IPs</h5>
+                                <div class="table2-container">
+
+                                    <table class="table2 table2-bordered table2-hover align-middle text-center"
+                                        style="table-layout: fixed !important;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="pointer resizable" style="width: 165px;">Src →
+                                                    Dst IP
+                                                    <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                        (click)="$event.stopPropagation()">
+                                                    </div>
+                                                </th>
+                                                <th (click)="sortTopDstIPTable('count')" class="sortable">
+                                                    Count
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortTopDstIPColumn !== 'count'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopDstIPColumn === 'count' && sortTopDstIPDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopDstIPColumn === 'count' && sortTopDstIPDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+
+                                                </th>
+                                                <th (click)="sortTopDstIPTable('packetLength')" class="sortable">
+                                                    Size (bytes)
+                                                    <span class="sort-icon">
+                                                        <i *ngIf="sortTopDstIPColumn !== 'packetLength'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopDstIPColumn === 'packetLength' && sortTopDstIPDirection === 'desc'"
+                                                            class="fas fa-sort"></i>
+                                                        <i *ngIf="sortTopDstIPColumn === 'packetLength' && sortTopDstIPDirection === 'asc'"
+                                                            class="fas fa-sort"></i>
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let dst of topSrcAndDestCounts?.dst_ips"
+                                                style="font-size: small;" (click)="dst.showFull = !dst.showFull">
+                                                <td>
+                                                    <div [ngClass]="{'line-clamp-1': !dst.showFull, 'line-clamp-none': dst.showFull}"
+                                                        class="overflow-hidden">
+                                                        {{ dst.ip }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-info"
+                                                            [style.width.%]="(dst.count / maxCount) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ dst.count }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="pill-bar">
+                                                        <div class="pill-fill bg-success"
+                                                            [style.width.%]="(dst.packetLength / maxPacketLength) * 100">
+                                                        </div>
+                                                        <span class="pill-label">{{ dst.packetLength }}</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="!topSrcAndDestCounts?.dst_ips?.length">
+                                                <td colspan="3" class="text-center text-muted">No data available</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logs with filters -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-secondary" style="margin-left: 0.3%;">Logs</h5>
+
+                            <!-- Filter UI -->
+                            <div class="card card-sm p-2 mb-3 shadow-sm">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa-solid fa-circle-info text-success me-2 fs-6"></i>
+                                    <h6 class="mb-0 fw-semibold small">Filters</h6>
+                                    <div class="ms-auto">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                            (click)="resetFilters()" title="Reset to defaults">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Active Filters as Chips -->
+                                <div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
+                                    <ng-container *ngIf="dynamicFilters.length; else noFilters">
+                                        <span *ngFor="let f of dynamicFilters; let i = index"
+                                            class="badge filter-chip d-flex align-items-center gap-2 px-3 py-1 rounded-pill">
+                                            <i class="fa-solid fa-filter text-primary small"></i>
+                                            <span class="fw-medium small">{{ f.field }}:</span>
+                                            <span class="small text-truncate" style="max-width:140px;">{{ f.value
+                                                }}</span>
+
+                                            <span class="ms-2 d-flex gap-1">
+                                                <button class="btn btn-sm btn-link p-0 link-warning" title="Edit filter"
+                                                    (click)="editFilter(i)">
+                                                    <i class="fa-solid fa-pen small"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-link p-0 link-danger"
+                                                    title="Remove filter" (click)="removeFilter(i)">
+                                                    <i class="fa-solid fa-xmark small"></i>
+                                                </button>
+                                            </span>
+                                        </span>
+                                    </ng-container>
+
+                                    <ng-template #noFilters>
+                                        <div class="text-muted fst-italic small">No active filters</div>
+                                    </ng-template>
+                                </div>
+
+                                <!-- Add / Edit Filter (compact responsive grid) -->
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-12 col-md-4" style="width: 30%; margin-right: 1%; margin-left: 1%;">
+                                        <select class="form-select form-select-sm" [(ngModel)]="newFilter.field"
+                                            aria-label="Field">
+                                            <option [ngValue]="''" disabled selected value="">Select field</option>
+                                            <option *ngFor="let opt of filterOptions" [ngValue]="opt"
+                                                [disabled]="isFilterSelected(opt) && !isEditingFilter(opt)">
+                                                {{ opt.label }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-5" style="margin-right: 1%">
+                                        <input type="text" class="form-control form-control-sm"
+                                            placeholder="Enter value" [(ngModel)]="newFilter.value"
+                                            aria-label="Filter value" />
+                                    </div>
+
+                                    <div class="col-12 col-md-3 d-flex gap-2">
+                                        <button class="btn btn-sm w-100"
+                                            [ngClass]="isEditing ? 'btn-warning' : 'btn-outline-primary'" type="button"
+                                            (click)="saveFilter()" style="border-radius: 15px;">
+                                            <i
+                                                [ngClass]="isEditing ? 'fa-solid fa-save' : 'fa-solid fa-plus-circle'"></i>
+                                            <span class="ms-1 small">{{ isEditing ? 'Update' : 'Add' }}</span>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-success w-100" type="button"
+                                            (click)="applyFilters()" style="border-radius: 15px;">
+                                            <i class="fa-solid fa-check-circle"></i>
+                                            <span class="ms-1 small">Apply</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Logs Table -->
+                            <div class="table2-container">
+                                <table class="table2 table2-bordered table2-hover align-middle text-center"
+                                    style="table-layout:fixed !important;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="pointer resizable" style="width: 12%;">Time
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 10%;">Src IP
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 10%;">Dst IP
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 9%;">Src Port
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 9%;">Dst Port
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 7%;">Size (Bytes)
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 7%;">Protocol
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 10%;">Action
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 10%;">Rule
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="pointer resizable" style="width: 8%;">Interface
+                                                <div class="resize-handle" (mousedown)="initResize($event, 0)"
+                                                    matButton="elevated" data-bs-toggle="tooltip" title="Resize"
+                                                    (click)="$event.stopPropagation()">
+                                                </div>
+                                            </th>
+                                            <th>Direction</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let log of logs" style="font-size: small;"
+                                            (click)="log.showFull = !log.showFull">
+                                            <td>
+                                                <div [ngClass]="{'line-clamp-1': !log.showFull, 'line-clamp-none': log.showFull}"
+                                                    class="overflow-hidden" matButton="elevated"
+                                                    data-bs-toggle="tooltip" title="{{log.timeStamp}}">
+                                                    {{ log.timeStamp }}
+                                                </div>
+                                            </td>
+                                            <td>{{ log.srcIp }}</td>
+                                            <td>{{ log.dstIp }}</td>
+                                            <td>{{ log.srcPort }}</td>
+                                            <td>{{ log.dstPort }}</td>
+                                            <td>{{ log.packetLength }}</td>
+                                            <td><span class="badge bg-secondary">{{ log.protocol }}</span></td>
+                                            <td>
+                                                <span class="badge"
+                                                    [ngClass]="{'bg-success': log.ruleResult === 'pass','bg-danger': log.ruleResult === 'blocked'}">
+                                                    {{ log.ruleResult }}
+                                                </span>
+                                            </td>
+                                            <td>{{ log.ruleAction }}</td>
+                                            <td>{{ log.interfaceName }}</td>
+                                            <td>{{ log.direction }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <nav *ngIf="totalPages > 1" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" [class.disabled]="currentPage === 1">
+                                        <button class="page-link" (click)="changePage(currentPage - 1)"
+                                            [disabled]="currentPage === 1">
+                                            Previous
+                                        </button>
+                                    </li>
+
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ currentPage }}/{{totalPages}}</span>
+                                    </li>
+
+                                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                        <button class="page-link" (click)="changePage(currentPage + 1)"
+                                            [disabled]="currentPage === totalPages">
+                                            Next
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="properties" role="tabpanel">
+                <div class="card custom-shadow">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">PROPERTIES DETAILS</h5>
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control form-control-sm mr-2"
+                                [ngClass]="{ 'search-input-hidden': !showSearch }" [(ngModel)]="searchText"
+                                style="width: 200px;" />
+                            <i class="fas fa-search mr-3" (click)="toggleSearch()" style="cursor: pointer;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th> NAME </th>
+                                        <th> INTERFACE </th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="networkPropertiesData?.length !== 0">
+                                    <ng-container
+                                        *ngFor="let item of networkPropertiesData | networkSearch: searchText">
+                                        <tr *ngIf="item.displayType === 'History'">
+                                            <td>{{ item.itemName }}</td>
+                                            <td>{{ getItemValue(item.itemName) }}</td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                                <div class="noData d-flex justify-content-center align-items-center"
+                                    style="height: 67vh;" *ngIf="networkPropertiesData?.length === 0">
+                                    <h4>No Data to Display</h4>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -1,0 +1,765 @@
+<!-- ── FORM VIEW ── -->
+<div *ngIf="view === 'form'"
+  class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mt-2">
+
+  <!-- Header -->
+  <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+    <i class="ri-building-line text-primary text-xl"></i>
+    <h2 class="text-base font-semibold flex-1 text-slate-800 dark:text-slate-100">Add New Client</h2>
+    <button class="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+      (click)="showTable()">
+      See All Clients <i class="ri-arrow-right-line text-sm"></i>
+    </button>
+  </div>
+
+  <!-- Form Body -->
+  <div class="p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+
+      <!-- Client Name -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Client Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+          type="text" appSanitizeInput maxlength="50" placeholder="Enter client name" [(ngModel)]="clientObj.clientName" />
+      </div>
+
+      <!-- Domain -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Domain <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none no-native-arrow cursor-pointer transition-all text-slate-700 dark:text-slate-200"
+            [(ngModel)]="clientObj.domainTypeId">
+            <option [ngValue]="null" disabled>Select Domain</option>
+            <option *ngFor="let d of domainList" [value]="d.id">{{ d.domainName }}</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <i class="ri-arrow-down-s-line text-slate-400 text-base"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Status <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none no-native-arrow cursor-pointer transition-all text-slate-700 dark:text-slate-200"
+            [(ngModel)]="clientObj.isActive">
+            <option value="Y">Active</option>
+            <option value="N">Inactive</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <i class="ri-arrow-down-s-line text-slate-400 text-base"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retention Period -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Retention Period
+        </label>
+        <div class="flex items-center gap-2">
+          <input
+            class="w-[56%] bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+            type="number"
+            placeholder="Enter Retention Period"
+            [(ngModel)]="clientObj.dataRetentionValue" />
+
+          <select
+            class="w-[40%] bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200"
+            [(ngModel)]="clientObj.dataRetentionUnit">
+            <option value="DAY">Day</option>
+            <option value="MONTH">Month</option>
+            <option value="YEAR">Year</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Contact Details -->
+    <div class="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100">Company Contact Details</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">You can add up to 3 contacts.</p>
+        </div>
+
+        <button
+          type="button"
+          class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 shadow-md shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="addCompanyContact()"
+          [disabled]="companyContact.length >= 3">
+          <i class="ri-add-line"></i>
+          Add Contact
+        </button>
+      </div>
+
+      <!-- Dynamic Contact Cards -->
+      <div *ngFor="let person of companyContact; let i = index"
+        class="mb-5 p-4 border border-slate-200 dark:border-slate-800 rounded-lg">
+
+        <div class="mb-3 flex items-center justify-between">
+          <div class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Company Contact {{ i + 1 }}
+          </div>
+
+          <button *ngIf="companyContact.length > 1" type="button" class="text-red-500 hover:text-red-600 text-sm"
+            (click)="removeCompanyContact(i)">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Name -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Name
+            </label>
+            <input
+              class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+              type="text" appSanitizeInput placeholder="Enter name" [(ngModel)]="companyContact[i].name"/>
+          </div>
+
+          <!-- Number -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Number
+            </label>
+            <input
+              class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+              type="text" appSanitizeInput placeholder="Enter number" [(ngModel)]="companyContact[i].number" #phoneRef="ngModel" maxlength="10"
+              pattern="^[0-9]{10}$" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" />
+          
+            <p *ngIf="phoneRef.invalid && phoneRef.touched" class="text-xs text-red-500 mt-1">
+              Please enter a valid 10-digit phone number.
+            </p>
+          </div>
+
+          <!-- Mail ID -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Mail ID
+            </label>
+            <input
+              class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+              type="email" appSanitizeInput placeholder="Enter mail ID" [(ngModel)]="companyContact[i].email" #mailRef="ngModel" email
+              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" />
+          
+            <p *ngIf="mailRef.invalid && mailRef.touched" class="text-xs text-red-500 mt-1">
+              Please enter a valid email address.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <button type="button"
+        class="px-4 py-1.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30 rounded-lg text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-900/20 active:scale-95 transition-all flex items-center gap-2 shadow-sm shadow-red-100/50"
+        (click)="resetForm()">
+        Discard Changes <i class="ri-close-line text-sm"></i>
+      </button>
+
+      <button type="button"
+        class="px-4 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 shadow-md shadow-primary/20"
+        (click)="saveClient()" [disabled]="!canCreate">
+        <i class="ri-save-line"></i> Save Client
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── TABLE VIEW (Paginated - Matching Resource Mapping UI) ── -->
+<div *ngIf="view === 'table'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div
+    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mt-4">
+    <!-- Search and Header -->
+    <div
+      class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <button (click)="showForm()"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+          <i class="ri-arrow-left-line text-lg"></i>
+        </button>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">See All Clients</h2>
+      </div>
+
+      <!-- Search -->
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" appSanitizeInput [(ngModel)]="searchText" (keyup)="search()"
+            class="pl-9 pr-4 py-2 w-full md:w-64 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400"
+            placeholder="Search by name or email..." />
+        </div>
+
+        <button (click)="showForm()" [disabled]="!canCreate"
+          class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-primary/20">
+          <i class="ri-add-line text-sm"></i>
+          Add Client
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Body -->
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="w-full text-left border-collapse min-w-[1000px]">
+        <thead>
+          <tr
+            class="bg-slate-50/80 dark:bg-slate-800/50 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-12 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              SN</th>
+            <th (click)="sortBy('clientName')"
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 cursor-pointer hover:bg-slate-100/50 transition-colors">
+              Client Name <i class="ri-arrow-up-down-line ml-1 text-slate-400"></i>
+            </th>
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              Domain Name</th>
+            <th (click)="sortBy('dataRetention')"
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 cursor-pointer hover:bg-slate-100/50 transition-colors">
+              Data Retention <i class="ri-arrow-up-down-line ml-1 text-slate-400"></i>
+            </th>
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700">
+              Contact 1
+            </th>
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700">
+              Contact 2
+            </th>
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700">
+              Contact 3
+            </th>
+            <th (click)="sortBy('isActive')"
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 cursor-pointer hover:bg-slate-100/50 transition-colors">
+              Status <i class="ri-arrow-up-down-line ml-1 text-slate-400"></i>
+            </th>
+            <th
+              class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center px-4 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+          <tr *ngFor="let client of paginatedData; let i = index"
+            class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <td
+              class="px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              {{ (p - 1) * itemsPerPage + i + 1 }}
+            </td>
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              <ng-container *ngIf="!client.isEditing; else editName">
+                {{ client.clientName }}
+              </ng-container>
+              <ng-template #editName>
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientName"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+              </ng-template>
+            </td>
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              <ng-container *ngIf="!client.isEditing; else editDomain">
+                {{ client.domainName }}
+              </ng-container>
+              <ng-template #editDomain>
+                <select [(ngModel)]="client.domainTypeId"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                  <option *ngFor="let d of domainList" [value]="d.id">{{ d.domainName }}</option>
+                </select>
+              </ng-template>
+            </td>
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              <ng-container *ngIf="!client.isEditing; else editDataRetention">
+                {{ client.dataRetention || 'N/A' }}
+              </ng-container>
+              <ng-template #editDataRetention>
+                <input type="number" [(ngModel)]="client.dataRetentionValue" style="width: 35%;"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <select [(ngModel)]="client.dataRetentionUnit" style="width: 60%;"
+                  class="ms-1 w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                  <option value="DAY">Day</option>
+                  <option value="MONTH">Month</option>
+                  <option value="YEAR">Year</option>
+                </select>
+              </ng-template>
+            </td>
+            <!-- Contact 1 -->
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700">
+              <ng-container *ngIf="!client.isEditing; else editContact1">
+                <div
+                  *ngIf="client.clientContactName1 || client.clientContactNumber1 || client.clientContactMailId1; else noContact1">
+                  <p class="font-medium">{{ client.clientContactName1 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactNumber1 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactMailId1 || '—' }}</p>
+                </div>
+                <ng-template #noContact1><span class="text-slate-300">—</span></ng-template>
+              </ng-container>
+              <ng-template #editContact1>
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactName1" placeholder="Name"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactNumber1" placeholder="Phone"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500"
+                  maxlength="10" pattern="^[0-9]{10}$" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+                <input type="email" appSanitizeInput [(ngModel)]="client.clientContactMailId1" placeholder="Email"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500"
+                  email pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+              </ng-template>
+            </td>
+            
+            <!-- Contact 2 -->
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700">
+              <ng-container *ngIf="!client.isEditing; else editContact2">
+                <div
+                  *ngIf="client.clientContactName2 || client.clientContactNumber2 || client.clientContactMailId2; else noContact2">
+                  <p class="font-medium">{{ client.clientContactName2 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactNumber2 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactMailId2 || '—' }}</p>
+                </div>
+                <ng-template #noContact2><span class="text-slate-300">—</span></ng-template>
+              </ng-container>
+              <ng-template #editContact2>
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactName2" placeholder="Name"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactNumber2" placeholder="Phone"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <input type="email" appSanitizeInput [(ngModel)]="client.clientContactMailId2" placeholder="Email"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+              </ng-template>
+            </td>
+            
+            <!-- Contact 3 -->
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700">
+              <ng-container *ngIf="!client.isEditing; else editContact3">
+                <div
+                  *ngIf="client.clientContactName3 || client.clientContactNumber3 || client.clientContactMailId3; else noContact3">
+                  <p class="font-medium">{{ client.clientContactName3 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactNumber3 || '—' }}</p>
+                  <p class="text-slate-400">{{ client.clientContactMailId3 || '—' }}</p>
+                </div>
+                <ng-template #noContact3><span class="text-slate-300">—</span></ng-template>
+              </ng-container>
+              <ng-template #editContact3>
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactName3" placeholder="Name"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <input type="text" appSanitizeInput [(ngModel)]="client.clientContactNumber3" placeholder="Phone"
+                  class="w-full text-xs p-1 mb-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                <input type="email" appSanitizeInput [(ngModel)]="client.clientContactMailId3" placeholder="Email"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+              </ng-template>
+            </td>
+            <td
+              class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+              <ng-container *ngIf="!client.isEditing; else editStatus">
+                <span
+                  [class]="client.isActive === 'Y' ? 'px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-bold' : 'px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px] font-bold'">
+                  {{ client.isActive === 'Y' ? 'Active' : 'Inactive' }}
+                </span>
+              </ng-container>
+              <ng-template #editStatus>
+                <select [(ngModel)]="client.isActive"
+                  class="w-full text-xs p-1 border rounded outline-none focus:ring-1 focus:ring-primary-500">
+                  <option value="Y">Active</option>
+                  <option value="N">Inactive</option>
+                </select>
+              </ng-template>
+            </td>
+            <td class="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 px-4">
+              <div class="flex items-center justify-center gap-2">
+                <ng-container *ngIf="!client.isEditing; else editActions">
+                  <button (click)="viewLicense(client)"
+                    class="w-7 h-7 flex items-center justify-center rounded bg-purple-50 hover:bg-purple-100 text-purple-600 transition-colors"
+                    title="View License">
+                    <i class="ri-eye-line text-sm"></i>
+                  </button>
+                  <button (click)="enableEdit(client)" [disabled]="!canEdit"
+                    class="w-7 h-7 flex items-center justify-center rounded bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                    title="Edit">
+                    <i class="ri-edit-line text-sm"></i>
+                  </button>
+                </ng-container>
+                <ng-template #editActions>
+                  <button (click)="saveEdit(client)"
+                    class="w-7 h-7 flex items-center justify-center rounded bg-green-50 hover:bg-green-100 text-green-600 transition-colors"
+                    title="Save">
+                    <i class="ri-check-line text-sm"></i>
+                  </button>
+                  <button (click)="cancelEdit(client)"
+                    class="w-7 h-7 flex items-center justify-center rounded bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors"
+                    title="Cancel">
+                    <i class="ri-close-line text-sm"></i>
+                  </button>
+                </ng-template>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredClients.length === 0">
+            <td colspan="12" class="py-12 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <div
+                  class="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-800">
+                  <i class="ri-search-line text-3xl"></i>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-600 dark:text-slate-300">No clients found</p>
+                  <p class="text-xs text-slate-400">We couldn't find any clients matching your search criteria.</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination (Matching Resource Mapping Exactly) -->
+    <div
+      class="px-4 py-3 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          Showing <span class="text-slate-900 dark:text-slate-200 font-bold">{{(p - 1) * itemsPerPage + 1}}</span> to
+          <span class="text-slate-900 dark:text-slate-200 font-bold">{{Math.min(p * itemsPerPage, clientTableData.length
+            || 0)}}</span> of
+          <span class="text-slate-900 dark:text-slate-200 font-bold">{{clientTableData.length || 0}}</span> results
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-slate-500 font-medium">Rows per page:</label>
+          <input type="number" [(ngModel)]="itemsPerPage" (change)="onPageSizeChange(itemsPerPage)" min="1"
+            class="w-16 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs py-1.5 px-2 outline-none focus:ring-2 focus:ring-primary/20 text-center" />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <button (click)="prevPage()" [disabled]="p === 1"
+          class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+
+        <ng-container *ngFor="let page of visiblePages">
+          <button (click)="goToPage(page)" [class.bg-primary-500]="p === page" [class.text-white]="p === page"
+            [class.border-primary-500]="p === page" [class.bg-white]="p !== page" [class.text-slate-600]="p !== page"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:border-primary-500 transition-all shadow-sm">
+            {{page}}
+          </button>
+        </ng-container>
+
+        <button (click)="nextPage()" [disabled]="p === totalPages"
+          class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- License Details Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" *ngIf="isLicenseModalOpen">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" (click)="closeLicenseModal()"></div>
+  <div class="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <i class="ri-shield-keyhole-line text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">License Details</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Client: <span class="font-bold text-slate-700 dark:text-slate-300">{{ selectedClientForLicense?.clientName }}</span></p>
+        </div>
+      </div>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 transition-colors" (click)="closeLicenseModal()">
+        <i class="ri-close-line text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-slate-50/30 dark:bg-slate-900">
+      
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        
+        <!-- Fullstack Card -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-700 pb-2">
+            <div class="flex items-center gap-2 text-primary font-bold">
+              <i class="ri-server-line"></i> Fullstack
+            </div>
+            <button (click)="openDetailsModal('Fullstack')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded transition-colors">View</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="space-y-1">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ licenseDetails?.fullstackTotal }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-blue-500 uppercase tracking-wider font-semibold">Used</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ licenseDetails?.fullstackUsed }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">Remaining</p>
+              <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ licenseDetails?.fullstackRemaining }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modules Card -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-700 pb-2">
+            <div class="flex items-center gap-2 text-primary font-bold">
+              <i class="ri-function-line"></i> Modules
+            </div>
+            <button (click)="openDetailsModal('Modules')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded transition-colors">View</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="space-y-1">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ licenseDetails?.modulesTotal }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-blue-500 uppercase tracking-wider font-semibold">Used</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ licenseDetails?.modulesUsed }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">Remaining</p>
+              <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ licenseDetails?.modulesRemaining }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- NDU Card -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-700 pb-2">
+            <div class="flex items-center gap-2 text-primary font-bold">
+              <i class="ri-database-2-line"></i> NDU
+            </div>
+            <button (click)="openDetailsModal('NDU')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded transition-colors">View</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="space-y-1">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ licenseDetails?.nduTotal }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-blue-500 uppercase tracking-wider font-semibold">Used</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ licenseDetails?.nduUsed }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">Remaining</p>
+              <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ licenseDetails?.nduRemaining }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Card -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-700 pb-2">
+            <div class="flex items-center gap-2 text-primary font-bold">
+              <i class="ri-group-line"></i> Users
+            </div>
+            <button (click)="openDetailsModal('Users')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded transition-colors">View</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="space-y-1">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ licenseDetails?.usersTotal }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-blue-500 uppercase tracking-wider font-semibold">Used</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ licenseDetails?.usersUsed }}</p>
+            </div>
+            <div class="space-y-1 border-l border-slate-100 dark:border-slate-700">
+              <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">Remaining</p>
+              <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ licenseDetails?.usersRemaining }}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal (Matches Role Feature List Popup) -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6" *ngIf="isDetailsModalOpen">
+  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="closeDetailsModal()"></div>
+  <div class="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[16px] shadow-2xl flex flex-col max-h-[80vh] animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+      <h2 class="text-base font-bold text-slate-800 dark:text-slate-100 m-0">{{ detailsModalTitle }}</h2>
+      <div class="bg-blue-500 py-1 px-2 rounded-md text-white text-[9px] font-bold tracking-wide shadow-sm flex items-center gap-1">
+        <span class="opacity-90">CLIENT:</span>
+        <span class="uppercase font-extrabold">{{ selectedClientForLicense?.clientName }}</span>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 flex gap-2 shrink-0">
+      <div class="relative flex-1">
+        <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input 
+          type="text" 
+          appSanitizeInput
+          placeholder="Search {{ detailsModalType === 'Fullstack' ? 'hosts or applications' : (detailsModalType === 'Users' ? 'users' : 'applications') }}..." 
+          [(ngModel)]="searchModalText"
+          (input)="filterModalData()"
+          class="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+        />
+      </div>
+    </div>
+
+    <ng-container *ngIf="detailsModalType !== 'Fullstack'">
+      <!-- List Header -->
+      <div class="flex bg-slate-50 dark:bg-slate-800/50 text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0 border-b border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700 rounded-t-lg">
+        <div class="w-[60px] px-2 py-2.5 text-center">SR. NO.</div>
+        <div class="flex-1 px-3 py-2.5 text-center">{{ detailsModalType === 'Users' ? 'USER NAME' : 'APPLICATION NAME' }}</div>
+        <div class="px-3 py-2.5 text-center shrink-0" [ngClass]="detailsModalType === 'Users' ? 'w-[160px]' : 'w-36'">{{ detailsModalType === 'Users' ? 'ROLE' : 'APPLICATION TYPE' }}</div>
+        <div class="w-28 px-3 py-2.5 text-center shrink-0" *ngIf="detailsModalType === 'Users'">STATUS</div>
+      </div>
+
+      <!-- Scrollable List -->
+      <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/30 dark:bg-slate-900/30">
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-colors divide-x divide-slate-100 dark:divide-slate-700" *ngFor="let item of detailsModalData; let i = index">
+            <div class="w-[60px] text-xs font-bold text-slate-400 py-2.5 text-center">{{ (i + 1) < 10 ? '0' + (i + 1) : (i + 1) }}</div>
+            <div class="flex-1 text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-start gap-2 px-4 py-2.5 text-left min-w-0">
+              <i class="ri-user-line text-blue-500 text-sm shrink-0" *ngIf="detailsModalType === 'Users'"></i>
+              <i class="ri-apps-line text-blue-500 text-sm shrink-0" *ngIf="detailsModalType !== 'Users'"></i>
+              <span class="truncate block w-full" [title]="detailsModalType === 'Users' ? item.userName : item.applicationName">
+                {{ detailsModalType === 'Users' ? item.userName : item.applicationName }}
+              </span>
+            </div>
+            <div class="text-center shrink-0 px-3 py-2.5" [ngClass]="detailsModalType === 'Users' ? 'w-[160px]' : 'w-36'">
+              <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded text-[10px] font-bold block truncate" [title]="item.roleName">
+                {{ detailsModalType === 'Users' ? item.roleName : (item.applicationType || 'N/A') }}
+              </span>
+            </div>
+            <div class="w-28 text-center shrink-0 px-3 py-2.5 flex items-center justify-center" *ngIf="detailsModalType === 'Users'">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold tracking-wide whitespace-nowrap"
+                    [ngClass]="item.isActive === 'Y' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/30' : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/30'">
+                {{ item.isActive === 'Y' ? 'ACTIVE' : 'INACTIVE' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex flex-col items-center justify-center py-12 gap-2" *ngIf="!detailsModalData?.length">
+          <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center">
+            <i class="ri-search-line text-lg text-slate-300 dark:text-slate-500"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400">
+            {{ detailsModalType === 'Users' ? 'No users mapped.' : 'No applications mapped.' }}
+          </p>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="detailsModalType === 'Fullstack'">
+      <!-- Scrollable Host List -->
+      <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/30 dark:bg-slate-900/30">
+        <div class="flex flex-col gap-3">
+          
+          <div *ngFor="let host of filteredFullstackHostGroups" 
+               class="group bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all overflow-hidden">
+            
+            <!-- Host Header -->
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <!-- Dropdown Arrow -->
+                <button (click)="toggleHost(host.hostName + '_' + host.ipAddress)"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                  <i class="ri-arrow-right-s-line text-lg text-slate-400 transition-transform duration-300"
+                     [class.rotate-90]="expandedHosts[host.hostName + '_' + host.ipAddress]"></i>
+                </button>
+                
+                <!-- Host Icon / Avatar -->
+                <div class="w-9 h-9 rounded-lg text-white flex items-center justify-center text-sm font-bold shadow-md dark:shadow-none"
+                     [ngClass]="host.hostName === 'No Associated Host' || host.hostName === 'No Associated Host Application' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-orange-100/50' : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-100'">
+                  <i [ngClass]="host.hostName === 'No Associated Host' || host.hostName === 'No Associated Host Application' ? 'ri-question-line' : 'ri-server-line'" class="text-base"></i>
+                </div>
+                
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-slate-100 text-xs cursor-pointer hover:text-blue-600"
+                      (click)="toggleHost(host.hostName + '_' + host.ipAddress)">
+                    {{ host.hostName }}
+                  </h3>
+                  <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5" *ngIf="host.ipAddress">
+                    IP: {{ host.ipAddress }}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Badge showing App Count -->
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/30">
+                {{ host.apps?.length || 0 }} mapped
+              </span>
+            </div>
+            
+            <!-- Mapped Apps Accordion Content -->
+            <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800"
+                 *ngIf="expandedHosts[host.hostName + '_' + host.ipAddress]">
+              <div class="grid grid-cols-1 gap-2.5">
+                <div *ngFor="let app of host.apps" 
+                     class="flex items-center gap-3 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/10 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all group/app">
+                  
+                  <div class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover/app:text-blue-600 group-hover/app:border-blue-100 transition-colors shadow-sm">
+                    <i [ngClass]="getProductIcon(app.type || app.techType)" class="text-base"></i>
+                  </div>
+                  
+                  <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate group-hover/app:text-blue-700 dark:group-hover/app:text-blue-400">
+                      {{ app.name }}
+                    </p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                      <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ app.type }}</span>
+                      <span *ngIf="app.techType" class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                      <span *ngIf="app.techType" class="text-[9px] font-medium text-blue-500 font-mono">{{ app.techType }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          
+          <div class="flex flex-col items-center justify-center py-12 gap-2" *ngIf="!filteredFullstackHostGroups?.length">
+            <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center">
+              <i class="ri-search-line text-lg text-slate-300 dark:text-slate-500"></i>
+            </div>
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400">
+              No hosts found matching your search.
+            </p>
+          </div>
+          
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Footer -->
+    <div class="px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end shrink-0 rounded-b-[16px]">
+      <button class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-1.5 rounded-lg font-bold text-xs transition-colors flex items-center gap-1.5" (click)="closeDetailsModal()">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>

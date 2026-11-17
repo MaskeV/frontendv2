@@ -1,0 +1,1361 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;">
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item"><a [routerLink]="['/infra']" class="d-flex">
+                    <div class="winlogo mt-1">
+                        <img src="assets/images/windows.png" alt="Windows">
+                    </div>{{selectedService}}
+                </a></li>
+            <li class="breadcrumb-item active" aria-current="page">Host Service</li>
+        </ol>
+    </nav>
+    <div class="p-1 rounded" style="margin-bottom: -14px;">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom" id="service-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#process_list"
+                        (click)="loadData('process_list')">Process List</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+    <div class="tab-content custom-bg p-1">
+        <!-- OVERVIEW -->
+        <div class="tab-pane fade in active show" id="overview">
+            <div class="d-flex rounded-4 pt-2 justify-content-start align-items-center w-100"
+                style="gap: 2px; flex-wrap: wrap;">
+                <!-- Logo -->
+                <div class="logo-inline">
+                    <img src="assets/images/windows.png" alt="Windows">
+                </div>
+
+                <!-- Metric Boxes -->
+                <div class="custom-border rounded-4 border topBoxMap">
+                    <div class="map-wrapper" *ngIf="locations.length && locations[0].name">
+                        <img src="assets/images/mapp.png" alt="Map" class="map-image rounded-4"
+                            style="width: 15vw; height: 12vh;" />
+
+                        <div *ngFor="let point of locations" class="pin" [style.left.%]="point.x"
+                            [style.top.%]="point.y">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <div class="pin-label">{{ point.name }}</div>
+                        </div>
+                    </div>
+                    <div class="noDataBox" *ngIf="!locations.length || !locations[0].name">
+                        No data available
+                    </div>
+                </div>
+
+                <!-- <div class="card topBox">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        Uptime
+                        <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Total system running time since last reboot."></i>
+                    </h5>
+                    <div class="textFill px-1" *ngIf="upTime!=null">
+
+                        <div class="uptim1">
+                            <p class="pb-0 mb-0 fw-bold" [ngStyle]="{'color': uptimeColor}" [innerHTML]="upTime"></p>
+                            <span class="pt-0 mt-0"
+                                style="color: rgb(144, 143, 143); font-size: x-small; font-weight: 400;">since
+                                {{sinceWhenUptime}}</span>
+                        </div>
+
+                    </div>
+                    <div class="noDataBox" *ngIf="upTime==null">
+                        No data available
+                    </div>
+                </div> -->
+
+                <div class="card topBox" [ngClass]="{
+    'orange-border': getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).color === 'orange',
+    'red-border': getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).color === 'red'
+}">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        CPU Usage
+                        <span>
+                            <span *ngIf="cpuUsage != null"
+                                class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold cursor-pointer"
+                                [ngStyle]="{'color': getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).badgeColor}"
+                                style="font-size: x-small;"
+                                [matTooltip]="getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                (click)="userDefinedThreshold('CPU Usage')">
+                                {{ getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).badgeValue |
+                                number:'1.0-0' }}
+                            </span>
+                        </span>
+                    </h5>
+                    <div class="uptim">
+                        <div class="fw-bold"
+                            [ngStyle]="{'color': getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).color}">
+                            {{cpuUsage}}<span class="mini-text">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card topBox" [ngClass]="{
+    'orange-border': getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).color === 'orange',
+    'red-border': getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).color === 'red'
+}">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        Memory Usage
+                        <span>
+                            <span *ngIf="memoryRamUsage != null"
+                                class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold cursor-pointer"
+                                [ngStyle]="{'color': getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).badgeColor}"
+                                style="font-size: x-small;"
+                                [matTooltip]="getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                (click)="userDefinedThreshold('Memory Usage')">
+                                {{ getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).badgeValue |
+                                number:'1.2-2' }}
+                            </span>
+                        </span>
+                    </h5>
+                    <div class="uptim">
+                        <div class="fw-bold"
+                            [ngStyle]="{'color': getMetricUiState('meter_win_memory_used', memoryRamUsage, 1024).color}">
+                            {{ memoryRamUsage }}<span class="mini-text">GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card topBox" [ngClass]="{
+    'orange-border': getMetricUiState('meter_win_memory_swap_percentage', memorySwapUsage).color === 'orange',
+    'red-border': getMetricUiState('meter_win_memory_swap_percentage', memorySwapUsage).color === 'red'
+}">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        Swap Usage
+                        <span>
+                            <span *ngIf="memorySwapUsage != null"
+                                class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold cursor-pointer"
+                                [ngStyle]="{'color': getMetricUiState('meter_win_memory_swap_percentage', memorySwapUsage).badgeColor}"
+                                style="font-size: x-small;"
+                                [matTooltip]="getMetricUiState('meter_win_memory_swap_percentage', memorySwapUsage).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                (click)="userDefinedThreshold('Swap Usage')">
+                                {{ getMetricUiState('meter_win_memory_swap_percentage', memorySwapUsage).badgeValue |
+                                number:'1.2-2' }}
+                            </span>
+                        </span>
+                    </h5>
+
+                    <div class="uptim" *ngIf="latestSwapUsed != null">
+                        <div class="fw-bold"
+                            [ngStyle]="{'color': getMetricUiState('meter_win_memory_swap_percentage', latestSwapUsed).color}">
+                            {{ (latestSwapUsed ) | number:'1.2-2' }}<span class="mini-text">%</span>
+                        </div>
+                    </div>
+
+                    <div class="noDataBox" *ngIf="memorySwapUsage == null">
+                        No data available
+                    </div>
+                </div>
+
+                <!-- <div class="card topBox" [ngClass]="{
+                                            'orange-border': loadAverageColor === 'orange',
+                                            'red-border': loadAverageColor === 'red'
+                                          }">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        Load Average
+                        <span>
+                            <span *ngIf="loadAverageThreshold"
+                                class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold cursor-pointer"
+                                [ngStyle]="{'color': cpuLoadBadgeColor}" style="font-size: x-small;"
+                                [matTooltip]="cpuLoadBadgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                (click)="userDefinedThreshold('Load Average')">
+                                {{cpuLoadBadge}}
+                            </span>
+                            <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Shows 1,5 and 15-minute load averages. Indicates the number of processes waiting for CPU resources, helping assess system performance and saturation."></i>
+                        </span>
+                    </h5>
+                    <div class="uptim" *ngIf="loadAverage!=null">
+                        <div class="fw-bold" [ngStyle]="{'color': loadAverageColor}">
+                            {{loadAverage}}<span class="mini-text">%</span>
+                        </div>
+                    </div>
+                    <div class="noDataBox" *ngIf="loadAverage==null">
+                        No data available
+                    </div>
+                </div> -->
+
+                <div class="card topBox">
+                    <h5 class="card-title mb-0 py-1 d-flex justify-content-between align-items-center">
+                        Disk Usage (C:)
+                        <span>
+                            <!-- <span class="badge  border me-1  rounded-0 py-0 px-1 m-0 threshold">60</span> -->
+                            <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Percentage of disk space used on the primary partition."></i>
+                        </span>
+                    </h5>
+                    <div class="uptim" *ngIf="diskPartitionPercent!=null">
+
+                        <div class="fw-bold" [ngStyle]="{'color': uptimeColor}">{{diskPartitionPercent}}<span
+                                class="mini-text">%</span></div>
+
+                    </div>
+                    <div class="noDataBox" *ngIf="diskPartitionPercent==null">
+                        No data available
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row col-md-12 ms-1 my-3 alertRow">
+                <div class="problemPage"
+                    style="width: 6.5%; display: flex; align-items: center; cursor: pointer; justify-content: space-around;"
+                    (click)="goToProblemPage()">
+                    <span class="badge" data-bs-toggle="tooltip" matButton="elevated" title="See what went wrong"
+                        style="font-size: small; padding: 0%; font-family: system-ui;font-weight: 600;">
+                        Failures
+                    </span>
+                </div>
+                <div style="width: 93.5%; padding: 0%;">
+                    <ng-container *ngFor="let alert of alertData">
+                        <div *ngIf="alert.Critical > 0 || alert.Warning > 0" class="d-flex align-items-center">
+                            <div class="p-0 alert-bar d-flex w-100 custom-shadow">
+                                <div class="alert-section critical-section" *ngIf="alert.Critical > 0"
+                                    [style.minWidth.px]="70" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Critical Alert: {{alert.Critical}} | Warning Alert: {{alert.Warning}}"
+                                    (click)="goToAlertHistory()" [style.flex]="alert.Critical" style="cursor: pointer">
+                                    Critical: {{ alert.Critical }}
+                                </div>
+                                <div class="alert-section warning-section" *ngIf="alert.Warning > 0"
+                                    [style.minWidth.px]="70" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Critical Alert: {{alert.Critical}} | Warning Alert: {{alert.Warning}}"
+                                    (click)="goToAlertHistory()" [style.flex]="alert.Warning" style="cursor: pointer">
+                                    Warn: {{ alert.Warning }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-0 alert-bar d-flex w-100 custom-shadow"
+                            *ngIf="alert.Critical === 0 && alert.Warning === 0">
+                            <div class="alert-section alert-empty w-100 p-2 text-center text-white small">
+                                No alerts
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Group: HOST -->
+            <div class="d-flex align-items-stretch custom-border w-100 gap-1">
+                <div class=" p-0 d-flex justify-content-center align-items-center host-box"
+                    style="background: var(--custom-card-color); width: 5%;">
+                    <h5 class="custom-bold mb-0">Host</h5>
+                </div>
+
+                <div class=" d-flex gap-1 flex-wrap">
+                    <div class="gap-3">
+                        <div class="squareBox">
+                            <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                                CPU Usage (%)
+                                <span>
+                                    <span *ngIf="cpuUsageBadge"
+                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold cursor-pointer"
+                                        [ngStyle]="{'color': getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).badgeColor}"
+                                        style="font-size: small;line-height: 1.2;" [matTooltip]="cpuUsageBadge">
+                                        {{ getMetricUiState('meter_win_cpu_total_percentage', cpuUsage).badgeValue |
+                                        number:'1.0-0' }}
+                                    </span>
+                                    <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Breaks down CPU time spent on user, system, idle, I/O wait, interrupts, and hypervisor tasks. Helps detect CPU bottlenecks and ensure efficient processing."></i>
+                                </span>
+                            </div>
+                            <div class="d-flex" [style.width.px]="cpuSizeW" [style.height.px]="cpuSizeH"
+                                style="position: relative; border: 1px solid #ccc;">
+                                <div class="cpu-tile" *ngFor="let tile of displayCpuUsageTiles"
+                                    [style.width.px]="tile.width" [style.height.px]="tile.height"
+                                    [style.backgroundColor]="tile.color" [style.position]="'absolute'"
+                                    [style.left.px]="tile.x" [style.top.px]="tile.y" [title]="getTileTooltip2(tile)">
+                                    {{ tile.isOverflowTile ? '...' : tile.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div [hidden]="avgCpuUsageChart==null"
+                            style="height: 150px; color: #219ebc;box-shadow:
+                                        0 2px 4px rgba(0, 0, 0, 0.1),
+                                        0 8px 16px rgba(0, 0, 0, 0.10),
+                                        0 12px 24px rgba(0, 0, 0, 0.1);
+                                    transition: box-shadow 0.5s ease, transform 0.3s ease; padding-top: 8px; background-color: white; "
+                            id="avgCpuUsageChart">
+                        </div>
+                        <div *ngIf="avgCpuUsageChart==null" class="noDataGraphBox">
+                            No Data Available
+                        </div>
+
+                    </div>
+
+                    <div class="gap-3">
+                        <div class="squareBox">
+                            <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                style="background-color: #66a3ad85; font-weight: 500; ">
+
+                                <span
+                                    style="font-size: small; font-weight:500; display: inline-block; max-width: 130px; 
+                                                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Memory RAM (MB)
+                                </span>
+                                <span class="d-flex ">
+                                    <div *ngIf="!isInfraThresholdsEmpty()"
+                                        class="d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chartData_criteriaForMemoryRam"
+                                            (ngModelChange)="updateChartVisibility('MemoryRam')"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                            aria-label="Small select example"
+                                            style="line-height: 1.2; font-size: small;">
+
+                                            <option value="all" selected>All</option>
+                                            <option value="total">Total</option>
+                                            <option value="available">Available</option>
+                                            <option value="buff">Buff/Cache</option>
+                                            <option value="used">Used</option>
+
+                                        </select>
+                                        <select *ngIf="chartData_criteriaForMemoryRam!='all'"
+                                            [(ngModel)]="chart_criteriaForMemoryRam"
+                                            style="line-height: 1.2; font-size: small"
+                                            class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                            aria-label="Small select example">
+
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+
+                                        </select>
+                                        <div *ngIf="chart_criteriaForMemoryRam=='avg' && chartData_criteriaForMemoryRam!='all'"
+                                            class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1; font-size: small;line-height: 1.2">
+                                            {{ chartValuesRam.avg | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForMemoryRam=='threshold' && chartData_criteriaForMemoryRam!='all'"
+                                            class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23; font-size: small;line-height: 1.2">
+                                            {{ chartValuesRam.warning | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForMemoryRam=='threshold' && chartData_criteriaForMemoryRam!='all'"
+                                            class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold"
+                                            style="font-size:small;line-height: 1.2">
+                                            {{ chartValuesRam.critical | number:'1.0-2' }}
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1" matButton="elevated"
+                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Shows total, used, available memory, and buffers/cache. Helps track memory pressure, optimize performance, and prevent out-of-memory issues."></i>
+                                </span>
+                            </div>
+                            <div class="d-flex" [style.width.px]="cpuSizeW" [style.height.px]="cpuSizeH"
+                                style="position: relative; border: 1px solid #ccc;">
+                                <div class="cpu-tile" *ngFor="let tile of displayMemoryRamTiles"
+                                    [style.width.px]="tile.width" [style.height.px]="tile.height"
+                                    [style.backgroundColor]="tile.color" [style.position]="'absolute'"
+                                    [style.left.px]="tile.x" [style.top.px]="tile.y" [title]="getTileTooltip(tile)">
+                                    {{ tile.isOverflowTile ? '...' : tile.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div [hidden]="memoryRamChart==null"
+                            style="height: 150px; color: #219ebc;box-shadow:
+                                        0 2px 4px rgba(0, 0, 0, 0.1),
+                                        0 8px 16px rgba(0, 0, 0, 0.10),
+                                        0 12px 24px rgba(0, 0, 0, 0.1);
+                                    transition: box-shadow 0.5s ease, transform 0.3s ease; padding-top: 8px; background-color: white; "
+                            id="memoryRAMChart">
+                        </div>
+                        <div *ngIf="memoryRamChart==null" class="noDataGraphBox">
+                            No Data Available
+                        </div>
+
+                    </div>
+                    <div class="gap-3">
+                        <div class="squareBox">
+
+                            <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+
+                                <span
+                                    style="font-size: small; font-weight:500; display: inline-block; max-width: 130px; 
+                                                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Memory Swap (MB)
+                                </span>
+                                <span class="d-flex">
+                                    <div *ngIf="!isInfraThresholdsEmpty()"
+                                        class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chartData_criteriaForMemorySwap"
+                                            (ngModelChange)="updateChartVisibility('MemorySwap')"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                            aria-label="Small select example"
+                                            style="line-height: 1.2; font-size: small;">
+
+                                            <option value="all" selected>All</option>
+                                            <option value="totalSwap">Total</option>
+                                            <option value="free">Free</option>
+                                            <option value="usedSwap">Used</option>
+
+                                        </select>
+                                        <select *ngIf="chartData_criteriaForMemorySwap!='all'"
+                                            [(ngModel)]="chart_criteriaForMemorySwap"
+                                            style="line-height: 1.2; font-size: small"
+                                            class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                            aria-label="Small select example">
+
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold"
+                                                *ngIf="chartData_criteriaForMemorySwap!='totalSwap'">
+                                                Threshold
+                                            </option>
+
+                                        </select>
+                                        <div *ngIf="chart_criteriaForMemorySwap=='avg' && chartData_criteriaForMemorySwap!='all'"
+                                            class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1; font-size: small;line-height: 1.2">
+                                            {{ chartValuesSwap.avg | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForMemorySwap=='threshold' && chartData_criteriaForMemorySwap!='all'"
+                                            class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23; font-size: small;line-height: 1.2">
+                                            {{ chartValuesSwap.warning | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForMemorySwap=='threshold' && chartData_criteriaForMemorySwap!='all'"
+                                            class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold"
+                                            style="color:#e07e23; font-size: small;line-height: 1.2">
+                                            {{ chartValuesSwap.critical | number:'1.0-2' }}
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1" matButton="elevated"
+                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Shows total and free swap space. High swap usage may indicate insufficient RAM and potential system slowdowns."></i>
+                                </span>
+                            </div>
+                            <div class="d-flex" [style.width.px]="cpuSizeW" [style.height.px]="cpuSizeH"
+                                style="position: relative; border: 1px solid #ccc;">
+                                <div class="cpu-tile" *ngFor="let tile of displayMemorySwapTiles"
+                                    [style.width.px]="tile.width" [style.height.px]="tile.height"
+                                    [style.backgroundColor]="tile.color" [style.position]="'absolute'"
+                                    [style.left.px]="tile.x" [style.top.px]="tile.y" [title]="getTileTooltip(tile)">
+                                    {{ tile.isOverflowTile ? '...' : tile.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div [hidden]="memorySwapChart==null"
+                            style="height: 150px; color: #219ebc;box-shadow:
+                                        0 2px 4px rgba(0, 0, 0, 0.1),
+                                        0 8px 16px rgba(0, 0, 0, 0.10),
+                                        0 12px 24px rgba(0, 0, 0, 0.1);
+                                    transition: box-shadow 0.5s ease, transform 0.3s ease; padding-top: 8px; background-color: white; "
+                            id="memorySwapChart">
+                        </div>
+                        <div *ngIf="memorySwapChart==null" class="noDataGraphBox">
+                            No Data Available
+                        </div>
+
+                    </div>
+
+
+                    <!-- <div class="gap-3 mt-2">
+                        <div class="squareBox">
+                            <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                                style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+
+                                <span
+                                    style="font-size: small; font-weight:500; display: inline-block; max-width: 130px; 
+                                                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    CPU Load (%)
+                                </span>
+                                <span class="d-flex">
+                                    <div *ngIf="!isInfraThresholdsEmpty()"
+                                        class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chartData_criteriaForCpuLoad"
+                                            (ngModelChange)="updateChartVisibility('CpuLoad')"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                            aria-label="Small select example"
+                                            style="line-height: 1.2; font-size: small;">
+
+                                            <option value="all" selected>All</option>
+                                            <option value="load_1">load_1</option>
+                                            <option value="load_5">load_5</option>
+                                            <option value="load_15">load_15</option>
+
+                                        </select>
+                                        <select *ngIf="chartData_criteriaForCpuLoad!='all'"
+                                            [(ngModel)]="chart_criteriaForCpuLoad"
+                                            style="line-height: 1.2; font-size: small"
+                                            class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                            aria-label="Small select example">
+
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+
+                                        </select>
+                                        <div *ngIf="chart_criteriaForCpuLoad=='avg' && chartData_criteriaForCpuLoad!='all'"
+                                            class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1; font-size: small;line-height: 1.2">
+                                            {{ chartValuesCpuLoad.avg | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForCpuLoad=='threshold' && chartData_criteriaForCpuLoad!='all'"
+                                            class="bg-white rounded-2 px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23;font-size: small;line-height: 1.2">
+                                            {{ chartValuesCpuLoad.warning | number:'1.0-2' }}
+                                        </div>
+
+                                        <div *ngIf="chart_criteriaForCpuLoad=='threshold' && chartData_criteriaForCpuLoad!='all'"
+                                            class="bg-white mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold"
+                                            style="font-size: small;line-height: 1.2">
+                                            {{ chartValuesCpuLoad.critical | number:'1.0-2' }}
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1" matButton="elevated"
+                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Shows 1,5 and 15-minute load averages. Indicates the number of processes waiting for CPU resources, helping assess system performance and saturation."></i>
+                                </span>
+                            </div>
+
+                            <div class="d-flex" [style.width.px]="cpuSizeW" [style.height.px]="cpuSizeH"
+                                style="position: relative; border: 1px solid #ccc;">
+                                <div class="cpu-tile" *ngFor="let tile of displayCpuLoadTiles"
+                                    [style.width.px]="tile.width" [style.height.px]="tile.height"
+                                    [style.backgroundColor]="tile.color" [style.position]="'absolute'"
+                                    [style.left.px]="tile.x" [style.top.px]="tile.y" [title]="getTileTooltip2(tile)">
+                                    {{ tile.isOverflowTile ? '...' : tile.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div [hidden]="avgCpuLoadChart==null"
+                            style="height: 150px; color: #219ebc;box-shadow:
+                                        0 2px 4px rgba(0, 0, 0, 0.1),
+                                        0 8px 16px rgba(0, 0, 0, 0.10),
+                                        0 12px 24px rgba(0, 0, 0, 0.1);
+                                    transition: box-shadow 0.5s ease, transform 0.3s ease; padding-top: 8px; background-color: white; "
+                            id="avgCpuLoadChart">
+                        </div>
+                        <div *ngIf="avgCpuLoadChart==null" class="noDataGraphBox">
+                            No Data Available
+                        </div>
+
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Group: NETWORK -->
+            <div class="d-flex align-items-stretch custom-border w-100 gap-1" style="margin-top: 15px;">
+                <div class="p-0 d-flex justify-content-center align-items-center"
+                    style="background: var(--custom-card-color); width: 4%;">
+                    <h5 class="custom-bold mb-0 text-center">Net.</h5>
+                </div>
+                <div class="d-flex gap-1">
+
+                    <div class="card">
+                        <div class="p-1 border-bottom custom-border d-flex justify-content-between netw"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            <span
+                                style="font-size: small; font-weight:500; display: inline-block; max-width: 160px; 
+                                                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                Network Bandwidth (KB/s)
+                            </span>
+                            <span class="d-flex">
+                                <div *ngIf="!isInfraThresholdsEmpty()"
+                                    class=" d-flex align-items-center justify-content-between">
+                                    <select [(ngModel)]="chartData_criteriaForNetworkBandwidth"
+                                        (ngModelChange)="updateChartVisibility('NetworkBandwidth')"
+                                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched ng-pristine"
+                                        aria-label="Small select example" style="line-height: 1.2; font-size: small;">
+
+                                        <option value="all" selected>All</option>
+                                        <option value="receive">receive</option>
+                                        <option value="transmit">transmit</option>
+                                        <option value="traffic">traffic</option>
+
+                                    </select>
+                                    <select *ngIf="chartData_criteriaForNetworkBandwidth!='all'"
+                                        [(ngModel)]="chart_criteriaForNetworkBandwidth"
+                                        style="line-height: 1.2; font-size: small"
+                                        class="form-select py-0 ps-1 pe-3 me-1 form-select-sm "
+                                        aria-label="Small select example">
+
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold">Threshold</option>
+
+                                    </select>
+                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='avg' && chartData_criteriaForNetworkBandwidth!='all'"
+                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                        style="color:#0e38f1; font-size: small;line-height: 1.2">
+                                        {{ chartValuesNetworkBandwidth.avg | number:'1.0-2' }}
+                                    </div>
+
+                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='threshold' && chartData_criteriaForNetworkBandwidth!='all'"
+                                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                        style="color:#e07e23; font-size: small;line-height: 1.2">
+                                        {{ chartValuesNetworkBandwidth.warning | number:'1.0-2' }}
+                                    </div>
+
+                                    <div *ngIf="chart_criteriaForNetworkBandwidth=='threshold' && chartData_criteriaForNetworkBandwidth!='all'"
+                                        class="bg-white rounded-2 me-1 px-1 text-danger chart-threshold fw-bold"
+                                        style=" font-size: small;line-height: 1.2">
+                                        {{ chartValuesNetworkBandwidth.critical | number:'1.0-2' }}
+                                    </div>
+
+                                </div>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1 pt-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It measures data transmitted and received per second, giving insight into overall network load, traffic patterns, and potential bottlenecks."></i>
+                            </span>
+                        </div>
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+
+                            <div [hidden]="networkBandwidthUsageChart==null"
+                                style="width: 98%;height: 170px; margin-left: -3%;padding: 0%; color: #219ebc"
+                                id="networkBandwidthUsageChart">
+                            </div>
+
+                            <div *ngIf="networkBandwidthUsageChart==null"
+                                style="color: rgb(155, 154, 154); font-size: small;">
+                                No Data Available
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- <div class="card">
+                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            Network Status
+                            <span>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It tracks active TCP/UDP connections, sockets in use, and connections waiting to close, helping identify potential connection spikes or resource exhaustion."></i>
+                            </span>
+                        </div>
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+
+                            <div [hidden]="networkStatusChart==null"
+                                style="width: 98%;height: 170px; margin-left: -3%;padding: 0%; color: #219ebc"
+                                id="networkStatusChart">
+
+                            </div>
+                            <div *ngIf="networkStatusChart==null" style="color: rgb(155, 154, 154); font-size: small;">
+                                No Data Available
+                            </div>
+
+                        </div>
+                    </div> -->
+                    <div class="card">
+                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            <span>
+                                Network Speed (KB/s)
+                            </span>
+                            <span class="d-flex justify-content-end">
+                                <div class=" d-flex align-items-center justify-content-between">
+                                    <select class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm"
+                                        [(ngModel)]="networkSpeedUnit" (change)="getAvgNetworkSpeed()"
+                                        aria-label="Small select example" style="line-height: 1.2; font-size: small;">
+                                        <option value="KBps">KBps</option>
+                                        <option value="MBps">MBps</option>
+                                        <option value="GBps">GBps</option>
+                                    </select>
+                                </div>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1 mt-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It displays the current network speed."></i>
+                            </span>
+                        </div>
+
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+                            <div style="width: 250px; height: 180px;">
+                                <app-network-speed-chart [value]="avgNetworkSpeed"
+                                    [unit]="networkSpeedUnit"></app-network-speed-chart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Group: DISC FILE -->
+            <div class="d-flex w-100 align-items-stretch custom-border gap-1" style="margin-top: 15px;">
+                <div class="p-0 d-flex justify-content-center align-items-center"
+                    style="background: var(--custom-card-color); width: 4%;">
+                    <h5 class="custom-bold mb-0 text-center">Disk File</h5>
+                </div>
+                <div class="d-flex gap-1">
+                    <!-- <div class="card">
+                        <div class="p-1 border-bottom custom-border  d-flex justify-content-between"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            File system Usage (%)
+                            <span>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Displays the status and usage of mounted file systems on the server."></i>
+                            </span>
+                        </div>
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+
+                            <div [hidden]="fileSystemMountpointUsageChart==null"
+                                style="width: 98%;height: 170px; margin-left: -3%;padding: 0%; color: #219ebc"
+                                id="fileSystemMountpointUsageChart">
+                            </div>
+                            <div *ngIf="fileSystemMountpointUsageChart==null"
+                                style="color: rgb(155, 154, 154); font-size: small;">
+                                No Data Available
+                            </div>
+
+                        </div>
+                    </div> -->
+                    <!-- <div class="card">
+                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            Filefd Allocated
+                            <span>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="File Descriptors Allocated (filefd) shows the number of file descriptors currently allocated on the server. File descriptors represent open files, network sockets, or other I/O resources."></i>
+                            </span>
+                        </div>
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+
+                            <div [hidden]="filefdAllocatedChart==null"
+                                style="width: 98%;height: 170px; margin-left: -3%;padding: 0%; color: #219ebc"
+                                id="filefdAllocatedChart">
+                            </div>
+                            <div *ngIf="filefdAllocatedChart==null"
+                                style="color: rgb(155, 154, 154); font-size: small;">
+                                No Data Available
+                            </div>
+
+                        </div>
+                    </div> -->
+                    <div class="card">
+                        <div class="p-1 border-bottom custom-border d-flex justify-content-between"
+                            style="background-color: #66a3ad85; font-weight: 500; font-size: small; text-wrap: wrap;">
+                            Disk R/W (KB/s)
+                            <span>
+                                <i class="fa-solid fa-circle-info gradiantIcon me-1" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="This metric shows the rate of data being read from and written to the disk for the selected server (IP)."></i>
+                            </span>
+                        </div>
+                        <div class="card-body graphDiv p-0 my-0 d-flex justify-content-center align-items-center">
+
+                            <div [hidden]="diskReadWriteChart==null"
+                                style="width: 98%;height: 170px; margin-left: -3%;padding: 0%; color: #219ebc"
+                                id="diskReadWriteChart">
+                            </div>
+                            <div *ngIf="diskReadWriteChart==null" style="color: rgb(155, 154, 154); font-size: small;">
+                                No Data Available
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group: DISC SPACE -->
+            <div class="d-flex w-100 align-items-stretch custom-border gap-1"
+                style="margin-top: 15px; margin-bottom: 10px;">
+                <div class=" p-0 d-flex justify-content-center align-items-center"
+                    style="flex: 0 0 4%; background: var(--custom-card-color) ;">
+                    <h5 class="custom-bold mb-0 text-center">Disk Space</h5>
+                </div>
+                <div style="flex: 0 0 94%;">
+                    <div class="card-header px-2 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="font-size: small;">Disk Usage Details</h5>
+                        <div style="position: relative; width: 250px;">
+                            <input type="text" class="form-control form-control-sm"
+                                style="padding-right: 30px; font-size: x-small; margin: 2px;"
+                                [(ngModel)]="searchTermDisk" (input)="onSearchDisk()" placeholder="Search Disk Name" />
+                            <i class="fas fa-search"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;    color: #888;"></i>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="mb-0 table table-stripped table-hover">
+                            <thead>
+                                <tr>
+                                    <th (click)="setDiskSort('name')"
+                                        style="padding: 2px 5px; width: 40%; background-color: #D2DCDD;">
+                                        Name &nbsp;
+                                        <i class="fa"
+                                            [ngClass]="sortColumnDisk === 'name' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="setDiskSort('usedPercent')"
+                                        style="padding: 2px 5px; width: 36%; background-color: #D2DCDD;">
+                                        Used Percentage &nbsp;
+                                        <i class="fa"
+                                            [ngClass]="sortColumnDisk === 'usedPercent' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="setDiskSort('free')"
+                                        style="padding: 2px 5px; width: 8%;background-color: #D2DCDD;">
+                                        Free (GB) &nbsp;
+                                        <i class="fa"
+                                            [ngClass]="sortColumnDisk === 'free' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="setDiskSort('used')"
+                                        style="padding: 2px 5px; width: 8%; background-color: #D2DCDD;">
+                                        Used (GB) &nbsp;
+                                        <i class="fa"
+                                            [ngClass]="sortColumnDisk === 'used' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="setDiskSort('total')"
+                                        style="padding: 2px 5px; width: 8%; background-color: #D2DCDD;">
+                                        Total (GB) &nbsp;
+                                        <i class="fa"
+                                            [ngClass]="sortColumnDisk === 'total' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of pagedDiscSpaceList">
+                                    <td style="padding: 2px 5px;">{{item.name}}</td>
+                                    <td style="padding: 2px 5px;">
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar" role="progressbar" [ngClass]="{
+                                                'progress-blue': item.usedPercent < 80,
+                                                'progress-yellow': item.usedPercent >= 80 && item.usedPercent < 90,
+                                                'progress-red': item.usedPercent >= 90
+                                              }" [style.width.%]="item.usedPercent"
+                                                [attr.aria-valuenow]="item.usedPercent" aria-valuemin="0"
+                                                aria-valuemax="100">
+                                                {{ item.usedPercent }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 2px 5px;">{{item.free}}</td>
+                                    <td style="padding: 2px 5px;">{{item.used}}</td>
+                                    <td style="padding: 2px 5px;">{{item.total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="pagedDiscSpaceList.length !== 0" class="col-md-12 d-flex justify-content-between">
+                            <div class=" ps-2 d-flex align-items-center"
+                                style="font-size: small; color: rgb(128, 126, 126);">
+                                {{ pagedDiscSpaceList.length }}/{{ filteredDiscSpaceList.length }}
+                            </div>
+                            <div class="d-flex me-2">
+                                <div class="pagination-container">
+                                    <button class="py-0 px-2" (click)="previousPageDisk()"
+                                        [disabled]="currentPageDisk === 1">
+                                        <i class="fa-solid fa-angle-left icon-color"></i>
+                                    </button>
+
+                                    <span class="page-number">
+                                        Page
+                                        <input type="number" class="page-input" [value]="currentPageDisk"
+                                            (keydown.enter)="goToPageDisk(+inputPage.value)" #inputPage min="1"
+                                            [max]="totalPagesDisk" aria-label="Page number input" />
+                                        of {{ totalPagesDisk }}
+                                    </span>
+
+                                    <button class="py-0 px-2" (click)="nextPageDisk()"
+                                        [disabled]="currentPageDisk === totalPagesDisk">
+                                        <i class="fa-solid fa-angle-right icon-color"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="pagedDiscSpaceList.length == 0" class="discNoData">
+                            No data Available
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROCESS LIST -->
+        <div class="tab-pane fade" id="process_list">
+            <div class="d-flex justify-content-between">
+                <div style="width: 59.5%; height: 65%; overflow-y: auto;">
+                    <div class="card ">
+                        <div class="card-header d-flex justify-content-between align-items-center py-0 px-1">
+                            <!-- <h4 style="font-size: xx-small;" class="mb-0">PROCESS LIST
+                                </h4> -->
+                            <div class="d-flex align-items-center py-1 ml-auto">
+                                <div style="position: relative; width: 200px;">
+                                    <input type="text" class="form-control form-control-sm pr-4"
+                                        [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search..."
+                                        style="font-size: x-small; " />
+
+                                    <!-- Search icon inside input -->
+                                    <i class="fas fa-search"
+                                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #888; cursor: pointer;">
+                                    </i>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-body p-0">
+                            <div style="max-height: 69vh; overflow-y: auto;">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-1" style="cursor: pointer; " (click)="sortData('key')">
+                                                Process Name
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+
+                                            <th class="py-1" style="cursor: pointer;"
+                                                (click)="sortData('currentProcessCount')">
+                                                Count &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th class="py-1" style="cursor: pointer;" (click)="sortData('state')">
+                                                State &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th class="py-1" style="cursor: pointer;"
+                                                (click)="sortData('total_cpu_percent')">CPU
+                                                (%) &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th class="py-1" style="cursor: pointer;"
+                                                (click)="sortData('total_memory_percent')">
+                                                Memory (%) &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th class="py-1" style="cursor: pointer;" (click)="sortData('pid')">PID
+                                                &nbsp;<i class="fa-solid fa-sort"></i>
+                                            </th>
+                                            <th class="py-1" style="cursor: pointer;" (click)="sortData('ppid')">
+                                                PPID &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th class="py-1">Chart</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody *ngIf="pagedProcessList.length !== 0">
+                                        <ng-container *ngFor="let key of pagedProcessList">
+                                            <!-- PARENT ROW -->
+                                            <tr (click)="toggleExpand(key)" style="cursor: pointer;">
+                                                <td class="py-1" style="text-align: left;">
+                                                    <i
+                                                        [ngClass]="isExpanded[key] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+                                                    {{ key }}
+                                                </td>
+                                                <td class="py-1">{{ processList[key].currentProcessCount }}</td>
+                                                <td class="py-1">{{ processList[key].processes[0]?.state || 'N/A' }}
+                                                </td>
+                                                <td class="py-1">{{ processList[key].total_cpu_percent }}</td>
+                                                <td class="py-1">{{ processList[key].total_memory_percent }}</td>
+                                                <td class="py-1">{{ processList[key].isMultiplePID ? 'MULTIPLE' :
+                                                    processList[key].processes[0]?.pid }}</td>
+                                                <td class="py-1">{{ processList[key].isMultiplePPID ? 'MULTIPLE' :
+                                                    processList[key].processes[0]?.ppid }}</td>
+                                                <td class="py-1 text-center">
+                                                    <i class="fa-solid fa-chart-line"
+                                                        style="cursor: pointer; color: #007bff;"
+                                                        title="Show Process Chart"
+                                                        (click)="openProcessChartModal(key); $event.stopPropagation();">
+                                                    </i>
+                                                </td>
+                                            </tr>
+
+                                            <!-- CHILD ROWS -->
+                                            <ng-container *ngIf="isExpanded[key]">
+                                                <tr *ngFor="let process of processList[key].processes">
+                                                    <td class="py-1" (click)="toggleCommand(key, process.pid)"
+                                                        style="cursor: pointer; max-width: 200px; background-color: #dce8ff;">
+                                                        <div
+                                                            *ngIf="expandedCommandSet.has(key + '-' + process.pid); else truncated">
+                                                            - {{ process.command }}
+                                                        </div>
+                                                        <ng-template #truncated>
+                                                            <div class="ellipsis-cell"> {{ process.command }}</div>
+                                                        </ng-template>
+                                                    </td>
+                                                    <td class="py-1" style="background-color: #dce8ff;"></td>
+                                                    <td class="py-1" style="background-color: #dce8ff;">{{
+                                                        process.state }}</td>
+                                                    <td class="py-1" style="background-color: #dce8ff;">{{
+                                                        process.cpu_percent }}
+                                                    </td>
+                                                    <td class="py-1" style="background-color: #dce8ff;">{{
+                                                        process.memory_percent
+                                                        }}</td>
+                                                    <td class="py-1" style="background-color: #dce8ff;">{{
+                                                        process.pid }}</td>
+                                                    <td class="py-1" style="background-color: #dce8ff;">{{
+                                                        process.ppid }}</td>
+                                                    <td class="py-1 text-center">
+                                                        <i class="fa-solid fa-chart-line"
+                                                            style="cursor: pointer; color: #007bff;"
+                                                            title="Show Process Chart {{process.pid}}"
+                                                            (click)="openProcessChartModal(key, process.pid, process.ppid); $event.stopPropagation();">
+                                                        </i>
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                        </ng-container>
+                                    </tbody>
+
+                                    <tbody *ngIf="pagedProcessList.length === 0">
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="noData-wrapper">
+                                                    No Data Available
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+
+
+                                </table>
+
+                            </div>
+                            <div class="col-12 d-flex justify-content-between">
+                                <div class=" ps-2 d-flex align-items-center"
+                                    style="font-size: small; color: rgb(128, 126, 126);">
+                                    {{ pagedProcessList.length }}/{{ filteredProcessList.length }}
+                                </div>
+                                <div class="d-flex me-2">
+                                    <div class="pagination-container">
+                                        <!-- Previous Button -->
+                                        <button class="py-0 px-2" (click)="previousPage()"
+                                            [disabled]="currentPage === 1">
+                                            <i class="fa-solid fa-angle-left icon-color"></i>
+                                        </button>
+
+                                        <!-- Page Number + Input -->
+                                        <span class="page-number">
+                                            Page
+                                            <input type="number" class="page-input" [value]="currentPage"
+                                                (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1"
+                                                [max]="totalPages" aria-label="Page number input" />
+                                            of {{ totalPages }}
+                                        </span>
+
+                                        <!-- Next Button -->
+                                        <button class="py-0 px-2" (click)="nextPage()"
+                                            [disabled]="currentPage === totalPages">
+                                            <i class="fa-solid fa-angle-right icon-color"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 39.5%;">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center px-0 py-1">
+                            <div class="container-fluid d-flex align-items-center ml-auto justify-content-between px-1">
+                                <div ngbDropdown class="d-inline-block">
+                                    <img src="assets/images/add-filter.png" alt="icon" class="icon" id="filterDropdown"
+                                        ngbDropdownToggle style="cursor: pointer;" />
+                                    <div ngbDropdownMenu aria-labelledby="filterDropdown" class="filter-dropdown p-2"
+                                        style="min-width: 136px; max-height: 220px; overflow-y: auto; font-size: small;">
+                                        <i (click)="clearFilters()" title="Deselect All" class="bi bi-dash-square"
+                                            style="font-size: 12px;cursor: pointer;display: flex;justify-content: end;"></i>
+                                        <div *ngFor="let state of stateFilterOptions" class="form-check">
+                                            <input class="form-check-input" type="checkbox" [id]="state"
+                                                [checked]="selectedStateFilters.has(state)"
+                                                (change)="onToggleState(state)">
+                                            <label class="form-check-label d-flex" [for]="state"><i
+                                                    class="fa-solid fa-circle fa-lg mx-1"
+                                                    [ngClass]="getColorCodingForFilter(state)"
+                                                    style="font-size: xx-small; padding-top: 10px;"></i>{{ state
+                                                }}</label>
+                                        </div>
+                                        <!-- <div class="dropdown-divider"></div> -->
+                                        <!-- <button class="btn btn-sm btn-outline-danger w-100" (click)="clearFilters()"
+                                            style="font-size: small;">Clear All</button> -->
+                                    </div>
+                                </div>
+                                <div style="position: relative; width: 200px;">
+                                    <input type="text" class="form-control form-control-sm pr-4"
+                                        [ngClass]="{ 'search-input-hidden': !showSearch2 }" [(ngModel)]="searchQuery2"
+                                        (input)="onSearch2()" style="font-size: x-small; " placeholder="Search..." />
+
+                                    <i class="fas fa-search" (click)="toggleSearch2()"
+                                        style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #888; cursor: pointer;">
+                                    </i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div style="height: 69vh; overflow-y: auto;">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-1">Service State</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="pagedServiceList.length !== 0" style="max-height: 50vh;">
+                                        <tr *ngFor="let item of pagedServiceList">
+                                            <td class="py-1" style="text-align: left;"><span
+                                                    [ngClass]="getRowClass(item)"><i class="fa-solid fa-circle fa-lg"
+                                                        style="font-size: xx-small;"></i></span> {{
+                                                formatServiceName(item) }}</td>
+                                        </tr>
+                                    </tbody>
+                                    <div *ngIf="pagedServiceList.length == 0" class="noData" style="height: 60vh;">
+                                        No Data Available
+                                    </div>
+                                </table>
+                            </div>
+                            <div class="col-12 d-flex justify-content-between">
+                                <div class=" ps-2 d-flex align-items-center"
+                                    style="font-size: small;color: rgb(128, 126, 126);">
+                                    {{ pagedServiceList.length }}/{{ filteredServiceList.length }}
+                                </div>
+                                <div class="d-flex me-2">
+                                    <div class="pagination-container">
+                                        <!-- Previous Button -->
+                                        <button class="py-0 px-2" (click)="previousPage2()"
+                                            [disabled]="currentPage2 === 1">
+                                            <i class="fa-solid fa-angle-left icon-color"></i>
+                                        </button>
+
+                                        <!-- Page Number + Input -->
+                                        <span class="page-number">
+                                            Page
+                                            <input type="number" class="page-input" [value]="currentPage2"
+                                                (keydown.enter)="goToPage2(inputPage.value)" #inputPage min="1"
+                                                [max]="totalPages2" aria-label="Page number input" />
+                                            of {{ totalPages2 }}
+                                        </span>
+
+                                        <!-- Next Button -->
+                                        <button class="py-0 px-2" (click)="nextPage2()"
+                                            [disabled]="currentPage2 === totalPages2">
+                                            <i class="fa-solid fa-angle-right icon-color"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<ng-template #commandModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header py-1">
+            <h6 class="modal-title" style="font-weight: 500; color: #275881; margin-bottom: 0%;">COMMAND</h6>
+        </div>
+        <div class="modal-body py-1" style="overflow: auto; max-height: 30vh;">
+            <p class="small">
+                {{ selectedCommand }}
+            </p>
+        </div>
+        <div class="modal-footer" style="padding: 6px 10px;">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+
+
+
+<div class="modal fade custom-modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style=" margin-top: 10; box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);">
+            <div class="modal-header justify-content-between py-1" style=" background-color: var(--card-header-bg);">
+                <span class="modal-title" id="staticBackdropLabel" style="font-size: 14px;font-weight: 500;">Update
+                    {{selectedMetricName}}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.7rem; line-height: 1;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div *ngIf="!isUpdateThreshold" class="modal-body py-2" style="background-color: var(--card-bg-color);">
+                <div class=" d-flex align-items-center">
+                    <label for="metricName" class="col-sm-4  col-form-label small-font-label">Metric Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" id="metricName"
+                            value="{{selectedMetricForThresholdUpdate}}">
+                    </div>
+                </div>
+                <div class=" d-flex align-items-center">
+                    <label for="warningValue" class="col-sm-4  col-form-label small-font-label">Warning Value:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font"
+                            style="color: rgb(255, 149, 0);" id="warningValue" value="{{selectedMetricWarningValue}}">
+                    </div>
+                </div>
+
+                <div class=" d-flex align-items-center">
+                    <label for="criticalValue" class="col-sm-4 col-form-label small-font-label">Critical Value:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" style="color: red;"
+                            id="criticalValue" value="{{selectedMetricCriticalValue}}">
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isUpdateThreshold" class="modal-body py-2" style="background-color: var(--card-bg-color);">
+                <div *ngIf="isUpdateThreshold" style="font-size: 12px;">
+                    <i class="fa-solid fa-arrow-left " style="cursor:pointer" (click)="isUpdateThreshold = false"></i>
+                </div>
+                <div class=" d-flex align-items-center">
+                    <label for="metricName" class="col-sm-4  col-form-label small-font-label">Metric Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" id="metricName"
+                            value="{{selectedMetricForThresholdUpdate}}">
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="metricType" class="col-sm-4  col-form-label small-font-label">Metric Type:</label>
+                    <div class="col-sm-8">
+                        <select for="metricType" class="form-select form-control-sm py-1 small-font"
+                            [(ngModel)]="selectedMetricType" (change)="getThresholdMessage()">
+
+                            <option value="Percentage" selected>Percentage</option>
+                        </select>
+                    </div>
+                </div>
+                <small *ngIf="thresholdMessage" class="text-danger small-font">{{thresholdMessage}}</small>
+                <div class=" d-flex align-items-center">
+                    <label for="warningValue" class="col-sm-4  col-form-label small-font-label">Warning %:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control form-control-sm small-font"
+                            style="color: rgb(255, 149, 0);" id="warningValue"
+                            [(ngModel)]="selectedMetricWarningPercent">
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="criticalValue" class="col-sm-4  col-form-label small-font-label">Critical %:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control form-control-sm small-font" style="color: red;"
+                            id="criticalValue" [(ngModel)]="selectedMetricCriticalPercent">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer px-1 py-0" style="background-color: var(--card-bg-color);">
+                <div class="d-flex justify-content-end me-1 ">
+                    <button *ngIf="!isUpdateThreshold" type="button" class="btn btn-sm btn-success rounded-1 form-btn"
+                        style="font-size: 12px;" (click)="isUpdateThreshold = true">
+                        Edit
+                    </button>
+                    <button *ngIf="isUpdateThreshold" type="button"
+                        class="btn btn-sm btn-success rounded-1 mx-1 form-btn" style="font-size: 12px;"
+                        data-bs-dismiss="modal" (click)="updateMetricThreshold()">
+                        Update
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-primary mx-1 rounded-1 form-btn"
+                        style="font-size: 12px;" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="showChartModal" class="modal-backdrop"></div>
+<div *ngIf="showChartModal" class="modal-custom" role="dialog" aria-modal="true" aria-labelledby="chartModalTitle">
+
+    <div class="modal-content-custom">
+        <div class="modal-header-custom">
+            <h5 class="modal-title-custom" id="chartModalTitle">
+                Time-Series Chart: {{ selectedProcessName }}
+            </h5>
+            <button type="button" class="btn-close" (click)="closeChartModal()" aria-label="Close">
+            </button>
+        </div>
+
+        <div class="modal-body-custom">
+            <div *ngIf="isChartLoading" class="chart-loading">
+                <i class="fa-solid fa-spinner fa-spin fa-3x"></i>
+                <p>Loading Chart Data...</p>
+            </div>
+
+            <div *ngIf="!isChartLoading">
+                <highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions"
+                    style="width: 100%; height: 300px; display: block;">
+                </highcharts-chart>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="containerProp" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="containerPropLabel" aria-hidden="true">
+    <div class="modal-dialog" [ngClass]="properties ? 'custom-modal-left' : 'custom-modal-small'">
+        <div class="modal-content"
+            style=" margin-top: 19%;max-height: 60vh;  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);">
+            <div class="modal-header justify-content-between py-1" style=" background-color:  var(--card-header-bg);">
+                <span class="modal-title" id="containerPropLabel" style="font-size: 14px;font-weight: 500;">Attributes
+                </span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.7rem; line-height: 1;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-body" style="font-size: small;" *ngIf="properties; else noData">
+                    <li style="display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"> <i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Name :
+                        </span>
+                        {{properties.name}}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            ID: </span>
+                        {{ properties.id }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Size: </span>
+                        {{ properties.size }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Created:
+                        </span>
+                        {{ properties.created }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Repo Tags:</span>
+                        {{ properties.repoTags }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            CPU Limit: </span>
+                        {{ properties.cpu_limit }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Memory Limit: </span>
+                        {{ properties.memory_limit }}
+                    </li>
+                </ul>
+                <ng-template #noData>
+                    <div class="text-center text-muted">No data available</div>
+                </ng-template>
+                <div class="d-flex justify-content-end me-1 mt-2" *ngIf="properties">
+                    <button type="button" class="btn btn-sm btn-primary rounded-1" style="font-size: 12px;"
+                        data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

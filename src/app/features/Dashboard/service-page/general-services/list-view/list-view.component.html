@@ -1,0 +1,102 @@
+<div style="display: flex; width: 100%;">
+  <!-- Flame Graph -->
+  <div class="waterfall-wrapper" style="flex: 4;">
+    <table class="waterfall-table bg-transparent">
+      <thead style="font-size: small; color: #219ebc;">
+        <tr>
+          <th style="width: 56%;"></th>
+          <th style="width: 40%; padding-top: 6px; padding-bottom: 15px;">
+            <div style="position: relative; height: 20px;">
+              <div
+                style="height: 1px; background-color: #ccc; position: absolute; top: 10px; left: 0; right: 0;"
+              ></div>
+              <ng-container *ngFor="let tick of getTicks(maxDuration)">
+                <div
+                  [style.left.%]="tick.position"
+                  style="position: absolute; height: 10px; width: 1px; background-color: white; top: 5px;"
+                ></div>
+                <div
+                  [style.left.%]="tick.position"
+                  style="position: absolute; top: 12px; transform: translateX(-50%); font-size: 9px; color: white;"
+                >
+                  {{ tick.label }}
+                </div>
+              </ng-container>
+            </div>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let item of visibleSpans; let i = index">
+          <tr style="font-size: x-small; letter-spacing: 1px;" (click)="onItemClick(item)">
+            <td>
+              <div
+                [ngStyle]="{
+                  marginLeft: item.level * 40 + 'px',
+                  fontWeight: item.children?.length ? 'bold' : 'normal'
+                }"
+                style="display: flex; align-items: center;"
+              >
+                <span
+                  *ngIf="item.children?.length"
+                  (click)="toggleExpand(item); $event.stopPropagation()"
+                  style="cursor: pointer; margin-right: 5px;"
+                >
+                  <i
+                    class="fa-solid collapse-expand-icon"
+                    [ngClass]="
+                      item.expanded ? 'fa-square-minus' : 'fa-square-plus'
+                    "
+                  ></i>
+                </span>
+
+                <span
+                  class="bar-label"
+                  [ngStyle]="{ color: getColor(item, i) }"
+                >
+                  {{ item.endpointName }}
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <div
+                class="self-bar-container"
+                style="position: relative; background-color: transparent; height: 6px; border-radius: 6px;"
+              >
+                <div
+                  class="self-bar"
+                  [ngStyle]="{
+                    left: ((item.startTime - earliestStartTime) / maxDuration) * 100 + '%',
+                    width: (calculateSelfExecTime(item) / maxDuration) * 100 + '%',
+                    backgroundColor: getColor(item, i),
+                    height: '100%',
+                    position: 'absolute',
+                    borderRadius: '6px'
+                  }"
+                  [attr.title]="'Self Time: ' + calculateSelfExecTime(item) + ' ms \n Start: ' + formatIST(item.startTime)"
+                ></div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header text-dark">
+      <span>Span</span>
+      <span>Exec Time (ms)</span>
+    </div>
+    <div class="sidebar-list">
+      <div *ngFor="let data of getSidebarData()" class="sidebar-item">
+        <div class="color-box" [style.background-color]="data.color"></div>
+        <span class="span-name text-muted">{{ data.span.endpointName }}</span>
+        <span class="exec-time text-muted">{{ data.execTime }}</span>
+      </div>
+    </div>
+  </div>
+</div>

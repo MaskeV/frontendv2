@@ -1,0 +1,310 @@
+.custom-bg {
+  background-color: var(--custom-bg-color);
+}
+
+/* Card */
+
+.card {
+  padding: 0%;
+  border-radius: 0%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 0%;
+  font-size: small;
+  font-weight: 100;
+  border-bottom: 1px solid var(--border-color);
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+
+}
+
+.chart-title {
+  font-weight: 599;
+  color: var(--text-color);
+  background-color: var(--card-header-bg);
+
+}
+
+/* Side Badge */
+
+.section-header {
+  background-color: var(--custom-card-color);
+  word-wrap: break-word;
+  white-space: break-spaces;
+  text-align: center;
+  font-size: small;
+  font-family: sans-serif;
+  width: 5vw;
+}
+
+.pointers {
+  position: relative;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-left: 18px solid var(--custom-card-color);
+  left: 7px;
+  z-index: 1;
+}
+
+/* Width */
+
+.w-49 {
+  width: 49.5%;
+}
+
+.w-33 {
+  width: 33%;
+}
+
+.noData {
+  height: 33vh;
+}
+
+.form-control {
+  font-size: x-small;
+  padding: 2px 6px;
+  min-width: 150px;
+}
+
+.list-unstyled {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.gradiantIcon {
+  background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 0px;
+  font-size: small;
+}
+
+/* ═══════════════════════════════════════════
+   CONTAINER DASHBOARD — fully self-contained
+   Mirrors log- / pl- / ct- design language
+   Prefix: cd-
+   ═══════════════════════════════════════════ */
+
+/* ══════════════════════════════════
+   BREADCRUMB
+   ══════════════════════════════════ */
+.cd-breadcrumb {
+  padding: 6px 14px 4px;
+}
+
+.cd-breadcrumb__list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.cd-breadcrumb__item {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* separator via ::before on all items after first */
+.cd-breadcrumb__item+.cd-breadcrumb__item::before {
+  content: '/';
+  margin-right: 6px;
+  color: #cbd5e1;
+  font-size: 10px;
+}
+
+.cd-breadcrumb__item a {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.12s;
+}
+
+.cd-breadcrumb__item a:hover {
+  color: #4f46e5;
+  text-decoration: underline dotted;
+}
+
+.cd-breadcrumb__item--active {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.cd-breadcrumb__icon {
+  margin-right: 5px;
+  font-size: 12px;
+  color: #475569;
+}
+
+/* ══════════════════════════════════
+   ROOT
+   ══════════════════════════════════ */
+.cd-root {
+  background: #f8fafc;
+  width: 100%;
+  height: 89vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px 14px 14px;
+  box-sizing: border-box;
+}
+
+/* ══════════════════════════════════
+   TOOLBAR
+   ══════════════════════════════════ */
+.cd-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.cd-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 3px 10px 3px 8px;
+  height: 30px;
+  transition: border-color 0.15s;
+}
+
+.cd-select-wrap:focus-within {
+  border-color: #6366f1;
+}
+
+.cd-select-wrap__icon {
+  font-size: 11px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.cd-select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 11px;
+  color: #1e293b;
+  width: 220px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* ══════════════════════════════════
+   PERF SECTION WRAPPER
+   ══════════════════════════════════ */
+.cd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Horizontal heading — mirrors db tab Performance label */
+.cd-section__heading {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.cd-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* ══════════════════════════════════
+   CHART GRID
+   ══════════════════════════════════ */
+.cd-chart-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+}
+
+/* ══════════════════════════════════
+   CHART CARD
+   ══════════════════════════════════ */
+.cd-chart-card {
+  width: calc(33.333% - 7px);
+  /* 3 per row, accounting for gap */
+  background: #ffffff;
+  border: 1px solid #e8edf3;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.cd-chart-card:hover {
+  border-color: #60a5fa !important;
+  box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+/* top margin for 2nd row cards */
+.cd-chart-card--mt {
+  /* gap already handles spacing — kept for class parity */
+}
+
+/* spacer — invisible placeholder, same width */
+.cd-chart-card--spacer {
+  width: calc(33.333% - 7px);
+  visibility: hidden;
+}
+
+/* Header */
+.cd-chart-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px 7px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.cd-chart-card__title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cd-info-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.cd-info-icon:hover {
+  opacity: 1;
+}
+
+/* Body — chart container lives here */
+.cd-chart-card__body {
+  padding: 0;
+  background: #ffffff;
+}

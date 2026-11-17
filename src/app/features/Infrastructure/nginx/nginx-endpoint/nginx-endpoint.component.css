@@ -1,0 +1,213 @@
+/* Modern UI Styles for NGINX Endpoint inspired by Kafka and matching Redis structure */
+
+main {
+    height: 100%;
+    width: 100%;
+    background-color: #F8FAFC;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.icons {
+    height: 15px;
+    background: transparent;
+}
+
+.icon-sm {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+}
+
+.nav-link {
+    font-size: small;
+    padding: 5px 10px;
+    color: #64748b;
+}
+
+.nav-link.active {
+    background-color: #F8FAFC !important;
+}
+
+.nav-link:focus, .nav-link:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.tab-content {
+    width: 100%;
+    height: 82vh;
+    overflow-y: auto;
+    overflow-x: hidden !important;
+    background-color: #F8FAFC;
+}
+
+.small {
+    font-size: 0.7rem;
+}
+
+.fs-lg {
+    font-size: 0.9rem;
+}
+
+.ls-wider {
+    letter-spacing: 0.05em;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+/* Card Styles */
+.card {
+    background-color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-soft {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.05);
+    background: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-soft:hover {
+    border-color: #60A5FA !important;
+    box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+/* Charts Wrapper */
+.h-26 {
+    height: 220px;
+}
+
+.chart-wrapper-sm {
+    height: 22vh;
+}
+
+/* Metric Card (KPI) */
+.metric-card {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    height: 100%;
+    min-height: 65px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 0.75rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.chart-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Utilities */
+.text-primary {
+    color: #3b82f6 !important;
+}
+
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-info {
+    color: #06b6d4 !important;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, #ececec 0px, #f3f3f3 40px, #ececec 80px);
+    background-size: 600px;
+    border-radius: 4px;
+    animation: shimmer 1.4s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
+}
+
+.skeleton-text { width: 100%; height: 24px; margin-bottom: 8px; }
+.skeleton-chart { width: 100%; height: 220px; border-radius: 12px; }
+.skeleton-kpi { width: 100%; height: 65px; border-radius: 12px; }
+
+/* Tooltip Look and Feel */
+.tooltip {
+    background: transparent !important;
+    --bs-tooltip-bg: #3d6268;
+    /* sets background AND arrow */
+}
+
+/* Success Rate Pill matching service-page aesthetics */
+.sv-success-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+}
+
+.sv-success-pill:hover {
+    background: #bbf7d0;
+}
+
+.sv-metric-icon {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.sv-nodata-text {
+    font-size: 11px;
+    color: #cbd5e1;
+}

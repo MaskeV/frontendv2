@@ -1,0 +1,183 @@
+<main class="license-main p-2">
+    <div class="p-0" style="height: 92vh; overflow: auto;">
+        <div class="container-fluid">
+            <div class="row justify-content-between align-items-center mb-2">
+                <span class="section-title"> License Details</span>
+                <span class="text-muted mt-1" style="font-size: smaller;">{{licenseModule}}</span>
+            </div>
+
+            <!-- Skeleton Loader -->
+            <div class="license-skeleton" *ngIf="isLoading">
+                <div class="mb-3">
+                    <div class="row mb-3">
+                        <div class="col-6 col-sm-4 col-md-3" *ngFor="let i of [1,2,3,4]">
+                            <div class="card px-3 py-2 mb-2">
+                                <span class="placeholder col-6 mb-1"></span>
+                                <span class="placeholder col-8"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 col-sm-4 col-md-3" *ngFor="let i of [1,2,3]">
+                            <div class="card px-3 py-2 mb-2">
+                                <span class="placeholder col-6 mb-1"></span>
+                                <span class="placeholder col-8"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <div class="card px-3 py-2 mb-2">
+                                <span class="placeholder col-6 mb-1"></span>
+                                <span class="placeholder col-8"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2" *ngFor="let i of [1,2,3]">
+                            <div class="card p-3">
+                                <div class="placeholder-glow">
+                                    <span class="placeholder col-12 mb-2" style="height: 120px;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="licenseContent mt-4" *ngIf="!isLoading">
+                <div class="row mb-4 mx-1">
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-user license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{ licenceDetails?.issuedTo }}</span>
+                            <span class="text-muted license-text">Account</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-user license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{ licenceDetails?.issuedBy }}</span>
+                            <span class="text-muted license-text">License Issued By</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-envelope license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{email}}</span>
+                            <span class="text-muted license-text">Contact Email Address</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-id-card license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span
+                                style="font-size: small; text-transform: capitalize;">{{licenceDetails?.status}}</span>
+                            <span class="text-muted license-text">License Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4 mx-1">
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-calendar license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{ licenceDetails?.expiresOn }}</span>
+                            <span class="text-muted license-text">Expires</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-calendar license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{ licenceDetails?.updatedOn }}</span>
+                            <span class="text-muted license-text">Last Billing Time</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex align-items-start">
+                        <i class="fa-solid fa-calendar license-icon me-3"></i>
+                        <div class="d-flex flex-column">
+                            <span style="font-size: small;">{{ licenceDetails?.createdOn }}</span>
+                            <span class="text-muted license-text">License Creation Time</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4 mx-1">
+                    <div class="col-md-4 d-flex align-items-start">
+                        <div class="d-flex flex-column">
+                            <span class="text-muted license-text">License Key</span>
+                            <span style="font-size: small;">
+                                {{ licenceDetails?.licenseKey }}
+                                <i class="fa-solid fa-pen license-key ms-3" style="cursor: pointer;"
+                                    (click)="openModal()"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unit-row mb-2">
+                    <div *ngFor="let chart of unitCharts" class="unit-item">
+                        <div class="text-center p-2">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="chart.chartOptions"
+                                style="width: 100%; height: 140px; display: block;">
+                            </highcharts-chart>
+                
+                            <div class="mt-1">
+                                <div class="unit-label">{{ chart.label }}</div>
+                                <div class="text-muted license-text">
+                                    {{ licenceDataUsed[chart.type] || 0 }} /
+                                    {{ getUnitValues(chart.type).allotted }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex justify-content-start mb-2 mt-5 text-muted license-text">
+                    <p><i class="fa-solid fa-square me-2" style="color: #1E88E5;"></i> Your Used Quota is below 60%</p>
+                    <p><i class="fa-solid fa-square me-2" style="color: #FF9302;"></i> Your Used Quota is between 60% to 90%</p>
+                    <p><i class="fa-solid fa-square me-2" style="color: #FF0202;"></i> Your Used Quota is more than 90%</p>
+                    <p><i class="fa-solid fa-square me-2" style="color: #E6E6E6;"></i> Your Quota Left</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<div *ngIf="isModalVisible" class="fixed inset-0 flex items-center justify-center bg-black/60 px-4"
+    style="z-index: 1000;">
+    <div class="w-100 relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color); max-width: 500px;">
+
+        <div class="flex justify-between items-center border-b p-2 mb-2" style="border-color: var(--border-color);">
+            <span style="font-size: medium; font-weight: 500;">
+                Renew License
+            </span>
+            <button (click)="closeModal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">&times;</button>
+        </div>
+
+        <div class="p-2 space-y-4 max-h-[80vh] overflow-y-auto" style="font-size: small;">
+            <div class="p-2">
+                <p style="color: var(--text-color);" class="text-sm">
+                    Please enter a new license key to renew your License.
+                </p>
+                <div>
+                    <input id="licenseKey" type="text" [(ngModel)]="licenseKey" placeholder="Enter your license key"
+                        class="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 text-sm" style="background-color: var(--input-bg-color); border: 1px solid var(--input-border-color);
+                            color: var(--text-color); placeholder-color: var(--placeholder-color);" />
+                </div>
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <button (click)="confirmLicense()" class="btn btn-gradiant">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

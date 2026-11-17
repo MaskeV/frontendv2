@@ -1,0 +1,521 @@
+<div class="screens-dashboard p-3" style="height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden;">
+
+  <!-- Row 1: KPIs & Navigation Flow -->
+  <div class="row g-3 mb-3">
+    <!-- KPIs -->
+    <div class="col-lg-6">
+      <div class="row g-3 h-100">
+        <!-- Total Screens -->
+        <div class="col-md-4">
+          <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+            style="background-color: #f5f3ff; color: #4c1d95; --card-bg: #f5f3ff;">
+            <div class="d-flex flex-column justify-content-between" style="flex: 0 0 max-content; padding-right: 5px;">
+              <div class="mb-2">
+                <h6 class="m-0 fw-bold" style="font-size: 13px;">Total Screens
+                  <span class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                    <i class="bi bi-info-circle opacity-75" style="font-size: 11px;"></i>
+                    <span class="custom-tooltip"
+                      style="--tooltip-bg: #f5f3ff; --tooltip-border: #a78bfa; --tooltip-color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Count
+                      of unique screens accessed by users</span>
+                  </span>
+                </h6>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                  style="width: 36px; height: 36px; color: #6d28d9; flex-shrink: 0;">
+                  <i class="bi bi-phone fs-6"></i>
+                </div>
+                <div class="ms-2">
+                  <div class="fs-5 fw-bold lh-1">{{ totalScreens }}</div>
+                  <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Screens</div>
+                </div>
+              </div>
+            </div>
+            <!-- Sparkline -->
+            <div class="rounded flex-grow-1 p-1"
+              style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+              <div id="totalScreensSparkline" style="width: 100%; height: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Screen Visits -->
+        <div class="col-md-4">
+          <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+            style="background-color: #eff6ff; color: #1e3a8a; --card-bg: #eff6ff;">
+            <div class="d-flex flex-column justify-content-between" style="flex: 0 0 max-content; padding-right: 5px;">
+              <div class="mb-2">
+                <h6 class="m-0 fw-bold" style="font-size: 13px;">Screen Visits
+                  <span class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                    <i class="bi bi-info-circle opacity-75" style="font-size: 11px;"></i>
+                    <span class="custom-tooltip"
+                      style="--tooltip-bg: #eff6ff; --tooltip-border: #60a5fa; --tooltip-color: #1e3a8a; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Total
+                      number of times screens were visited</span>
+                  </span>
+                </h6>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                  style="width: 36px; height: 36px; color: #2563eb; flex-shrink: 0;">
+                  <i class="bi bi-eye fs-6"></i>
+                </div>
+                <div class="ms-2">
+                  <div class="fs-5 fw-bold lh-1">{{ screenVisits | number }}</div>
+                  <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Visits</div>
+                </div>
+              </div>
+            </div>
+            <!-- Sparkline -->
+            <div class="rounded flex-grow-1 p-1"
+              style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+              <div id="screenVisitsSparkline" style="width: 100%; height: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Avg Load Time -->
+        <div class="col-md-4">
+          <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+            style="background-color: #fff7ed; color: #9a3412; --card-bg: #fff7ed;">
+            <div class="d-flex flex-column justify-content-between" style="flex: 0 0 max-content; padding-right: 5px;">
+              <div class="mb-2">
+                <h6 class="m-0 fw-bold" style="font-size: 13px;">Avg. Load Time
+                  <span class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                    <i class="bi bi-info-circle opacity-75" style="font-size: 11px;"></i>
+                    <span class="custom-tooltip"
+                      style="--tooltip-bg: #fff7ed; --tooltip-border: #fb923c; --tooltip-color: #9a3412; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Overall
+                      average load time across all screens</span>
+                  </span>
+                </h6>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                  style="width: 36px; height: 36px; color: #ea580c; flex-shrink: 0;">
+                  <i class="bi bi-activity fs-6"></i>
+                </div>
+                <div class="ms-2">
+                  <div class="fs-5 fw-bold lh-1">{{ avgLoadTime }} <span
+                      style="font-size: 14px; font-weight: 600;">ms</span></div>
+                  <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Load Time</div>
+                </div>
+              </div>
+            </div>
+            <!-- Sparkline -->
+            <div class="rounded flex-grow-1 p-1"
+              style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+              <div id="avgLoadTimeSparkline" style="width: 100%; height: 100%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Flow -->
+    <div class="col-lg-6">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #eef2ff; color: #3730a3;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Screen Navigation Flow
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #a78bfa; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #f5f3ff; --tooltip-border: #a78bfa; --tooltip-color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">User
+                journey path across different screens</span>
+            </div>
+          </h6>
+          <a href="#" class="text-primary text-decoration-none" style="font-size: 11px;">View full flow</a>
+        </div>
+        <div class="d-flex justify-content-between align-items-center px-2">
+          <ng-container *ngFor="let step of navigationFlow; let last = last">
+            <div class="flow-box text-center p-2 rounded border" [ngStyle]="{'background-color': step.bg}"
+              style="flex: 1; min-width: 0;">
+              <div class="fw-semibold text-truncate mb-1" style="font-size: 11px;" [title]="step.name">{{ step.name }}
+              </div>
+              <div class="opacity-75" style="font-size: 9px;">Visits</div>
+              <div class="fw-bold" style="font-size: 13px;">{{ step.visits }}</div>
+            </div>
+            <div *ngIf="!last" class="opacity-50 mx-1"><i class="bi bi-arrow-right"></i></div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Charts -->
+  <div class="row g-3 mb-3">
+    <!-- Visits Chart -->
+    <div class="col-lg-4">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #f5f3ff; color: #4c1d95;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Screen Visits Over Time
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #a78bfa; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #f5f3ff; --tooltip-border: #a78bfa; --tooltip-color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Trend
+                of screen visits and active sessions over the selected time range</span>
+            </div>
+          </h6>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" style="font-size: 10px;">5m</button>
+            <button class="btn btn-outline-secondary" style="font-size: 10px;">15m</button>
+            <button class="btn btn-primary"
+              style="font-size: 10px; background-color: #8b5cf6; border-color: #8b5cf6;">30m</button>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mb-2" style="font-size: 10px;">
+          <span class="d-flex align-items-center"><i class="bi bi-circle-fill me-1"
+              style="color: #6d28d9; font-size: 6px;"></i> Visits</span>
+          <span class="d-flex align-items-center"><i class="bi bi-circle-fill me-1"
+              style="color: #059669; font-size: 6px;"></i> Sessions</span>
+        </div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="chartVisitsOptions"
+          style="width: 100%; height: 220px; display: block;"></highcharts-chart>
+      </div>
+    </div>
+    <!-- Load Time Chart -->
+    <div class="col-lg-4">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #f5f3ff; color: #4c1d95;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Avg. Load Time (ms) Over Time
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #a78bfa; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #f5f3ff; --tooltip-border: #a78bfa; --tooltip-color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Average
+                time taken to fully load the screens</span>
+            </div>
+          </h6>
+        </div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="chartLoadTimeOptions"
+          style="width: 100%; height: 240px; display: block;"></highcharts-chart>
+      </div>
+    </div>
+    <!-- Screen Health -->
+    <div class="col-lg-2">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #f0fdf4; color: #14532d;">
+        <div class="d-flex align-items-center mb-2">
+          <h6 class="fw-bold mb-0" style="font-size: 13px;">Screen Health
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #4ade80; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #f0fdf4; --tooltip-border: #4ade80; --tooltip-color: #14532d; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Overall
+                health rating based on Apdex and errors</span>
+            </div>
+          </h6>
+        </div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="chartHealthOptions"
+          style="width: 100%; height: 160px; display: block;"></highcharts-chart>
+        <div class="mt-2">
+          <div class="d-flex justify-content-between" style="font-size: 10px;"><span><i class="bi bi-circle-fill me-1"
+                style="color: #22c55e;"></i> Excellent (0.94 - 1.00)</span> <strong>58.3%</strong></div>
+          <div class="d-flex justify-content-between mt-1" style="font-size: 10px;"><span><i
+                class="bi bi-circle-fill me-1" style="color: #f59e0b;"></i> Good (0.85 - 0.93)</span>
+            <strong>24.6%</strong>
+          </div>
+          <div class="d-flex justify-content-between mt-1" style="font-size: 10px;"><span><i
+                class="bi bi-circle-fill me-1" style="color: #f97316;"></i> Fair (0.70 - 0.84)</span>
+            <strong>12.5%</strong>
+          </div>
+          <div class="d-flex justify-content-between mt-1" style="font-size: 10px;"><span><i
+                class="bi bi-circle-fill me-1" style="color: #ef4444;"></i> Poor (0.50 - 0.69)</span>
+            <strong>4.6%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Device Distribution -->
+    <div class="col-lg-2">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #f0fdfa; color: #115e59;">
+        <div class="d-flex align-items-center mb-2">
+          <h6 class="fw-bold mb-0" style="font-size: 13px;">Device Distribution</h6>
+          <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+            <i class="bi bi-info-circle-fill" style="color: #2dd4bf; font-size: 11px; opacity: 0.8;"></i>
+            <span class="custom-tooltip"
+              style="--tooltip-bg: #f0fdfa; --tooltip-border: #2dd4bf; --tooltip-color: #115e59; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Breakdown
+              of OS platforms accessing the screens</span>
+          </div>
+        </div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="chartDeviceOptions"
+          style="width: 100%; height: 160px; display: block;"></highcharts-chart>
+        <div class="mt-2 ms-4">
+          <div class="mt-1" style="font-size: 11px;"><i class="bi bi-circle-fill me-2" style="color: #2563eb;"></i>
+            Android</div>
+          <div class="mt-2" style="font-size: 11px;"><i class="bi bi-circle-fill me-2" style="color: #8b5cf6;"></i> iOS
+          </div>
+          <div class="mt-2" style="font-size: 11px;"><i class="bi bi-circle-fill me-2" style="color: #ec4899;"></i>
+            Other</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Lists & Errors/Crashes -->
+  <div class="row g-3 mb-3">
+    <!-- Top Slow Screens -->
+    <div class="col-lg-3">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #fff7ed; color: #9a3412;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Top Slow Screens
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #fb923c; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #fff7ed; --tooltip-border: #fb923c; --tooltip-color: #7c2d12; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Screens
+                with the highest average load times</span>
+            </div>
+          </h6>
+          <a href="#" class="text-primary text-decoration-none" style="font-size: 11px;">View all</a>
+        </div>
+        <table class="table table-borderless table-sm mb-0 mt-1 table-theme-orange"
+          style="font-size: 11px; color: #9a3412;">
+          <thead>
+            <tr>
+              <th class="py-2">#</th>
+              <th class="py-2">Screen Name</th>
+              <th class="py-2">Avg. Load Time (ms)</th>
+              <th class="py-2">Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of topSlowScreens; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td class="fw-semibold">
+                <a [routerLink]="['/mrum/screens', item.name]" [queryParamsHandling]="'preserve'"
+                  class="text-decoration-none text-primary" style="cursor: pointer;">
+                  {{ item.name }}
+                </a>
+              </td>
+              <td>{{ item.time }}</td>
+              <td><img src="assets/images/sparklines/trend-red.svg" style="height: 12px;"
+                  onerror="this.style.display='none'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Screens by Apdex -->
+    <div class="col-lg-3">
+      <div class="dash-card p-3 border-0 rounded-3 shadow-sm h-100" style="background-color: #f0fdf4; color: #14532d;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Top Screens by Apdex
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #4ade80; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip"
+                style="--tooltip-bg: #f0fdf4; --tooltip-border: #4ade80; --tooltip-color: #14532d; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Best
+                performing screens according to user satisfaction</span>
+            </div>
+          </h6>
+          <a href="#" class="text-primary text-decoration-none" style="font-size: 11px;">View all</a>
+        </div>
+        <table class="table table-borderless table-sm mb-0 mt-1 table-theme-green"
+          style="font-size: 11px; color: #14532d;">
+          <thead>
+            <tr>
+              <th class="py-2">#</th>
+              <th class="py-2">Screen Name</th>
+              <th class="py-2">Apdex</th>
+              <th class="py-2">Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of topScreensApdex; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td class="fw-semibold">
+                <a [routerLink]="['/mrum/screens', item.name]" [queryParamsHandling]="'preserve'"
+                  class="text-decoration-none text-primary" style="cursor: pointer;">
+                  {{ item.name }}
+                </a>
+              </td>
+              <td>{{ item.score }}</td>
+              <td><img src="assets/images/sparklines/trend-green.svg" style="height: 12px;"
+                  onerror="this.style.display='none'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Most Errors -->
+    <div class="col-lg-3">
+      <div class="dash-card p-3 h-100 border-0 rounded-3 shadow-sm" style="background-color: #fee2e2; color: #7f1d1d;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Most Errors by Screen
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #f87171; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip align-right"
+                style="--tooltip-bg: #fef2f2; --tooltip-border: #f87171; --tooltip-color: #7f1d1d; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Screens
+                encountering the highest number of errors</span>
+            </div>
+          </h6>
+          <a href="#" class="text-primary text-decoration-none" style="font-size: 11px;">View all</a>
+        </div>
+        <table class="table table-borderless table-sm mb-0 mt-1 table-theme-red"
+          style="font-size: 11px; color: #7f1d1d;">
+          <thead>
+            <tr>
+              <th class="py-2">#</th>
+              <th class="py-2">Page Name</th>
+              <th class="py-2" style="width: 35%;">Errors</th>
+              <th class="text-end py-2">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of mostErrors; let i = index">
+              <td class="align-middle">{{ i + 1 }}</td>
+              <td class="align-middle fw-semibold text-truncate" style="max-width: 80px;">
+                <a [routerLink]="['/mrum/screens', item.name]" [queryParamsHandling]="'preserve'"
+                  class="text-decoration-none text-primary" style="cursor: pointer;">
+                  {{ item.name }}
+                </a>
+              </td>
+              <td class="align-middle">
+                <div class="progress" style="height: 4px; background-color: rgba(239, 68, 68, 0.2);">
+                  <div class="progress-bar" style="background-color: #ef4444;" [style.width]="item.pct + '%'"></div>
+                </div>
+              </td>
+              <td class="align-middle text-end opacity-75">{{ item.count }} ({{ item.pct }}%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Most Crashes -->
+    <div class="col-lg-3">
+      <div class="dash-card p-3 h-100 border-0 rounded-3 shadow-sm" style="background-color: #ffedd5; color: #7c2d12;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 13px;">Most Crashes by Screens
+            <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+              <i class="bi bi-info-circle-fill" style="color: #fb923c; font-size: 11px; opacity: 0.8;"></i>
+              <span class="custom-tooltip align-right"
+                style="--tooltip-bg: #ffedd5; --tooltip-border: #fb923c; --tooltip-color: #7c2d12; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Screens
+                responsible for the most application crashes</span>
+            </div>
+          </h6>
+          <a href="#" class="text-primary text-decoration-none" style="font-size: 11px;">View all</a>
+        </div>
+        <table class="table table-borderless table-sm mb-0 mt-1 table-theme-orange"
+          style="font-size: 11px; color: #7c2d12;">
+          <thead>
+            <tr>
+              <th class="py-2">#</th>
+              <th class="py-2">Page Name</th>
+              <th class="py-2" style="width: 35%;">Crashes</th>
+              <th class="text-end py-2">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of mostCrashes; let i = index">
+              <td class="align-middle">{{ i + 1 }}</td>
+              <td class="align-middle fw-semibold text-truncate" style="max-width: 80px;">
+                <a [routerLink]="['/mrum/screens', item.name]" [queryParamsHandling]="'preserve'"
+                  class="text-decoration-none text-primary" style="cursor: pointer;">
+                  {{ item.name }}
+                </a>
+              </td>
+              <td class="align-middle">
+                <div class="progress" style="height: 4px; background-color: rgba(239, 68, 68, 0.2);">
+                  <div class="progress-bar" style="background-color: #ef4444;" [style.width]="item.pct + '%'"></div>
+                </div>
+              </td>
+              <td class="align-middle text-end opacity-75">{{ item.count }} ({{ item.pct | number:'1.1-1' }}%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Main Table -->
+  <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden bg-white">
+    <div class="p-3 d-flex justify-content-between align-items-center"
+      style="background-color: #f5f3ff; border-bottom: 1px solid #ede9fe;">
+      <h6 class="mb-0 fw-bold d-flex align-items-center" style="color: #4c1d95; font-size: 13px;">All Screens
+        <div class="tooltip-wrap position-relative d-inline-flex ms-2" style="cursor: help;">
+          <i class="bi bi-info-circle-fill" style="color: #a78bfa; font-size: 11px; opacity: 0.8;"></i>
+          <span class="custom-tooltip"
+            style="--tooltip-bg: #f5f3ff; --tooltip-border: #a78bfa; --tooltip-color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Comprehensive
+            list of all tracked screens</span>
+        </div>
+      </h6>
+    </div>
+    <div class="table-responsive px-3 pb-3 pt-3">
+      <table class="table table-hover table-sm align-middle mb-0 mt-1 screens-main-table">
+        <thead>
+          <tr>
+            <th>Screen Name <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Screen Name"></i></th>
+            <th>Visits <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Visits"></i></th>
+            <th>Sessions <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Sessions"></i></th>
+            <th>Avg. Duration <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Avg. Duration"></i>
+            </th>
+            <th>Avg. Load Time <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Avg. Load Time"></i>
+            </th>
+            <th>Errors <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Errors"></i></th>
+            <th>Crashes <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Crashes"></i></th>
+            <th>Apdex <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Apdex"></i></th>
+            <th>Bounce Rate <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Bounce Rate"></i></th>
+            <th>Last Seen <i class="bi bi-arrow-down-up ms-1 p-1 rounded cursor-pointer"
+                style="font-size: 9px; background-color: #ede9fe; color: #6d28d9;" title="Sort by Last Seen"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let screen of paginatedScreens" class="cursor-pointer" (click)="viewScreenDetails(screen)"
+            style="font-size: 12px;">
+            <td style="color: #6d28d9; font-weight: 700;">{{ screen.name }}</td>
+            <td>{{ screen.visits }}</td>
+            <td>{{ screen.sessions }}</td>
+            <td>{{ screen.avgDuration }}</td>
+            <td>{{ screen.avgLoadTime }}</td>
+            <td>{{ screen.errors }}</td>
+            <td>{{ screen.crashes }}</td>
+            <td>
+              <span class="badge rounded-pill"
+                style="background-color: #dcfce7; color: #16a34a; font-weight: 700; border: 1px solid #86efac; padding: 4px 8px;">{{
+                screen.apdex }}</span>
+            </td>
+            <td>{{ screen.bounceRate }}</td>
+            <td style="color: #7c3aed; opacity: 0.8;">{{ screen.lastSeen }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-transparent border-0 py-4 px-4 d-flex justify-content-between align-items-center"
+      style="border-top: 1px solid #f1f5f9 !important;">
+      <div style="font-size: 12px; font-weight: 600; color: #6d28d9;">Showing {{ screenPaginationStart }} to {{
+        screenPaginationEnd }} of {{ filteredScreens.length }} screens</div>
+      <div class="d-flex align-items-center gap-4">
+        <div class="d-flex align-items-center gap-2">
+          <input type="number" min="1" class="form-control form-control-sm border-0"
+            style="width: 70px; text-align: center; font-weight: 600; background-color: #f5f3ff; color: #4c1d95;"
+            [(ngModel)]="screenPageSize" (ngModelChange)="updateScreenPagination()">
+          <span style="font-size: 12px; font-weight: 700; color: #4c1d95;">per page</span>
+        </div>
+        <nav>
+          <ul class="pagination mb-0 shadow-sm" style="border-radius: 8px; overflow: hidden; font-weight: 600;">
+            <li class="page-item" [class.disabled]="currentScreenPage === 1">
+              <a class="page-link border-0 py-2 px-3" href="#" (click)="changeScreenPage(currentScreenPage - 1, $event)"
+                [style.background-color]="currentScreenPage === 1 ? '#f8fafc' : '#ffffff'"
+                [style.color]="currentScreenPage === 1 ? '#cbd5e1' : '#64748b'"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item" *ngFor="let page of screenPaginationPages"
+              [class.active]="currentScreenPage === page">
+              <a class="page-link border-0 py-2 px-3" href="#" (click)="changeScreenPage(page, $event)"
+                [style.background-color]="currentScreenPage === page ? '#4f46e5' : '#ffffff'"
+                [style.color]="currentScreenPage === page ? '#ffffff' : '#64748b'">{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentScreenPage === totalScreenPages">
+              <a class="page-link border-0 py-2 px-3" href="#" (click)="changeScreenPage(currentScreenPage + 1, $event)"
+                [style.background-color]="currentScreenPage === totalScreenPages ? '#f8fafc' : '#ffffff'"
+                [style.color]="currentScreenPage === totalScreenPages ? '#cbd5e1' : '#64748b'"><i
+                  class="bi bi-chevron-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>

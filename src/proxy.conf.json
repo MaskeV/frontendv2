@@ -1,0 +1,139 @@
+{
+  "/user": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/clients": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/application": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/data-discover": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/feature": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/document": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/dashboard": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/graph": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/interfaceConfig": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/metric": {
+    "target": "http://192.168.12.95:12010",
+    "secure": false
+  },
+  "/report": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/role": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/alert": {
+    "target": "http://192.168.12.95:12011",
+    "secure": false
+  },
+  "/cronjob": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/firewall": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/capacity-planner": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/selfmonitoring": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/apm": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/infra": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/network": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/cloudGateway": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/monitoring": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/activemq": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/browser": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/edata": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/eks": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/database": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/rds": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/metering/report": {
+    "target": "http://192.168.12.95:15001",
+    "secure": false
+  },
+  "/metering": {
+    "target": "http://192.168.12.95:15001",
+    "secure": false
+  },
+  "/backendJob": {
+    "target": "http://192.168.12.95:16001",
+    "secure": false
+  },
+  "/netra/report": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/api/k8s": {
+    "target": "http://192.168.12.95:12001",
+    "secure": false
+  },
+  "/api/haproxy": {
+    "target": "http://192.168.12.93:9999",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

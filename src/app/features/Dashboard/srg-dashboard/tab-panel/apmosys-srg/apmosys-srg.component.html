@@ -1,0 +1,365 @@
+<main class="dashboard-shell" id="dashboard">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="left">
+            <button class="btn-gradient primary" title="Back to SRG" routerLink="/srg">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <strong>SRG Dashboard</strong>
+        </div>
+
+        <div class="right">
+            <!-- Select Dashboard -->
+            <div class="modern-select-wrapper">
+                <i class="fa-solid fa-database select-icon"></i>
+                <select class="modern-select" aria-label="Select Dashboard" [(ngModel)]="subFeatureName" (change)="getHardwareIp()">
+                    <option value="Select" disabled selected>Select Dashboard</option>
+                    <option value="{{ subfeature.subFeatureName }}" *ngFor="let subfeature of subFeatureList">
+                        {{ subfeature.subFeatureName }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Select IP Address -->
+            <div class="modern-select-wrapper" *ngIf="subFeatureName == 'Hardware'">
+                <i class="fa-solid fa-network-wired select-icon"></i>
+                <select class="modern-select" aria-label="Select IP Address" [(ngModel)]="ipAddress" (change)="getData()">
+                    <option value="Select" disabled selected>Select IP Address</option>
+                    <option value="{{ ip.ipAddress }}" *ngFor="let ip of ipAddressList">
+                        {{ ip.ipAddress }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="modern-select-wrapper">
+                <i class="fa-regular fa-clock select-icon"></i>
+                <select class="modern-select" [(ngModel)]="dateFilter" (change)="dateFilter !== 'CUSTOM' ? getData() : null">
+                    <option value="5 MINUTE">Last 5 MINUTE</option>
+                    <option value="10 MINUTE">Last 10 MINUTE</option>
+                    <option value="15 MINUTE">Last 15 MINUTE</option>
+                    <option value="30 MINUTE">Last 30 MINUTE</option>
+                    <option value="1 HOUR">Last 1 HOUR</option>
+                    <option value="6 HOUR">Last 6 HOURS</option>
+                    <option value="12 HOUR">Last 12 HOURS</option>
+                    <option value="1 DAY">Last 1 DAY</option>
+                    <option value="7 DAY">Last 7 DAYS</option>
+                    <option value="CUSTOM">Custom</option>
+                </select>
+            </div>
+
+            <ng-container *ngIf="dateFilter === 'CUSTOM'">
+                <div class="modern-select-wrapper">
+                    <i class="fa-regular fa-calendar-plus select-icon"></i>
+                    <input type="datetime-local" class="modern-input" [(ngModel)]="fromDate" title="Start Date" style="padding: 6px 10px 6px 32px;" />
+                </div>
+                <div class="modern-select-wrapper">
+                    <i class="fa-regular fa-calendar-check select-icon"></i>
+                    <input type="datetime-local" class="modern-input" [(ngModel)]="toDate" title="End Date" style="padding: 6px 10px 6px 32px;" />
+                </div>
+                <!-- <button class="btn-gradient primary" (click)="getDataByTimeRange()" title="Search Custom Date">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button> -->
+            </ng-container>
+
+            <button class="btn-gradient primary" title="Refresh Dashboard" (click)="getData()">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+
+            <button class="btn-gradient primary" title="Save Dashboard Layout"
+                *ngIf="userType == 'Super Admin' || userType == 'Admin'" (click)="saveDashboardLayout()">
+                <i class="fa-solid fa-floppy-disk"></i> Save 
+            </button>
+
+            <!-- Export Dashboard -->
+            <button class="btn-gradient primary" title="Export Dashboard as PDF" (click)="exportDashboardToPDF()">
+                <i class="fa-solid fa-file-pdf"></i> Export
+            </button>
+
+            <button class="btn-gradient primary" [title]="fullScreenMode ? 'Exit Full Screen' : 'View Full Screen'"
+                (click)="fullscreenModeToggle()">
+                <i class="fa-solid" [ngClass]="fullScreenMode ? 'fa-compress' : 'fa-expand'"></i>
+                {{ fullScreenMode ? 'Exit' : 'TV' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="dashboard-canvas" id="dashboard-canvas-container">
+        <gridster [options]="options">
+            <gridster-item [item]="item" *ngFor="let item of dashboard; let i = index"
+                class="modern-grid-card bg-white">
+                <div class="button-holder h-100 position-relative w-100">
+
+                    <!-- Chart content area -->
+                    <div class="gridster-item-content h-100 w-100 p-3" id="{{ item['chartId'] }}">
+                        <div id="{{ item['chartId'] }}-spinner"
+                            class="d-flex justify-content-center align-items-center h-100 w-100 position-absolute bg-white bg-opacity-75"
+                            style="z-index: 5; top: 0; left: 0">
+                            <div class="spinner-grow text-primary" role="status"
+                                style="width: 3rem; height: 3rem">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RAG Status Bar (for DoughNut charts) -->
+                    <div class="rag-status-bar d-flex justify-content-center gap-3 px-2 pb-1"
+                        *ngIf="item['chartType'] == 'DoughNut' && (item['pointChildGraphs'] == 'RAG' || item['pointChildGraphs'] == 'RAGCOUNT_POINTGRAPHS')">
+                        <span class="rag-badge">
+                            <span class="rag-dot" [ngStyle]="{'background-color': item['criticalColor']}"></span>
+                            Critical
+                        </span>
+                        <span class="rag-badge">
+                            <span class="rag-dot" [ngStyle]="{'background-color': item['warningColor']}"></span>
+                            Warning
+                        </span>
+                        <span class="rag-badge">
+                            <span class="rag-dot" [ngStyle]="{'background-color': item['normalColor']}"></span>
+                            Normal
+                        </span>
+                    </div>
+
+                    <!-- Per-item action buttons (visible on hover) -->
+                    <div class="item-buttons position-absolute top-0 end-0 p-2 d-flex gap-2" style="z-index: 10">
+
+                        <!-- Trend context menu (Trend Dashboard only) -->
+                        <div class="dropdown" *ngIf="isTrendDashBoard">
+                            <button class="modern-action-btn shadow-sm" type="button"
+                                id="trend-menu-{{ item['chartId'] }}"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                (click)="evaluate(item); setZIndex(item['chartId'])"
+                                title="Trend Data Options">
+                                <i class="fas fa-ellipsis-v text-secondary fa-sm"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 160px; font-size: 0.85rem;">
+                                <li *ngIf="magicKey">
+                                    <span class="dropdown-item text-muted">
+                                        <i class="fas fa-spinner fa-spin me-1"></i> Loading...
+                                    </span>
+                                </li>
+                                <li *ngIf="!magicKey && lastOneDay">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '1_day')">
+                                        <i class="fas fa-calendar-day me-2 text-primary"></i>Last 1 day
+                                    </a>
+                                </li>
+                                <li *ngIf="!magicKey && lastOneweek">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '1_week')">
+                                        <i class="fas fa-calendar-week me-2 text-primary"></i>Last 1 week
+                                    </a>
+                                </li>
+                                <li *ngIf="!magicKey && lastOneMonth">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '1_month')">
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Last 1 month
+                                    </a>
+                                </li>
+                                <li *ngIf="!magicKey && lastThreeMonth">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '3_months')">
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Last 3 months
+                                    </a>
+                                </li>
+                                <li *ngIf="!magicKey && LastSixMonth">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '6_months')">
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Last 6 months
+                                    </a>
+                                </li>
+                                <li *ngIf="!magicKey && lastOneYear">
+                                    <a class="dropdown-item" (click)="getTrendData(item, '1_year')">
+                                        <i class="fas fa-calendar me-2 text-primary"></i>Last 1 year
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Download Menu -->
+                        <div class="dropdown" *ngIf="item['chartType'] != 'Text'">
+                            <button class="modern-action-btn shadow-sm" type="button"
+                                id="download-menu-{{ item['chartId'] }}"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                title="Export Options">
+                                <i class="fas fa-download text-primary fa-sm"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 140px; font-size: 0.85rem;">
+                                <!-- For Graphs & Tables -->
+                                <li>
+                                    <a class="dropdown-item" style="cursor: pointer;" (click)="exportGraphToPNG(item)">
+                                        <i class="fas fa-image me-2 text-info"></i>Download PNG
+                                    </a>
+                                </li>
+                                <!-- For Tables -->
+                                <li *ngIf="item['chartType'] == 'Table' || item['chartType'] == 'RAG Table'">
+                                    <a class="dropdown-item" style="cursor: pointer;" (click)="exportTableToExcel(item)">
+                                        <i class="fas fa-file-excel me-2 text-success"></i>Export Excel
+                                    </a>
+                                </li>
+                                <li *ngIf="item['chartType'] == 'Table' || item['chartType'] == 'RAG Table'">
+                                    <a class="dropdown-item" style="cursor: pointer;" (click)="exportTableToPDF(item)">
+                                        <i class="fas fa-file-pdf me-2 text-danger"></i>Export PDF
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Drill-down button -->
+                        <button class="modern-action-btn shadow-sm drilldown-btn"
+                            (click)="openChildDashboard(item)"
+                            title="Drill Down"
+                            *ngIf="item['chartType'] != 'Single Value' && item['chartType'] != 'Text'">
+                            <i class="fas fa-angle-double-right text-info fa-sm"></i>
+                        </button>
+
+                        <!-- Per-item Refresh (Table / RAG Table with live DB) -->
+                        <button class="modern-action-btn shadow-sm"
+                            (click)="openRefreshGraphModal(item)"
+                            title="Refresh Live Data"
+                            *ngIf="(item['chartType'] == 'Table' || item['chartType'] == 'RAG Table') && item['sourceDBEnable'] == 'yes'">
+                            <i class="fas fa-database text-success fa-sm"></i>
+                        </button>
+
+                        <!-- Drag handle -->
+                        <button class="drag-handler modern-action-btn shadow-sm" title="Move">
+                            <i class="fas fa-grip-horizontal text-secondary"></i>
+                        </button>
+
+                        <!-- Edit Graph (Admin only) -->
+                        <button class="modern-action-btn shadow-sm"
+                            (click)="editGraph(item)"
+                            title="Edit Graph"
+                            *ngIf="userType == 'Super Admin' || userType == 'Admin'">
+                            <i class="fas fa-pencil-alt text-primary"></i>
+                        </button>
+
+                        <!-- Remove -->
+                        <button class="remove-button modern-action-btn shadow-sm"
+                            (mousedown)="removeItem($event, item)" (touchstart)="removeItem($event, item)"
+                            title="Remove" *ngIf="userType == 'Super Admin'">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </button>
+                    </div>
+                </div>
+            </gridster-item>
+        </gridster>
+    </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Child / Drilldown Dashboard Modal
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="child_graph_modal" class="child-modal-overlay" style="display: none;">
+    <div class="child-modal-dialog">
+        <!-- Header -->
+        <div class="child-modal-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-project-diagram text-primary"></i>
+                <h6 class="mb-0 fw-bold text-dark">{{ nodeGraphModalTittle || 'Drilldown' }}</h6>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="modern-toolbar-btn" *ngIf="subChildBackButton"
+                    (click)="clearSubChildDashboard()" title="Back">
+                    <i class="fas fa-arrow-left fa-sm"></i>
+                </button>
+                <button class="modern-toolbar-btn" (click)="clearChildDashboard()" title="Close">
+                    <i class="fas fa-times fa-sm text-danger"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Child Gridster Body -->
+        <div class="child-modal-body">
+            <gridster [options]="childOptions" style="background-color: transparent; height: 100%;">
+                <gridster-item [item]="item" *ngFor="let item of childDashboard; let i = index"
+                    class="modern-grid-card bg-white">
+                    <div class="button-holder h-100 position-relative w-100">
+
+                        <!-- Child chart content -->
+                        <div class="gridster-item-content h-100 w-100 p-3" id="child-{{ item['chartId'] }}">
+                            <div id="child-{{ item['chartId'] }}-child-spinner"
+                                class="d-flex justify-content-center align-items-center h-100 w-100 position-absolute bg-white bg-opacity-75"
+                                style="z-index: 5; top: 0; left: 0">
+                                <div class="spinner-grow text-primary" role="status"
+                                    style="width: 2rem; height: 2rem">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RAG Status Bar in child -->
+                        <div class="rag-status-bar d-flex justify-content-center gap-3 px-2 pb-1"
+                            *ngIf="item['chartType'] == 'DoughNut' && (item['pointChildGraphs'] == 'RAG' || item['pointChildGraphs'] == 'RAGCOUNT_POINTGRAPHS')">
+                            <span class="rag-badge">
+                                <span class="rag-dot" [ngStyle]="{'background-color': item['criticalColor']}"></span>
+                                Critical
+                            </span>
+                            <span class="rag-badge">
+                                <span class="rag-dot" [ngStyle]="{'background-color': item['warningColor']}"></span>
+                                Warning
+                            </span>
+                            <span class="rag-badge">
+                                <span class="rag-dot" [ngStyle]="{'background-color': item['normalColor']}"></span>
+                                Normal
+                            </span>
+                        </div>
+
+                    </div>
+                </gridster-item>
+            </gridster>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Per-item Live DB Refresh Modal
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="refresh_graph_modal" class="child-modal-overlay" style="display: none;">
+    <div class="child-modal-dialog" style="max-width: 900px;">
+        <!-- Header -->
+        <div class="child-modal-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-database text-success"></i>
+                <h6 class="mb-0 fw-bold text-dark">Live Data Refresh</h6>
+            </div>
+            <button class="modern-toolbar-btn" (click)="closeRefreshModal()" title="Close">
+                <i class="fas fa-times fa-sm text-danger"></i>
+            </button>
+        </div>
+
+        <!-- Refresh Body -->
+        <div class="child-modal-body p-4" style="height: auto; max-height: 70vh; overflow-y: auto;">
+
+            <!-- Loading -->
+            <div *ngIf="isRefreshLoading" class="d-flex justify-content-center align-items-center py-5">
+                <div class="spinner-grow text-success me-3" style="width: 2.5rem; height: 2.5rem;"></div>
+                <span class="text-muted fw-semibold">Fetching live data...</span>
+            </div>
+
+            <!-- Error -->
+            <div *ngIf="isRefreshError && !isRefreshLoading"
+                class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ refreshErrorMessage }}</span>
+            </div>
+
+            <!-- Table -->
+            <div *ngIf="isRefreshSuccess && !isRefreshLoading" class="table-responsive">
+                <table class="table table-sm table-bordered table-hover align-middle" style="font-size: 0.82rem;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th *ngFor="let header of refreshTableHeaders">{{ header }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of refreshTableData">
+                            <td *ngFor="let cell of row">{{ cell }}</td>
+                        </tr>
+                        <tr *ngIf="!refreshTableData || refreshTableData.length === 0">
+                            <td [attr.colspan]="refreshTableHeaders.length || 1" class="text-center text-muted py-3">
+                                No records found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

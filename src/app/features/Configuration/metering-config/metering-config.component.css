@@ -1,0 +1,2226 @@
+ .main {
+     width: 99%;
+     height: 88vh;
+     max-height: 100vh;
+     margin-top: 0.5%;
+     overflow-x: hidden !important;
+
+ }
+
+ .custom-border {
+     border-color: var(--border-color) !important;
+ }
+
+
+ .client-config-container {
+    background: var(--card-bg-color);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .config-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  .config-cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+  
+  .config-card {
+    flex: 1;
+    min-width: 150px;
+    background: var(--table-header-bg);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .detail-label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  
+  .detail-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+  }
+  
+  
+
+ .right-div {
+     width: 75%;
+     margin: 7px;
+     height: auto;
+ }
+
+ .right-div-main {
+     width: 100.1%;
+     margin-left: -2px;
+     /* height: auto; */
+     max-height: 100vh;
+     margin-top: 0.5%;
+     overflow-x: hidden !important;
+ }
+
+ .raleway-font-size {
+     font-size: 15px;
+ }
+
+ .text-white {
+     color: var(--text-color) !important;
+ }
+  .text {
+     color: var(--text-color) !important;
+ }
+
+
+ .semi-text {
+     font-weight: 700;
+ }
+
+ .heading {
+     margin: 25px 24px 20px 24px;
+     font-size: 15px;
+     font-weight: bold;
+ }
+
+ .show-div {
+     border: 2px solid;
+     border-radius: 4px;
+     width: 63%;
+     background-color: #055d8cc7 !important;
+     margin-left: 2px;
+     border-color: #055d8cc7 !important;
+ }
+
+ .show-div1 {
+     margin-top: 16px;
+     border: 2px solid;
+     border-radius: 4px;
+     width: 67%;
+     background-color: #055d8cc7 !important;
+     margin-left: -43%;
+     border-color: #055d8cc7 !important;
+ }
+
+ .show-div4 {
+     margin-top: 16px;
+     border: 2px solid;
+     border-radius: 4px;
+     width: 74%;
+     background-color: #055d8cc7 !important;
+     margin-left: -81%;
+     border-color: #055d8cc7 !important;
+ }
+
+ .show-div2 {
+     margin-top: 0%;
+     border: 2px solid;
+     border-radius: 4px;
+     width: 55%;
+     height: 25px;
+     background-color: #055d8cc7 !important;
+     margin-left: -143%;
+     border-color: #055d8cc7 !important;
+ }
+
+ .show-div3 {
+     margin-top: 0%;
+     border: 2px solid;
+     border-radius: 4px;
+     width: 71%;
+     height: 25px;
+     background-color: #055d8cc7 !important;
+     margin-left: -122%;
+     border-color: #055d8cc7 !important;
+ }
+
+
+ .div-container {
+     width: 96.3%;
+     margin-left: 18px;
+     height: 75vh;
+     max-height: 100vh;
+     margin-top: 1%;
+     scrollbar-width: thin;
+     scrollbar-color: #555d75 #20273C;
+     overflow-x: hidden !important;
+ }
+
+ .div-container2 {
+     width: 96.50%;
+     /* background-color: #333; */
+     margin-left: 18px;
+     height: 57vh;
+     border-radius: 4px;
+     max-height: 100vh;
+     margin-top: 1%;
+     scrollbar-width: thin;
+     scrollbar-color: #555d75 #20273C;
+     overflow-x: hidden !important;
+ }
+
+ /* Webkit browsers */
+ .div-container::-webkit-scrollbar {
+     width: 10px;
+ }
+
+ .div-container::-webkit-scrollbar-track {
+     background: #20273C;
+     border-radius: 10px;
+ }
+
+ .div-container::-webkit-scrollbar-thumb {
+     background-color: #555d75;
+     border-radius: 10px;
+     border: 2px solid #20273C;
+ }
+
+ .custom-input {
+     background-color: transparent !important;
+     border: 1px solid #555d75;
+     color: white;
+     border-radius: 6px;
+     height: 30px;
+     font-size: 0.875rem;
+ }
+
+ .custom-input::placeholder {
+     color: var(--text-color);
+ }
+
+ .custom-input:focus {
+     border-color: #5a9ee0;
+     outline: none;
+     box-shadow: none;
+ }
+
+ .custom-select {
+     background-color: transparent !important;
+     border: 1px solid #555d75;
+     color: white;
+     border-radius: 6px;
+     height: 30px;
+     font-size: 0.875rem;
+     padding-left: 8px;
+ }
+
+ .custom-select option {
+     background-color: #333;
+     color: white;
+ }
+
+ .custom-select:focus {
+     border-color: #5a9ee0;
+     outline: none;
+     box-shadow: none;
+ }
+
+ .custom-radio input[type='radio'] {
+     appearance: none;
+     -webkit-appearance: none;
+     background-color: transparent;
+     border: 2px solid #ccc;
+     border-radius: 50%;
+     width: 18px;
+     height: 18px;
+     cursor: pointer;
+     position: relative;
+     margin-top: 2px;
+     vertical-align: middle;
+     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+     outline: none;
+ }
+
+ /* Custom focus (optional ripple effect substitute) */
+ .custom-radio input[type='radio']:focus {
+     box-shadow: 0 0 0 3px rgba(225, 85, 0, 0.3);
+     /* Soft orange glow */
+ }
+
+ /* Checked state */
+ .custom-radio input[type='radio']:checked {
+     border-color: #E15500;
+     background-color: #fff;
+ }
+
+ /* Inner dot */
+ .custom-radio input[type='radio']::before {
+     content: '';
+     display: block;
+     width: 8px;
+     height: 8px;
+     border-radius: 50%;
+     background-color: #E15500;
+     position: absolute;
+     top: 3px;
+     left: 3px;
+     transform: scale(0);
+     transition: transform 0.2s ease-in-out;
+ }
+
+ .custom-radio input[type='radio']:checked::before {
+     transform: scale(1);
+ }
+
+ .padding-tbody {
+     padding-top: 0px !important;
+     padding-bottom: 0px !important;
+ }
+
+ .add {
+     margin-left: 93%;
+     margin-top: -2.3%;
+     font-weight: 400;
+ }
+
+ .dropdown-list li.highlighted {
+     background-color: #5a9ee0;
+     color: white;
+ }
+
+ .zone-dropdown {
+     max-height: 150px;
+     overflow-y: auto;
+     position: absolute;
+     top: 22px;
+     left: 12px;
+     width: 138%;
+     max-height: 150px;
+     overflow-y: auto;
+     z-index: 10;
+     background-color: #333;
+     border: 1px solid #555d75;
+     border-radius: 6px;
+     font-size: x-small;
+     padding: 0;
+     margin: 4px 0 0 0;
+     list-style: none;
+     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+ }
+
+ .zone-dropdown li {
+     padding: 0px 7px;
+     color: white;
+     cursor: pointer;
+ }
+
+ .zone-dropdown li:hover {
+     background-color: #555;
+ }
+
+
+ /* Scrollbar styles (WebKit) */
+ .zone-dropdown::-webkit-scrollbar {
+     width: 10px;
+ }
+
+ .zone-dropdown::-webkit-scrollbar-track {
+     background: #20273C;
+     border-radius: 10px;
+ }
+
+ .zone-dropdown::-webkit-scrollbar-thumb {
+     background-color: #555d75;
+     border-radius: 10px;
+     border: 2px solid #20273C;
+ }
+
+ /* Scrollbar styles (Firefox) */
+ .zone-dropdown {
+     scrollbar-width: thin;
+     scrollbar-color: #555d75 #20273C;
+ }
+
+/* metering-config.component.css */
+
+/* New UI Styles */
+.metering-container {
+  background: #1a1f2e;
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  padding: 20px 24px 0px 24px; /* Top, Right, Bottom, Left */
+}
+
+.header h1 {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid transparent;
+  border-bottom-color: linear-gradient(to right, #8e2c1f, #b83422, #d94f30);
+}
+
+/* .border-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #8e2c1f, #b83422, #d94f30);
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+} */
+
+/* .border-bottom-active::after {
+  transform: scaleX(1);
+} */
+
+.nav-tab {
+  background: var(--bg-color);
+  border: none;
+  color: linear-gradient(to right, #8e2c1f, #b83422, #d94f30);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  /* border-bottom: 2px solid transparent;
+  border-bottom-color: linear-gradient(to right, #8e2c1f, #b83422, #d94f30); */
+  transition: color 0.5s ease;
+  position: relative;
+}
+
+.nav-tab.active {
+  background-color: var(--nav-bg-color);
+  color: var(--nav-link-active-color);
+  border-color: var(--border-color) var(--border-color);
+  /* border-bottom: 0.5px solid ;
+  border-image: linear-gradient(to right, #8e2c1f, #b83422, #d94f30) 1; */
+}
+
+.nav-tab.active::after { /* Apply this to the active tab */
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* Thickness of the underline */
+  background: linear-gradient(to right, #8e2c1f, #b83422, #d94f30);
+  border-radius: 1px;
+  transform: scaleX(0); /* Initially hidden (scaled to 0 width) */
+  transform-origin: left; /* Animation starts from the left */
+  transition: transform 0.4s ease; /* Smooth animation over 0.4 seconds */
+}
+
+/* When the tab is active, scale the underline to full width */
+.nav-tab.active::after {
+  transform: scaleX(1); /* Scales to full width when active */
+}
+
+.nav-tab:hover {
+  color: var(--accent-light-blue);
+  border-color: var(--border-color);
+}
+
+.tab-content {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Teams Section Styles */
+.teams-section {
+  padding: 20px 24px 0px 24px;
+}
+
+.right-div-teams {
+    margin: 7px;
+    height: auto;
+ }
+
+.teams-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.teams-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.add-team-btn {
+  background: linear-gradient(to right, #003366, #006699, #3399CC);
+ /* Applied linear gradient */
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation for hover effects */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Initial subtle shadow */
+}
+
+.add-team-btn:hover {
+  background: linear-gradient(to right, #0A2647, #14427b, #205295); /* Optional: reverse gradient or make it slightly darker/lighter on hover */
+  transform: translateY(-2px) scale(1.02); /* Lifts and slightly enlarges the button */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: 24px;
+  max-width: 300px;
+}
+
+.search-icon {
+  margin-right: 8px;
+  font-size: 16px;
+  color: #4b4bb7;
+}
+
+.search-container-host{
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  /* background-color: #f9f9f9; */
+  width: 250px;
+}
+
+/* .search-input {
+  width: 90%;
+  background: #2a3441;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 8px 12px 8px 36px;
+  color: #ffffff;
+  font-size: 10px;
+  outline: none;
+  transition: border-color 0.2s ease;
+} */
+
+.search-input:focus {
+  border-color: #4f46e5;
+}
+
+.search-input::placeholder {
+  color: #6b7280;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  width: 100%;
+}
+
+.table-container {
+  background: #2a3441;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.teams-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.teams-table th {
+  background: #374151;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+  color: #d1d5db;
+  border-bottom: 1px solid #4b5563;
+}
+
+.teams-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #374151;
+}
+
+.table-row:hover {
+  background: #374151;
+}
+
+.table-row:last-child td {
+  border-bottom: none;
+}
+
+.empty-row:hover {
+  background: transparent;
+}
+
+.empty-message {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 48px 16px;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid #4b5563;
+  color: var(--text-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #374151;
+  border-color: #6b7280;
+}
+
+.action-btn.delete:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-btn {
+  background: #374151;
+  border: 1px solid #4b5563;
+  color: #d1d5db;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  background: #4f46e5;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Client Tab Styles - Keep your existing styles and add these overrides */
+.tab-content .main {
+  background: transparent;
+}
+
+.tab-content .right-div {
+  /* background: #2a3441 !important; */
+}
+
+.tab-content .heading {
+  color: var(--text-color);
+}
+
+/* .tab-content .custom-border {
+  border-color: #4b5563 !important;
+} */
+
+/* .tab-content .right-div-main {
+  background: #2a3441;
+} */
+
+.tab-content label {
+  color: #d1d5db;
+}
+
+.tab-content .custom-input {
+  background: #374151;
+  border: 1px solid #4b5563;
+  color: #ffffff;
+}
+
+.tab-content .custom-input:focus {
+  background: #374151;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+.tab-content .custom-select {
+  background: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: #ffffff !important;
+}
+
+.tab-content .custom-select:focus {
+  background: #374151 !important;
+  border-color: #4f46e5 !important;
+  color: #ffffff !important;
+}
+
+.tab-content .custom-select option {
+  background: #374151;
+  color: #ffffff;
+}
+
+.tab-content .div-container2 {
+  /* background: #374151; */
+  border-radius: 8px;
+  padding: 16px;
+  /* margin: 16px 0; */
+}
+
+.tab-content .zone-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-content .zone-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.tab-content .zone-dropdown li:hover {
+  background: #4b5563;
+}
+
+.tab-content .btn-success {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: var(--text-color);
+}
+
+.tab-content .btn-success:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.tab-content span {
+  color: var(--text-color);
+}
+
+.tab-content .bi-plus {
+  color: #4f46e5 !important;
+}
+
+.tab-content .bi-trash3 {
+  color: #dc2626 !important;
+}
+
+.tab-content .bi-check2-circle {
+  color: #10b981 !important;
+}
+
+.tab-content .bi-gear-fill {
+  color: #f59e0b !important;
+}
+
+.tab-content hr {
+  border-top: 1px solid #4b5563 !important;
+}
+
+.client-config-flex-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased vertical gap */
+    /* background: #1a1f2e; */
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.client-config-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--custom-bg-color);
+    padding: 8px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.client-config-item label {
+    color: var(--text-color);
+    font-size: small;
+    white-space: nowrap;
+    flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+.input-container {
+    flex: 1; /* Allow input container to take remaining space */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: x-small;
+    /* justify-content: flex-end; */
+}
+
+.input-container span {
+    color: var(--text-color);
+    font-size: x-small;
+    white-space: nowrap;
+}
+
+.input-with-unit {
+    gap: 8px;
+}
+
+.unit-label {
+    color: #d1d5db;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.custom-input {
+    background: #374151;
+    border: 1px solid #4b5563;
+    color: #ffffff;
+    border-radius: 6px;
+    height: 30px;
+    font-size: 0.875rem;
+    padding: 4px 8px;
+    width: 100%; /* Makes input take maximum width inside container */
+    box-sizing: border-box;
+}
+
+.custom-input:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+
+.client-config-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.client-config-actions-update {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically if there's height */
+  padding: 10px 0; /* Add some padding above/below if needed */
+}
+
+.action-icon {
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.action-icon:hover {
+    color: #4f46e5;
+}
+table {
+    table-layout: auto !important;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border-color);
+  }
+
+.table th,
+.table td {
+    overflow: hidden;
+    position : sticky;
+    text-overflow: ellipsis;
+    /* white-space: normal; */
+    /* Allow text to wrap */
+    word-wrap: break-word;
+    /* Ensure long words break to avoid overflow */
+    word-break: break-word;
+    /* Handle long words or unbreakable content */
+    max-width: 90%;
+    /* Ensure content doesn't overflow beyond the column */
+    white-space: nowrap;
+    padding: 4px 8px;
+    text-align: center;
+    vertical-align: middle;
+    border-color: var(--border-color);
+    border-top: 1px solid var(--border-color);
+}
+.table-md{
+    border-bottom: var(--border-color);
+    border-top: var(--border-color);
+}
+.table-container {
+    overflow: auto;
+}
+  /* Make headers resizable with cursor */
+.resizable {
+    position: relative;
+    cursor: col-resize; /* cursor changes on header */
+  }
+  
+  /* The draggable handle on the right side of each header */
+  .resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    cursor: col-resize;
+    user-select: none; /* prevent text selection during drag */
+    background-color: rgba(0, 0, 0, 0.1); /* subtle visible handle */
+    z-index: 1;
+  }
+  
+  /* Text clamp for the Query column when collapsed */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; /* allow wrapping but clamp lines */
+  }
+  
+  .line-clamp-none {
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .clamp-content {
+    cursor: pointer; /* Indicate it's clickable */
+}
+
+
+
+  .pointer {
+    cursor: pointer;
+  }
+  
+  th.resizable {
+    position: relative;
+    border-right: 0.5px solid;
+  }
+  
+  .resize-handle {
+    width: 5px;
+    height: 100%;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+  }
+  
+  .resize-handle:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  /* For Pagination */
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-dark {
+  background-color: #1f2937;
+  color: #ffffff;
+  border: 1px solid #374151;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-dark:hover:not(:disabled) {
+  background-color: #374151;
+}
+
+.btn-dark:disabled {
+  background-color: #2d2d2d;
+  color: #888;
+  cursor: not-allowed;
+  border-color: #444;
+}
+
+.page-number {
+  color: #ccc;
+  font-size: 12px;
+}
+
+.page-input {
+  width: 50px;
+  margin: 0 6px;
+  padding: 4px;
+  background-color: #111827;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.no-teams-message {
+  text-align: center; /* Keep for text, but flex will handle overall centering */
+  padding: 20px 20px;
+  font-size: small;
+  color: #6c757d;
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally within the flex container */
+  justify-content: center; /* Center items vertically if container has specific height */
+  min-height: 150px;
+}
+
+.no-teams-message p {
+  margin-bottom: 20px;
+}
+
+/* Style for the new image */
+.no-teams-image {
+  max-width: 150px; /* Adjust size as needed */
+  height: auto;
+  margin-bottom: 25px; /* Space between image and text */
+  opacity: 0.7; /* Slightly dim the image */
+}
+
+/* Adjust the original Add Team button to only show if there's data */
+.teams-header .add-team-btn {
+  /* Your existing button styles */
+}
+
+.team-form-container {
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 20px; /* Space from the top of the tab content */
+    margin-bottom: 20px;
+}
+
+.team-form-container h3 {
+    margin-bottom: 25px;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.go-back-link {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.go-back-link a {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.go-back-link a:hover {
+    text-decoration: underline;
+}
+
+.team-form .form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px; /* Space between form groups */
+    margin-bottom: 15px; /* Space between rows */
+}
+
+.team-form .form-group {
+    flex: 1; /* Each form group takes equal space */
+    min-width: 250px; /* Minimum width for responsiveness */
+    display: flex;
+    flex-direction: column;
+}
+
+.team-form label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: small;
+}
+
+.team-form input[type="text"],
+.team-form textarea {
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9em;
+    width: 100%; /* Ensure inputs take full width of their group */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    color: black;
+}
+
+.team-form textarea {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 80px;
+}
+
+.team-form .readonly-input {
+    background-color: #e9ecef; /* Light grey background for readonly fields */
+    color: #495057;
+    cursor: not-allowed;
+}
+
+.team-form .form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.team-form .btn {
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+.team-form .btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.team-form .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.team-form .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+}
+
+.team-form .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.team-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for form groups */
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    max-width: 900px; /* Adjust as needed */
+    margin: 0 auto;
+}
+
+.form-column-left {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between stacked items in the left column */
+}
+
+.form-column-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin : 7px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: small;
+}
+
+.add-host-btn{
+  color: var(--text-color);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: small;
+}
+
+.team-input,
+.team-textarea {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--background-color-dark);
+    color: var(--text-color);
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.team-textarea {
+    resize: vertical;
+    min-height: 100px; /* Adjust as needed */
+    flex-grow: 1; /* Allow textarea to take available height */
+}
+
+.description-group {
+    height: 100%; /* Make description group take full height of its column */
+    display: flex;
+    flex-direction: column;
+}
+
+/* NEW: Style for centered buttons below the table */
+.form-actions-centered-below-table {
+    grid-column: 1 / -1; /* Span across all columns */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    gap: 15px; /* Space between buttons */
+    margin-top: 20px; /* Space above buttons */
+    padding-top: 15px; /* Adds padding to separate from table visually */
+    border-top: 1px solid var(--border-color); /* Optional: add a separator line */
+}
+
+#selected-hosts-table-div {
+    /* Remove overflow-x: auto from here if you want to explicitly avoid a scrollbar */
+    /* If the goal is truly no scroll, even if it means squishing or excessive wrapping,
+       then remove or comment out overflow-x: auto. If the table *must* fit
+       within its parent without a scrollbar, allowing text to wrap and reducing font
+       size are the primary ways to achieve that. */
+    /* overflow-x: auto; */ /* Enable horizontal scrolling for the table if content overflows */
+}
+
+.selected-hosts-table {
+    width: 100%; /* Ensure table takes full width of its container */
+    /* If the aim is strictly no scroll, even if the content might get very squished,
+       you might remove or drastically reduce min-width.
+       However, a small min-width is often good for readability.
+       With smaller font and text wrapping, this might not cause a scroll anymore. */
+    /* min-width: 600px; */ /* Minimum width to prevent excessive squishing */
+    border-collapse: collapse;
+}
+
+.selected-hosts-table th,
+.selected-hosts-table td {
+    border: 1px solid var(--border-color);
+    padding: 6px; /* Slightly reduced padding to save space */
+    text-align: left;
+    color: var(--text-color);
+    font-size: 0.75rem; /* Make table fonts smaller (e.g., 12px if 1rem=16px) */
+    white-space: normal; /* Allow text to wrap to the next line */
+    word-wrap: break-word; /* Ensure long words break and wrap */
+    /* Remove text-overflow and overflow: hidden if you want all text to be visible via wrapping */
+    overflow: visible; /* Make sure overflow is visible now that wrapping is allowed */
+    text-overflow: clip; /* Clip any remaining overflow, don't use ellipsis if text wraps */
+}
+
+/* Optional: You can set max-width for specific columns to guide wrapping if desired */
+.selected-hosts-table th:nth-child(1), /* Hostname */
+.selected-hosts-table td:nth-child(1) {
+    max-width: 120px; /* Example max-width for Hostname */
+}
+.selected-hosts-table th:nth-child(2), /* Hardware Serial */
+.selected-hosts-table td:nth-child(2) {
+    max-width: 100px; /* Example max-width for Hardware Serial */
+}
+.selected-hosts-table th:nth-child(3), /* Primary IP */
+.selected-hosts-table td:nth-child(3) {
+    max-width: 90px; /* Example max-width */
+}
+.selected-hosts-table th:nth-child(4), /* Primary MAC */
+.selected-hosts-table td:nth-child(4) {
+    max-width: 90px; /* Example max-width */
+}
+.selected-hosts-table th:nth-child(5), /* OS Version */
+.selected-hosts-table td:nth-child(5) {
+    max-width: 120px; /* Example max-width for OS Version */
+}
+
+.selected-hosts-table h5{
+  font-size: small;
+  color: var(--text-color);
+}
+
+
+.selected-hosts-table thead {
+    background-color: var(--header-bg-color); /* Or a slightly darker shade */
+}
+
+.selected-hosts-table tbody tr:nth-child(even) {
+    background-color: var(--even-row-bg-color); /* Lighten if needed */
+}
+
+.selected-hosts-table tbody tr:nth-child(odd) {
+    background-color: var(--odd-row-bg-color); /* Darken if needed */
+}
+
+.host-selection-section {
+    grid-column: 1 / -1; /* Span across all columns */
+    margin-top: 20px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-indicator.online {
+    background-color: #28a745; /* Green */
+}
+
+.status-indicator.offline {
+    background-color: #dc3545; /* Red */
+}
+
+.remove-host-icon {
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s ease-in-out;
+}
+
+.remove-host-icon:hover {
+    color: #bd2130;
+}
+
+.readonly-input {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    cursor: not-allowed;
+}
+
+/* Adjust Material Datepicker input styles to match others */
+.mat-mdc-form-field { /* Target the Angular Material form field container */
+    width: 100%; /* Make it take full width of its column */
+}
+
+.mat-mdc-form-field.mat-form-field-animations-enabled .mdc-text-field__input{
+    color: var(--text-color);
+}
+.mat-mdc-icon-button .mat-mdc-button-touch-target{
+    color: var(--text-color);
+}
+
+.mat-datepicker-content .mat-calendar{
+    background-color: var(--bg-color); /* Ensure calendar background matches */
+    color: var(--text-color);
+}
+
+.mat-mdc-text-field-wrapper {
+    background-color: var(--bg-color) !important; /* Ensure background is white */
+}
+
+.mat-mdc-form-field-appearance-outline .mat-mdc-text-field-wrapper {
+    border-radius: 4px;
+}
+
+.mat-mdc-form-field-flex .mat-mdc-form-field-infix {
+    padding: 10px 0 10px 0; /* Adjust internal padding to match other inputs */
+}
+
+.mat-mdc-text-field-wrapper .mat-mdc-form-field-infix {
+  min-height: 40px; /* Ensure consistent height */
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none; /* Hide default error/hint messages if you don't need them */
+}
+
+.mat-calendar-table {
+    background-color: var(--bg-color); /* Ensure calendar background matches */
+    color: var(--text-color);
+}
+
+/* Adjustments for existing table styles for host column if needed */
+/* For example, if host content is too wide without line breaks */
+/* .teams-table td:nth-child(4) { Assuming Host is the 4th column
+    word-break: break-word; Helps with long IP addresses/hostnames
+} */
+
+
+.go-back-icon:hover {
+    color: #0056b3; /* Darker color on hover */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.client-config-form {
+    padding: 20px; /* Consistent padding with team form */
+    background-color: var(--bg-color);
+    /* If you want a background and shadow, apply them here or to .right-div-main directly */
+}
+
+.client-config-form {
+    padding: 20px;
+}
+
+.client-config-form .form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 20px; /* Spacing between form groups */
+    margin-bottom: 15px; /* Spacing between rows */
+}
+
+.client-config-form .form-group {
+    flex: 1; /* Each form group takes equal space */
+    min-width: 280px; /* Ensure sufficient width for input and label */
+    display: flex;
+    flex-direction: column; /* Stack label above input */
+}
+
+.client-config-form label {
+    margin-bottom: 8px; /* Space between label and input */
+    font-weight: 600;
+    color: var(--text-color); /* Light text for labels on dark background */
+    font-size: small;
+}
+
+/* Styling for input fields within the client form */
+.client-config-form .client-form-input {
+    background-color: var(--bg-color); /* Dark background from your image */
+    border: 1px solid var(--border-color); /* Slightly lighter border */
+    color: var(--text-color); /* Light text color for input */
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none; /* Remove default outline */
+}
+
+.client-config-form .client-form-input::placeholder {
+    color: var(--placeholder-color); /* Lighter placeholder text */
+}
+
+.client-config-form .client-form-input:focus {
+    border-color: var(--focus-border-color); /* Highlight border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle glow on focus */
+}
+
+
+/* Styling for "input-with-unit" for client config */
+.client-input-with-unit {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-color); /* Dark background */
+    border: 1px solid var(--border-color); /* Border on the container */
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.client-input-with-unit .client-form-input {
+    border: none; /* Remove border from the input itself */
+    flex-grow: 1;
+    background-color: transparent; /* Transparent background for input inside unit container */
+    padding-right: 0; /* Adjust padding to fit unit */
+}
+
+.client-input-with-unit .client-unit-label {
+    padding: 0 10px;
+    background-color: var(--unit-bg-color); /* Darker background for the unit part */
+    border-left: 1px solid var(--border-color);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: var(--text-color); /* Light text for the unit */
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Styling for static display boxes (Client Name, Last Updation) */
+.input-display-box {
+    background-color: var(--input-bg-color); /* Dark background */
+    border: 1px solid var(--border-color); /* Consistent border */
+    color: var(--text-color); /* Light text color */
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: small;
+    min-height: 42px; /* Ensure consistent height with inputs */
+    display: flex;
+    align-items: center; /* Vertically center content */
+    box-sizing: border-box;
+}
+
+.input-display-box span {
+    white-space: nowrap; /* Prevent text wrap for small values */
+}
+
+.input-display-box .no-data-text {
+    color: var(--text-color); /* Muted color for "No Data" */
+}
+
+/* Action buttons at the bottom of the client form */
+.client-config-form .form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center; /* Center buttons */
+}
+
+/* Modal styles (from previous response, ensure they are here) */
+.modal-content {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    color: var(--text-color);
+}
+
+.btn-close {
+    filter: invert(1); /* Makes the close 'x' icon white/visible on dark background */
+}
+
+.modal-body {
+    overflow-x: auto; /* Allow horizontal scrolling if table content overflows */
+    padding: 15px; /* Add some padding around the table */
+}
+
+.host-selection-table {
+    width: 100%; /* Ensure table takes full width of its container */
+    border-collapse: collapse;
+    min-width: 600px; /* Set a minimum width for the table to prevent squishing on smaller screens, adjust as needed */
+}
+
+.host-selection-table th,
+.host-selection-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    text-align: left;
+    color: var(--text-color);
+    font-size: 0.8rem; /* Make table fonts smaller */
+    white-space: nowrap; /* Prevent text wrapping in cells by default */
+    overflow: hidden; /* Hide overflowing content within cells */
+    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+/* Optionally, you can set max-width for specific columns if some content is very long */
+.host-selection-table th:nth-child(2), /* Hostname */
+.host-selection-table td:nth-child(2) {
+    max-width: 150px; /* Example max-width for Hostname column */
+}
+
+.host-selection-table th:nth-child(3), /* Hardware Serial */
+.host-selection-table td:nth-child(3) {
+    max-width: 120px; /* Example max-width */
+}
+
+.host-selection-table th:nth-child(4), /* Primary IP */
+.host-selection-table td:nth-child(4) {
+    max-width: 110px; /* Example max-width */
+}
+
+.host-selection-table th:nth-child(5), /* Primary MAC */
+.host-selection-table td:nth-child(5) {
+    max-width: 110px; /* Example max-width */
+}
+
+.host-selection-table th:nth-child(6), /* OS Version */
+.host-selection-table td:nth-child(6) {
+    max-width: 150px; /* Example max-width */
+}
+
+
+.host-selection-table thead {
+    background-color: var(--header-bg-color);
+}
+
+.host-selection-table tbody tr:nth-child(even) {
+    background-color: var(--even-row-bg-color);
+}
+
+.host-selection-table tbody tr:nth-child(odd) {
+    background-color: var(--odd-row-bg-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- NEW: Stepper Specific Styles --- */
+.stepper-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.stepper-sidebar {
+    flex: 0 0 250px; /* Fixed width for the sidebar */
+    padding-right: 20px;
+    border-right: 1px solid var(--border-color); /* Separator line */
+    display: flex;
+    flex-direction: column;
+}
+
+.stepper-step {
+    display: flex;
+    align-items: flex-start; /* Align icon/number and title at the top */
+    margin-bottom: 25px; /* Space between steps */
+    cursor: pointer;
+    position: relative;
+    color: var(--text-color);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.stepper-step:last-child {
+    margin-bottom: 0; /* No margin for the last step */
+}
+
+.step-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--bg-color); /* Dark grey for inactive */
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0; /* Prevent shrinking */
+    z-index: 1; /* Ensure it's above the line */
+    border: 2px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.stepper-step.active .step-indicator {
+    background-color: var(--primary-color); /* E.g., blue */
+    border-color: var(--primary-color);
+}
+
+.stepper-step.completed .step-indicator {
+    background-color: #28a745; /* Green for completed */
+    border-color: #28a745;
+    font-size: 1.1rem; /* Slightly larger tick */
+}
+
+.stepper-step.completed .step-indicator i.fas.fa-check-circle {
+    color: white; /* Ensure tick is white */
+}
+
+.step-title {
+    margin-left: 15px;
+    flex-grow: 1;
+    line-height: 30px; /* Align with indicator */
+    color: var(--text-color);
+}
+
+.step-line {
+    position: absolute;
+    left: 15px; /* Center with indicator */
+    top: 30px; /* Below the indicator */
+    bottom: -25px; /* Extends to next indicator's top */
+    width: 2px;
+    background-color: var(--border-color);
+    z-index: 0; /* Behind indicators */
+}
+
+.stepper-step.completed .step-line {
+    background-color: #28a745; /* Green line for completed steps */
+}
+
+/* Stepper Content Area */
+.stepper-content {
+    flex: 1; /* Takes remaining space */
+    min-height: 400px; /* Ensure content area has a minimum height */
+    display: flex; /* Use flex to manage card expansion */
+    flex-direction: column;
+}
+
+.step-form-card {
+    background-color: var(--background-color-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px; /* Space between content blocks if they stack */
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+    overflow: hidden; /* Hide overflow when collapsed */
+    max-height: 1000px; /* A large enough value for expanded state */
+    opacity: 1; /* For smoother transition */
+    display: block; /* Show by default */
+}
+
+.step-form-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.step-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.form-toggle-switch {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-toggle-switch input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color); /* Style the checkbox */
+}
+
+.form-toggle-switch label {
+    font-weight: bold;
+    color: var(--text-color);
+}
+.input-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between input/select and icon button */
+}
+
+.input-with-icon .client-form-input {
+    flex-grow: 1; /* Allow input/select to take available space */
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    color: var(--text-color);
+    border-radius: 5px;
+    font-size: small;
+}
+
+.icon-button {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.icon-button:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Final Table Styles */
+.final-table-card {
+    background-color: var(--background-color-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.final-table-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.final-asset-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    table-layout: fixed
+}
+
+.final-asset-table th,
+.final-asset-table td {
+    /* border: 1px solid var(--border-color); */
+    padding: 10px;
+    text-align: left;
+    color: var(--text-color);
+    font-size: small;
+}
+
+.final-asset-table thead {
+    background-color: var(--header-bg-color);
+}
+
+.final-asset-table tbody tr:nth-child(even) {
+    background-color: var(--even-row-bg-color);
+}
+
+.final-asset-table tbody tr:nth-child(odd) {
+    background-color: var(--odd-row-bg-color);
+}
+
+.zone-table-group-card {
+    background-color: var(--background-color-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px; /* Space between different zone tables */
+}
+
+.zone-table-group-card h5 {
+    color: var(--primary-color);
+    font-size: small;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.final-tables-container {
+    padding: 20px;
+    background-color: var(--bg-color); /* Match other dark sections */
+    margin-top: 20px;
+}
+
+.final-tables-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.final-tables-header h4 {
+    color: var(--text-color);
+    margin: 0;
+}
+
+.add-zone-btn {
+    background-color: #28a745; /* Green */
+    border-color: #28a745;
+    color: white;
+    height: max-content;
+}
+.add-zone-btn:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.add-zone-btn {
+    /* Styles for the "Add Zone" button */
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+.no-hosts-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed var(--border-color);
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.no-data-message-large {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: var(--background-color-dark);
+    border-radius: 8px;
+    color: var(--text-color-light);
+}
+
+.no-data-message-large .no-data-image {
+    max-width: 150px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.no-data-message-large p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.toast-box {
+  position: fixed;
+  top: 20px;
+  right: 45%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  z-index: 9999;
+  animation: fadein 0.3s, fadeout 0.3s 2.7s;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.toast-box.success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.toast-box.error {
+  background-color: #edd4d4;
+  border-color: #e6c3c3;
+  color: #571515;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeout {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.confirm-modal {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background-color: #d9534f; /* red for confirm */
+  color: white;
+}
+
+.modal-actions button:last-child {
+  background-color: #6c757d; /* gray for cancel */
+  color: white;
+}
+
+/* General container for cards */
+.zone-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust card width as needed */
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Individual Zone Card */
+.zone-card {
+    background-color: var(--bg-color); /* Dark background */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.zone-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #3c445c;
+    margin-bottom: 15px;
+}
+
+.zone-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between "Add new team" button and dropdown */
+}
+
+.add-team-btn-header { /* Use this class for the header button */
+    white-space: nowrap;
+    font-size: 0.85em;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #8ab4f8;
+    border-color: #8ab4f8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent; /* Make it transparent by default, outline-primary behavior */
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.add-team-btn-header:hover {
+    background-color: #007bff; /* Primary color background on hover */
+    border-color: #007bff;
+    color: white;
+}
+
+.zone-name-heading {
+    margin: 0;
+    font-size: small;
+    color: var(--text-color); /* Light text */
+    display: flex;
+    align-items: center;
+}
+
+.zone-icon {
+    margin-right: 8px;
+    color: #6a9cff; /* Icon color */
+}
+
+.add-team-btn-team {
+    white-space: nowrap; /* Prevent button text from wrapping */
+    font-size: 0.85em;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: var(--text-color); /* Light blue text */
+    border-color: var(--border-color); /* Light blue border */
+    display: flex;
+    align-items: center;
+}
+
+.add-team-btn-team i {
+    margin-left: 5px;
+}
+
+.zone-card-body {
+    flex-grow: 1;
+    /* This is the drop zone for teams */
+    min-height: 100px; /* Ensure drop zone is visible even if empty */
+}
+
+.team-item {
+    background-color: var(--bg-color); /* Slightly lighter dark background for team items */
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-color); /* Light text */
+    font-size: small;
+    cursor: grab; /* Indicate draggable */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-item:last-child {
+    margin-bottom: 0;
+}
+
+.team-item:hover {
+    background-color: lightgrey; /* Slightly lighter on hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.team-details {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.team-icon {
+    margin-right: 8px;
+    color: #a7d9b9; /* Greenish icon */
+}
+
+.team-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.team-members {
+    font-size: small;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.team-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Styling for drag-and-drop */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  background-color: #5a667f; /* Color of the item being dragged */
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e0e6ed;
+  font-size: 0.95em;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.zone-card-body.cdk-drop-list-dragging .team-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-receiving,
+.cdk-drop-list-dragging {
+  border: 2px dashed #6a9cff; /* Border for active drop lists */
+  border-radius: 8px;
+}
+
+.view-hosts-icon {
+    /* Styles specific to the eye icon button */
+    color: #ffd700; /* Gold-like color, or choose your preference */
+}
+
+.view-hosts-icon:hover {
+    color: #ffeb3b; /* Lighter gold on hover */
+}
+
+/* Basic styling for the new host details table in the modal */
+.host-details-table-container {
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto;
+    border: 1px solid #4a5369;
+    border-radius: 5px;
+}
+
+.host-details-table-container table {
+    margin-bottom: 0; /* Remove default table margin */
+}
+
+.host-details-table-container th,
+.host-details-table-container td {
+    white-space: nowrap; /* Prevent text wrapping in table cells */
+    padding: 8px 12px;
+}
+
+/* NEW: Style for the action <select> dropdown */
+.action-select {
+    /* Basic Bootstrap 5 form-select styles for dark theme */
+    background-color: #4a5369; /* Dark background */
+    color: #e0e6ed; /* Light text */
+    border: 1px solid #5a667f; /* Subtle border */
+    border-radius: 5px;
+    padding: 5px 10px;
+    /* width:5%; */
+    font-size: x-small;
+    cursor: pointer;
+    /* Custom caret color if needed (Bootstrap's default is often dark) */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e0e6ed' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.action-select:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    outline: 0;
+}
+
+/* Ensure options also have dark theme */
+.action-select option {
+    background-color: #212b36; /* Dark background for options */
+    color: #e0e6ed; /* Light text for options */
+}
+
+/* Specific style for disabled placeholder option if needed */
+.action-select option[disabled] {
+    color: #b0bec5; /* Lighter grey for disabled option */
+}

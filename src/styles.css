@@ -1,0 +1,1226 @@
+@font-face {
+  font-family: 'Raleway';
+  src: url('/assets/fonts/Raleway/static/Raleway-SemiBold.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', 'Inter', 'Poppins', 'Montserrat', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.tab-underline-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #8e2c1f, #b83422, #d94f30);
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.tab-underline-gradient-active::after {
+  transform: scaleX(1);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-weight: 600;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-text {
+  font-family: 'Netraa', sans-serif;
+}
+
+.sidebar-branding {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.1rem;
+  color: #f3f4f7;
+}
+
+.sidebar-branding img {
+  max-width: 150px;
+  margin-bottom: 1rem;
+}
+
+nav {
+  transition: transform 0.8s ease-in-out;
+}
+
+button {
+  transition: transform 0.3s ease;
+}
+
+button:hover {
+  animation: pulse infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5),
+      0 0 10px rgba(255, 255, 255, 0.3),
+      0 0 15px rgba(255, 255, 255, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+      0 0 20px rgba(255, 255, 255, 0.5),
+      0 0 30px rgba(255, 255, 255, 0.2);
+  }
+
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5),
+      0 0 10px rgba(255, 255, 255, 0.3),
+      0 0 15px rgba(255, 255, 255, 0.1);
+  }
+}
+
+.pagination li a {
+  background-color: transparent !important;
+  color: inherit;
+}
+
+.pagination li.pagination-previous a,
+.pagination li.pagination-next a {
+  color: white !important;
+}
+
+:host {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-family: inherit;
+}
+
+.custom-topology-modal .modal-dialog {
+  width: 400px;
+  max-width: 90vw;
+  margin: 1.75rem auto;
+}
+
+.custom-topology-modal .modal-content {
+  height: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+.hot-toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* c5cbcd */
+
+:root {
+  /* Light Theme Colors */
+  --bg-color: white;
+  --disabled-bg-color: #f0f0f0;
+  --text-color: #000;
+  --border-color: #d1d5db;
+  --border-color-dark: #acafb3;
+  --primary-color: #3b82f6;
+  --primary-hover-color: #2563eb;
+  --link-color: #3b82f6;
+  --link-hover-color: #1d4ed8;
+  --input-bg-color: #fafafa;
+  --input-border-color: #cfd1d3;
+  --placeholder-color: #9ca3af;
+  --tooltip-bg-color: #f3f4f6;
+  --tooltip-text-color: #1f2937;
+  --toast-bg-color: white;
+  --toast-color: #161c25;
+  --disabled-text-color: #9ca3af;
+  --custom-bg-color: #ecf0f1;
+  --custom-card-color: #e0e0e0;
+
+  /* Table Colors */
+  --table-header-bg: #D2DCDD;
+  --table-header-text: #2b4f55;
+  --table-body-bg: #fafafa;
+  --table-body-text: #374151;
+  --table-border-color: #e5e7eb;
+
+  /* Accent Colors */
+  --accent-green: #16a34a;
+  --accent-red: #dc2626;
+  --accent-yellow: #facc15;
+  --accent-blue: #0ea5e9;
+  --accent-dark-blue: #25769a;
+
+  /* Scrollbars */
+  --scroll-bg-color: #e5e7eb;
+  --scroll-bg-color-thumb: #6d8e94;
+
+  /*  #612017, #b83422, #c14636 */
+
+  /* SideBar */
+  --sideBar-text-color: #fcf9f9;
+  --sideBar-bg-color1: #446d74;
+  --sideBar-bg-color2: #d9e1e399;
+  --sideBar-bg-hover-color1: #ffffff;
+  --sideBar-bg-hover-color2: #36575c;
+  --sideBar-box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+  --sideBar-text-hover-color: #243a3e;
+  --sideBar-heading-back-color1: #253c40;
+  --sideBar-heading-back-color2: #c4c9ca;
+
+  /* navbar */
+  --navBar-text-color: #ffffff;
+  --navBar-bg-color: #446d74;
+
+  /* Card */
+  --card-headder: #0b4761;
+  --card-bg-color: #fafafa;
+  --card-header-bg: #66a3ad85;
+
+  /* NavLink */
+  --nav-bg-color: #e5e7eb;
+  --nav-link-color: #358f80;
+  --nav-link-active-color: #f2683f;
+
+  /* Pagination */
+  --pagination-active-color: #bb3e03;
+  --page-input-text: #2f4a4f;
+  --page-input-bg: rgb(250, 250, 250);
+  --paginate-box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+
+  /* NoDataDisplay */
+  --noData-bg-color: #CEDEE8;
+  --noData-color: #333;
+
+  /* Modal */
+  --modal-bg-color: #fafafa;
+  --modal-text-color: #1f2937;
+
+  /* Skeleton */
+  --skeleton-base: #e5e7eb;
+  --skeleton-highlight: #f3f4f6;
+  /* border */
+
+  --border: #b9b9ba;
+  --scroll-color: #b9b9ba;
+
+  --scrollbar-track: rgba(255, 255, 255, 1);
+  --scrollbar-thumb: rgba(212, 212, 212, 1);
+  --scrollbar-thumb-hover: rgb(182, 182, 182);
+
+  /* btn */
+  --btn-bg: #ffffff;
+  --btn-color: #446D74;
+  --btn-bg-hover: #ecf0f1;
+  --btn-color-hover: #446D74;
+  --btn-border: #446D74;
+
+  /* kpi badge */
+  --badge-bg-color: #faf4b6b3;
+
+  /* Chart */
+  --chart-grid-line: #e0dede;
+
+}
+
+/* 132637 */
+[data-theme='dark'] {
+  /* Dark Theme Colors */
+  --bg-color: #101b25;
+  --disabled-bg-color: #1e293b;
+  --text-color: #e2e8f0;
+  --border-color: #415080;
+  --border-color-dark: #415080;
+  --primary-color: #818cf8;
+  --primary-hover-color: #3894ca;
+  --link-color: #818cf8;
+  --link-hover-color: #a5b4fc;
+  --input-bg-color: #1e293b;
+  --input-border: none;
+  --input-border-color: #334155;
+  --placeholder-color: #64748b;
+  --tooltip-bg-color: #1e293b;
+  --tooltip-text-color: #f8fafc;
+  --toast-bg-color: #dee3f0;
+  --toast-color: #161c25;
+  --disabled-text-color: #475569;
+  --secondary-bg-color: #0a1824;
+  --custom-bg-color: #0a1b2a;
+  --custom-card-color: #132637;
+  /* Table Colors */
+  --table-header-bg: #021220;
+  --table-header-text: #219ebc;
+  /* --table-body-bg: #212529; */
+  --table-body-bg: #031423;
+  --table-body-text: #e0e7ff;
+  --table-border-color: #02111E;
+
+
+  /* Accent Colors */
+  --accent-green: #05dd47;
+  --accent-red: #ef4033;
+  --accent-yellow: #fff362;
+  --accent-blue: #26cee9;
+  --accent-dark-blue: #2ba7df;
+
+  /* Scrollbars */
+  --scroll-bg-color: #2a2a2a;
+  --scroll-bg-color-thumb: #555;
+
+  /* SideBar */
+  --sideBar-text-color: #f3f3f3;
+  --sideBar-bg-color1: #081320;
+  --sideBar-bg-color2: #081320;
+  --sideBar-bg-hover-color1: #253c40;
+  ;
+  --sideBar-bg-hover-color2: #020a15;
+  --sideBar-bg-gradiant1: #081320;
+  --sideBar-bg-gradiant2: #081320;
+  --sideBar-bg-gradiant3: #081320;
+  --sideBar-heading-back-color: #081320;
+  --sideBar-text-hover-color: white;
+
+  /* navbar */
+  --navBar-text-color: #f3f3f3;
+  --navBar-bg-color: #081320;
+
+  /* card */
+  --card-headder: #00aefb;
+  --card-bg-color: #0A1824;
+  --card-header-bg: #091f32;
+
+  /* NavLink */
+  --nav-bg-color: #091b2b;
+  --nav-link-color: #a1c181;
+  --nav-link-active-color: #f59e0b;
+
+  /* pagination */
+  --pagination-active-color: #bb3e03;
+  --page-input-text: #f1f1f1;
+
+  --page-input-bg: #0A1824;
+  --paginate-box-shadow: rgb(33, 36, 37) 3px 3px 6px 0px inset, rgba(59, 56, 56, 0.5) -3px -3px 6px 1px inset;
+
+
+  /* NoDataDisplay */
+  --noData-bg-color: #212529;
+  --noData-color: #808080;
+
+  /* Modal */
+  --modal-bg-color: #1b1c21;
+  --modal-text-color: #f1f1f1;
+
+  /* skeleton */
+  --skeleton-base: #2a2a2a;
+  --skeleton-highlight: #3a3a3a;
+
+  /* border */
+  --border: #4d545a;
+  --scroll-color: #4d545a;
+
+  --scrollbar-track: #0A1824;
+  --scrollbar-thumb: #1e293b;
+  --scrollbar-thumb-hover: #202938;
+
+  /* btn */
+  --btn-bg: #1E293B;
+  --btn-color: #c0c0c0;
+  --btn-bg-hover: #161f2d;
+  --btn-color-hover: #c0c0c0;
+  --btn-border: #423d3d;
+
+  /* kpi badge */
+  --badge-bg-color: #152537;
+
+  /* Chart */
+  --chart-grid-line: #5d6686;
+}
+
+body,
+.card,
+.card-header,
+.nav-tabs,
+.nav-tabs .nav-link.active,
+.table th,
+.table td,
+.sidebar,
+.navbar,
+table,
+.tab-content,
+.custom-border,
+.present-time-btn {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+
+/* Color-only styles */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+a {
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--link-hover-color);
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+}
+
+/* .tooltip {
+  background-color: var(--tooltip-bg-color);
+  color: var(--tooltip-text-color);
+} */
+
+/* Card */
+.card {
+  background-color: var(--card-bg-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.card-header {
+  background-color: var(--card-bg-color);
+  color: var(--card-headder);
+  border-color: var(--border-color);
+  letter-spacing: 0.4px;
+}
+
+/* Breadcrumb */
+.breadcrumb-item.active {
+  color: var(--text-color);
+}
+
+.breadcrumb-item a {
+  color: var(--link-color);
+}
+
+/* Nav tabs */
+
+.nav-tabs {
+  background-color: transparent;
+  display: flex;
+  border: 0;
+  margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link {
+  position: relative;
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+/* Underline setup */
+.nav-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F);
+  transition: width 0.4s ease;
+  z-index: 1;
+}
+
+.nav-tabs .nav-link.active::after {
+  width: 100%;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--text-color);
+  font-weight: 500;
+  /* background-color: #eaedee; */
+
+}
+
+.nav-tabs .nav-link:hover {
+  color: #1c92a4;
+}
+
+/* Tables */
+table {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  border-collapse: collapse;
+  border-color: var(--border-color) !important;
+}
+
+.table td {
+  border-bottom: 0.1px solid var(--table-border-color);
+  border-right: none;
+  border-left: none;
+  border-top: none;
+  background-color: var(--table-body-bg);
+  color: var(--table-body-text);
+}
+
+.table th {
+  border-bottom: 2px solid var(--border-color);
+  border-right: none;
+  border-left: none;
+  border-top: none;
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+}
+
+td.status-active {
+  color: var(--accent-green);
+}
+
+td.status-deactive {
+  color: var(--accent-red);
+}
+
+td.text-link {
+  color: var(--accent-dark-blue);
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+}
+
+.pagination .page-item.active .page-link {
+  color: var(--text-color);
+}
+
+.pagination .page-item.disabled .page-link {
+  color: var(--disabled-text-color);
+}
+
+.pagination .page-link:hover:not(.disabled):not(.active) {
+  color: var(--text-color);
+  background-color: var(--btn-bg-hover);
+}
+
+.pagination-info {
+  color: var(--pagination-info);
+}
+
+/* Icons */
+i.fas.fa-search {
+  color: var(--text-color);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar-track {
+  background-color: var(--scroll-bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scroll-bg-color-thumb);
+}
+
+/* No data display */
+.noData {
+  background-color: transparent;
+  color: var(--noData-color);
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-border {
+  border-color: var(--border-color);
+}
+
+/* SIDEBAR AND NAVBAR */
+
+.navbar {
+  color: var(--navBar-text-color);
+  background-color: var(--navBar-bg-color);
+}
+
+.sidebar {
+  color: var(--sideBar-text-color);
+  background-color: var(--sideBar-bg-color1);
+  box-shadow: var(--sideBar-box-shadow)
+}
+
+
+/* .menu-item:hover {
+  background-color: var(--sideBar-bg-hover-color);
+} */
+
+/* Modal */
+
+.modal-content {
+  background-color: var(--modal-bg-color);
+  color: var(--modal-text-color);
+}
+
+/* Extras */
+.form-control,
+.form-check-input,
+.form-select,
+input.form-control:focus,
+select.form-control,
+select.form-control option,
+select.form-control:focus,
+.form-control-plaintext,
+.custom-dropdown-bg {
+  color: var(--text-color);
+  background-color: var(--input-bg-color);
+  border-color: var(--input-border-color) !important;
+  padding: 2px 6px !important;
+  border-radius: 5px !important;
+}
+
+.present-time-btn {
+  color: var(--text-color);
+  background-color: var(--input-bg-color);
+}
+
+.form-control {
+  border-color: var(--input-border-color);
+}
+
+.form-select {
+  border-color: var(--input-border-color);
+}
+
+/* skeleton */
+
+.skeleton {
+  background-color: var(--skeleton-base);
+  background-image: linear-gradient(90deg,
+      var(--skeleton-base) 0px,
+      var(--skeleton-highlight) 40px,
+      var(--skeleton-base) 80px);
+  animation: skeleton-loading 2s infinite linear;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+}
+
+.scroll-color::-webkit-scrollbar {
+  width: 8px !important;
+
+}
+
+.scroll-color::-webkit-scrollbar-track {
+  background: var(--scrollbar-track) !important;
+}
+
+.scroll-color::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+}
+
+.scroll-color::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover) !important;
+}
+
+/* pagination */
+.ngx-pagination .current {
+  background: #446d74 !important;
+  color: #ffffff;
+
+}
+
+.ngx-pagination a {
+  color: #1B2B2E !important;
+  background-color: #446D74 !important;
+}
+
+.pagination li a {
+  /* background-color: #D9E1E3 !important; */
+  color: #1B2B2E !important;
+}
+
+.ngx-pagination a:hover {
+  background: #edf4f5 !important;
+  color: #1B2B2E !important;
+}
+
+
+
+.ngx-pagination .disabled {
+  color: rgb(160, 161, 161) !important;
+}
+
+.ngx-pagination .pagination-next a,
+.ngx-pagination .pagination-previous a {
+  color: #1B2B2E !important;
+
+}
+
+.pagination li.pagination-previous a,
+.pagination li.pagination-next a {
+  color: #1B2B2E !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+
+.btn {
+  padding: 0px 8px;
+  background: var(--btn-bg);
+  height: 26px;
+  border-radius: 2px;
+  color: var(--btn-color);
+  font-style: Source Sans Pro, Arial, sans-serif;
+  border-color: var(--btn-border);
+  /* box-shadow: rgba(255, 255, 255, 0.2) 0px 0px 0px 1px inset, #446d74 0px 0px 0px 1px; */
+}
+
+.btn:hover {
+  background-color: var(--btn-bg-hover);
+  color: var(--btn-color-hover);
+  border-color: var(--btn-border);
+}
+
+button {
+  font-family: 'Noto Sans';
+}
+
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.page-number {
+  color: #6e7070;
+  font-size: 12px;
+}
+
+
+.page-input {
+  width: 34px;
+  margin: 0 6px;
+  padding: 2px 0px;
+  background-color: var(--page-input-bg);
+  color: var(--page-input-text);
+  border: 1px solid #3d6268;
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: var(--paginate-box-shadow);
+  -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge (WebKit) */
+.page-input::-webkit-inner-spin-button,
+.page-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.page-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Styles for the tooltip content */
+
+.tooltip {
+  background: transparent !important;
+  --bs-tooltip-bg: #3d6268;
+  /* sets background AND arrow */
+}
+
+.tooltip-inner {
+  font-size: 12px;
+  font-family: system-ui;
+  padding: 6px 7px;
+  border-radius: 8px;
+  font-weight: 400;
+}
+
+
+
+
+/* Chatbot alert card (inside chat bubble) */
+.alert-card-bot {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin: 10px 0;
+  border-left: 5px solid #4A90E2;
+  max-width: 90%;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+
+/* Title section */
+.alert-card-bot .alert-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Section header */
+.alert-card-bot h4 {
+  font-size: 14px;
+  margin: 10px 0 5px;
+  color: #444;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 3px;
+}
+
+/* Label + Value row */
+.alert-card-bot .row-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.alert-card-bot strong {
+  color: #222;
+}
+
+.alert-card-bot span {
+  color: #555;
+}
+
+
+
+.page-input[type="number"] {
+  width: 34px;
+  margin: 0 6px;
+  padding: 2px 0px;
+  font-size: small;
+  line-height: 1;
+  background-color: var(--page-input-bg);
+  color: var(--page-input-text);
+  border: 1px solid #3d6268;
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: var(--paginate-box-shadow);
+
+  appearance: textfield;
+  /* standard */
+  -moz-appearance: textfield;
+  /* Firefox */
+}
+
+/* Remove arrows (Chrome, Safari, Edge) */
+.page-input[type="number"]::-webkit-outer-spin-button,
+.page-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* RabbitMQ Skeleton Utilities */
+.skeleton-text {
+  width: 120px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.skeleton-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.skeleton-short {
+  width: 50px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.skeleton-row td {
+  padding: 12px 6px;
+}
+
+/* Global Kubernetes Table Search */
+.k8s-table-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 4px 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.k8s-table-search:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.k8s-table-search svg {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.k8s-table-search input {
+  border: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  font-size: 12px;
+  color: #374151;
+  width: 140px;
+  padding: 0;
+}
+
+.k8s-table-search input:focus,
+.k8s-table-search input:focus-visible,
+.k8s-table-search input:active,
+.search input:focus,
+.search input:focus-visible,
+.search input:active,
+.table-search input:focus,
+.table-search input:focus-visible,
+.table-search input:active {
+  border: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+}
+
+.k8s-table-search input::placeholder {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* Global Kubernetes Table Export */
+.k8s-export-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.k8s-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.k8s-export-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.k8s-export-btn svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.k8s-export-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 170px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.k8s-export-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.k8s-export-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.k8s-export-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.k8s-export-badge.xlsx {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.k8s-export-badge.csv {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* =========================================================
+   Unified Typography for Entire Kubernetes Module
+   ========================================================= */
+app-kubernetes,
+app-kubernetes-clusters,
+app-kubernetes-tab-header,
+app-kubernetes-namespace,
+app-namespace-details,
+app-kubernetes-workload,
+app-workload-details,
+app-service-details,
+app-kubernetes-node,
+app-node-details,
+app-pod-details {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+app-kubernetes *,
+app-kubernetes-clusters *,
+app-kubernetes-tab-header *,
+app-kubernetes-namespace *,
+app-namespace-details *,
+app-kubernetes-workload *,
+app-workload-details *,
+app-service-details *,
+app-kubernetes-node *,
+app-node-details *,
+app-pod-details * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+app-kubernetes button,
+app-kubernetes input,
+app-kubernetes select,
+app-kubernetes textarea,
+app-kubernetes-clusters button,
+app-kubernetes-clusters input,
+app-kubernetes-clusters select,
+app-kubernetes-clusters textarea,
+app-kubernetes-tab-header button,
+app-kubernetes-tab-header input,
+app-kubernetes-tab-header a,
+app-kubernetes-namespace button,
+app-kubernetes-namespace input,
+app-kubernetes-namespace select,
+app-kubernetes-namespace textarea,
+app-namespace-details button,
+app-namespace-details input,
+app-namespace-details select,
+app-namespace-details textarea,
+app-kubernetes-workload button,
+app-kubernetes-workload input,
+app-kubernetes-workload select,
+app-kubernetes-workload textarea,
+app-workload-details button,
+app-workload-details input,
+app-workload-details select,
+app-workload-details textarea,
+app-service-details button,
+app-service-details input,
+app-service-details select,
+app-service-details textarea,
+app-kubernetes-node button,
+app-kubernetes-node input,
+app-kubernetes-node select,
+app-kubernetes-node textarea,
+app-node-details button,
+app-node-details input,
+app-node-details select,
+app-node-details textarea,
+app-pod-details button,
+app-pod-details input,
+app-pod-details select,
+app-pod-details textarea {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* =========================================================
+   Left-align table contents for all pages in Kubernetes module
+   ========================================================= */
+app-kubernetes table th,
+app-kubernetes table td,
+app-kubernetes-clusters table th,
+app-kubernetes-clusters table td,
+app-kubernetes-workload table th,
+app-kubernetes-workload table td,
+app-kubernetes-node table th,
+app-kubernetes-node table td,
+app-kubernetes-namespace table th,
+app-kubernetes-namespace table td,
+app-node-details table th,
+app-node-details table td,
+app-pod-details table th,
+app-pod-details table td,
+app-workload-details table th,
+app-workload-details table td,
+app-service-details table th,
+app-service-details table td,
+app-namespace-details table th,
+app-namespace-details table td {
+  text-align: left !important;
+}
+
+app-kubernetes table th *,
+app-kubernetes table td *,
+app-kubernetes-clusters table th *,
+app-kubernetes-clusters table td *,
+app-kubernetes-workload table th *,
+app-kubernetes-workload table td *,
+app-kubernetes-node table th *,
+app-kubernetes-node table td *,
+app-kubernetes-namespace table th *,
+app-kubernetes-namespace table td *,
+app-node-details table th *,
+app-node-details table td *,
+app-pod-details table th *,
+app-pod-details table td *,
+app-workload-details table th *,
+app-workload-details table td *,
+app-service-details table th *,
+app-service-details table td *,
+app-namespace-details table th *,
+app-namespace-details table td * {
+  text-align: left !important;
+}
+
+app-node-details .pill,
+app-namespace-details .st,
+app-workload-details .badge,
+app-workload-details .status-pill,
+app-service-details .status-badge,
+app-pod-details .status-badge,
+app-kubernetes-workload .kw-usage,
+app-kubernetes-node .metric-bar-wrapper,
+app-kubernetes-node .condition-flex,
+app-kubernetes-namespace .td-actions {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  justify-content: flex-start !important;
+}
+

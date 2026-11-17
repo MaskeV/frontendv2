@@ -1,0 +1,406 @@
+<!-- orchestrator.component.html -->
+<div class="orch-shell">
+
+    <!-- ── Header ── -->
+    <header class="orch-header">
+        <div class="header-left">
+            <span class="back-btn rounded-md px-2 py-1" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i></span>
+            <div class="cluster-badge">
+                <span class="cluster-icon">⬡</span>
+                <div>
+                    <span class="cluster-label">CLUSTER</span>
+                    <h1 class="cluster-name">{{ clusterAlias || orchestrator }}</h1>
+                </div>
+            </div>
+            <div class="status-pill" [class.status-ok]="serviceStatus === 'Success'"
+                [class.status-err]="serviceStatus !== 'Success'">
+                <span class="status-dot"></span>
+                {{ serviceStatus || 'Connecting...' }}
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="instance-count">{{ instances.length }} INSTANCES</span>
+            <button class="btn-refresh" (click)="refresh()" [disabled]="isLoading">
+                <mat-icon class="icon-sm text-danger">refresh</mat-icon>
+                REFRESH
+            </button>
+        </div>
+    </header>
+    <div class="promote-box" *ngIf="replicaNodes.length > 0">
+
+        <select [(ngModel)]="selectedReplicaToPromote" class="promote-select">
+            <option [ngValue]="null" disabled selected>Select replica</option>
+            <option *ngFor="let r of replicaNodes" [ngValue]="r">
+                {{ r.Key.Hostname }}:{{ r.Key.Port }}
+            </option>
+        </select>
+
+        <button class="btn-danger" [disabled]="!selectedReplicaToPromote" (click)="promoteReplica()">
+            ⬆ Promote
+        </button>
+
+    </div>
+
+    <!-- ── Body row: canvas + detail panel ── -->
+    <div class="orch-body">
+
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="isLoading">
+            <div class="loader-ring"></div>
+            <span>Querying orchestrator...</span>
+        </div>
+
+        <!-- Topology Canvas -->
+        <main class="topology-canvas" *ngIf="!isLoading && masterNode">
+
+            <!-- Master Column -->
+            <div class="topology-col col-master">
+                <div class="col-label">PRIMARY</div>
+
+                <div class="node master-node"
+                    [class.node-selected]="selectedInstance?.Key?.Hostname === masterNode!.Key.Hostname"
+                    [class.node-healthy]="getHealthStatus(masterNode!) === 'healthy'"
+                    [class.node-warning]="getHealthStatus(masterNode!) === 'warning'"
+                    [class.node-error]="getHealthStatus(masterNode!) === 'error'" (click)="selectInstance(masterNode!)">
+
+                    <div class="node-header">
+                        <div class="node-title-row">
+                            <span class="node-hostname">{{ masterNode!.Key.Hostname }}</span>
+                            <span class="node-port">:{{ masterNode!.Key.Port }}</span>
+                        </div>
+                        <div class="node-role-badge">MASTER</div>
+                    </div>
+
+                    <div class="node-meta">
+                        <span class="meta-version">{{ masterNode!.Version }}</span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-format">{{ masterNode!.Binlog_format }}/{{ masterNode!.BinlogRowImage
+                            }}</span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-flavor">{{ masterNode!.FlavorName }}</span>
+                    </div>
+
+                    <div class="node-stats">
+                        <div class="stat">
+                            <span class="stat-label">LAG</span>
+                            <span class="stat-value">0s</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">REPLICAS</span>
+                            <span class="stat-value">{{ masterNode!.Replicas.length }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">UPTIME</span>
+                            <span class="stat-value">{{ getUptimeDisplay(masterNode!.Uptime) }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">READ ONLY</span>
+                            <span class="stat-value" [class.val-false]="!masterNode!.ReadOnly"
+                                [class.val-true]="masterNode!.ReadOnly">
+                                {{ masterNode!.ReadOnly ? 'YES' : 'NO' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="node-gtid" *ngIf="masterNode!.ExecutedGtidSet">
+                        <span class="gtid-label">GTID</span>
+                        <span class="gtid-value">{{ masterNode!.ExecutedGtidSet }}</span>
+                    </div>
+
+                    <div class="node-footer">
+                        <span class="last-seen">Last seen {{ masterNode!.SecondsSinceLastSeen.Int64 }}s ago</span>
+                        <span class="health-indicator" [class.hi-ok]="getHealthStatus(masterNode!) === 'healthy'">
+                            ● {{ getHealthStatus(masterNode!) | uppercase }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connector Lines -->
+            <div class="connector-area" *ngIf="replicaNodes.length > 0">
+                <svg class="connector-svg" [attr.height]="replicaNodes.length * 160 + 40" width="80">
+                    <ng-container *ngFor="let r of replicaNodes; let i = index">
+                        <line [attr.x1]="0" [attr.y1]="(replicaNodes.length * 160) / 2 + 20" [attr.x2]="80"
+                            [attr.y2]="i * 160 + 100" stroke="#e8522a" stroke-width="1.5" stroke-dasharray="4 3"
+                            opacity="0.5" />
+                        <circle cx="0" [attr.cy]="(replicaNodes.length * 160) / 2 + 20" r="3.5" fill="#e8522a"
+                            opacity="0.7" />
+                        <circle cx="80" [attr.cy]="i * 160 + 100" r="3.5" fill="#e8522a" opacity="0.7" />
+                    </ng-container>
+                </svg>
+            </div>
+
+            <!-- Replicas Column -->
+            <div class="topology-col col-replicas" *ngIf="replicaNodes.length > 0">
+                <div class="col-label">REPLICAS</div>
+
+                <div class="node replica-node" *ngFor="let replica of replicaNodes"
+                    [class.node-selected]="selectedInstance?.Key?.Hostname === replica.Key.Hostname"
+                    [class.node-healthy]="getHealthStatus(replica) === 'healthy'"
+                    [class.node-warning]="getHealthStatus(replica) === 'warning'"
+                    [class.node-error]="getHealthStatus(replica) === 'error'" (click)="selectInstance(replica)">
+
+                    <div class="node-header">
+                        <div class="node-title-row">
+                            <span class="node-hostname">{{ replica.Key.Hostname }}</span>
+                            <span class="node-port">:{{ replica.Key.Port }}</span>
+                        </div>
+                        <div class="replication-threads">
+                            <span class="thread-badge" [class.thread-ok]="replica.Slave_IO_Running"
+                                [class.thread-err]="!replica.Slave_IO_Running" title="IO Thread">IO</span>
+                            <span class="thread-badge" [class.thread-ok]="replica.Slave_SQL_Running"
+                                [class.thread-err]="!replica.Slave_SQL_Running" title="SQL Thread">SQL</span>
+                        </div>
+                    </div>
+
+                    <div class="node-meta">
+                        <span class="meta-version">{{ replica.Version }}</span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-format">{{ replica.Binlog_format }}/{{ replica.BinlogRowImage }}</span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-flavor">{{ replica.FlavorName }}</span>
+                    </div>
+
+                    <div class="node-stats">
+                        <div class="stat">
+                            <span class="stat-label">LAG</span>
+                            <span class="stat-value" [class.val-warn]="replica.SlaveLagSeconds.Int64 > 5">
+                                {{ getLagDisplay(replica) }}
+                            </span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">DEPTH</span>
+                            <span class="stat-value">{{ replica.ReplicationDepth }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">GTID</span>
+                            <span class="stat-value" [class.val-true]="replica.UsingOracleGTID">
+                                {{ replica.UsingOracleGTID ? 'ON' : 'OFF' }}
+                            </span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">READ ONLY</span>
+                            <span class="stat-value val-true">YES</span>
+                        </div>
+                    </div>
+
+                    <div class="node-master-ref">
+                        <span class="master-ref-label">↑ PRIMARY</span>
+                        <span class="master-ref-val">{{ replica.MasterKey.Hostname }}:{{ replica.MasterKey.Port
+                            }}</span>
+                    </div>
+
+                    <div class="node-footer">
+                        <span class="last-seen">Last seen {{ replica.SecondsSinceLastSeen.Int64 }}s ago</span>
+                        <span class="health-indicator" [class.hi-ok]="getHealthStatus(replica) === 'healthy'">
+                            ● {{ getHealthStatus(replica) | uppercase }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && instances.length === 0">
+            <div class="empty-icon">⬡</div>
+            <div class="empty-title">No instances found</div>
+            <div class="empty-sub">Cluster <strong>{{ orchestrator }}</strong> returned no data</div>
+        </div>
+
+        <!-- Detail Panel — slides in from right inside the body row -->
+        <aside class="detail-panel" [class.panel-open]="selectedInstance !== null">
+            <ng-container *ngIf="selectedInstance">
+
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-hostname">{{ selectedInstance!.Key.Hostname }}:{{ selectedInstance!.Key.Port
+                            }}</div>
+                        <div class="panel-role">
+                            {{ selectedInstance!.ReplicationDepth === 0 ? 'PRIMARY MASTER' : 'REPLICA'}}
+                        </div>
+                    </div>
+                    <button class="btn-close" (click)="closeDetail()">✕</button>
+                </div>
+
+                <div class="panel-body">
+
+                    <!-- START DOWNTIME -->
+                    <div class="detail-section downtime-box" *ngIf="!selectedInstance!.IsDowntimed">
+                        <div class="ds-title">DOWNTIME</div>
+                        <div class="downtime-body">
+                            <div class="dg-row">
+                                <input type="text" placeholder="Owner name" [(ngModel)]="downtimeForm.owner"
+                                    class="input-field" />
+                                <input type="text" placeholder="Reason" [(ngModel)]="downtimeForm.reason"
+                                    class="input-field" />
+                                <select [(ngModel)]="downtimeForm.duration" class="input-field">
+                                    <option value="10m">10m</option>
+                                    <option value="30m">30m</option>
+                                    <option value="1h">1h</option>
+                                    <option value="4h">4h</option>
+                                    <option value="24h">24h</option>
+                                    <option value="2d">2d</option>
+                                    <option value="7d">7d</option>
+                                </select>
+                            </div>
+
+                            <button class="btn-secondary mt-2" (click)="startDowntime(selectedInstance!)">
+                                ▶ Begin downtime
+                            </button>
+                        </div>
+                    </div>
+                    <!-- DOWNTIME SECTION -->
+                    <div class="detail-section downtime-box" *ngIf="selectedInstance!.IsDowntimed">
+                        <div class="ds-title">DOWNTIME</div>
+                        <div class="downtime-header">
+                            <span>
+                                Downtimed by <b>{{ selectedInstance!.DowntimeOwner || 'Unknown' }}</b>
+                                until {{ selectedInstance!.DowntimeEndTimestamp }}
+                            </span>
+                        </div>
+
+                        <div class="downtime-body">
+                            <div class="dg-row" *ngIf="selectedInstance!.DowntimeReason">
+                                <span class="dg-key">Reason</span>
+                                <span class="dg-val">{{ selectedInstance!.DowntimeReason }}</span>
+                            </div>
+
+                            <button class="btn-secondary mt-2" (click)="endDowntime(selectedInstance!)">
+                               End downtime
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="detail-section" *ngIf="selectedInstance!.Problems.length > 0">
+                        <div class="ds-title">PROBLEMS</div>
+                        <div class="problem-list">
+                            <div class="problem-item" *ngFor="let p of selectedInstance!.Problems">⚠ {{ p }}</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="ds-title">IDENTITY</div>
+                        <div class="detail-grid">
+                            <div class="dg-row"><span class="dg-key">Server ID</span><span class="dg-val">{{
+                                    selectedInstance!.ServerID }}</span></div>
+                            <div class="dg-row"><span class="dg-key">UUID</span><span class="dg-val small">{{
+                                    selectedInstance!.ServerUUID }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Version</span><span class="dg-val">{{
+                                    selectedInstance!.Version }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Flavor</span><span class="dg-val">{{
+                                    selectedInstance!.FlavorName }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Uptime</span><span class="dg-val">{{
+                                    getUptimeDisplay(selectedInstance!.Uptime) }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Allow TLS</span><span class="dg-val"
+                                    [class.chip-red]="!selectedInstance!.AllowTLS"
+                                    [class.chip-green]="selectedInstance!.AllowTLS">{{
+                                    selectedInstance!.AllowTLS }}</span></div>
+                        </div>
+                        <!-- ACTIONS -->
+                        <div class="ds-title pt-2"
+                            *ngIf="!(selectedInstance!.Slave_IO_Running && selectedInstance!.Slave_SQL_Running) && !(selectedInstance.ReplicationDepth===0)">
+                            ACTIONS
+                        </div>
+
+                        <button class="btn-primary"
+                            *ngIf="!(selectedInstance!.Slave_IO_Running && selectedInstance!.Slave_SQL_Running) && !(selectedInstance.ReplicationDepth===0)"
+                            (click)="startReplication(selectedInstance!)">
+
+                            ▶ START REPLICATION
+
+                        </button>
+
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="ds-title">REPLICATION</div>
+                        <div class="detail-grid">
+                            <div class="dg-row">
+                                <span class="dg-key">Read Only</span>
+                                <span class="dg-val" [class.chip-red]="!selectedInstance!.ReadOnly"
+                                    [class.chip-green]="selectedInstance!.ReadOnly">
+                                    {{ selectedInstance!.ReadOnly }}
+                                </span>
+                            </div>
+                            <div class="dg-row">
+                                <span class="dg-key">IO Thread</span>
+                                <span class="dg-val" [class.chip-green]="selectedInstance!.Slave_IO_Running"
+                                    [class.chip-red]="!selectedInstance!.Slave_IO_Running">
+                                    {{ selectedInstance!.Slave_IO_Running }}
+                                </span>
+                            </div>
+                            <div class="dg-row">
+                                <span class="dg-key">SQL Thread</span>
+                                <span class="dg-val" [class.chip-green]="selectedInstance!.Slave_SQL_Running"
+                                    [class.chip-red]="!selectedInstance!.Slave_SQL_Running">
+                                    {{ selectedInstance!.Slave_SQL_Running }}
+                                </span>
+                            </div>
+                            <div class="dg-row"><span class="dg-key">GTID Mode</span><span class="dg-val">{{
+                                    selectedInstance!.GTIDMode }}</span></div>
+                            <!-- <div class="dg-row"><span class="dg-key">Oracle GTID</span><span class="dg-val">{{ selectedInstance!.UsingOracleGTID }}</span></div> -->
+                            <div class="dg-row" *ngIf="selectedInstance!.SlaveLagSeconds.Valid">
+                                <span class="dg-key">Repl Lag</span><span class="dg-val">{{
+                                    selectedInstance!.SlaveLagSeconds.Int64 }}s</span>
+                            </div>
+                            <div class="dg-row"><span class="dg-key">Depth</span><span class="dg-val">{{
+                                    selectedInstance!.ReplicationDepth }}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="ds-title">BINLOG</div>
+                        <div class="detail-grid">
+                            <div class="dg-row"><span class="dg-key">Format</span><span class="dg-val">{{
+                                    selectedInstance!.Binlog_format }}/{{ selectedInstance!.BinlogRowImage }}</span>
+                            </div>
+                            <div class="dg-row"><span class="dg-key">Log Enabled</span><span class="dg-val">{{
+                                    selectedInstance!.LogBinEnabled }}</span></div>
+                            <div class="dg-row">
+                                <span class="dg-key">Self Coords</span>
+                                <span class="dg-val small">{{ selectedInstance!.SelfBinlogCoordinates.LogFile }}:{{
+                                    selectedInstance!.SelfBinlogCoordinates.LogPos }}</span>
+                            </div>
+                            <div class="dg-row" *ngIf="selectedInstance!.ExecutedGtidSet">
+                                <span class="dg-key">Executed GTID</span>
+                                <span class="dg-val small gtid-text">{{ selectedInstance!.ExecutedGtidSet }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section" *ngIf="selectedInstance!.Replicas.length > 0">
+                        <div class="ds-title">REPLICAS ({{ selectedInstance!.Replicas.length }})</div>
+                        <div class="replica-chips">
+                            <span class="replica-chip" *ngFor="let r of selectedInstance!.Replicas">
+                                {{ r.Hostname }}:{{ r.Port }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="ds-title">HEALTH</div>
+                        <div class="detail-grid">
+                            <div class="dg-row"><span class="dg-key">Last Seen</span><span class="dg-val">{{
+                                    selectedInstance!.LastSeenTimestamp }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Check Valid</span><span class="dg-val">{{
+                                    selectedInstance!.IsLastCheckValid }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Recently Checked</span><span class="dg-val">{{
+                                    selectedInstance!.IsRecentlyChecked }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Discovery Latency</span><span class="dg-val">{{
+                                    getLatencyDisplay(selectedInstance!.LastDiscoveryLatency) }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Promotion Rule</span><span class="dg-val">{{
+                                    selectedInstance!.PromotionRule }}</span></div>
+                            <div class="dg-row"><span class="dg-key">Downtimed</span><span class="dg-val">{{
+                                    selectedInstance!.IsDowntimed }}</span></div>
+                        </div>
+                    </div>
+
+                </div>
+            </ng-container>
+        </aside>
+
+    </div><!-- /orch-body -->
+
+</div>

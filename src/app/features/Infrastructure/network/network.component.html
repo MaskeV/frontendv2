@@ -1,0 +1,254 @@
+<main class="nw-root">
+
+    <!-- ══════════════════════════════════
+         HEADER (nav tab + search)
+         ══════════════════════════════════ -->
+    <div class="nw-header">
+        <div class="nw-tabs">
+            <span class="nw-tab nw-tab--active">
+                <i class="fas fa-network-wired nw-tab__icon"></i>
+                Network
+            </span>
+        </div>
+
+        <div class="nw-header__right">
+            <!-- Breadcrumb -->
+            <!-- <nav class="nw-breadcrumb" aria-label="breadcrumb">
+                <span class="nw-breadcrumb__item nw-breadcrumb__item--active">Network Root</span>
+            </nav> -->
+
+            <!-- Search -->
+            <div class="nw-search-wrap">
+                <input type="text" class="nw-search-input" [(ngModel)]="searchQuery" (input)="onSearch()"
+                    autocomplete="off" placeholder="Search interfaces..." />
+                <i class="fas fa-search nw-search-wrap__icon" (click)="toggleSearch()"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SECTION TITLE
+         ══════════════════════════════════ -->
+    <div class="nw-section-header">
+        <h5 class="nw-section-title">All Network Interfaces</h5>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TABLE AREA
+         ══════════════════════════════════ -->
+    <div class="nw-table-wrap">
+
+        <!-- Data table -->
+        <table class="nw-table" *ngIf="pagedNetworkName.length > 0; else noNetworkData">
+            <colgroup>
+                <col style="width: 28%">
+                <col style="width: 22%">
+                <col style="width: 18%">
+                <col style="width: 16%">
+                <col style="width: 16%">
+            </colgroup>
+
+            <thead>
+                <tr>
+                    <th class="pointer" (click)="onSort('name')">
+                        Name
+                        <span class="nw-sort-icon">
+                            <i *ngIf="sortColumn !== 'name'" class="fas fa-sort"></i>
+                            <i *ngIf="sortColumn === 'name' && sortDirection === 'asc'" class="fas fa-sort-up"></i>
+                            <i *ngIf="sortColumn === 'name' && sortDirection === 'desc'" class="fas fa-sort-down"></i>
+                        </span>
+                    </th>
+                    <th class="pointer" (click)="onSort('ipAddress')">
+                        Interface
+                        <span class="nw-sort-icon">
+                            <i *ngIf="sortColumn !== 'ipAddress'" class="fas fa-sort"></i>
+                            <i *ngIf="sortColumn === 'ipAddress' && sortDirection === 'asc'" class="fas fa-sort-up"></i>
+                            <i *ngIf="sortColumn === 'ipAddress' && sortDirection === 'desc'"
+                                class="fas fa-sort-down"></i>
+                        </span>
+                    </th>
+                    <th class="pointer" (click)="onSort('availability')">
+                        Availability
+                        <span class="nw-sort-icon">
+                            <i *ngIf="sortColumn !== 'availability'" class="fas fa-sort"></i>
+                            <i *ngIf="sortColumn === 'availability' && sortDirection === 'asc'"
+                                class="fas fa-sort-up"></i>
+                            <i *ngIf="sortColumn === 'availability' && sortDirection === 'desc'"
+                                class="fas fa-sort-down"></i>
+                        </span>
+                    </th>
+                    <th class="pointer" (click)="onSort('status')">
+                        Status
+                        <span class="nw-sort-icon">
+                            <i *ngIf="sortColumn !== 'status'" class="fas fa-sort"></i>
+                            <i *ngIf="sortColumn === 'status' && sortDirection === 'asc'" class="fas fa-sort-up"></i>
+                            <i *ngIf="sortColumn === 'status' && sortDirection === 'desc'" class="fas fa-sort-down"></i>
+                        </span>
+                    </th>
+                    <!-- ── NEW COLUMN ── -->
+                    <th class="pointer" (click)="onSort('overallHealth')">
+                        Overall Health
+                        <span class="nw-sort-icon">
+                            <i *ngIf="sortColumn !== 'overallHealth'" class="fas fa-sort"></i>
+                            <i *ngIf="sortColumn === 'overallHealth' && sortDirection === 'asc'"
+                                class="fas fa-sort-up"></i>
+                            <i *ngIf="sortColumn === 'overallHealth' && sortDirection === 'desc'"
+                                class="fas fa-sort-down"></i>
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- ── DATA ROWS — exact bindings preserved ── -->
+                <tr class="nw-tr" *ngFor="let item of pagedNetworkName; let i = index">
+
+                    <!-- Name — exact same -->
+                    <td (click)="setServiceId($event)" class="nw-td--name">
+                        <div class="nw-avatar">
+                            <img [src]="getRowIcon(item.name)" alt="icon" class="nw-avatar__img" />
+                        </div>
+                        <span class="nw-name-text">{{ item.name }}</span>
+                    </td>
+
+                    <!-- Interface — exact same -->
+                    <td class="nw-td--muted">
+                        {{ item.ipAddress }}:{{ item.portNumber }}
+                    </td>
+
+                    <!-- Availability — exact same -->
+                    <td [ngClass]="{'nw-td--danger': item.availability !== 'Available'}"
+                        [ngStyle]="{ 'cursor': item.errorDetails ? 'pointer' : 'default' }"
+                        (click)="item.errorDetails ? openErrorModal(item.errorDetails) : null">
+                        <span class="nw-avail-pill"
+                            [ngClass]="item.availability === 'Available' ? 'nw-avail-pill--ok' : 'nw-avail-pill--err'">
+                            <i class="fas"
+                                [ngClass]="item.availability === 'Available' ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+                            {{ item.availability }}
+                        </span>
+                    </td>
+
+                    <!-- Status — exact same -->
+                    <td>
+                        <span class="nw-status-badge"
+                            [ngClass]="item.status === '1' ? 'nw-status-badge--disabled' : 'nw-status-badge--enabled'">
+                            {{ item.status === '1' ? 'Disabled' : 'Enabled' }}
+                        </span>
+                    </td>
+
+                    <!-- Overall Health — NEW -->
+                    <td>
+
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                            <!-- MAIN STATUS -->
+                            <span class="nw-avail-pill" [ngClass]="{
+  'nw-avail-pill--up-active': item.overallHealth === 'Up-Active',
+  'nw-avail-pill--up-idle':   item.overallHealth === 'Up-Idle',
+  'nw-avail-pill--down':      item.overallHealth === 'Down',
+  'nw-avail-pill--unknown':   item.overallHealth === 'Unknown'
+}">
+                                <i class="fas" [ngClass]="{
+    'fa-circle-check':    item.overallHealth === 'Up-Active',
+    'fa-circle-minus':    item.overallHealth === 'Up-Idle',
+    'fa-circle-xmark':    item.overallHealth === 'Down',
+    'fa-circle-question': item.overallHealth === 'Unknown'
+  }"></i>
+                                {{ item.overallHealth }}
+                            </span>
+
+                            <!-- COUNTS -->
+                            <span class="nw-health-mini nw-health-mini--up">
+                                ↑ {{ item.upCount }}
+                            </span>
+
+                            <span class="nw-health-mini nw-health-mini--down">
+                                ↓ {{ item.downCount }}
+                            </span>
+
+                            <span class="nw-health-mini nw-health-mini--unknown" *ngIf="item.unknownCount > 0">
+
+                                ? {{ item.unknownCount }}
+
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- Inline empty row for paged empty state -->
+                <tr *ngIf="pagedNetworkName.length === 0">
+                    <td colspan="5" class="nw-td--empty">
+                        <div class="nw-empty-container">
+                            <i class="fas fa-network-wired nw-empty-icon"></i>
+                            <p class="nw-empty-text">No network data found.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- No Data Template — exact same -->
+        <ng-template #noNetworkData>
+            <div class="nw-empty">
+                <div class="nw-empty-container">
+                    <i class="fas fa-network-wired nw-empty-icon"></i>
+                    <p class="nw-empty-text">No data to display.</p>
+                </div>
+            </div>
+        </ng-template>
+
+    </div>
+
+    <!-- ══════════════════════════════════
+         FIXED BOTTOM PAGINATION — exact same
+         ══════════════════════════════════ -->
+    <div class="nw-pager">
+        <span class="nw-pager__info">
+            Showing {{ pagedNetworkName.length }} of {{ pagedNetworkName.length }} interfaces
+        </span>
+
+        <nav *ngIf="totalPages > 0" class="nw-pager__controls">
+            <button class="nw-pager__btn" [class.disabled]="currentPage === 1" (click)="previousPage()">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+
+            <button class="nw-pager__btn nw-pager__page-num" *ngFor="let page of totalPagesArray"
+                [class.nw-pager__btn--active]="page === currentPage" (click)="goToPage(page)">
+                {{ page }}
+            </button>
+
+            <button class="nw-pager__btn" [class.disabled]="currentPage === totalPages" (click)="nextPage()">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </nav>
+    </div>
+
+</main>
+
+
+<!-- ══════════════════════════════════
+     ERROR MODAL — exact same
+     ══════════════════════════════════ -->
+<div class="nw-modal-backdrop" *ngIf="showErrorModal">
+    <div class="nw-modal">
+        <div class="nw-modal__header">
+            <div class="nw-modal__title">
+                <i class="fas fa-circle-exclamation nw-modal__title-icon"></i>
+                Error Details
+            </div>
+            <button class="nw-modal__close" (click)="closeErrorModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="nw-modal__body">
+            <pre class="nw-modal__pre">{{ selectedRow }}</pre>
+        </div>
+        <div class="nw-modal__footer">
+            <button class="nw-modal__close-btn" (click)="closeErrorModal()">Close</button>
+        </div>
+    </div>
+</div>

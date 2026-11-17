@@ -1,0 +1,90 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.44);
+    z-index: 1000;
+}
+
+.modal-header{
+    font-size: large;
+    font-weight: 500;
+    padding: 1%;
+}
+
+.modal-body{
+    word-wrap: break-word; 
+    word-break: break-word;
+    max-height: 75vh;
+    overflow-x: auto;
+}
+
+.modal-content {
+    border-radius: 6px;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-body p {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 8px 0;
+    font-size: small;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.modal-body p strong {
+    flex: 0 0 100px;
+    font-weight: 500;
+}
+
+.modal-body p span,
+.modal-body p pre {
+    flex: 1;
+    /* color: #ffffff; */
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    /* color: #bbbbbb; */
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    background: none;
+    transition: color 0.3s ease;
+}
+
+.tags {
+    padding: 5px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: small;
+    border: 1px solid #cecece;
+}
+
+.logs {
+    padding: 5px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: small;
+    border: 1px solid #cecece;
+}

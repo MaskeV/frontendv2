@@ -1,0 +1,341 @@
+<!-- Dynamic Dashboard -->
+
+<div class="dashboard-shell" [class.dark]="themeService.isDark">
+
+    <!-- CONTEXT MENU -->
+    <div *ngIf="contextMenu.visible" class="context-menu" [style.top.px]="contextMenu.y"
+        [style.left.px]="contextMenu.x">
+        <button class="context-item edit" (click)="handleContextEdit(contextMenu.item)">
+            <i class="fa-solid fa-pen"></i> Edit
+        </button>
+        <button class="context-item delete" (click)="handleContextDelete(contextMenu.item)">
+            <i class="fa-solid fa-trash"></i> Delete
+        </button>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="left">
+            <button class="btn-gradient primary" (click)="goToDashboardPage()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <strong>{{currentDashboardName}}</strong>
+            <span class="dashboard-count-badge">{{ dashboard.length }} widget</span>
+        </div>
+
+        <div class="right">
+            <button class="btn-gradient primary full-width" (click)="saveLayout()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Layout
+            </button>
+
+            <button class="btn-gradient primary" (click)="openSidePanel()">
+                <i class="fa-solid fa-sliders"></i> Configure
+            </button>
+
+            <button class="btn-gradient primary" (click)="toggleFullScreen()" matTooltip="TV Fullscreen Mode">
+                <i class="fa-solid" [ngClass]="isFullScreen ? 'fa-compress' : 'fa-tv'"></i>
+                {{ isFullScreen ? 'Exit' : '' }}
+            </button>
+            <button *ngIf="isFullScreen" class="btn-gradient primary" (click)="themeService.toggle()"
+                [matTooltip]="themeService.isDark ? 'Light Mode' : 'Dark Mode'">
+                <i class="fa-solid" [ngClass]="themeService.isDark ? 'fa-sun' : 'fa-moon'"></i>
+            </button>
+            <button class="btn-gradient primary" (click)="downloadDashboardPdf()" [disabled]="isExporting"
+                matTooltip="Export dashboard as PDF">
+                <i class="fa-solid" [ngClass]="isExporting ? 'fa-spinner fa-spin' : 'fa-file-pdf'"></i>
+                {{ isExporting ? 'Exporting...' : 'PDF' }}
+            </button>
+
+        </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="dashboard-canvas">
+
+        <!-- EMPTY STATE -->
+        <div *ngIf="!dashboard.length" class="empty-state">
+            <i class="fa-regular fa-chart-bar empty-state-icon"></i>
+            <span>No charts yet. click on <strong>Configure</strong> to get started</span>
+        </div>
+
+        <gridster *ngIf="dashboard.length" [options]="options">
+
+            <gridster-item *ngFor="let item of dashboard" [item]="item">
+
+                <!-- KPI CARD -->
+                <div *ngIf="item.type.startsWith('numeric')" class="kpi-card" [id]="'widget-' + item.id"
+                    (dblclick)="onWidgetDblClick(item, $event)">
+
+                    <div class="kpi-title">
+                        {{ item.title }}
+                        <span *ngIf="item.unit">({{item.unit}})</span>
+                    </div>
+
+                    <div class="kpi-switch" *ngIf="item.series?.length > 1">
+                        <div class="kpi-option" *ngFor="let s of item.series; let i = index"
+                            [class.active]="item.selectedMetric === i" (click)="selectKpiMetric(item, i, $event)">
+                            {{ s.name }}
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" *ngIf="item.series[item.selectedMetric || 0]?.name !== 'linux_availability'">
+                        {{ item.series[item.selectedMetric || 0]?.data[0] | number:'1.0-2' }}
+                    </div>
+
+                    <div class="kpi-value availability-value"
+                        *ngIf="item.series[item.selectedMetric || 0]?.name === 'linux_availability'">
+                        <span class="down-count">{{ item.series[item.selectedMetric || 0]?.downApps }}</span>
+                        <span class="separator"> / </span>
+                        <span>{{ item.series[item.selectedMetric || 0]?.totalApps }}</span>
+                    </div>
+                </div>
+
+                <!-- CHART / TABLE WIDGET -->
+                <div *ngIf="!item.type.startsWith('numeric') && item.type !== 'text' && item.type !== 'arrow' && item.type !== 'url'"
+                    class="widget" [id]="'widget-' + item.id" [class.widget-selected]="selectedWidgetId === item.id"
+                    (dblclick)="onWidgetDblClick(item, $event)">
+
+                    <div class="kpi-title">
+                        {{ item.title }}
+                        <!-- <span *ngIf="item.unit">({{item.unit}})</span> -->
+                    </div>
+
+                    <!-- TABLE -->
+                    <div *ngIf="item.type==='table'" class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        {{ item.metrics.length !== 0 && item.hasEntityData ? 'Entity' : 'Application' }}
+                                        <span class="col-resize-handle"
+                                            (mousedown)="onColumnResizeStart($event)"></span>
+                                    </th>
+                                    <th *ngFor="let m of item.metrics" style="text-align: center;">
+                                        <div style="display:flex;flex-direction:column;gap:2px;">
+                                            <span>{{m}}</span>
+                                            <span *ngIf="item.metricUnits[m]">
+                                                ({{ item.metricUnits[m] }})
+                                            </span>
+                                        </div>
+                                        <span class="col-resize-handle"
+                                            (mousedown)="onColumnResizeStart($event)"></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of item.data | keyvalue">
+                                    <td>
+                                        <div style="display:flex;flex-direction:column;gap:4px;">
+                                            <span>
+                                                {{ $any(row).key.includes(' | ') ? $any(row).key.split(' | ')[1] :
+                                                $any(row).key }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td *ngFor="let m of item.metrics" style="text-align: center;">
+                                        {{
+                                        $any(row.value)[m]?.value == null
+                                        ? '--'
+                                        : (
+                                        $any(row.value)[m].value >= 1000000
+                                        ? ($any(row.value)[m].value / 1000000 | number:'1.1-1') + 'M'
+                                        : $any(row.value)[m].value >= 1000
+                                        ? ($any(row.value)[m].value / 1000 | number:'1.1-1') + 'K'
+                                        : ($any(row.value)[m].value | number:'1.0-2')
+                                        )
+                                        }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- CHART -->
+                    <div *ngIf="item.type !== 'table'" [id]="'chart-' + item.id" class="chart-container"></div>
+                </div>
+
+                <!-- TEXT CARD -->
+                <div *ngIf="item.type === 'text'" class="text-card" [id]="'widget-' + item.id"
+                    (dblclick)="onWidgetDblClick(item, $event)">
+                    <div class="text-content">{{ item.data }}</div>
+                </div>
+
+                <!-- URL / IMAGE CARD -->
+                <div *ngIf="item.type === 'url'" class="url-card" [id]="'widget-' + item.id"
+                    (dblclick)="onWidgetDblClick(item, $event)">
+                    <img [src]="item.entity" alt="Dashboard Image"
+                        style="width:100%; height:100%; object-fit:contain;" />
+                </div>
+
+                <!-- ARROW CARD -->
+                <div *ngIf="item.type === 'arrow'" class="arrow-card" [id]="'widget-' + item.id"
+                    (dblclick)="onWidgetDblClick(item, $event)">
+                    <i [class]="item.data + ' arrow-icon'"></i>
+                </div>
+
+            </gridster-item>
+        </gridster>
+    </div>
+
+    <!-- SIDE PANEL OVERLAY -->
+    <div class="side-panel-overlay" *ngIf="isSidePanelOpen" (click)="closeSidePanel()"></div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel" [class.open]="isSidePanelOpen">
+
+        <div class="side-panel-header">
+            <span>Configure Dashboard</span>
+            <button class="side-panel-close" (click)="closeSidePanel()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- TABS -->
+        <div class="side-panel-tabs">
+            <button class="side-tab" [class.active]="sidePanelTab === 'chart'"
+                [class.disabled]="editingWidget && sidePanelTab !== 'chart'"
+                [disabled]="editingWidget && sidePanelTab !== 'chart'" (click)="sidePanelTab = 'chart'">
+                <i class="fa-solid fa-chart-line"></i> Chart
+            </button>
+            <button class="side-tab" [class.active]="sidePanelTab === 'text'"
+                [class.disabled]="editingWidget && sidePanelTab !== 'text'"
+                [disabled]="editingWidget && sidePanelTab !== 'text'" (click)="sidePanelTab = 'text'">
+                <i class="fa-solid fa-text-width"></i> Text
+            </button>
+            <button class="side-tab" [class.active]="sidePanelTab === 'url'"
+                [class.disabled]="editingWidget && sidePanelTab !== 'url'"
+                [disabled]="editingWidget && sidePanelTab !== 'url'" (click)="sidePanelTab = 'url'">
+                <i class="fa-solid fa-globe"></i> URL
+            </button>
+            <button class="side-tab" [class.active]="sidePanelTab === 'arrows'"
+                [class.disabled]="editingWidget && sidePanelTab !== 'arrows'"
+                [disabled]="editingWidget && sidePanelTab !== 'arrows'" (click)="sidePanelTab = 'arrows'">
+                <i class="fa-solid fa-arrow-right"></i> Arrows
+            </button>
+        </div>
+
+        <!-- TAB: CHART -->
+        <div *ngIf="sidePanelTab === 'chart'" class="side-panel-body">
+            <app-dashboard-config [editWidget]="sidePanelTab === 'chart' ? editingWidget : null">
+            </app-dashboard-config>
+        </div>
+
+        <!-- TAB: TEXT -->
+        <div *ngIf="sidePanelTab === 'text'" class="side-panel-body">
+            <textarea [(ngModel)]="newText" class="side-textarea" rows="4"></textarea>
+            <button class="btn-gradient primary full-width"
+                (click)="editingWidget?.type === 'text' ? updateTextCard() : createTextCard()">
+                {{ editingWidget?.type === 'text' ? 'Update Text' : '+ Add Text Card' }}
+            </button>
+        </div>
+
+        <!-- TAB: URL -->
+        <div *ngIf="sidePanelTab === 'url'" class="side-panel-body url-panel">
+
+            <!-- Edit notice (only shown in edit mode) -->
+            <div *ngIf="editingWidget?.type === 'url'" class="edit-notice">
+                <i class="ti ti-pencil" aria-hidden="true"></i>
+                <span>Editing existing image — paste a new URL or base64 string to replace it.</span>
+            </div>
+
+            <!-- Input -->
+            <div>
+                <textarea [(ngModel)]="newUrl" class="side-textarea" rows="4"></textarea>
+            </div>
+
+            <!-- Preview / Clear -->
+            <div class="btn-row">
+                <button class="btn-gradient primary full-width" (click)="getImageFromUrl()">
+                    <i class="ti ti-eye" aria-hidden="true"></i> Preview
+                </button>
+                <button class="btn-gradient secondary full-width" (click)="clearImagePreview()">
+                    <i class="ti ti-x" aria-hidden="true"></i> Clear
+                </button>
+            </div>
+
+            <!-- Preview box -->
+            <div class="preview-box">
+                <div *ngIf="!imageSrc" class="preview-empty">
+                    <i class="ti ti-photo" aria-hidden="true"></i>
+                    <span>Preview will appear here</span>
+                </div>
+                <ng-container *ngIf="imageSrc">
+                    <img [src]="imageSrc" alt="Image preview"
+                        style="max-width:100%;max-height:200px;object-fit:contain;" />
+                    <span class="preview-badge">✓ Loaded</span>
+                </ng-container>
+            </div>
+
+            <!-- Save button (only shown after preview loads) -->
+            <ng-container *ngIf="imageSrc">
+                <hr class="url-divider" />
+                <button class="btn-gradient primary full-width"
+                    (click)="editingWidget?.type === 'url' ? updateImage() : addImage()">
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                    {{ editingWidget?.type === 'url' ? 'Update image widget' : 'Add image widget' }}
+                </button>
+            </ng-container>
+
+        </div>
+
+        <!-- TAB: ARROWS -->
+        <div *ngIf="sidePanelTab === 'arrows'" class="side-panel-body">
+            <p class="side-panel-hint">
+                {{ editingWidget?.type === 'arrow' ? 'Select a new arrow.' : 'Click an arrow to add it to the
+                dashboard.' }}
+            </p>
+            <div class="arrow-grid">
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-right') : addArrow('fa-solid fa-arrow-right')">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>Right</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-left') : addArrow('fa-solid fa-arrow-left')">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Left</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-up') : addArrow('fa-solid fa-arrow-up')">
+                    <i class="fa-solid fa-arrow-up"></i>
+                    <span>Up</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-down') : addArrow('fa-solid fa-arrow-down')">
+                    <i class="fa-solid fa-arrow-down"></i>
+                    <span>Down</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-turn-down') : addArrow('fa-solid fa-arrow-turn-down')">
+                    <i class="fa-solid fa-arrow-turn-down"></i>
+                    <span>Turn Down</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-turn-up') : addArrow('fa-solid fa-arrow-turn-up')">
+                    <i class="fa-solid fa-arrow-turn-up"></i>
+                    <span>Turn Up</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrow-right-arrow-left') : addArrow('fa-solid fa-arrow-right-arrow-left')">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    <span>Bidirectional</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrows-rotate') : addArrow('fa-solid fa-arrows-rotate')">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Circular</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrows-left-right') : addArrow('fa-solid fa-arrows-left-right')">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                    <span>Left-Right</span>
+                </button>
+                <button class="arrow-tile"
+                    (click)="editingWidget?.type === 'arrow' ? updateArrow('fa-solid fa-arrows-up-down') : addArrow('fa-solid fa-arrows-up-down')">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <span>Up-Down</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

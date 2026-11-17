@@ -1,0 +1,453 @@
+<div class="top-error-bar" *ngIf="showError">
+    <span class="error-icon">!</span>
+    <span>{{ errorMessage }}</span>
+</div>
+
+<div class="top-success-bar" *ngIf="showSuccess">
+    <span class="success-icon">✓</span>
+    <span>Feature created successfully</span>
+</div>
+
+<div class="top-update-bar" *ngIf="showUpdateSuccess">
+    <span class="update-icon">↻</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="top-delete-bar" *ngIf="showDelete">
+    <span class="delete-icon1">↻</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="page-wrapper">
+    <div class="features-wrapper">
+
+        <ng-container *ngIf="showFeatureForm">
+            <!-- LEFT PANEL -->
+            <div class="card">
+
+                <div class="header">
+                    <div class="">
+                        <div class="icon gear-icon" [class.disabled]="!isEditMode"
+                            [attr.title]="isEditMode ? 'Back to Create Feature' : null"
+                            (click)="isEditMode && goToCreateFeature()">
+                        </div>
+
+                        <div style="margin-top: -14%; margin-left: 21%; width: 100%;">
+                            <h2>Feature Configuration</h2>
+                            <p>Configure your application features</p>
+                        </div>
+                    </div>
+
+                    <button style="margin-left: 30%;" class="table-toggle-btn" title="View Features"
+                        (click)="toggleFeatureTable()">
+                        ☰
+                    </button>
+
+                    <button class="table-toggle-btn" [title]="showFeaturesTable ? 'Back to Form' : 'clone feature'"
+                        (click)="openCloneForm()">
+
+                        <i class="fa-regular" [ngClass]="showFeaturesTable ? 'fa-angles-left' : 'fa-clone'">
+                        </i>
+
+                    </button>
+
+
+                </div>
+
+
+
+
+                <label>Application Name<span class="text-danger">*</span></label>
+
+                <select class="form-control" [(ngModel)]="selectedApplicationId" [disabled]="isEditMode">
+
+                    <option disabled selected value="Select">Select</option>
+
+                    <option *ngFor="let data of applicationList" [ngValue]="data.appID">
+                        {{ data.applicationName }}
+                    </option>
+
+                </select>
+
+
+                <!-- <label>Feature Name</label>
+                <select [(ngModel)]="form.featureName">
+                    <option>Dashboard</option>
+                    <option>Trend Dashboard</option>
+                </select> -->
+
+                <section class="mt-3">
+                    <h4>Sub-Features</h4>
+
+                    <div class="ip-card" *ngFor="let sf of subFeatures; let i = index">
+
+                        <div class="badge">{{ i + 1 }}</div>
+
+                        <!-- Sub-feature name -->
+                        <label>Sub-Feature Name</label>
+                        <input [(ngModel)]="sf.subFeatureName" placeholder="Enter sub-feature name" />
+
+                        <!-- Display type -->
+                        <div class="display-type">
+                            <label>
+                                <input type="radio" [name]="'bgType-' + i" [checked]="sf.bgType === 'color'"
+                                    (change)="onBgTypeChange(i, 'color')" />
+                                Pick a Color
+                            </label>
+
+                            <label>
+                                <input type="radio" [name]="'bgType-' + i" [checked]="sf.bgType === 'image'"
+                                    (change)="onBgTypeChange(i, 'image')" />
+                                Upload an Image
+                            </label>
+                        </div>
+
+                        <!-- Color picker -->
+                        <input type="color" *ngIf="sf.bgType === 'color'" [(ngModel)]="sf.bgColor" />
+
+                        <!-- Image upload -->
+                        <div *ngIf="sf.bgType === 'image'">
+
+                            <!-- Image type selector -->
+                            <label class="mt-2">Image Source</label>
+                            <select [(ngModel)]="sf.bgImageType" (change)="onImageTypeChange(i)">
+                                <option value="image-url">Image URL</option>
+                                <option value="image-file">Upload Image</option>
+                            </select>
+
+                            <!-- Image URL (change)="onUrlChange(i)"  -->
+                            <input *ngIf="sf.bgImageType === 'image-url'" type="text" placeholder="Enter image URL"
+                                [(ngModel)]="sf.bgURL" />
+
+                            <!-- Image File -->
+                            <div class="upload-box mt-2" *ngIf="sf.bgImageType === 'image-file'"
+                                (click)="fileInput.click()">
+
+                                <input #fileInput type="file" accept="image/*"
+                                    (change)="onSubFeatureImageUpload($event, i)" />
+
+                                <p>
+                                    Click to upload image<br />
+                                    <small>PNG, JPG, GIF (max 5MB)</small>
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <!-- Delete -->
+                        <button class="delete-icon" *ngIf="subFeatures.length > 1" (click)="removeSubFeature(i)">
+                            <span class="trash"></span>
+                        </button>
+
+                    </div>
+
+                    <!-- Add new -->
+                    <div *ngIf="!isEditMode" class="add-ip-row" [class.disabled]="!canAddSubFeature()"
+                        (click)="canAddSubFeature() && addSubFeature()">
+
+                        <span class="plus">+</span>
+                        <span>Add Sub-Feature</span>
+                    </div>
+                </section>
+
+                <button class="submit" (click)="isEditMode ? updateFeature() : createFeature()"
+                    [disabled]="isEditMode ? !canEdit : !canCreate">
+                    {{ isEditMode ? 'Update Feature' : 'Create Feature' }}
+                </button>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+
+                <ng-container *ngIf="!showCloneForm">
+                    <!-- LIVE PREVIEW -->
+                    <div class="card">
+                        <h3>👁️ Live Preview</h3>
+
+                        <div class="preview-image" *ngFor="let sf of subFeatures" [ngStyle]="getPreviewStyle(sf)">
+                        </div>
+
+                        <div class="preview-info" *ngFor="let sf of subFeatures">
+                            <p><b>Component</b></p>
+                            <p><small>Application</small><br>{{ form.applicationName }}</p>
+                            <p><small>Sub-Feature</small><br>{{ sf.subFeatureName }}</p>
+                        </div>
+                    </div>
+                    <!-- SUMMARY -->
+                    <div class="card summary">
+                        <h4>Configuration Summary</h4>
+                        <p><b>Type:</b> {{ form.featureType }}</p>
+                        <p><b>Application:</b> {{ form.applicationName }}</p>
+                        <p><b>Feature:</b> {{ form.featureName }}</p>
+                        <p><b>Sub-Features:</b></p>
+                        <ul>
+                            <li *ngFor="let sf of subFeatures">
+                                {{ sf.subFeatureName }} — {{ sf.bgType | titlecase }}
+                            </li>
+                        </ul>
+                        <p><b>Display:</b> {{ form.displayType | titlecase }}</p>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="showCloneForm">
+
+                    <div class="card">
+
+                        <div class="header">
+                            <div class="header-left">
+                                <h3>📄 Clone Feature</h3>
+                            </div>
+
+                            <button class="table-toggle-btn" title="Back to Live Preview" (click)="backFromClone()">
+
+                                <i class="fa-solid fa-angles-left"></i>
+
+                            </button>
+                        </div>
+
+
+                        <label>Clone From Application<span class="text-danger">*</span></label>
+                        <select class="form-control" [(ngModel)]="selectedApplicationId"
+                            (ngModelChange)="getSubfeatureNameFromAppId(selectedApplicationId)">
+                            <option disabled selected value="Select">Select</option>
+                            <option *ngFor="let data of applicationList" [ngValue]="data.appID">
+                                {{ data.applicationName }}
+                            </option>
+                        </select>
+
+                        <label>Clone From Sub Feature<span class="text-danger">*</span></label>
+                        <select class="form-control" [(ngModel)]="cloneSourceSubFeature"
+                            (ngModelChange)="getgraphNameFromAppIdandsubfeatureid($event, selectedApplicationId)">
+                            <option disabled selected value="">Select</option>
+                            <option *ngFor="let sf of clonesubFeatureList" [ngValue]="sf.id">
+                                {{ sf.subFeatureName }}
+                            </option>
+
+                        </select>
+
+                        <label>Clone To Application<span class="text-danger">*</span></label>
+                        <select class="form-control" [(ngModel)]="cloneTargetApplication">
+                            <option disabled selected value="">Select</option>
+                            <option *ngFor="let data of applicationList" [ngValue]="data.appID">
+                                {{ data.applicationName }}
+                            </option>
+                        </select>
+
+                        <label>Clone Sub Feature Name<span class="text-danger">*</span></label>
+                        <input class="form-control" [(ngModel)]="cloneSubFeatureName"
+                            placeholder="Enter new sub-feature name" />
+
+                        <label>Clone Graph<span class="text-danger">*</span></label>
+
+                        <div class="graph-list">
+                            <div class="graph-item" *ngFor="let g of graphList">
+                                <input type="checkbox" [value]="g.id" (change)="onGraphToggle(g.id, $event)" />
+                                <span class="graph-name">{{ g.chartName }}</span>
+                            </div>
+                        </div>
+
+
+
+                        <button class="submit mt-3" (click)="cloneFeature()" [disabled]="!canCreate">
+                            Clone Feature
+                        </button>
+
+                    </div>
+
+                </ng-container>
+
+            </div>
+
+
+
+        </ng-container>
+
+        <ng-container *ngIf="showFeaturesTable">
+
+            <div class="card mt-4 table-only" *ngIf="showFeaturesTable">
+
+                <div class="header">
+                    <div class="header-left">
+                        <div class="icon gear-icon" (click)="goToCreateFeature()" title="Create Feature"></div>
+                        <div>
+                            <h2> All Configured Feature</h2>
+                            <p>Configure your application features</p>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="table-glass">
+                    <div class="table-toolbar">
+                        <div class="table-search">
+                            <input type="text" style="width: 625px;" [(ngModel)]="searchText" (input)="onSearch()"
+                                placeholder="Search features..." />
+
+                        </div>
+                    </div>
+
+
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Feature Name</th>
+                                <th>Feature Type</th>
+                                <th>Created On</th>
+                                <th>View Sub-Feature(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr *ngFor="let feature of pagedFeatureList">
+
+                                <td>{{ feature.featureName }}</td>
+                                <td>{{ feature.featureType }}</td>
+                                <td>{{ feature.createdOn | date:'dd/MM/yyyy' }}</td>
+
+                                <td class="text-center">
+                                    <button class="eye-btn" (click)="openSubFeatureModal(feature, subFeatureModal)">
+                                        👁
+                                    </button>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- PAGINATION -->
+                    <div class="pagination minimal-pagination">
+                        <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                            ‹ Previous
+                        </button>
+
+                        <span class="page-indicator">
+                            <strong>{{ page }}</strong> / {{ totalPages }}
+                        </span>
+
+                        <button class="page-btn" (click)="nextPage()" [disabled]="page === totalPages">
+                            Next ›
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #subFeatureModal let-modal>
+
+    <div class="modal-header">
+        <h5 class="modal-title">
+            Sub-Features
+            <small class="text-muted">– {{ selectedFeature?.featureName }}</small>
+        </h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="table-toolbar">
+            <div class="table-search">
+                <input type="text" [(ngModel)]="subFeatureSearchText" (input)="onSubFeatureSearch()"
+                    placeholder="Search sub-features..." />
+            </div>
+        </div>
+
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Sub-Feature</th>
+                    <th *ngIf="check === 'PRODUCT'">Route Name</th>
+                    <th>Created On</th>
+                    <th>Created By</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let sf of pagedSubFeatures; let i = index">
+
+                    <td>{{ sf.subFeatureName }}</td>
+                    <td *ngIf="check === 'PRODUCT'">
+                        {{ sf.routeName }}
+                    </td>
+                    <td>{{ sf.createdOn | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ sf.createdByName }}</td>
+
+                    <td>
+                        <button class="icon-btn" title="Edit" (click)="onEditSubFeature(sf, modal)"
+                            [disabled]="check === 'PRODUCT' || !canEdit"
+                            [class.disabled]="check === 'PRODUCT' || !canEdit">
+                            ✏️
+                        </button>
+
+                        <button class="icon-btn" title="Delete" (click)="openDeleteConfirm(sf, deleteConfirmTemplate)"
+                            [disabled]="check === 'PRODUCT' || isDeleting || !canDelete"
+                            [class.disabled]="check === 'PRODUCT' || !canDelete">
+                            🗑️
+                        </button>
+
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination minimal-pagination" *ngIf="subFeatureTotalPages > 1">
+            <button class="page-btn" (click)="prevSubFeaturePage()" [disabled]="subFeaturePage === 1">
+                ‹ Previous
+            </button>
+
+            <span class="page-indicator">
+                <strong>{{ subFeaturePage }}</strong> / {{ subFeatureTotalPages }}
+            </span>
+
+            <button class="page-btn" (click)="nextSubFeaturePage()"
+                [disabled]="subFeaturePage === subFeatureTotalPages">
+                Next ›
+            </button>
+        </div>
+
+
+    </div>
+</ng-template>
+
+<ng-template #deleteConfirmTemplate let-modal>
+    <div class="delete-modal-wrapper">
+
+        <!-- HEADER -->
+        <div class="delete-header">
+            <div class="delete-icon-circle">
+                !
+            </div>
+            <div class="delete-header-text">
+                <h3>Confirm Deletion</h3>
+                <p>
+                    You are about to delete this sub feature.
+                    This will remove all associated data.
+                </p>
+            </div>
+        </div>
+
+        <!-- CAUTION -->
+        <div class="delete-warning">
+            <span class="warn-icon">⚠</span>
+            <span><strong>Caution:</strong> This action cannot be undone.</span>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="delete-actions">
+            <button class="btn btn-outline-secondary" (click)="modal.dismiss()">
+                No, Keep It
+            </button>
+
+            <button class="btn btn-danger" [disabled]="isDeleting" (click)="confirmDelete(deleteConfirmTemplate)">
+                {{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}
+            </button>
+
+        </div>
+
+    </div>
+</ng-template>

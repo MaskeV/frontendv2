@@ -1,0 +1,1037 @@
+<main class="py-0 my-0">
+    <div class="container-fluid   px-0 mx-0">
+        <div class="container-fluid py-1">
+            <!-- <header class="pb-1 mb-1 ">
+                <ul class="nav nav-tabs border-bottom">
+                    <li class="nav-item ">
+                        <a class="nav-link active  sm-font" aria-current="page" href="#">Custom Reports</a>
+                    </li>
+                </ul>
+            </header> -->
+
+            <div class="container-fluid py-0">
+                <div class="row mb-3 ">
+                    <div class="col-2 themed-grid-col ">
+                        <label for="staticEmail" class="form-label smm-font">Select Sub Module </label>
+                    </div>
+                    <div class="col-3 themed-grid-col ">
+                        <div class="d-flex align-items-center">
+
+                            <span class="me-3">:</span>
+                            <div class="container py-0 d-flex justify-content-between  align-items-center">
+
+                                <div class="form-check fs-6">
+                                    <input class="form-check-input" type="radio" name="SubModule" id="Hardware" checked>
+                                    <label class="form-check-label smm-font" for="Hardware">
+                                        Hardware
+                                    </label>
+                                </div>
+                                <div class="form-check fs-6">
+                                    <input class="form-check-input" type="radio" name="SubModule" id="Software" checked>
+                                    <label class="form-check-label smm-font" for="Software">
+                                        Software
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mb-3 ">
+                    <div class="col-2 themed-grid-col ">
+                        <label for="staticEmail" class="form-label smm-font">Report Name <span
+                                class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-4 themed-grid-col ">
+                        <div class="d-flex align-items-center">
+
+                            <span class="me-3">:</span>
+                            <select class="form-select form-select-sm rounded-0 pe-0 mx-0 smm-font "
+                                (ngModelChange)="onReportChange($event)" [(ngModel)]="reportId" name="reportId">
+                                <option disabled selected value="">-- Select Report --</option>
+                                <option *ngFor="let report of reports " [value]="report.id">
+                                    {{ report.reportName }}
+                                </option>
+                            </select>
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- <div class="row mb-3 ">
+                    <div class="col-2 themed-grid-col ">
+                        <label for="staticEmail" class="form-label smm-font">Select Timeframe<span
+                                class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-4 themed-grid-col ">
+                        <div class="d-flex align-items-center">
+
+                            <span class="me-3">:</span>
+                            <app-day-timer (ApplyLastRun)="onApplyLastRun($event)"></app-day-timer>
+                        </div>
+                    </div>
+
+                </div> -->
+            </div>
+
+            <div class="py-1 px-2 mb-1   rounded-0 custom-bg">
+                <div class="container-fluid py-2">
+
+
+
+                    <div class="mx-3 mb-1" *ngIf="isEdit">
+                        <h5 class=" sm-font fw-bold start-0  mt-1  sub-headers pe-0" style="z-index: 1;">
+                            Select Criteria
+                        </h5>
+
+                        <div class="pb-2 card-shadow rounded-0">
+                            <div class="container-fluid py-1">
+                                <div class="row mt-1" *ngFor="let row of criteriaRows; let i = index">
+
+                                    <div class="col-sm-1 mx-2 px-0">
+                                        <label *ngIf="i === 0" class="form-label smm-font opacity-0">Condition</label>
+                                        <select class="form-select form-select-sm rounded-0 pe-0 mx-0 smm-font"
+                                            [(ngModel)]="row.condition" [hidden]="i === 0" name="condition">
+                                            <option value="AND">AND</option>
+                                            <option value="OR">OR</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <label *ngIf="i === 0" for="Columns" class="form-label smm-font">Columns</label>
+                                        <select class="form-select form-select-sm rounded-0 smm-font" id="Columns"
+                                            required [(ngModel)]="row.column" name="column">
+                                            <option value="" selected>Select Column</option>
+                                            <option>Server name</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3 mx-4">
+                                        <label *ngIf="i === 0" for="Criteria" class="form-label smm-font">Criteria
+                                            Type</label>
+                                        <select class="form-select form-select-sm rounded-0 smm-font" id="Criteria"
+                                            required [(ngModel)]="row.type" name="Criteria">
+                                            <option value="" selected>Select Criteria </option>
+                                            <option>equal</option>
+                                            <option>not equal</option>
+                                            <option>like</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3 me-2">
+                                        <label *ngIf="i === 0" for="value"
+                                            class="form-label smm-font opacity-0">Value</label>
+                                        <input type="text" class="form-control py-1 rounded-0 smm-font" id="value"
+                                            placeholder="NA" required [(ngModel)]="row.value" name="value" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label *ngIf="i === 0" for="value"
+                                            class="form-label smm-font opacity-0">Action</label>
+                                        <div class="container py-2 d-flex align-items-center">
+                                            <i class="fa-solid fa-xmark me-2 smm-font" style="cursor: pointer"
+                                                *ngIf="criteriaRows.length > 1" (click)="removeCriteriaRow(i)"></i>
+                                            <i class="fa-solid fa-plus sm-font" style="cursor: pointer"
+                                                *ngIf="i === criteriaRows.length - 1" (click)="addCriteriaRow()"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- select col -->
+
+                    <div class=" mx-3 ">
+
+
+                        <div class="py-0  rounded-0">
+                            <div class=" pt-1 pb-1">
+                                <div class="row mt-2 ">
+                                    <!-- Available Columns -->
+                                    <!-- <div class="col-sm-3 themed-grid-col">
+                                        <div class="smm-font bold-heading">Columns List</div>
+                                        <div class="border columns-box overflow-auto scroll-color">
+                                            <dl *ngFor="let group of availableColumns">
+                                                <dt>{{ group.group }}</dt>
+                                                <dd *ngFor="let col of group.items"
+                                                    [class.selected]="selectedFromAvailable.includes(col)"
+                                                    (mousedown)="onMouseDown(); toggleAvailableSelection(col, $event)"
+                                                    (mouseup)="onMouseUp()"
+                                                    (mouseenter)="toggleAvailableSelection(col, $event, true)"
+                                                    style="cursor: pointer;">
+                                                    {{ col }}
+                                                </dd>
+
+                                            </dl>
+                                        </div>
+                                    </div> -->
+
+                                    <!-- Arrow -->
+                                    <!-- <div class="col-sm-1 themed-grid-col align-self-center">
+                                        <i class="fa-solid fa-angles-right angles-right xsm-font fw-bolder py-1 px-2"
+                                            (click)="moveToSelected()" style="cursor: pointer;"></i>
+                                    </div> -->
+
+                                    <!-- Selected Columns -->
+                                    <div class="col-sm-3 card-shadow themed-grid-col d-flex">
+                                        <div class="flex-grow-1 me-2 my-2 border">
+                                            <div class="d-flex py-0 justify-content-between">
+                                                <div
+                                                    class="container-fluid mx-0 py-0 my-0 px-0 ps-2 smm-font  bold-heading">
+                                                    Selected Columns</div>
+                                                <div class="container d-flex py-0 my-0 align-items-center">
+                                                    <!-- <i class="fa-solid fa-xmark xsm-font mx-2"
+                                                        (click)="deleteFromSelected()" style="cursor: pointer;"></i> -->
+                                                    <!-- <span class="text-primary smm-font">Delete</span> -->
+                                                </div>
+                                            </div>
+                                            <div class=" overflow-auto columns-box border-top  scroll-color"
+                                                #selectedBox>
+                                                <div *ngFor="let col of selectedColumns"
+                                                    (mousedown)="onMouseDown(); toggleSelectedSelection(col, $event)"
+                                                    (mouseup)="onMouseUp()"
+                                                    (mouseenter)="toggleSelectedSelection(col, $event, true)"
+                                                    class="selected-col-box" style="cursor: pointer;">
+                                                    {{ col }}
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Optional up/down buttons (inactive for now) -->
+                                        <div class="d-flex flex-column justify-content-center p-0">
+                                            <i (click)="scrollSelectedBox('up')"
+                                                class="fa-solid fa-up-long mb-1 arrows text-primary xsm-font py-1 px-1 pointor"></i>
+                                            <i (click)="scrollSelectedBox('down')"
+                                                class="fa-solid fa-down-long mt-1 arrows text-primary xsm-font py-1 px-1 pointor"></i>
+                                        </div>
+                                        <!-- <div class="d-flex mx-4 flex-column justify-content-center  p-2">
+
+                                        </div> -->
+                                    </div>
+
+                                    <div class="col-sm-9 bg-white themed-grid-col ">
+                                        <!-- schedule -->
+                                        <div class=" ms-3 mb-1">
+                                            <div class="d-flex justify-content-between">
+
+
+                                                <div>
+
+
+                                                    <h5 class="  sm-font fw-bold start-0  sub-headers mt-2 mb-1  pe-0"
+                                                        style="z-index: 1;">
+                                                        Schedule
+                                                    </h5>
+                                                </div>
+
+                                                <div class="d-flex justify-content-center container  p-0 rounded ">
+                                                    <header class="pb-0 mb-0">
+                                                        <ul class="nav nav-tabs border-bottom">
+                                                            <li class="nav-item">
+                                                                <a class="nav-link active sm-font" aria-current="page"
+                                                                    data-bs-toggle="tab" (click)="setActiveTab('Daily')"
+                                                                    href="#Daily">Daily
+                                                                </a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link sm-font"
+                                                                    (click)="setActiveTab('Weekly')"
+                                                                    data-bs-toggle="tab" href="#Weekly">Weekly
+                                                                </a>
+                                                            </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link sm-font"
+                                                                    (click)="setActiveTab('Monthly')"
+                                                                    data-bs-toggle="tab" href="#Monthly">Monthly
+                                                                </a>
+                                                            </li>
+
+                                                        </ul>
+                                                    </header>
+                                                </div>
+                                            </div>
+
+                                            <div class="p-0 card-shadow rounded-0">
+                                                <div class="container-fluid p-0 ">
+
+
+                                                    <div class="tab-content p-0">
+                                                        <div class="tab-pane fade  active show p-0" id="Daily"
+                                                            role="tabpanel">
+                                                            <div
+                                                                class="container d-flex align-items-center justify-content-center mb-4 p-0">
+                                                                <div class="container custom-bg card-shadow d-flex  m-0  p-0"
+                                                                    style="overflow-y: scroll;height:230px">
+
+
+                                                                    <form class="needs-validation container p-3 "
+                                                                        novalidate="">
+
+
+
+                                                                        <div class="row g-3 mb-2">
+                                                                            <div class="col-sm-6 "> <label for="Storage"
+                                                                                    class="form-label">Reports Storage
+                                                                                    Options:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 text-primary">
+                                                                                <!-- <input type="file" webkitdirectory directory> -->
+
+                                                                                File Path
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label for="Export"
+                                                                                    class="form-label">Export
+                                                                                    Format:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 ">
+                                                                                <select
+                                                                                    class=" rounded-0  smm-font py-1" name="formate"
+                                                                                    id="format" required="">
+                                                                                    <option value="">Choose format
+                                                                                    </option>
+                                                                                    <option>PDF</option>
+                                                                                    <option>Excel</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label for="Time"
+                                                                                    class="form-label">Time:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-3 ">
+                                                                                <input id="Time" type="time"
+                                                                                    name="scheduledTime"
+                                                                                    [(ngModel)]="reportSchedule.scheduledTime"
+                                                                                    class="border px-1 py-0" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label for="status"
+                                                                                    class="form-label">Status:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <input type="checkbox"
+                                                                                    class="form-check-input"
+                                                                                    [(ngModel)]="reportSchedule.status" name="status"
+                                                                                    id="Status"> <label
+                                                                                    class="form-check-label ms-1 smm-font"
+                                                                                    for="Status ">Email
+                                                                                    this scheduled report</label>
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <!-- <hr class=""> -->
+                                                                        <div
+                                                                            class="row mb-2 g-1 justify-content-center">
+
+                                                                            <div class="col-sm-3 align-self-center">
+                                                                                <input type="checkbox" name="email"
+                                                                                    (change)="toggleEmail($event)"
+                                                                                    class="form-check-input" id="email">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="email ">Email</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 align-self-center">
+
+
+                                                                                <input type="checkbox" name="checkboxSms"
+                                                                                    (change)="toggleSMS($event)"
+                                                                                    class="form-check-input" id="sms">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="sms">SMS</label>
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    class="form-label">To
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <label class="form-label">CC
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of toEmails; let i = index ;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center ">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="toEmails[i]"
+                                                                                            [name]="'toEmail' + i"
+                                                                                            placeholder="Enter email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addToEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeToEmail(i)"
+                                                                                            *ngIf="toEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [name]="'ccEmail' + i"
+                                                                                            name="ccEmail{{i}}"
+                                                                                            placeholder="Enter  email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addCcEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeCcEmail(i)"
+                                                                                            *ngIf="ccEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </div>
+
+
+
+                                                                        <!-- CC Email Fields -->
+                                                                        <div class="row g-3 mb-2" *ngIf="showSMS">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="mb-2">
+                                                                                    <label class="form-label">Phone
+                                                                                        Number(s):</label>
+                                                                                    <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="number"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="phoneNumbers[i]"
+                                                                                           [name]="'number' + i"
+                                                                                            placeholder="Enter phone number">
+
+                                                                                        <i class="fa fa-plus sm-font text-secondary mx-1"
+                                                                                            (click)="addPhoneNumber()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removePhoneNumber(i)"
+                                                                                            *ngIf="phoneNumbers.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+
+
+
+                                                                    </form>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="tab-pane fade  " id="Weekly" role="tabpanel">
+                                                            <div
+                                                                class="container d-flex align-items-center justify-content-center mb-4 p-0">
+                                                                <div class="container custom-bg d-flex  m-0 p-0"
+                                                                    style="overflow-y: scroll;height:240px">
+
+                                                                    <form class="needs-validation container  p-3 "
+                                                                        style="overflow-y: scroll;" novalidate="">
+                                                                        <div class="row g-3 mb-2">
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="StorageWeekly"
+                                                                                    class="form-label">Reports Storage
+                                                                                    Options:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 text-primary">
+
+
+                                                                                File Path
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="ExportWeekly"
+                                                                                    class="form-label">Export
+                                                                                    Format:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 ">
+                                                                                <select
+                                                                                    class=" rounded-0  smm-font py-1" name="formate2"
+                                                                                    id="format" required="">
+                                                                                    <option value="">Choose format
+                                                                                    </option>
+                                                                                    <option>PDF</option>
+                                                                                    <option>Excel</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="statusweekly"
+                                                                                    class="form-label">Status:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <input type="checkbox"
+                                                                                    class="form-check-input" name="statusWeeklyReport"
+                                                                                    [(ngModel)]="reportSchedule.status"
+                                                                                    id="statusWeekly">
+                                                                                <label
+                                                                                    class="form-check-label ms-1 smm-font"
+                                                                                    for="statusWeekly ">Email this
+                                                                                    scheduled
+                                                                                    report</label>
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-12 ">
+                                                                                <label class="form-label ">Select
+                                                                                    Days:</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-12 ">
+                                                                                <div class="mb-1">
+                                                                                    <div class="container-fluid"
+                                                                                        style="height: auto;">
+                                                                                        <div class="mb-1 smm-font">
+
+                                                                                            <!-- All checkbox -->
+                                                                                            <div
+                                                                                                class="form-check form-check-inline">
+                                                                                                <input
+                                                                                                    class="form-check-input"
+                                                                                                    type="checkbox"
+                                                                                                    [(ngModel)]="dailyAllSelected"
+                                                                                                    name="dailyAll"
+                                                                                                    (change)="toggleAllDailyDays()" />
+                                                                                                <label
+                                                                                                    class="form-check-label">All</label>
+                                                                                            </div>
+
+                                                                                            <!-- Individual day checkboxes -->
+                                                                                            <div class="form-check form-check-inline"
+                                                                                                *ngFor="let day of weekdays">
+                                                                                                <input
+                                                                                                    class="form-check-input"
+                                                                                                    type="checkbox"
+                                                                                                    [(ngModel)]="schedule.daily[day].selected"
+                                                                                                    (change)="onDaySelectionChange()"
+                                                                                                    [disabled]="dailyAllSelected"
+                                                                                                    [name]="'daily_' + day" />
+                                                                                                <label
+                                                                                                    class="form-check-label">{{
+                                                                                                    day }}</label>
+                                                                                            </div>
+
+                                                                                            <!-- Common time input for selected individual days -->
+                                                                                            <div class="row mt-1 g-1"
+                                                                                                *ngIf="!dailyAllSelected && selectedDays.length > 0">
+                                                                                                <div class="col-md-4"
+                                                                                                    [style.width.px]="selectedDays.length * 70">
+                                                                                                    <label
+                                                                                                        class="form-label">{{
+                                                                                                        selectedDays.join(', ') }}
+                                                                                                        Time:</label>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-3 align-self-center">
+                                                                                                    <input type="time"
+                                                                                                        class="border px-1 py-0"
+                                                                                                        [(ngModel)]="reportSchedule.scheduledTime"
+                                                                                                        (ngModelChange)="onCommonTimeChange($event)"
+                                                                                                        name="selected_days_time"
+                                                                                                        required />
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <!-- Common time input for All Days -->
+                                                                                            <div class="row mt-1 g-1"
+                                                                                                *ngIf="dailyAllSelected">
+                                                                                                <div class="col-md-3">
+                                                                                                    <label
+                                                                                                        class="form-label">All
+                                                                                                        Days
+                                                                                                        Time:</label>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="col-md-3 align-self-center">
+                                                                                                    <input type="time"
+                                                                                                        class="border px-1 py-0"
+                                                                                                        [(ngModel)]="reportSchedule.scheduledTime"
+                                                                                                        (ngModelChange)="onAllDaysTimeChange($event)"
+                                                                                                        name="all_time"
+                                                                                                        required />
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+
+
+                                                                            </div>
+
+                                                                        </div>
+
+
+                                                                        <div
+                                                                            class="row mb-2 g-1 justify-content-center">
+
+                                                                            <div class="col-sm-3 align-self-center">
+                                                                                <input type="checkbox" name="mailCheckbox"
+                                                                                    (change)="toggleEmail($event)"
+                                                                                    class="form-check-input" id="email">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="email ">Email</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 align-self-center">
+
+
+                                                                                <input type="checkbox" name="sms2Checkbox"
+                                                                                    (change)="toggleSMS($event)"
+                                                                                    class="form-check-input" id="sms">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="sms">SMS</label>
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    class="form-label">To
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <label class="form-label">CC
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of toEmails; let i = index  ;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center ">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="toEmails[i]"
+                                                                                            [name]="'toEmails' + i"
+                                                                                            placeholder="Enter email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addToEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeToEmail(i)"
+                                                                                            *ngIf="toEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="ccEmails[i]"
+                                                                                            [name]="'ccEmails' + i"
+                                                                                            placeholder="Enter  email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addCcEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeCcEmail(i)"
+                                                                                            *ngIf="ccEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </div>
+
+
+
+                                                                        <!-- CC Email Fields -->
+                                                                        <div class="row g-3 mb-2" *ngIf="showSMS">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="mb-2">
+                                                                                    <label class="form-label">Phone
+                                                                                        Number(s):</label>
+                                                                                    <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="number"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="phoneNumbers[i]"
+                                                                                            name="phoneNumbers"
+                                                                                            placeholder="Enter phone number">
+
+                                                                                        <i class="fa fa-plus sm-font text-secondary mx-1"
+                                                                                            (click)="addPhoneNumber()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removePhoneNumber(i)"
+                                                                                            *ngIf="phoneNumbers.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+
+
+
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="tab-pane fade  " id="Monthly" role="tabpanel">
+                                                            <div
+                                                                class="container d-flex align-items-center justify-content-center mb-4 p-0">
+                                                                <div class="container custom-bg d-flex  m-0 p-0"
+                                                                    style="overflow-y: scroll;height:250px">
+
+
+                                                                    <form class="needs-validation container   p-3"
+                                                                        style="overflow-y: scroll;" novalidate="">
+                                                                        <div class="row g-3 mb-2">
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="StorageMonthly"
+                                                                                    class="form-label">Reports Storage
+                                                                                    Options:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 text-primary">
+
+
+                                                                                File Path
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="ExportMonthly"
+                                                                                    class="form-label">Export
+                                                                                    Format:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 ">
+                                                                                <select
+                                                                                    class=" rounded-0  smm-font py-1" name="format3"
+                                                                                    id="format" required="">
+                                                                                    <option value="">Choose format
+                                                                                    </option>
+                                                                                    <option>PDF</option>
+                                                                                    <option>Excel</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row g-3 mb-0">
+
+                                                                            <div class="col-sm-12 ">
+                                                                                <label class="form-label "> Select Day
+                                                                                    of
+                                                                                    Month:</label>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row g-3 mb-2 ">
+
+                                                                            <div class="col-sm-3 ">
+                                                                                <div
+                                                                                    class="container-sm d-flex flex-column">
+
+                                                                                    <input type="date"
+                                                                                        class="smm-font border px-1 py-0 rounded-0"
+                                                                                        [(ngModel)]="monthlyDate"
+                                                                                        name="monthlyDate"
+                                                                                        (change)="onDateChange()" />
+
+                                                                                    <input type="time"
+                                                                                        class="smm-font border px-1 py-0 mt-1 rounded-0" 
+                                                                                        [(ngModel)]="reportSchedule.scheduledTime"
+                                                                                        name="monthlyTime" />
+
+                                                                                </div>
+
+                                                                                <div *ngIf="monthlyDay && monthlyTime"
+                                                                                    class="alert alert-info mt-1 mx-2">
+                                                                                    📤 Report will be sent on <strong>{{
+                                                                                        monthlyDay }}{{
+                                                                                        getOrdinal(monthlyDay)
+                                                                                        }}</strong>
+                                                                                    of every
+                                                                                    month at
+                                                                                    <strong>{{
+                                                                                        reportSchedule.scheduledTime
+                                                                                        }}</strong>
+                                                                                </div>
+
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="row g-3 mb-2">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    for="statusmonthly"
+                                                                                    class="form-label">Status:</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <input type="checkbox"
+                                                                                    class="form-check-input"
+                                                                                    [(ngModel)]="reportSchedule.status"
+                                                                                    name="statusMonthly"
+                                                                                    id="statusMonthly">
+                                                                                <label
+                                                                                    class="form-check-label ms-1 smm-font"
+                                                                                    for="statusMonthly ">Email this
+                                                                                    scheduled report</label>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <div
+                                                                            class="row mb-2 g-1 justify-content-center">
+
+                                                                            <div class="col-sm-3 align-self-center">
+                                                                                <input type="checkbox" name="emailCheck"
+                                                                                    (change)="toggleEmail($event)"
+                                                                                    class="form-check-input" id="email">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="email ">Email</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-4 align-self-center">
+
+
+                                                                                <input type="checkbox" name="smsCheck"
+                                                                                    (change)="toggleSMS($event)"
+                                                                                    class="form-check-input" id="sms">
+                                                                                <label class="form-check-label ms-2 "
+                                                                                    for="sms">SMS</label>
+
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 "> <label
+                                                                                    class="form-label">To
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+
+
+                                                                                <label class="form-label">CC
+                                                                                    Email(s):</label>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <div class="row g-3 " *ngIf="showEmail">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of toEmails; let i = index;trackBy: trackByIndex "
+                                                                                        class="input-group mb-2 align-items-center ">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="toEmails[i]"
+                                                                                            name="toEmail{{i}}"
+                                                                                            placeholder="Enter email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addToEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeToEmail(i)"
+                                                                                            *ngIf="toEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="">
+
+                                                                                    <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="email"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="ccEmails[i]"
+                                                                                            name="ccEmail{{i}}"
+                                                                                            placeholder="Enter  email address"
+                                                                                            autocomplete="off">
+
+                                                                                        <i class="fa fa-plus mx-1 sm-font text-secondary"
+                                                                                            (click)="addCcEmail()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removeCcEmail(i)"
+                                                                                            *ngIf="ccEmails.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </div>
+
+
+
+
+                                                                        <div class="row g-3 mb-2" *ngIf="showSMS">
+
+                                                                            <div class="col-sm-6 align-self-center">
+                                                                                <div class="mb-2">
+                                                                                    <label class="form-label">Phone
+                                                                                        Number(s):</label>
+                                                                                    <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                                                        class="input-group mb-2 align-items-center">
+                                                                                        <input type="number"
+                                                                                            class="form-control smm-font py-1 rounded-0 "
+                                                                                            [(ngModel)]="phoneNumbers[i]"
+                                                                                            [name]="'nUmber' +i"
+                                                                                            placeholder="Enter phone number">
+
+                                                                                        <i class="fa fa-plus sm-font text-secondary mx-1"
+                                                                                            (click)="addPhoneNumber()"></i>
+
+
+                                                                                        <i class="fa fa-minus sm-font text-secondary"
+                                                                                            (click)="removePhoneNumber(i)"
+                                                                                            *ngIf="phoneNumbers.length > 1"></i>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+
+
+
+                                                                    </form>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class=" my-1 ">
+                    <div class="container w-auto d-flex align-items-center justify-content-end py-0 ">
+                        <!-- <button class="btn btn-sm save-btn  rounded-1  smm-font fw-bold  me-2"
+                            (click)="onSaveOrCancel()">Execute & Save</button> -->
+
+
+                        <button class="btn btn-sm save-btn  rounded-1  smm-font fw-bold py-1  me-2"
+                            (click)="submitSchedule()">Save</button>
+
+                        <button class="btn btn-sm  cancel-btn rounded-1  smm-font fw-bold "
+                            (click)="onSaveOrCancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</main>
+
+<div *ngIf="toast.visible" class="toast-box" [ngClass]="toast.type">
+    {{ toast.message }}
+</div>

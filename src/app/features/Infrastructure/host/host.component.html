@@ -1,0 +1,245 @@
+<main class="ht-root">
+
+    <!-- ══════════════════════════════════
+         HEADER
+         ══════════════════════════════════ -->
+    <div class="ht-header">
+        <h3 class="ht-header__title raleway-font semi-text">Host Applications</h3>
+        <div class="ht-search-wrap">
+            <input type="text" class="ht-search-input" placeholder="Search..." [(ngModel)]="searchQuery"
+                (input)="onSearch()" autocomplete="off" />
+            <i class="fas fa-search ht-search-wrap__icon"></i>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TABLE AREA
+         ══════════════════════════════════ -->
+    <div class="ht-table-wrap">
+        <table class="ht-table">
+
+            <colgroup>
+                <col style="width: 16%"> <!-- Host IP -->
+                <col style="width: 20%"> <!-- Host Name -->
+                <col style="width: 13%"> <!-- CPU Usage -->
+                <col style="width: 13%"> <!-- Mem Usage -->
+                <col style="width: 13%"> <!-- Disk Usage -->
+                <col style="width: 15%"> <!-- Health Score -->
+                <col style="width: 10%"> <!-- Attributes -->
+            </colgroup>
+
+            <thead>
+                <tr>
+                    <th (click)="onSort('item')">
+                        Host IP
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'item' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('applicationName')">
+                        Host Name
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'applicationName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('cpu')">
+                        CPU Usage <span class="ht-th-unit">(%)</span>
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'cpu' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('ram')">
+                        Mem Usage <span class="ht-th-unit">(GB)</span>
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'ram' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('disk')">
+                        Disk Usage <span class="ht-th-unit">(%)</span>
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'disk' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                    </th>
+                    <th (click)="onSort('healthScore')">
+                        Health Score
+                        <i class="fa"
+                            [ngClass]="sortColumn === 'healthScore' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                        <i class="fa-solid fa-circle-info ht-info-icon gradiantIcon" matButton="elevated"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ healthScoreTitle }}"></i>
+                    </th>
+                    <th>Attributes</th>
+                </tr>
+            </thead>
+
+            <!-- ── SKELETON ── -->
+            <tbody *ngIf="isLoadingHost">
+                <tr class="ht-tr" *ngFor="let i of [].constructor(12)">
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                    <td>
+                        <div class="ht-skeleton"></div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <!-- ── DATA ── -->
+            <tbody *ngIf="!isLoadingHost">
+                <tr class="ht-tr" *ngFor="let item of pagedHostName; let i = index">
+
+                    <!-- Host IP — OS icon + IP -->
+                    <td class="ht-td--ip"
+                        (click)="item.ipType === 'WINDOWS' ? setServiceIdWindows($event, item.ipAddressId) : setServiceId($event, item.ipAddress, item.ipAddressId)">
+                        <img [src]="getImagePath(item.applicationTechnology, item.applicationType, item.ipType)" [alt]="item.ipType"
+                            [title]="item.ipType" class="ht-os-img" />
+                        <span class="ht-ip-text">{{ item.ipAddress }}</span>
+                    </td>
+
+                    <!-- Host Name -->
+                    <td>
+                        <div class="ht-hostname-cell">
+                            <i class="bi bi-bar-chart-fill ht-hostname-icon"></i>
+                            {{ item.applicationName || 'No Data' }}
+                        </div>
+                    </td>
+
+                    <!-- CPU Usage -->
+                    <td [ngClass]="{'ht-td--nodata': cpu_usage_arr[item.ipAddress] === 'No Data'}">
+                        <span class="ht-metric-val"
+                            [ngClass]="{'ht-metric-val--nodata': cpu_usage_arr[item.ipAddress] === 'No Data'}">
+                            <i class="fa-solid fa-hard-drive ht-metric-icon ht-metric-icon--cpu"></i>
+                            {{ cpu_usage_arr[item.ipAddress] }}
+                        </span>
+                    </td>
+
+                    <!-- Mem Usage -->
+                    <td [ngClass]="{'ht-td--nodata': ram_arr[item.ipAddress] === 'No Data'}">
+                        <span class="ht-metric-val"
+                            [ngClass]="{'ht-metric-val--nodata': ram_arr[item.ipAddress] === 'No Data'}">
+                            <i class="fa-solid fa-memory ht-metric-icon ht-metric-icon--ram"></i>
+                            {{ ram_arr[item.ipAddress] }}
+                        </span>
+                    </td>
+
+                    <!-- Disk Usage -->
+                    <td [ngClass]="{'ht-td--nodata': disk_arr[item.ipAddress] === 'No Data'}">
+                        <span class="ht-metric-val"
+                            [ngClass]="{'ht-metric-val--nodata': disk_arr[item.ipAddress] === 'No Data'}">
+                            <i class="fa-solid fa-compact-disc ht-metric-icon ht-metric-icon--disk"></i>
+                            {{ disk_arr[item.ipAddress] }}
+                        </span>
+                    </td>
+
+                    <!-- Health Score -->
+                    <td [ngClass]="{'ht-td--nodata': infraHealthScore[item.ipAddress] === 'No Data'}">
+                        <span class="ht-metric-val"
+                            [ngClass]="{'ht-metric-val--nodata': infraHealthScore[item.ipAddress] === 'No Data'}">
+                            <i class="fa-solid fa-heart-pulse ht-metric-icon ht-metric-icon--health"></i>
+                            {{ infraHealthScore[item.ipAddress] }}
+                        </span>
+                    </td>
+
+                    <!-- Attributes -->
+                    <td>
+                        <button class="ht-eye-btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                            (click)="getSystemProperties(item.ipAddress, item.ipType)">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </td>
+
+                </tr>
+            </tbody>
+
+        </table>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoadingHost && pagedHostName.length === 0" class="ht-empty">
+            No Data Available
+        </div>
+
+        <!-- No data template -->
+        <ng-template #noData>
+            <span class="ht-nodata-text">No Data</span>
+        </ng-template>
+
+    </div>
+
+    <!-- ══════════════════════════════════
+         FIXED BOTTOM PAGINATION
+         ══════════════════════════════════ -->
+    <div class="ht-pager">
+        <span class="ht-pager__info">
+            Showing {{ startIndex }}–{{ endIndex }} of {{ filteredHostName.length }} hosts
+        </span>
+        <div class="ht-pager__controls">
+            <button class="ht-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <input type="number" class="ht-pager__input" [value]="currentPage"
+                (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1" [max]="totalPages" />
+            <span class="ht-pager__of">of {{ totalPages }}</span>
+            <button class="ht-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+    </div>
+
+</main>
+
+
+<!-- ══════════════════════════════════
+     MODAL — Attributes
+     ══════════════════════════════════ -->
+<div class="modal fade ht-modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" [ngClass]="hasData ? 'custom-modal-left' : 'custom-modal-small'">
+        <div class="modal-content">
+
+            <div class="ht-modal__header">
+                <span class="ht-modal__title" id="staticBackdropLabel">Attributes</span>
+                <button type="button" class="ht-modal__close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="ht-modal__body">
+                <!-- Loading state -->
+                <div *ngIf="isSystemPropertiesLoading" class="ht-modal-loading">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Attributes list -->
+                <ul class="ht-attr-list" *ngIf="!isSystemPropertiesLoading && systemPropertiesList.length > 0">
+                    <li class="ht-attr-item" *ngFor="let prop of systemPropertiesList">
+                        <span class="ht-attr-label"><span class="ht-attr-dot"></span>{{ prop.label }} :</span>
+                        {{ prop.value }}
+                    </li>
+                </ul>
+
+                <!-- No data state -->
+                <div *ngIf="!isSystemPropertiesLoading && systemPropertiesList.length === 0" class="ht-nodata-center">
+                    No data available
+                </div>
+            </div>
+
+            <div class="ht-modal__footer" *ngIf="!isSystemPropertiesLoading && systemPropertiesList.length > 0">
+                <button type="button" class="ht-modal__close-btn" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

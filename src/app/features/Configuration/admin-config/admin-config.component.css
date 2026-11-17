@@ -1,0 +1,142 @@
+/* .mainDiv {
+  border-radius: 5px;
+  margin: 0 0.5% 0.5% 0.5%;
+  padding: 0.5%;
+  height: 95%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.10),
+    0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+input,
+textarea,
+select {
+  font-size: small;
+  height: 30px;
+}
+
+#Description{
+  height: 100px;
+}
+
+.tab-pane{
+  height: 90%;
+}
+
+.card-body {
+  font-size: small;
+}
+
+.custom-stepper {
+  border: 1px solid #ddd;
+  padding: 20px;
+  height: 50vh;
+  font-size: small;
+}
+
+.stepper-header {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.stepper-header li {
+  padding: 0px 15px;
+  cursor: pointer;
+}
+
+.stepper-header li.active {
+  font-weight: bold;
+  border-bottom: 2px solid blue;
+}
+
+.stepper-footer {
+  margin-top: 20px;
+} */
+
+/* New UI For Admin-Config Starts From Here */
+.admin-container {
+  display: flex;
+  height: calc(100vh - 120px);
+}
+
+.admin-sidenav {
+  width: 260px;
+  border-right: 1px solid #e5e7eb;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.admin-sidenav a {
+  display: block;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-sidenav a:hover {
+  background-color: #f1f5f9;
+}
+
+.admin-sidenav a.active {
+  background-color: #e0edff;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+}
+
+.admin-container {
+  display: flex;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+/* LEFT PANEL */
+.admin-sidenav {
+  width: 260px;
+  min-width: 260px;
+  background: #f8f9fa;
+  padding: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* RIGHT PANEL */
+.admin-content {
+  flex: 1;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+/* COLLAPSED STATE */
+.sidebar-collapsed .admin-sidenav {
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+.sidebar-collapsed .admin-content {
+  width: 100%;
+}
+
+/* Optional smooth fade */
+.admin-sidenav a {
+  display: block;
+  padding: 10px;
+  white-space: nowrap;
+}

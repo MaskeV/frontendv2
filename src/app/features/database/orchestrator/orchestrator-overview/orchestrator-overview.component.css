@@ -1,0 +1,287 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.icons {
+    height: 15px;
+    background: transparent;
+}
+
+.nav-link.active {
+    background-color: #F8FAFC;
+}
+
+.text-purple {
+    color: #8B5CF6;
+}
+
+
+.page {
+  background-image:
+    radial-gradient(ellipse 65% 40% at 65% -5%, rgba(99,102,241,0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 30% at 5% 85%, rgba(236,72,153,0.06) 0%, transparent 60%),
+    linear-gradient(rgba(99,102,241,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+  color: #1a2035;
+  min-height: 100vh;
+  padding: 16px 18px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a2035;
+  letter-spacing: -.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h1 i {
+  color: #3b6fd4;
+  font-size: 16px;
+}
+
+/* SUMMARY */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.s-card {
+  background: #fff;
+  border: 1px solid #e2e7f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.s-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.s-icon.blue {
+  background: #eef4ff;
+  color: #3b6fd4;
+}
+
+.s-icon.green {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.s-icon.purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.s-icon.amber {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.s-label {
+  font-size: 11px;
+  color: #8b98b8;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 3px;
+}
+
+.s-val {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* FILTER */
+.filters {
+  margin-left: auto;
+  grid-column: span 2;
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: #fff;
+  border: 1px solid #e2e7f0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #8b98b8;
+}
+
+.search-wrap i {
+  font-size: 11px;
+  color: #b4bdd4;
+}
+
+.search-wrap input {
+  box-shadow: none;
+  background: none;
+  border: none;
+  outline: none;
+  color: #1a2035;
+  font-size: 12px;
+  width: 160px;
+}
+
+.search-wrap input::placeholder {
+  color: #b4bdd4;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border: 1.5px solid #e2e7f0;
+  border-radius: 7px;
+  overflow: hidden;
+  transition: box-shadow .2s, border-color .2s, transform .2s;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 0px 16px;
+}
+
+.card:hover {
+  border-color: #a8c2f0;
+  box-shadow: 0 8px 28px rgba(59, 111, 212, .1);
+  transform: translateY(-2px);
+}
+
+.card-head {
+  padding: 11px 15px 14px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f2f8;
+}
+
+.cname {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cendpoint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #3b6fd4;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cendpoint i {
+  font-size: 9px;
+}
+
+/* METRICS */
+.card-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.metric {
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.m-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.m-label i {
+  font-size: 9px;
+}
+
+.m-val {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.m-val.blue {
+  color: #3b6fd4;
+}
+
+
+.status-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Colors */
+.green {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+}
+
+.yellow {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+}
+
+.red {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #9ca3af;
+}
+
+.cluster-card {
+  cursor: pointer;
+  transition: box-shadow .2s, transform .2s;
+}
+
+.noData {
+    text-align: center;
+    padding-top: 13%;
+    font-size: large;
+    letter-spacing: 1px;
+    color: #a0a0a0;
+    font-weight: 600;
+    width: 100%;
+}

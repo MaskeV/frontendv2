@@ -1,0 +1,102 @@
+main {
+    height: 100%;
+    width: 100%;
+    background-color: #F8FAFC;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.icons {
+    height: 15px;
+    background: transparent;
+}
+
+.icon-sm {
+    font-size: 14px !important;
+    height: 14px !important;
+    width: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.icon-wrapper {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+}
+
+.small {
+    font-size: 0.7rem;
+}
+
+.fs-lg {
+    font-size: 1.1rem;
+}
+
+.ls-wider {
+    letter-spacing: 0.05em;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.text-purple {
+    color: #8B5CF6;
+}
+
+.bg-purple {
+    background-color: #8B5CF6;
+}
+
+.card {
+    background-color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.10),
+        0 2px 6px rgba(0, 0, 0, 0.06) !important;
+}
+
+.chart-wrapper {
+    height: 30vh;
+}
+
+.chart-wrapper-sm {
+    height: 20vh;
+}
+
+.chart-wrapper-xsm {
+    height: 12vh;
+}
+
+.text-indigo { color: #6366f1; }
+.bg-indigo { background-color: #6366f1; }
+.text-purple { color: #8B5CF6; }
+.bg-purple { background-color: #8B5CF6; }
+.text-info { color: #0ea5e9; }
+.bg-info { background-color: #0ea5e9; }
+
+
+.gradiantIcon {
+  background: linear-gradient(to right bottom, #35AAE2, #5A5AD5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+

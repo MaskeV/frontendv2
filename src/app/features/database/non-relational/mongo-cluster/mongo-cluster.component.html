@@ -1,0 +1,249 @@
+<main class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img [src]="getImagePath()" class="Mongoicon" alt="mongo logo" />
+                <a (click)="goToNonRelational()" class="prevPage">{{decodedSelectedMongoService}}</a>
+            </li>
+            <li class="breadcrumb-item active">MongoDB Cluster</li>
+        </ol>
+    </nav>
+
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="database-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#node">Node</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="tab-content overflow-auto p-1">
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-pane fade show active">
+            <!-- KPI Section -->
+            <section class="mt-1 p-2">
+                <div class="row mr-1 justify-content-between align-items-center"
+                    style="padding: 10px 10px 10px 10px; background: aliceblue; border-bottom: 1px solid #dce8f5; border-radius: 6px;">
+                    <div style="width: 10%; display: flex; align-items: center; justify-content: center;">
+                        <img *ngIf="getImagePath()" [src]="getImagePath()"
+                            style="max-width: 100%; max-height: 90px; object-fit: contain;" alt="mongodb logo" />
+                    </div>
+                    <div style="width: 89%; display: flex; flex-wrap: wrap; gap: 10px;">
+                        <!-- Uptime -->
+                        <div class="metric-box shadow-sm border rounded-3" style="width: 20%; min-width: 150px;">
+                            <div class="small fw-semibold text-secondary">System Status <i
+                                    class="fa-regular fa-circle-check text-success"></i></div>
+                            <div class="fw-bold kpi-value"
+                                style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                                <div class="text-dark" style="font-size: 1.2rem;">Healthy</div>
+                                <div class="mini-text text-muted fw-normal" style="font-size: 11px; margin-top: 5px;"
+                                    *ngIf="clusterUptime"><span class="text-success">{{displayMain}}</span> Up</div>
+                                <div class="mini-text text-muted fw-normal" style="font-size: 11px; margin-top: 5px;"
+                                    *ngIf="!clusterUptime">No Data</div>
+                            </div>
+                        </div>
+
+                        <!-- Data Size -->
+                        <div class="metric-box shadow-sm border rounded-3" style="width: 20%; min-width: 150px;">
+                            <div class="small fw-semibold text-secondary">Data Size (GB) <i
+                                    class="fa-solid fa-database text-primary"></i></div>
+                            <div class="fw-bold kpi-value"
+                                style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                                <div class="text-dark" style="font-size: 1.2rem;">{{clusterDataSize | numericData}}
+                                </div>
+                                <div class="mini-text text-success fw-normal" style="font-size: 11px; margin-top: 5px;">
+                                    Stable</div>
+                            </div>
+                        </div>
+
+                        <!-- Collection Count -->
+                        <div class="metric-box shadow-sm border rounded-3" style="width: 20%; min-width: 150px;">
+                            <div class="small fw-semibold text-secondary">Collections <i
+                                    class="fa-solid fa-table-list text-info"></i></div>
+                            <div class="fw-bold kpi-value"
+                                style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                                <div class="text-dark" style="font-size: 1.2rem;">{{clusterCollectionCount |
+                                    shortNumber}}</div>
+                                <div class="mini-text text-muted fw-normal" style="font-size: 11px; margin-top: 5px;">
+                                    Total Structures</div>
+                            </div>
+                        </div>
+
+                        <!-- Object Count -->
+                        <div class="metric-box shadow-sm border rounded-3" style="width: 20%; min-width: 150px;">
+                            <div class="small fw-semibold text-secondary">Objects <i class="fa-solid fa-file-code"
+                                    style="color: #6f42c1;"></i></div>
+                            <div class="fw-bold kpi-value"
+                                style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                                <div class="text-dark" style="font-size: 1.2rem;">{{clusterObjectCount | shortNumber}}
+                                </div>
+                                <div class="mini-text text-muted fw-normal" style="font-size: 11px; margin-top: 5px;">
+                                    Total Documents</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metrics Visualized -->
+            <section class="mt-1 p-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card-soft p-3">
+                            <h4 class="fw-bold text-dark small mb-3">Document Total QPS</h4>
+                            <div class="chart-wrapper-sm">
+                                <div id="documentQps" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-soft p-3">
+                            <h4 class="fw-bold text-dark small mb-3">Operation Total QPS</h4>
+                            <div class="chart-wrapper-sm">
+                                <div id="operationQps" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-soft p-3">
+                            <h4 class="fw-bold text-dark small mb-3">Connections</h4>
+                            <div class="chart-wrapper-sm">
+                                <div id="connections" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-soft p-3">
+                            <h4 class="fw-bold text-dark small mb-3">Cursor Total</h4>
+                            <div class="chart-wrapper-sm">
+                                <div id="cursor_total" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- NODE TAB -->
+        <div id="node" class="tab-pane fade p-1">
+            <div class="root">
+                <!-- Header and search bar -->
+                <div class="card-header bg-transparent border-0 ps-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="small fw-bold text-secondary text-uppercase ls-wider mb-0">All Node Instances</h5>
+                        <div class="search-wrapper">
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="searchText"
+                                (input)="resetCurrentPage(nodeNamesData, searchText, ['nodeName'])"
+                                placeholder="Search Nodes..." />
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node Table -->
+                <div class="table-container mt-2">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th (click)="sortData('nodeName')" style="cursor: pointer;">
+                                    NAME <i class="fa"
+                                        [ngClass]="sortColumn === 'nodeName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th class="text-center" (click)="sortData('uptimeSeconds')" style="cursor: pointer;">
+                                    UPTIME <i class="fa"
+                                        [ngClass]="sortColumn === 'uptimeSeconds' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th class="text-center" (click)="sortData('qps')" style="cursor: pointer;">
+                                    QPS <i class="fa"
+                                        [ngClass]="sortColumn === 'qps' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th class="text-center" (click)="sortData('memoryUsagePercent')"
+                                    style="cursor: pointer;">
+                                    MEMORY USAGE <i class="fa"
+                                        [ngClass]="sortColumn === 'memoryUsagePercent' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th class="text-center" (click)="sortData('avgLatency')" style="cursor: pointer;">
+                                    AVG LATENCY <i class="fa"
+                                        [ngClass]="sortColumn === 'avgLatency' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="!isLoading; else loadingTemplate">
+                            <tr
+                                *ngFor="let node of nodeNamesData | sort:sortColumn:sortDirection | objectFilter:searchText:['nodeName'] | paginate:currentPage:pageSize">
+                                <td class="service-cell" (click)="goToMongoNode(node.nodeName)">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-leaf text-success"></i>
+                                        <span class="service-name">{{node.nodeName}}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{convertSeconds(node.uptimeSeconds)}}</td>
+                                <td class="text-center">{{node.qps | shortNumber}}</td>
+                                <td class="text-center">
+                                    <span class="badge-soft bg-success-soft">{{node.memoryUsagePercent}}%</span>
+                                </td>
+                                <td class="text-center">{{node.avgLatency | numericData}} µs</td>
+                            </tr>
+                            <tr *ngIf="(nodeNamesData | objectFilter:searchText:['nodeName']).length === 0">
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">No nodes found matching your search.</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <ng-template #loadingTemplate>
+                            <tbody>
+                                <tr *ngFor="let i of skeletonRows">
+                                    <td>
+                                        <div class="skeleton" style="height: 20px; width: 150px;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton mx-auto" style="height: 20px; width: 80px;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton mx-auto" style="height: 20px; width: 60px;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton mx-auto" style="height: 20px; width: 60px;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton mx-auto" style="height: 20px; width: 80px;"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </ng-template>
+                    </table>
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="d-flex justify-content-between align-items-center p-3 border-top bg-white">
+                    <div class="small text-muted">
+                        Showing {{((currentPage-1)*pageSize) + 1}} to {{(currentPage*pageSize < totalItems) ?
+                            (currentPage*pageSize) : totalItems}} of {{totalItems}} nodes </div>
+                            <div class="pagination-container">
+                                <button class="btn btn-sm page-btn" (click)="previousPage()"
+                                    [disabled]="currentPage === 1">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </button>
+                                <span class="small mx-2">
+                                    Page <input type="number" class="page-input" [(ngModel)]="inputPage"
+                                        (keydown.enter)="goToPage()"> of {{totalPages}}
+                                </span>
+                                <button class="btn btn-sm page-btn" (click)="nextPage()"
+                                    [disabled]="currentPage === totalPages">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</main>

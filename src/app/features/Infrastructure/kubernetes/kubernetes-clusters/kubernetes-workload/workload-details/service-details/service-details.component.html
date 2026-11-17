@@ -1,0 +1,663 @@
+<div class="page">
+
+    <!-- Breadcrumb bar -->
+    <div class="breadcrumb-bar">
+        <span class="back-arrow" (click)="goBack()" title="Back">&#8249;</span>
+        <ng-container *ngFor="let crumb of breadcrumbs">
+            <a class="crumb-link" (click)="onBreadcrumbClick(crumb)">{{ crumb }}</a>
+            <span class="crumb-sep">&rsaquo;</span>
+        </ng-container>
+        <span class="crumb-current">{{ currentPage }}</span>
+    </div>
+
+    <!-- Header card -->
+    <div class="header-card">
+        <div class="header-left">
+            <div class="header-icon">&#9737;</div>
+            <div class="header-info">
+                <div class="header-title-row">
+                    <h1>{{ serviceName }}</h1>
+                    <span class="status-badge"><span class="status-dot"></span>{{ status }}</span>
+                </div>
+                <div class="header-subtitle">Overview of the Kubernetes service</div>
+                <div class="header-meta">
+                    <span><b>Namespace:</b> <a (click)="onNamespaceClick(namespace)"
+                            style="cursor: pointer; color: #2563eb; text-decoration: none;">{{ namespace }}</a></span>
+                    <span><b>Type:</b> {{ type }}</span>
+                    <span><b>Cluster IP:</b> {{ clusterIp }}</span>
+                    <span><b>External IP:</b> {{ externalIp }}</span>
+                    <span><b>Created:</b> {{ created }}</span>
+                    <span><b>Age:</b> {{ age }}</span>
+                    <span><b>Labels:</b> {{ labels }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat cards (Strictly in one line as in image) -->
+    <div class="stat-grid">
+        <div class="stat-card" *ngFor="let card of statCards">
+            <div class="stat-icon" [ngClass]="card.tone">
+                <ng-container [ngSwitch]="card.icon">
+                    <svg *ngSwitchCase="'endpoints'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="18" r="3" />
+                        <circle cx="6" cy="6" r="3" />
+                        <path d="M13 6h3a2 2 0 0 1 2 2v7M6 9v12" />
+                    </svg>
+                    <svg *ngSwitchCase="'pods'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                    </svg>
+                    <svg *ngSwitchCase="'arrow-down'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <polyline points="19 12 12 19 5 12" />
+                    </svg>
+                    <svg *ngSwitchCase="'arrow-up'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5" />
+                        <polyline points="5 12 12 5 19 12" />
+                    </svg>
+                    <svg *ngSwitchCase="'connections'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    <svg *ngSwitchCase="'alert'" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </ng-container>
+            </div>
+            <div class="stat-body">
+                <div class="stat-title">{{ card.title }}</div>
+                <div class="stat-value" [class.danger]="card.danger">{{ card.value }}</div>
+                <div class="stat-sub">{{ card.sub }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource analysis -->
+    <div class="section-card">
+        <div class="section-header">
+            <div>
+                <h2>Resource analysis</h2>
+                <div class="section-subtitle">Service traffic and connection metrics over time.</div>
+            </div>
+            <div class="section-controls">
+                <span class="view-as-label">View as</span>
+                <button class="dropdown-btn">{{ viewAsOption }} <span class="chevron">&#9662;</span></button>
+                <button class="dropdown-btn">{{ aggregationOption }} <span class="chevron">&#9662;</span></button>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <!-- Network traffic chart -->
+            <div class="chart-box net-box">
+                <div class="chart-box-header">
+                    <span class="chart-dot-icon" style="background:#e6effe;">&#9673;</span>
+                    <span class="chart-title">Network traffic (Mbps)</span>
+                </div>
+
+                <div class="chart-main-grid">
+                    <div class="chart-y-axis">
+                        <span>300 Mbps</span>
+                        <span>200 Mbps</span>
+                        <span>100 Mbps</span>
+                        <span>0 Mbps</span>
+                    </div>
+
+                    <div class="chart-svg-wrap" (mousemove)="onNetworkMouseMove($event)"
+                        (mouseleave)="onNetworkMouseLeave()">
+
+                        <!-- Tooltip Box (Animated: only on hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="networkHover.hovered"
+                            [style.left.%]="networkHover.tooltipLeft" *ngIf="networkHover.hovered">
+                            <div class="tooltip-time-header">{{ networkHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background:#ffa64d;"></span>
+                                <span class="tooltip-metric">Incoming (Mbps)</span>
+                                <span class="tooltip-value">{{ networkHover.incomingVal }} Mbps</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background:#4a8df6;"></span>
+                                <span class="tooltip-metric">Outgoing (Mbps)</span>
+                                <span class="tooltip-value">{{ networkHover.outgoingVal }} Mbps</span>
+                            </div>
+                        </div>
+
+                        <svg class="chart-svg" viewBox="0 0 420 150" preserveAspectRatio="none">
+                            <line *ngFor="let y of [0, 50, 100, 150]" x1="0" [attr.y1]="y" x2="420" [attr.y2]="y"
+                                class="grid-line" />
+                            <polygon
+                                points="0,150 30,140 60,145 90,130 120,138 150,120 180,132 210,110 240,125 270,105 300,118 330,100 360,115 390,98 420,108 420,150 0,150"
+                                fill="rgba(255,166,77,0.15)" />
+                            <polyline
+                                points="0,150 30,140 60,145 90,130 120,138 150,120 180,132 210,110 240,125 270,105 300,118 330,100 360,115 390,98 420,108"
+                                fill="none" stroke="#ffa64d" stroke-width="2" />
+                            <polygon
+                                points="0,60 30,70 60,55 90,72 120,58 150,68 180,50 210,65 240,48 270,62 300,45 330,60 360,42 390,58 420,40 420,150 0,150"
+                                fill="rgba(74,141,246,0.12)" />
+                            <polyline
+                                points="0,60 30,70 60,55 90,72 120,58 150,68 180,50 210,65 240,48 270,62 300,45 330,60 360,42 390,58 420,40"
+                                fill="none" stroke="#4a8df6" stroke-width="2" />
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="networkHover.hovered" class="chart-guide-line" [attr.x1]="networkHover.cursorX"
+                                y1="0" [attr.x2]="networkHover.cursorX" y2="150" stroke="#4a8df6" stroke-dasharray="4 3"
+                                stroke-width="1.5" />
+
+                            <!-- Active points on vertical line (Animated: only on hover) -->
+                            <ng-container *ngIf="networkHover.hovered">
+                                <circle class="chart-active-dot" [attr.cx]="networkHover.cursorX"
+                                    [attr.cy]="networkHover.outgoingY" r="4.5" fill="#4a8df6" stroke="#ffffff"
+                                    stroke-width="1.5" />
+                                <circle class="chart-active-dot pulse-dot" [attr.cx]="networkHover.cursorX"
+                                    [attr.cy]="networkHover.incomingY" r="5" fill="#ffa64d" stroke="#ffffff"
+                                    stroke-width="2" />
+                            </ng-container>
+                        </svg>
+                    </div>
+
+                    <div class="chart-x-axis">
+                        <span *ngFor="let t of timeLabels">{{ t }}</span>
+                    </div>
+
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-swatch"
+                                style="background:#ffa64d;"></span>Incoming
+                            (Mbps)</span>
+                        <span class="legend-item"><span class="legend-swatch"
+                                style="background:#4a8df6;"></span>Outgoing
+                            (Mbps)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connections chart -->
+            <div class="chart-box conn-box">
+                <div class="chart-box-header">
+                    <span class="chart-dot-icon" style="background:#f0e9fb;">&#9673;</span>
+                    <span class="chart-title">Connections</span>
+                </div>
+
+                <div class="chart-main-grid">
+                    <div class="chart-y-axis">
+                        <span>300</span>
+                        <span>200</span>
+                        <span>100</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="chart-svg-wrap" (mousemove)="onConnectionsMouseMove($event)"
+                        (mouseleave)="onConnectionsMouseLeave()">
+
+                        <!-- Tooltip Box (Animated: only on hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="connectionsHover.hovered"
+                            [style.left.%]="connectionsHover.tooltipLeft" *ngIf="connectionsHover.hovered">
+                            <div class="tooltip-time-header">{{ connectionsHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background:#9b6be0;"></span>
+                                <span class="tooltip-metric">Active connections</span>
+                                <span class="tooltip-value">{{ connectionsHover.val }}</span>
+                            </div>
+                        </div>
+
+                        <svg class="chart-svg" viewBox="0 0 420 150" preserveAspectRatio="none">
+                            <line *ngFor="let y of [0, 50, 100, 150]" x1="0" [attr.y1]="y" x2="420" [attr.y2]="y"
+                                class="grid-line" />
+                            <polygon
+                                points="0,85 30,90 60,80 90,88 120,78 150,86 180,76 210,84 240,74 270,82 300,72 330,80 360,70 390,78 420,72 420,150 0,150"
+                                fill="rgba(155,107,224,0.18)" />
+                            <polyline
+                                points="0,85 30,90 60,80 90,88 120,78 150,86 180,76 210,84 240,74 270,82 300,72 330,80 360,70 390,78 420,72"
+                                fill="none" stroke="#9b6be0" stroke-width="2" />
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="connectionsHover.hovered" class="chart-guide-line"
+                                [attr.x1]="connectionsHover.cursorX" y1="0" [attr.x2]="connectionsHover.cursorX"
+                                y2="150" stroke="#9b6be0" stroke-dasharray="4 3" stroke-width="1.5" />
+
+                            <!-- Active point on vertical line (Animated: only on hover) -->
+                            <circle *ngIf="connectionsHover.hovered" class="chart-active-dot pulse-dot"
+                                [attr.cx]="connectionsHover.cursorX" [attr.cy]="connectionsHover.y" r="5" fill="#9b6be0"
+                                stroke="#ffffff" stroke-width="2" />
+                        </svg>
+                    </div>
+
+                    <div class="chart-x-axis">
+                        <span *ngFor="let t of timeLabels">{{ t }}</span>
+                    </div>
+
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-swatch" style="background:#9b6be0;"></span>Active
+                            connections</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request rate chart -->
+            <div class="chart-box req-box">
+                <div class="chart-box-header">
+                    <span class="chart-dot-icon" style="background:#dff3fb;">&#9673;</span>
+                    <span class="chart-title">Request rate (per second)</span>
+                </div>
+
+                <div class="chart-main-grid">
+                    <div class="chart-y-axis">
+                        <span>120</span>
+                        <span>80</span>
+                        <span>40</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="chart-svg-wrap" (mousemove)="onRequestsMouseMove($event)"
+                        (mouseleave)="onRequestsMouseLeave()">
+
+                        <!-- Tooltip Box (Animated: only on hover) -->
+                        <div class="chart-tooltip-box" [class.visible]="requestsHover.hovered"
+                            [style.left.%]="requestsHover.tooltipLeft" *ngIf="requestsHover.hovered">
+                            <div class="tooltip-time-header">{{ requestsHover.time }}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-dot" style="background:#3bb7e0;"></span>
+                                <span class="tooltip-metric">Requests per second</span>
+                                <span class="tooltip-value">{{ requestsHover.val }} req/s</span>
+                            </div>
+                        </div>
+
+                        <svg class="chart-svg" viewBox="0 0 420 150" preserveAspectRatio="none">
+                            <line *ngFor="let y of [0, 50, 100, 150]" x1="0" [attr.y1]="y" x2="420" [attr.y2]="y"
+                                class="grid-line" />
+                            <polygon
+                                points="0,120 30,110 60,118 90,105 120,115 150,100 180,112 210,95 240,108 270,92 300,105 330,90 360,102 390,88 420,98 420,150 0,150"
+                                fill="rgba(59,183,224,0.15)" />
+                            <polyline
+                                points="0,120 30,110 60,118 90,105 120,115 150,100 180,112 210,95 240,108 270,92 300,105 330,90 360,102 390,88 420,98"
+                                fill="none" stroke="#3bb7e0" stroke-width="2" />
+
+                            <!-- Vertical guide line (Animated: only on hover) -->
+                            <line *ngIf="requestsHover.hovered" class="chart-guide-line"
+                                [attr.x1]="requestsHover.cursorX" y1="0" [attr.x2]="requestsHover.cursorX" y2="150"
+                                stroke="#3bb7e0" stroke-dasharray="4 3" stroke-width="1.5" />
+
+                            <!-- Active point on vertical line (Animated: only on hover) -->
+                            <circle *ngIf="requestsHover.hovered" class="chart-active-dot pulse-dot"
+                                [attr.cx]="requestsHover.cursorX" [attr.cy]="requestsHover.y" r="5" fill="#3bb7e0"
+                                stroke="#ffffff" stroke-width="2" />
+                        </svg>
+                    </div>
+
+                    <div class="chart-x-axis">
+                        <span *ngFor="let t of timeLabels">{{ t }}</span>
+                    </div>
+
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-swatch"
+                                style="background:#3bb7e0;"></span>Requests
+                            per second</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ports / Endpoints -->
+    <div class="two-col">
+        <div class="section-card">
+            <div class="section-header simple" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Ports</h2>
+                    <div class="section-subtitle">Contains {{ filteredPorts.length }} port.</div>
+                </div>
+                <div class="k8s-table-search">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" placeholder="Search..." [(ngModel)]="portSearch" (ngModelChange)="portPage = 1" />
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Port</th>
+                        <th>Protocol</th>
+                        <th>Target port</th>
+                        <th>Node port</th>
+                        <th>Application Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let p of pagedPorts">
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.port }}</td>
+                        <td>{{ p.protocol }}</td>
+                        <td>{{ p.targetPort }}</td>
+                        <td>{{ p.nodePort }}</td>
+                        <td>{{ p.appProtocol }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ portStartIndex }} to {{ portEndIndex }} of {{ filteredPorts.length }} ports
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="portItemsPerPage"
+                            (ngModelChange)="onPortItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousPortPage()" [disabled]="portPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of portTotalPagesArray"
+                            [class.active]="portPage === p" (click)="p !== '...' && goToPortPage(p)"
+                            [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextPortPage()"
+                            [disabled]="portPage === portTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header simple" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Endpoints</h2>
+                    <div class="section-subtitle">Contains {{ filteredEndpoints.length }} endpoint.</div>
+                </div>
+                <div class="k8s-table-search">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" placeholder="Search..." [(ngModel)]="epSearch" (ngModelChange)="epPage = 1" />
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>IP address</th>
+                        <th>Port</th>
+                        <th>Ready</th>
+                        <th>Node</th>
+                        <th>Pod</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let e of pagedEndpoints">
+                        <td>{{ e.ip }}</td>
+                        <td>{{ e.port }}</td>
+                        <td><span class="ready-dot"></span>{{ e.ready ? 'True' : 'False' }}</td>
+                        <td><a class="link">{{ e.node }}</a></td>
+                        <td><a class="link">{{ e.pod }}</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ epStartIndex }} to {{ epEndIndex }} of {{ filteredEndpoints.length }} endpoints
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="epItemsPerPage"
+                            (ngModelChange)="onEpItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousEpPage()" [disabled]="epPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of epTotalPagesArray" [class.active]="epPage === p"
+                            (click)="p !== '...' && goToEpPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextEpPage()" [disabled]="epPage === epTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Served pods / Related services -->
+    <div class="two-col">
+        <div class="section-card">
+            <div class="section-header simple" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Served pods</h2>
+                    <div class="section-subtitle">Contains {{ filteredServedPods.length }} pod.</div>
+                </div>
+                <div class="k8s-table-search">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" placeholder="Search..." [(ngModel)]="spSearch" (ngModelChange)="spPage = 1" />
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Namespace</th>
+                        <th>Status</th>
+                        <th>Age</th>
+                        <th>Node</th>
+                        <th>IP address</th>
+                        <th>Ready</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let pod of pagedServedPods">
+                        <td><a class="link">{{ pod.name }}</a></td>
+                        <td><a class="link" (click)="onNamespaceClick(pod.namespace)" style="cursor: pointer;">{{
+                                pod.namespace }}</a></td>
+                        <td><span class="ready-dot"></span>{{ pod.status }}</td>
+                        <td>{{ pod.age }}</td>
+                        <td><a class="link">{{ pod.node }}</a></td>
+                        <td>{{ pod.ip }}</td>
+                        <td>{{ pod.ready }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ spStartIndex }} to {{ spEndIndex }} of {{ filteredServedPods.length }} pods
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="spItemsPerPage"
+                            (ngModelChange)="onSpItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousSpPage()" [disabled]="spPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of spTotalPagesArray" [class.active]="spPage === p"
+                            (click)="p !== '...' && goToSpPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextSpPage()" [disabled]="spPage === spTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header simple" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Related services</h2>
+                    <div class="section-subtitle">Contains related Kubernetes services.</div>
+                </div>
+                <div class="k8s-table-search">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" placeholder="Search..." [(ngModel)]="rsSearch" (ngModelChange)="rsPage = 1" />
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Cluster IP</th>
+                        <th>External IP</th>
+                        <th>Ports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let s of pagedRelatedServices">
+                        <td><a class="link">{{ s.name }}</a></td>
+                        <td>{{ s.type }}</td>
+                        <td>{{ s.clusterIp }}</td>
+                        <td>{{ s.externalIp }}</td>
+                        <td>{{ s.ports }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ rsStartIndex }} to {{ rsEndIndex }} of {{ filteredRelatedServices.length }} services
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="rsItemsPerPage"
+                            (ngModelChange)="onRsItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousRsPage()" [disabled]="rsPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of rsTotalPagesArray" [class.active]="rsPage === p"
+                            (click)="p !== '...' && goToRsPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextRsPage()" [disabled]="rsPage === rsTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events / Logs -->
+    <div class="two-col">
+        <div class="section-card">
+            <div class="section-header simple" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>Events</h2>
+                    <div class="section-subtitle">Contains {{ filteredEvents.length }} events.</div>
+                </div>
+                <div class="k8s-table-search">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" placeholder="Search..." [(ngModel)]="evSearch" (ngModelChange)="evPage = 1" />
+                </div>
+            </div>
+            <div class="filter-bar">
+                <span class="filter-icon">&#9698;</span> Filter by
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Type</th>
+                        <th>Reason</th>
+                        <th>Message</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let ev of pagedEvents">
+                        <td>{{ ev.timestamp }}</td>
+                        <td>{{ ev.type }}</td>
+                        <td>{{ ev.reason }}</td>
+                        <td>{{ ev.message }}</td>
+                        <td class="caret-cell">&#8964;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Table Pagination Footer -->
+            <div class="mrum-pagination-container">
+                <div class="mrum-showing-text">
+                    Showing {{ evStartIndex }} to {{ evEndIndex }} of {{ filteredEvents.length }} events
+                </div>
+                <div class="mrum-pagination-controls">
+                    <div class="mrum-per-page">
+                        <input type="number" min="1" [(ngModel)]="evItemsPerPage"
+                            (ngModelChange)="onEvItemsPerPageChange()" />
+                        <span>per page</span>
+                    </div>
+                    <div class="mrum-pager">
+                        <button class="mrum-pager-btn" (click)="previousEvPage()" [disabled]="evPage === 1">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="mrum-pager-btn" *ngFor="let p of evTotalPagesArray" [class.active]="evPage === p"
+                            (click)="p !== '...' && goToEvPage(p)" [disabled]="p === '...'">
+                            {{ p }}
+                        </button>
+                        <button class="mrum-pager-btn" (click)="nextEvPage()" [disabled]="evPage === evTotalPages">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header simple">
+                <h2>Logs</h2>
+                <div class="log-header-actions">
+                    <button class="icon-btn bordered">&#8599;</button>
+                    <button class="icon-btn bordered">&#9650;</button>
+                </div>
+            </div>
+            <div class="filter-bar with-run">
+                <span class="filter-icon">&#9698;</span> Filter by
+                <button class="run-query-btn">&#9654; Run query</button>
+            </div>
+            <div class="logs-empty">
+                <div class="logs-empty-icon">
+                    <span class="logs-search-icon">&#128269;</span>
+                    <span class="logs-doc-icon">LOG</span>
+                </div>
+                <div class="logs-empty-text">
+                    Select <b>Run query</b> to execute your query and display the results.
+                    <div class="logs-empty-sub">For details, see the <a class="link">documentation</a> &#8599;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

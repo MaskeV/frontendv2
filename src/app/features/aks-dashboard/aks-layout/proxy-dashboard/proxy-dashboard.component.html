@@ -1,0 +1,155 @@
+<div class="proxy-dashboard">
+
+  <!-- ===== RULES ===== -->
+  <div class="section rules">
+    <div class="section-title">Rules</div>
+
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">Average network programming latency</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="rulesLatencyChart"></highcharts-chart>
+        <div *ngIf="!rulesLatencyChart" class="no-data">
+          No data available
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Average SyncProxyRules latency</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="syncRulesLatencyChart"></highcharts-chart>
+
+        <div *ngIf="!syncRulesLatencyChart" class="no-data">
+          No data available
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROCESS ===== -->
+  <div class="section process">
+    <div class="section-title green">Process</div>
+
+    <div class="chart-grid">
+      <div class="card">
+
+        <!-- ===== TITLE + DOWNLOAD ===== -->
+        <div class="card-title card-title-row">
+          <div>
+            Proxy process data <span>(Metrics Kubernetes)</span>
+          </div>
+
+          <button class="btn-download" (click)="downloadProxyProcess()" [disabled]="proxyProcessTable.length === 0">
+            ⬇ Download
+          </button>
+        </div>
+
+        <!-- ===== TABLE ===== -->
+        <div class="table-wrapper" *ngIf="proxyProcessTable.length > 0; else noProcessData">
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>Resident memory</th>
+                <th>Virtual memory</th>
+                <th>Open FD usage</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let row of paginatedProcessMetrics">
+                <td>{{ row.host }}</td>
+                <td>{{ row.residentMemory }}</td>
+                <td>{{ row.virtualMemory }}</td>
+                <td>{{ row.fdUsage }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ===== NO DATA ===== -->
+        <ng-template #noProcessData>
+          <div class="no-data">
+            No proxy process metrics available
+          </div>
+        </ng-template>
+
+        <!-- ===== PAGINATION (ONLY WHEN DATA EXISTS) ===== -->
+        <div class="pagination-controls" *ngIf="proxyProcessTable.length > 0">
+
+          <button (click)="prevProcessPage()" [disabled]="processCurrentPage === 1">
+            Previous
+          </button>
+
+          <span>
+            Page {{ processCurrentPage }} of {{ processTotalPages || 1 }}
+          </span>
+
+          <button (click)="nextProcessPage()"
+            [disabled]="processCurrentPage === processTotalPages || processTotalPages === 0">
+            Next
+          </button>
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+        <div class="card-title">Average resident memory</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="residentMemoryChart"></highcharts-chart>
+
+        <div *ngIf="!residentMemoryChart" class="no-data">
+          No data available
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">CPU usage increase over time</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="cpuIncreaseChart"></highcharts-chart>
+
+        <div *ngIf="!cpuIncreaseChart" class="no-data">
+          No data available
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HTTP REQUESTS ===== -->
+  <div class="section http">
+    <div class="section-title orange">HTTP Requests</div>
+
+    <div class="note">
+      Default aggregation window is 10s. Adjust timestamp interval if required.
+    </div>
+
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-title">Average request latency</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="requestLatencyChart"></highcharts-chart>
+
+        <div *ngIf="!requestLatencyChart" class="no-data">
+          No data available
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Requests counter rate</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="requestRateChart"></highcharts-chart>
+
+        <div *ngIf="!requestRateChart" class="no-data">
+          No data available
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Client error responses counter rate</div>
+        <highcharts-chart [Highcharts]="Highcharts" [options]="clientErrorRateChart"></highcharts-chart>
+
+        <div *ngIf="!clientErrorRateChart" class="no-data">
+          No data available
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

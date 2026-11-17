@@ -1,0 +1,22 @@
+[{
+    "name":"Dashboard",
+    "className":"fa fa-dashboard",
+    "subLevel2":[{"name":"Hardware Dashborad","routeName":"Hardware Dashboard"},
+            {"name":"BOU Dashborad","routeName":"BOU-Biller Operating Unit"},
+            {"name":"COU Dashborad","routeName":"COU-Customer Operating Unit"}]
+},{
+    "name":"Trend Dashboard",
+    "className":"fa fa-line-chart",
+    "subLevel2":[{"name":"Hardware Trend Dashborad","routeName":"Hardware Dashboard"},
+            {"name":"BOU Trend Dashborad","routeName":"BOU-Biller Operating Unit"},
+            {"name":"COU Trend Dashborad","routeName":"COU-Customer Operating Unit"}]
+},{
+    "name":"Configuration",
+    "className":"fa fa-cog",
+    "subLevel2":[{"name":"Admin Config","routeName":"admin"},
+            {"name":"Alert Config","routeName":"alert-config"}]
+},{
+    "name":"Help",
+    "className":"fa fa-question",
+    "subLevel2":[{"name":"Help","routeName":"help"}]
+}]

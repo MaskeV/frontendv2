@@ -1,0 +1,13 @@
+<div class="flame-chart-wrapper">
+  <div *ngFor="let span of flattenedSpans" class="flame-row" [style.marginTop.px]="span.level * 20">
+    <div class="flame-bar"
+      [ngStyle]="{
+        left: getRelativeLeft(span) + '%',
+        width: getRelativeWidth(span) + '%',
+        backgroundColor: '#ff9800'
+      }"
+      [title]="span.endpointName + ' (' + getDuration(span) + ' ms)'">
+      {{ span.endpointName }}
+    </div>
+  </div>
+</div>

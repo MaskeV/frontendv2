@@ -1,0 +1,96 @@
+<div class="page">
+
+    <!-- Breadcrum -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb text-primary mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <i class="fa-solid fa-layer-group"></i><a
+                    routerLink="/database/orchestrator/service">Orchestrator</a>
+            </li>
+            <li class="breadcrumb-item active">{{orchestrator?.name}}</li>
+        </ol>
+    </nav>
+
+    <div class="summary-row mb-3">
+        <div class="s-card">
+            <div class="s-icon blue"><i class="fa-solid fa-server"></i></div>
+            <div>
+                <div class="s-label">Total Clusters</div>
+                <div class="s-val">{{ clusters.length }}</div>
+            </div>
+        </div>
+        <div class="s-card">
+            <div class="s-icon green"><i class="fa-solid fa-circle-nodes"></i></div>
+            <div>
+                <div class="s-label">Total Instances</div>
+                <div class="s-val">{{ totalInstances }}</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search clusters..." [(ngModel)]="searchTerm">
+            </div>
+        </div>
+        <!-- <div class="s-card">
+      <div class="s-icon purple"><i class="fa-solid fa-circle-check"></i></div>
+      <div>
+        <div class="s-label">Healthy</div>
+        <div class="s-val">{{ healthyCount }}</div>
+      </div>
+    </div> -->
+
+        <!-- <div class="s-card">
+      <div class="s-icon amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div>
+        <div class="s-label">Degraded</div>
+        <div class="s-val">{{ degradedCount }}</div>
+      </div>
+    </div> -->
+    </div>
+    <div class="header mb-3 ms-2">
+        <div class="header-left">
+            <h2>Cluster Overview</h2>
+        </div>
+    </div>
+
+    <div class="grid mt-2" *ngIf="filteredClusters && filteredClusters.length>0;else noDataTemplate">
+        <div class="card cluster-card" *ngFor="let c of filteredClusters" (click)="goToCluster(c)">
+
+            <div class="card-head">
+                <div>
+                    <div class="cname">{{ c.ClusterName }}</div>
+                    <div class="cendpoint"><i class="fa-solid fa-plug"></i>{{ c.ClusterDomain }}</div>
+                </div>
+            </div>
+
+            <!-- <div class="status-row">
+                <span class="badge"
+                    [ngClass]="c.name  === 'Healthy' ? 'green' : (c.name === 'Degraded' ? 'amber' : 'red')">
+                    {{ c.name }}
+                </span>
+
+                <span class="badge" [ngClass]="getRecoveryClass(c)">
+                    {{ getRecoveryText(c) }}
+                </span>
+            </div> -->
+
+            <div class="card-metrics">
+                <div class="metric">
+                    <div class="m-label"><i class="fa-solid fa-database"></i> Instances</div>
+                    <div class="m-val blue">{{ c.CountInstances }}</div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #noDataTemplate>
+    <div class="d-flex justify-content-center align-items-center p-5 w-100">
+      <img src="assets/images/NoSearch.png" style="height: 5vw;padding-right: 10px;" alt="No Data logo"
+        title="noData" />
+      <div class="text-center fs-5">No Data Available</div>
+    </div>
+  </ng-template>

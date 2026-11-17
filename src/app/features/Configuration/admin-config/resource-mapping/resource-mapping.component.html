@@ -1,0 +1,726 @@
+<div class="min-h-screen bg-slate-50/50 font-sans pb-20 -m-8 overflow-visible">
+  <!-- Header Section (Matching Role Component Style) -->
+  <header class="bg-white border-b border-slate-200/60 sticky top-0 z-40 backdrop-blur-md bg-white w-full m-0 p-0">
+    <div class="w-full px-10 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-5">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border"
+          [ngClass]="currentView === 'update' ? 'bg-[#f26321]/5 text-[#f26321] border-[#f26321]/10' : 'bg-blue-50/50 text-blue-600 border-blue-100/50'">
+          <i class="ri-node-tree text-2xl"></i>
+        </div>
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100/80 px-2 py-0.5 rounded">Configuration</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-[11px] font-bold uppercase tracking-widest"
+              [ngClass]="currentView === 'update' ? 'text-[#f26321]' : 'text-blue-600'">Resource Mapping</span>
+          </div>
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight premium-title leading-none">Resource Mapping</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button *ngIf="currentView === 'form'" (click)="showTable()"
+          class="group flex items-center gap-2.5 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl border border-slate-200 shadow-sm transition-all animate-hover">
+          <i class="ri-list-check text-lg text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+          See All Mappings
+        </button>
+        <button *ngIf="currentView === 'table'" (click)="showForm()"
+          class="flex items-center gap-2.5 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all animate-hover">
+          <i class="ri-add-line text-lg"></i>
+          New Mapping
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full px-10 pt-1 space-y-6">
+
+  <!-- TABLE VIEW (Paginated - Matching User Management UI) -->
+  <div *ngIf="currentView === 'table'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div class="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
+      <!-- Search and Header -->
+      <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/30">
+        <div class="flex items-center gap-3">
+          <button (click)="showForm()"
+            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-500 transition-all">
+            <i class="ri-arrow-left-line text-xl"></i>
+          </button>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 premium-title">Mapped Resources</h2>
+            <p class="text-[11px] text-slate-500 font-medium">Showing all active application and infrastructure mappings</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="relative group">
+            <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+            <input type="text" appSanitizeInput [(ngModel)]="searchText" (keyup)="search()"
+              class="pl-10 pr-4 py-2.5 w-full md:w-72 bg-white border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 font-medium"
+              placeholder="Search by application or host..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[1000px]">
+          <thead>
+            <tr class="bg-slate-50/50 border-b border-slate-100">
+              <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-16">SN</th>
+              <th (click)="sortBy('applicationName')"
+                class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center cursor-pointer hover:text-blue-600 transition-colors">
+                Application Name <i class="ri-arrow-up-down-line ml-1 opacity-50"></i>
+              </th>
+              <th (click)="sortBy('hostName')"
+                class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center cursor-pointer hover:text-blue-600 transition-colors">
+                Host Name <i class="ri-arrow-up-down-line ml-1 opacity-50"></i>
+              </th>
+              <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Database Connections</th>
+              <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-32">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <tr *ngFor="let m of paginatedMappings; let i = index"
+              class="group hover:bg-blue-50/30 transition-colors">
+              <td class="px-6 py-4 text-xs font-semibold text-slate-400 text-center">
+                {{ (p - 1) * itemsPerPage + i + 1 }}
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-start gap-3">
+                  <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500">
+                    <i class="ri-apps-2-line"></i>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700 tracking-tight">{{ m.applicationName }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-start gap-3">
+                  <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                    <i class="ri-server-line"></i>
+                  </div>
+                  <span class="text-xs font-semibold text-slate-600 tracking-tight">{{ m.hostName }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <button (click)="openDbModal(m)"
+                  class="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-600 text-slate-600 rounded-lg transition-all text-[11px] font-bold shadow-sm animate-hover">
+                  <i class="ri-database-2-line text-sm text-blue-500"></i> 
+                  View {{ m.dbDetails?.length || 0 }} Connections
+                </button>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center gap-3">
+                  <button (click)="openEdit(m)"
+                    class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
+                    title="Edit Mapping">
+                    <i class="ri-edit-line text-lg"></i>
+                  </button>
+                  <button (click)="deleteMapping(m)"
+                    class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-600 text-red-500 hover:text-white transition-all shadow-sm border border-red-100"
+                    title="Delete Mapping">
+                    <i class="ri-delete-bin-line text-lg"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- No Data Found -->
+            <tr *ngIf="filteredMappings.length === 0" class="border-b border-slate-200">
+              <td colspan="10" class="py-12 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 border border-slate-100">
+                    <i class="ri-search-line text-3xl"></i>
+                  </div>
+                  <div class="space-y-1">
+                    <p class="text-sm font-bold text-slate-600">No mappings found</p>
+                    <p class="text-xs text-slate-400">We couldn't find any resource mappings matching your search criteria.</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination (Matching add-client style) -->
+      <div class="px-4 py-3 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="text-xs text-slate-500 font-medium">
+            Showing <span class="text-slate-900 font-bold">{{(p - 1) * itemsPerPage + 1}}</span> to
+            <span class="text-slate-900 font-bold">{{Math.min(p * itemsPerPage, filteredMappings.length || 0)}}</span> of
+            <span class="text-slate-900 font-bold">{{filteredMappings.length || 0}}</span> results
+          </div>
+
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-500 font-medium">Rows per page:</label>
+            <input type="number" [(ngModel)]="itemsPerPage" (change)="onPageSizeChange($event)" min="1"
+              class="w-16 bg-slate-50 border border-slate-200 rounded-lg text-xs py-1.5 px-2 outline-none focus:ring-2 focus:ring-blue-500/20 text-center" />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <button (click)="prevPage()" [disabled]="p === 1"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+
+          <ng-container *ngFor="let page of visiblePages">
+            <button (click)="goToPage(page)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-semibold hover:border-blue-400 transition-all shadow-sm"
+              [ngClass]="p === page
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-slate-600 border-slate-200'">
+              {{page}}
+            </button>
+          </ng-container>
+
+          <button (click)="nextPage()" [disabled]="p >= totalPages"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="currentView === 'form'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <!-- Creation Form -->
+    <div class="w-full">
+      <div class="premium-card p-10 pt-2 space-y-12 relative overflow-hidden">
+        <!-- Decorator -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-full -mr-16 -mt-16"></div>
+
+        <div class="space-y-3 relative">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border border-blue-100 shadow-sm">
+              <i class="ri-add-circle-line text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 premium-title">Create New Resource Mapping</h2>
+          </div>
+          <p class="text-sm text-slate-500 pl-[3.25rem]">Define the relationship between your primary application services and their supporting database infrastructure.</p>
+        </div>
+
+        <div class="space-y-10">
+          <!-- Section 1 -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">01</div>
+              <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Primary Application</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label class="label-caps px-0">Application Service</label>
+                <div class="relative">
+                  <select [(ngModel)]="mappingRows[0].app_id" (change)="onAppChange(0)"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow">
+                    <option [ngValue]="null">Choose Application</option>
+                    <option *ngFor="let app of applicationList" [ngValue]="app.applicationId">
+                      {{ app.applicationName }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">02</div>
+              <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Application Infrastructure</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="space-y-2">
+                <label class="label-caps px-0">Host Tech Type</label>
+                <div class="relative">
+                  <select [(ngModel)]="mappingRows[0].app_tech_type" (change)="onAppTechChange(0)"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow">
+                    <option [ngValue]="null">Select Tech</option>
+                    <option *ngFor="let tech of hostTechList" [value]="tech.technologyType">
+                      {{ tech.technologyType }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="label-caps px-0">App Host</label>
+                <div class="relative">
+                  <select [(ngModel)]="mappingRows[0].app_infra_id" (change)="onAppHostChange(0)"
+                    [disabled]="!mappingRows[0].app_tech_type"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                    <option [ngValue]="null">Select Host</option>
+                    <option *ngFor="let host of mappingRows[0].appHostList" [ngValue]="host.applicationId || host.ipAddressId">
+                      {{ host.applicationName || host.ipAddress }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="label-caps px-0">IP Address</label>
+                <div class="relative">
+                  <select [(ngModel)]="mappingRows[0].app_ip_id" [disabled]="!mappingRows[0].app_infra_id"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                    <option [ngValue]="null">Select IP</option>
+                    <option *ngFor="let ip of mappingRows[0].appIpList" [ngValue]="ip.ipId || ip.ipAddressId">
+                      {{ ip.ipAddress }} ({{ ip.environment }})
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3 & 4 (Database Connections) - Repeatable -->
+          <div class="space-y-8 pt-8">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">03</div>
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Associated Database Nodes</h3>
+              </div>
+              <button (click)="addDbMapping(0)"
+                class="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all border border-blue-100 animate-hover shadow-sm">
+                <i class="ri-add-line text-base"></i> Add Database Node
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
+              <div *ngFor="let db of mappingRows[0].db_mappings; let dbIndex = index"
+                class="premium-card p-6 bg-slate-50/30 border-slate-200/60 relative group animate-in slide-in-from-bottom-2 duration-300">
+
+                <button (click)="removeDbMapping(dbIndex, 0)"
+                  class="absolute right-4 top-4 w-8 h-8 bg-red-50 hover:bg-red-600 text-red-500 hover:text-white rounded-xl flex items-center justify-center shadow-sm transition-all z-20 border border-red-100 hover:border-red-600"
+                  title="Remove Database Node">
+                  <i class="ri-delete-bin-line text-base"></i>
+                </button>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Type</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_type" (change)="onDbTypeChange(0, dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow">
+                        <option [ngValue]="null">Select Type</option>
+                        <option value="Relational">Relational</option>
+                        <option value="Non-Relational">Non-Relational</option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Technology</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_tech_type" (change)="onTechTypeChange(0, dbIndex)" [disabled]="!db.db_type"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select Technology</option>
+                        <option *ngFor="let tech of db.subTechList" [value]="tech.technologyType">
+                          {{ tech.technologyType }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">Database Instance</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_id" [disabled]="!db.db_tech_type" (change)="onDbChange(0, dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Choose Database</option>
+                        <option *ngFor="let app of db.dbAppList" [ngValue]="app.applicationId">
+                          {{ app.applicationName }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Host Tech</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_sub_tech_type" (change)="onDbHostTechChange(0, dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow">
+                        <option [ngValue]="null">Select Tech</option>
+                        <option *ngFor="let tech of hostTechList" [value]="tech.technologyType">
+                          {{ tech.technologyType }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Host</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_infra_id" (change)="onDbHostChange(0, dbIndex)"
+                        [disabled]="!db.db_sub_tech_type"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select Host</option>
+                        <option *ngFor="let host of db.dbHostList" [ngValue]="host.applicationId || host.ipAddressId">
+                          {{ host.applicationName || host.ipAddress }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">IP Address</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_ip_id" [disabled]="!db.db_infra_id"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select IP</option>
+                        <option *ngFor="let ip of db.dbIpList" [ngValue]="ip.ipId || ip.ipAddressId">
+                          {{ ip.ipAddress }} ({{ ip.environment }})
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="mappingRows[0].db_mappings.length === 0"
+                class="p-12 border-2 border-dashed border-slate-100 rounded-2xl text-center flex flex-col items-center justify-center gap-4 bg-slate-50/30">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-200 shadow-sm">
+                  <i class="ri-database-2-line text-3xl"></i>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-500">No database nodes connected</p>
+                  <p class="text-xs text-slate-400">Map your application to its database infrastructure for full visibility</p>
+                </div>
+                <button (click)="addDbMapping(0)" class="text-xs font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest mt-2">
+                  + Add First Connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex items-center justify-between pt-8 border-t border-slate-100">
+          <button (click)="addNewRow()"
+            class="px-6 py-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 animate-hover">
+            Discard Changes <i class="ri-close-line text-base"></i>
+          </button>
+
+          <button (click)="saveConfiguration()"
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2 animate-hover">
+            <i class="ri-save-3-line text-base"></i>
+            Save Configuration
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPDATE VIEW -->
+  <div *ngIf="currentView === 'update'" class="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+    <div class="w-full">
+      <div class="premium-card p-10 pt-2 space-y-12 relative overflow-hidden" *ngIf="editRow">
+        <!-- Decorator -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-full -mr-16 -mt-16"></div>
+
+        <div class="flex items-center justify-between relative">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-[#f26321]/10 text-[#f26321] rounded-xl flex items-center justify-center border border-[#f26321]/10 shadow-sm">
+              <i class="ri-refresh-line text-2xl"></i>
+            </div>
+            <div class="space-y-1">
+              <h2 class="text-xl font-bold text-slate-900 premium-title">Update Resource Mapping</h2>
+              <p class="text-xs text-slate-500 font-medium">Modify existing relationships between application services and infrastructure.</p>
+            </div>
+          </div>
+          <button (click)="showTable()" class="group flex items-center gap-2 text-[11px] font-bold text-[#f26321] hover:text-[#d9581b] uppercase tracking-widest transition-all">
+            <i class="ri-arrow-left-line text-lg group-hover:-translate-x-1 transition-transform"></i>
+            Back to List
+          </button>
+        </div>
+
+        <div class="space-y-10">
+          <!-- Section 1 -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div class="w-8 h-8 bg-[#f26321] text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">01</div>
+              <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Primary Application</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-2">
+                <label class="label-caps px-0">Application Service</label>
+                <div class="relative">
+                  <select [(ngModel)]="editRow.app_id"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow">
+                    <option [ngValue]="null">Choose Application</option>
+                    <option *ngFor="let app of applicationList" [ngValue]="app.applicationId">
+                      {{ app.applicationName }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div class="w-8 h-8 bg-[#f26321] text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">02</div>
+              <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Application Infrastructure</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="space-y-2">
+                <label class="label-caps px-0">Host Tech Type</label>
+                <div class="relative">
+                  <select [(ngModel)]="editRow.app_tech_type" (change)="onEditAppTechChange()"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow">
+                    <option [ngValue]="null">Select Tech</option>
+                    <option *ngFor="let tech of hostTechList" [value]="tech.technologyType">
+                      {{ tech.technologyType }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="label-caps px-0">App Host</label>
+                <div class="relative">
+                  <select [(ngModel)]="editRow.app_infra_id" (change)="onEditAppHostChange()"
+                    [disabled]="!editRow.app_tech_type"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                    <option [ngValue]="null">Select Host</option>
+                    <option *ngFor="let host of editRow.appHostList" [ngValue]="host.applicationId || host.ipAddressId">
+                      {{ host.applicationName || host.ipAddress }}
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="label-caps px-0">IP Address</label>
+                <div class="relative">
+                  <select [(ngModel)]="editRow.app_ip_id" [disabled]="!editRow.app_infra_id"
+                    class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                    <option [ngValue]="null">Select IP</option>
+                    <option *ngFor="let ip of editRow.appIpList" [ngValue]="ip.ipId || ip.ipAddressId">
+                      {{ ip.ipAddress }} ({{ ip.environment }})
+                    </option>
+                  </select>
+                  <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3 & 4 (Database Connections) -->
+          <div class="space-y-8 pt-8">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center text-xs font-bold shadow-sm">03</div>
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-tight">Associated Database Nodes</h3>
+              </div>
+              <button (click)="addDbMapping()"
+                class="flex items-center gap-2 px-4 py-2 bg-[#f26321]/5 text-[#f26321] rounded-xl text-xs font-bold hover:bg-[#f26321] hover:text-white transition-all border border-[#f26321]/10 animate-hover shadow-sm">
+                <i class="ri-add-line text-base"></i> Add Database Node
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
+              <div *ngFor="let db of editRow.db_mappings; let dbIndex = index"
+                class="premium-card p-6 bg-slate-50/30 border-slate-200/60 relative group animate-in slide-in-from-bottom-2 duration-300">
+
+                <button (click)="removeDbMapping(dbIndex)"
+                  class="absolute right-4 top-4 w-8 h-8 bg-red-50 hover:bg-red-600 text-red-500 hover:text-white rounded-xl flex items-center justify-center shadow-sm transition-all z-20 border border-red-100 hover:border-red-600"
+                  title="Remove Database Node">
+                  <i class="ri-delete-bin-line text-base"></i>
+                </button>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Type</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_type" (change)="onEditDbTypeChange(dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow">
+                        <option [ngValue]="null">Select Type</option>
+                        <option value="Relational">Relational</option>
+                        <option value="Non-Relational">Non-Relational</option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Technology</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_tech_type" (change)="onEditDbTechChange(dbIndex)" [disabled]="!db.db_type"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select Technology</option>
+                        <option *ngFor="let tech of db.subTechList" [value]="tech.technologyType">
+                          {{ tech.technologyType }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">Database Instance</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_id" [disabled]="!db.db_tech_type" (change)="onEditDbChange(dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Choose Database</option>
+                        <option *ngFor="let app of db.dbAppList" [ngValue]="app.applicationId">
+                          {{ app.applicationName }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Host Tech</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_sub_tech_type" (change)="onEditDbHostTechChange(dbIndex)"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow">
+                        <option [ngValue]="null">Select Tech</option>
+                        <option *ngFor="let tech of hostTechList" [value]="tech.technologyType">
+                          {{ tech.technologyType }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">DB Host</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_infra_id" (change)="onEditDbHostChange(dbIndex)"
+                        [disabled]="!db.db_sub_tech_type"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select Host</option>
+                        <option *ngFor="let host of db.dbHostList" [ngValue]="host.applicationId || host.ipAddressId">
+                          {{ host.applicationName || host.ipAddress }}
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="label-caps px-0">IP Address</label>
+                    <div class="relative">
+                      <select [(ngModel)]="db.db_ip_id" [disabled]="!db.db_infra_id"
+                        class="w-full bg-white border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-700 focus:ring-4 focus:ring-[#f26321]/10 focus:border-[#f26321] outline-none transition-all no-native-arrow disabled:opacity-50">
+                        <option [ngValue]="null">Select IP</option>
+                        <option *ngFor="let ip of db.dbIpList" [ngValue]="ip.ipId || ip.ipAddressId">
+                          {{ ip.ipAddress }} ({{ ip.environment }})
+                        </option>
+                      </select>
+                      <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="editRow.db_mappings.length === 0"
+                class="p-12 border-2 border-dashed border-slate-100 rounded-2xl text-center flex flex-col items-center justify-center gap-4 bg-slate-50/30">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-200 shadow-sm">
+                  <i class="ri-database-2-line text-3xl"></i>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-500">No database nodes connected</p>
+                  <p class="text-xs text-slate-400">Map your application to its database infrastructure for full visibility</p>
+                </div>
+                <button (click)="addDbMapping()" class="text-xs font-bold text-[#f26321] hover:text-[#d9581b] uppercase tracking-widest mt-2">
+                  + Add First Connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex items-center justify-end pt-10 border-t border-slate-100">
+          <button (click)="updateConfiguration()"
+            class="px-10 py-3.5 bg-[#f26321] hover:bg-[#d9581b] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#f26321]/20 flex items-center gap-3 animate-hover">
+            <i class="ri-refresh-line text-lg"></i>
+            Update Configuration
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Database Details Modal -->
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+    *ngIf="isDbModalOpen">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-200">
+      <!-- Modal Header -->
+      <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-bl-full -mr-12 -mt-12"></div>
+        
+        <div class="flex items-center gap-4 relative">
+          <div class="w-12 h-12 rounded-xl bg-[#f26321] text-white flex items-center justify-center shadow-lg shadow-[#f26321]/20">
+            <i class="ri-database-2-line text-2xl"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 tracking-tight premium-title">Associated Database Nodes</h3>
+            <p class="text-xs text-slate-500 font-medium tracking-tight">{{ selectedMappingTitle }}</p>
+          </div>
+        </div>
+        <button (click)="closeDbModal()"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all relative">
+          <i class="ri-close-line text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-8 max-h-[60vh] overflow-y-auto">
+        <div class="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-slate-50/50 border-b border-slate-100">
+                <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center w-16">SN</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">DB Instance</th>
+                <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Host Address</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              <tr *ngFor="let db of selectedDbDetails; let i = index"
+                class="hover:bg-blue-50/30 transition-colors group">
+                <td class="px-6 py-4 text-xs font-bold text-slate-400 text-center">0{{ i + 1 }}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-[#f26321] shadow-sm">
+                      <i class="ri-database-line"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-700">{{ db.dbName }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-xs text-slate-600 text-center font-semibold">
+                  {{ db.dbHost }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-8 py-6 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+        <button (click)="closeDbModal()"
+          class="px-8 py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>

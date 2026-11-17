@@ -1,0 +1,1379 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;">
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item">
+                <a routerLink="/infra" class="d-flex align-items-center" style="gap: 4px;">
+                    <div class="linuxlogo">
+                        <img src="assets/images/linux.png" alt="Linux">
+                    </div>
+                    {{selectedService}}
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Host Service</li>
+        </ol>
+    </nav>
+    <div class="p-1 rounded" style="margin-bottom: -14px;">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom" id="service-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#process_list"
+                        (click)="loadData('process_list')">Process List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#container"
+                        (click)="loadData('container')">Container</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+    <div class="tab-content custom-bg p-1">
+        <!-- OVERVIEW -->
+        <div class="tab-pane fade in active show" id="overview" style="background: #f8fafc;">
+
+            <div class="alert-container" (clickOutside)="showAlerts = false">
+
+                <!-- Trigger Button -->
+                <div class="alert-trigger" (click)="toggleAlerts()">
+
+                    <!-- Bell Icon + Badge -->
+                    <div class="bell-wrap">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15s1.5-1.5 1.5-5a6 6 0 0 1 6-6z" />
+                            <path d="M8.3 17a2 2 0 0 0 3.4 0" />
+                        </svg>
+                        <span class="alert-badge" *ngIf="getTotalAlerts() > 0">
+                            {{ getTotalAlerts() }}
+                        </span>
+                    </div>
+
+                    <span class="trigger-label">Alerts</span>
+
+                    <!-- Live Critical / Warning counts -->
+                    <div class="trigger-counts">
+                        <span class="tc crit" *ngIf="getTotalCritical() > 0">
+                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                <path
+                                    d="M6 1L1 10h10L6 1zm0 2.5 3.1 5.5H2.9L6 3.5zm-.5 1.5v2h1v-2H5.5zm0 2.5v1h1v-1H5.5z" />
+                            </svg>
+                            {{ getTotalCritical() }}
+                        </span>
+                        <span class="tc warn" *ngIf="getTotalWarning() > 0">
+                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 2a4 4 0 1 0 0 8A4 4 0 0 0 6 2zm-.5 2h1v3h-1V4zm0 3.5h1v1h-1v-1z" />
+                            </svg>
+                            {{ getTotalWarning() }}
+                        </span>
+                    </div>
+
+                    <!-- "Failures" button preserved -->
+                    <button class="hi-alert-label"
+                        (click)="$event.stopPropagation(); goToProblemPage()">Failures</button>
+
+                    <!-- Chevron -->
+                    <svg class="chevron" [class.open]="showAlerts" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="2,4 6,8 10,4" />
+                    </svg>
+
+                </div>
+
+                <!-- Dropdown Panel -->
+                <div class="alert-dropdown" *ngIf="showAlerts">
+
+                    <!-- Header -->
+                    <div class="dd-header">
+                        <div class="dd-title">
+                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M7 1.5a4.5 4.5 0 0 1 4.5 4.5c0 2.6 1 3.7 1 3.7H1.5s1-1.1 1-3.7A4.5 4.5 0 0 1 7 1.5z" />
+                                <path d="M5.7 12.5a1.5 1.5 0 0 0 2.6 0" />
+                            </svg>
+                            Alerts Summary
+                        </div>
+                        <span class="dd-live">● Live</span>
+                    </div>
+
+                    <!-- Body — same alertData binding -->
+                    <div class="dd-body">
+
+                        <ng-container *ngFor="let alert of alertData">
+
+                            <!-- Has Alerts -->
+                            <div *ngIf="alert.openalertcount > 0 || alert.closealertcount > 0" class="alert-row"
+                                (click)="goToAlertHistory()" style="cursor: pointer;">
+                                <div class="row-top">
+                                    <div class="row-counts">
+                                        <span class="rc crit" *ngIf="alert.openalertcount > 0">
+                                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                                <path
+                                                    d="M6 1L1 10h10L6 1zm0 2.2 3 5.3H3L6 3.2zm-.4 1.3v2h.8v-2h-.8zm0 2.5v.9h.8v-.9h-.8z" />
+                                            </svg>
+                                            {{ alert.openalertcount }} open
+                                        </span>
+                                        <span class="rc warn" *ngIf="alert.closealertcount > 0">
+                                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                                <path
+                                                    d="M6 2a4 4 0 1 0 0 8A4 4 0 0 0 6 2zm-.4 1.8h.8v3h-.8v-3zm0 3.5h.8v.8h-.8v-.8z" />
+                                            </svg>
+                                            {{ alert.closealertcount }} closed
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Proportional bar -->
+                                <div class="bar-track">
+                                    <div class="bar-crit" *ngIf="alert.openalertcount > 0"
+                                        [class.bar-only]="alert.closealertcount === 0" [style.flex]="alert.openalertcount">
+                                    </div>
+                                    <div class="bar-warn" *ngIf="alert.closealertcount > 0"
+                                        [class.bar-only]="alert.openalertcount === 0" [style.flex]="alert.closealertcount">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- No Alerts -->
+                            <div *ngIf="alert.openalertcount === 0 && alert.closealertcount === 0" class="no-alert">
+                                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="2,7 5.5,10.5 12,3" />
+                                </svg>
+                                No active alerts
+                            </div>
+
+                        </ng-container>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="dd-footer">
+                        <span class="footer-total">
+                            Total: <strong>{{ getTotalAlerts() }}</strong> alerts
+                        </span>
+                        <span class="footer-breakdown">
+                            <span class="fc crit" *ngIf="getTotalCritical() > 0">{{ getTotalCritical() }}
+                                open</span>
+                            <span class="fc-sep" *ngIf="getTotalCritical() > 0 && getTotalWarning() > 0">·</span>
+                            <span class="fc warn" *ngIf="getTotalWarning() > 0">{{ getTotalWarning() }} closed</span>
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ══════════════════════════════════
+         TOP BAR: Logo + KPI strip
+         ══════════════════════════════════ -->
+            <div class="hi-top-bar">
+
+                <!-- Logo -->
+                <div class="hi-logo-wrap">
+                    <img src="assets/images/linux.png" alt="Linux" />
+                </div>
+
+                <!-- KPI Strip -->
+                <div class="hi-kpi-strip">
+
+                    <!-- Map card -->
+                    <div class="hi-kpi-card hi-kpi-card--map">
+                        <div class="hi-map-wrap" *ngIf="locations.length && locations[0].name">
+                            <img src="assets/images/mapp.png" alt="Map" class="hi-map-img" />
+                            <div *ngFor="let point of locations" class="hi-map-pin" [style.left.%]="point.x"
+                                [style.top.%]="point.y">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div class="hi-pin-label">{{ point.name }}</div>
+                            </div>
+                        </div>
+                        <div class="hi-no-data" *ngIf="!locations.length || !locations[0].name">
+                            No data available
+                        </div>
+                    </div>
+
+                    <!-- Uptime -->
+                    <div class="hi-kpi-card">
+                        <div class="hi-kpi-label">
+                            Uptime
+                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Total system running time since last reboot."></i>
+                        </div>
+                        <div class="hi-kpi-value" *ngIf="upTime != null" [ngStyle]="{'color': uptimeColor}"
+                            [innerHTML]="upTime"></div>
+                        <!-- <div class="hi-kpi-uptime-sub" *ngIf="upTime != null">since {{ sinceWhenUptime }}</div> -->
+                        <div class="hi-no-data" *ngIf="upTime == null">No data</div>
+                    </div>
+
+                    <!-- CPU Usage -->
+                    <div class="hi-kpi-card" [ngClass]="{
+                'orange-border': getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).color === 'orange',
+                'red-border':    getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).color === 'red'
+            }">
+                        <div class="hi-kpi-label">
+                            CPU Usage
+                            <span class="hi-threshold-badge"
+                                *ngIf="getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeValue !== null"
+                                [ngStyle]="{'color': getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeColor}"
+                                [matTooltip]="getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                
+                                (click)="userDefinedThreshold('CPU Usage')">
+                                {{ getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeValue }}
+                            </span>
+                        </div>
+                        <div class="hi-kpi-value"
+                            [ngStyle]="{'color': getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).color}">
+                            {{ cpuUsage }}<span class="hi-kpi-unit">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage -->
+                    <div class="hi-kpi-card" [ngClass]="{
+                'orange-border': getMetricUiState('meter_vm_memory_used', memoryRamUsage).color === 'orange',
+                'red-border':    getMetricUiState('meter_vm_memory_used', memoryRamUsage).color === 'red'
+            }">
+                        <div class="hi-kpi-label">
+                            Memory Usage
+                            <span class="hi-threshold-badge"
+                                *ngIf="getMetricUiState('meter_vm_memory_used', memoryRamUsage).badgeValue !== null"
+                                [ngStyle]="{'color': getMetricUiState('meter_vm_memory_used', memoryRamUsage).badgeColor}"
+                                [matTooltip]="getMetricUiState('meter_vm_memory_used', memoryRamUsage).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                
+                                (click)="userDefinedThreshold('Memory Usage')">
+                                {{ getMetricUiState('meter_vm_memory_used', memoryRamUsage).badgeValue
+                                | bytesToGb:2 | number:'1.2-2' }}
+                            </span>
+                        </div>
+                        <div class="hi-kpi-value"
+                            [ngStyle]="{'color': getMetricUiState('meter_vm_memory_used', memoryRamUsage).color}">
+                            {{ memoryRamUsage }}<span class="hi-kpi-unit">GB</span>
+                        </div>
+                    </div>
+
+                    <!-- Swap Usage -->
+                    <div class="hi-kpi-card" [ngClass]="{
+                'orange-border': getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).color === 'orange',
+                'red-border':    getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).color === 'red'
+            }">
+                        <div class="hi-kpi-label">
+                            Swap Usage
+                            <span class="hi-threshold-badge"
+                                *ngIf="getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).badgeValue !== null"
+                                [ngStyle]="{'color': getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).badgeColor}"
+                                [matTooltip]="getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).badgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                
+                                (click)="userDefinedThreshold('Swap Usage')">
+                                {{ getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).badgeValue
+                                | number:'1.2-2' }}
+                            </span>
+                        </div>
+                        <div class="hi-kpi-value" *ngIf="memorySwapUsage != null"
+                            [ngStyle]="{'color': getMetricUiState('meter_vm_memory_swap_percentage', memorySwapUsage).color}">
+                            {{ memorySwapUsage | number:'1.2-2' }}<span class="hi-kpi-unit">%</span>
+                        </div>
+                        <div class="hi-no-data" *ngIf="memorySwapUsage == null">No data</div>
+                    </div>
+
+                    <!-- Load Average -->
+                    <div class="hi-kpi-card">
+                        <div class="hi-kpi-label">
+                            Load Average
+                            <span style="display:flex;align-items:center;gap:3px;">
+                                <span class="hi-threshold-badge"
+                                    *ngIf="getMetricUiState('meter_vm_cpu_load15', loadAverage).badgeValue !== null"
+                                    [ngStyle]="{'color': cpuLoadBadgeColor}"
+                                    [matTooltip]="cpuLoadBadgeColor === 'orange' ? 'Warning value' : 'Critical value'"
+                                    
+                                    (click)="userDefinedThreshold('Load Average')">
+                                    {{ getMetricUiState('meter_vm_cpu_load15', loadAverage).badgeValue | number:'1.2-2'
+                                    }}
+                                </span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Shows 1,5 and 15-minute load averages."></i>
+                            </span>
+                        </div>
+                        <div class="hi-kpi-value" *ngIf="loadAverage != null">
+                            {{ loadAverage }}<span class="hi-kpi-unit">%</span>
+                        </div>
+                        <div class="hi-no-data" *ngIf="loadAverage == null">No data</div>
+                    </div>
+
+                    <!-- Disk Usage -->
+                    <div class="hi-kpi-card">
+                        <div class="hi-kpi-label">
+                            Disk Usage (/)
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Percentage of disk space used on the primary partition."></i>
+                        </div>
+                        <div class="hi-kpi-value" *ngIf="diskPartitionPercent != null"
+                            [ngStyle]="{'color': uptimeColor}">
+                            {{ diskPartitionPercent }}<span class="hi-kpi-unit">%</span>
+                        </div>
+                        <div class="hi-no-data" *ngIf="diskPartitionPercent == null">No data</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════
+         ALERT BAR
+         ══════════════════════════════════ -->
+
+
+            <!-- ══════════════════════════════════
+         SECTION: HOST
+         ══════════════════════════════════ -->
+            <div class="hi-section">
+                <h3 class="hi-section-heading">Host</h3>
+
+                <div class="hi-cards-row">
+
+                    <!-- ── CPU Usage Chart ── -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">CPU Usage (%)</span>
+                            <div class="hi-chart-controls">
+                                <span
+                                    *ngIf="getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeValue !== null"
+                                    class="hi-badge-avg"
+                                    [ngStyle]="{'color': getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeColor}"
+                                    [matTooltip]="cpuUsageBadge">
+                                    {{ getMetricUiState('meter_vm_cpu_total_percentage', cpuUsage).badgeValue |
+                                    number:'1.0-0' }}
+                                </span>
+                                <i class="fa-solid fa-chart-bar hi-tile-toggle-icon"
+                                    (click)="toggleTilePanel('cpuUsage')"
+                                    [class.hi-tile-toggle-icon--active]="activeTilePanel === 'cpuUsage'"
+                                    matTooltip="Show breakdown"></i>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Breaks down CPU time spent on user, system, idle, I/O wait, interrupts, and hypervisor tasks. Helps detect CPU bottlenecks and ensure efficient processing."></i>
+                            </div>
+                        </div>
+
+                        <!-- Tile dropdown panel -->
+                        <div class="hi-tile-panel" [class.hi-tile-panel--open]="activeTilePanel === 'cpuUsage'">
+                            <div class="hi-tile-list">
+                                <div class="hi-tile-item" *ngFor="let tile of displayCpuUsageTiles">
+                                    <span class="hi-tile-dot" [style.background]="tile.color"></span>
+                                    <span class="hi-tile-name">{{ tile.name }}</span>
+                                    <span class="hi-tile-value">{{ tile.value | number:'1.0-1' }}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hi-graph-area" [hidden]="avgCpuUsageChart == null" id="avgCpuUsageChart"></div>
+                        <div class="hi-no-data" *ngIf="avgCpuUsageChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- ── Memory RAM Chart ── -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Memory RAM (MB)</span>
+                            <div class="hi-chart-controls">
+                                <ng-container *ngIf="!isInfraThresholdsEmpty()">
+                                    <select [(ngModel)]="chartData_criteriaForMemoryRam"
+                                        (ngModelChange)="updateChartVisibility('MemoryRam')" class="hi-select">
+                                        <option value="all" selected>All</option>
+                                        <option value="available">Available</option>
+                                        <option value="buff">Buff/Cache</option>
+                                        <option value="used">Used</option>
+                                    </select>
+                                    <select *ngIf="chartData_criteriaForMemoryRam != 'all'"
+                                        [(ngModel)]="chart_criteriaForMemoryRam"
+                                        (ngModelChange)="updateChartVisibility('MemoryRam')" class="hi-select">
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold" *ngIf="chartData_criteriaForMemoryRam != 'buff'">
+                                            Threshold</option>
+                                    </select>
+                                    <span
+                                        *ngIf="chart_criteriaForMemoryRam == 'avg' && chartData_criteriaForMemoryRam != 'all'"
+                                        class="hi-badge-avg">
+                                        {{ chartValuesRam.avg | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForMemoryRam == 'threshold' && chartData_criteriaForMemoryRam != 'all' && chartData_criteriaForMemoryRam != 'buff'"
+                                        class="hi-badge-warn">
+                                        {{ chartValuesRam.warning | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForMemoryRam == 'threshold' && chartData_criteriaForMemoryRam != 'all' && chartData_criteriaForMemoryRam != 'buff'"
+                                        class="hi-badge-crit">
+                                        {{ chartValuesRam.critical | number:'1.0-2' }}
+                                    </span>
+                                </ng-container>
+                                <i class="fa-solid fa-chart-bar hi-tile-toggle-icon"
+                                    (click)="toggleTilePanel('memoryRam')"
+                                    [class.hi-tile-toggle-icon--active]="activeTilePanel === 'memoryRam'"
+                                    matTooltip="Show breakdown"></i>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Shows total, used, available memory, and buffers/cache. Helps track memory pressure, optimize performance, and prevent out-of-memory issues."></i>
+                            </div>
+                        </div>
+
+                        <!-- Tile dropdown panel -->
+                        <div class="hi-tile-panel" [class.hi-tile-panel--open]="activeTilePanel === 'memoryRam'">
+                            <div class="hi-tile-list">
+                                <div class="hi-tile-item" *ngFor="let tile of displayMemoryRamTiles">
+                                    <span class="hi-tile-dot" [style.background]="tile.color"></span>
+                                    <span class="hi-tile-name">{{ tile.name }}</span>
+                                    <span class="hi-tile-value">{{ tile.value | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hi-graph-area" [hidden]="memoryRamChart == null" id="memoryRAMChart"></div>
+                        <div class="hi-no-data" *ngIf="memoryRamChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- ── Memory Swap Chart ── -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Memory Swap (MB)</span>
+                            <div class="hi-chart-controls">
+                                <ng-container *ngIf="!isInfraThresholdsEmpty()">
+                                    <select [(ngModel)]="chartData_criteriaForMemorySwap"
+                                        (ngModelChange)="updateChartVisibility('MemorySwap')" class="hi-select">
+                                        <option value="all" selected>All</option>
+                                        <option value="free">Free</option>
+                                        <option value="usedSwap">Used</option>
+                                    </select>
+                                    <select *ngIf="chartData_criteriaForMemorySwap != 'all'"
+                                        [(ngModel)]="chart_criteriaForMemorySwap"
+                                        (ngModelChange)="updateChartVisibility('MemorySwap')" class="hi-select">
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold">Threshold</option>
+                                    </select>
+                                    <span
+                                        *ngIf="chart_criteriaForMemorySwap == 'avg' && chartData_criteriaForMemorySwap != 'all'"
+                                        class="hi-badge-avg">
+                                        {{ chartValuesSwap.avg | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForMemorySwap == 'threshold' && chartData_criteriaForMemorySwap != 'all'"
+                                        class="hi-badge-warn">
+                                        {{ chartValuesSwap.warning | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForMemorySwap == 'threshold' && chartData_criteriaForMemorySwap != 'all'"
+                                        class="hi-badge-crit">
+                                        {{ chartValuesSwap.critical | number:'1.0-2' }}
+                                    </span>
+                                </ng-container>
+                                <i class="fa-solid fa-chart-bar hi-tile-toggle-icon"
+                                    (click)="toggleTilePanel('memorySwap')"
+                                    [class.hi-tile-toggle-icon--active]="activeTilePanel === 'memorySwap'"
+                                    matTooltip="Show breakdown"></i>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Shows total and free swap space. High swap usage may indicate insufficient RAM and potential system slowdowns."></i>
+                            </div>
+                        </div>
+
+                        <!-- Tile dropdown panel -->
+                        <div class="hi-tile-panel" [class.hi-tile-panel--open]="activeTilePanel === 'memorySwap'">
+                            <div class="hi-tile-list">
+                                <div class="hi-tile-item" *ngFor="let tile of displayMemorySwapTiles">
+                                    <span class="hi-tile-dot" [style.background]="tile.color"></span>
+                                    <span class="hi-tile-name">{{ tile.name }}</span>
+                                    <span class="hi-tile-value">{{ tile.value | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hi-graph-area" [hidden]="memorySwapChart == null" id="memorySwapChart"></div>
+                        <div class="hi-no-data" *ngIf="memorySwapChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- ── CPU Load Chart — full row ── -->
+                    <div class="hi-chart-card hi-full-width">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">CPU Load</span>
+                            <div class="hi-chart-controls">
+                                <select [(ngModel)]="chartData_criteriaForCpuLoad"
+                                    (ngModelChange)="updateChartVisibility('CpuLoad')" class="hi-select">
+                                    <option value="all" selected>All</option>
+                                    <option value="load_1">load_1</option>
+                                    <option value="load_5">load_5</option>
+                                    <option value="load_15">load_15</option>
+                                </select>
+                                <select *ngIf="chartData_criteriaForCpuLoad != 'all'"
+                                    [(ngModel)]="chart_criteriaForCpuLoad" class="hi-select">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <span *ngIf="chart_criteriaForCpuLoad == 'avg' && chartData_criteriaForCpuLoad != 'all'"
+                                    class="hi-badge-avg">
+                                    {{ chartValuesCpuLoad.avg | number:'1.0-2' }}
+                                </span>
+                                <span
+                                    *ngIf="chart_criteriaForCpuLoad == 'threshold' && chartData_criteriaForCpuLoad != 'all'"
+                                    class="hi-badge-warn" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Warning">
+                                    {{ logicalCores * 0.75 }}
+                                </span>
+                                <span
+                                    *ngIf="chart_criteriaForCpuLoad == 'threshold' && chartData_criteriaForCpuLoad != 'all'"
+                                    class="hi-badge-crit" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Critical">
+                                    {{ logicalCores * 1.0 }}
+                                </span>
+                                <i class="fa-solid fa-chart-bar hi-tile-toggle-icon"
+                                    (click)="toggleTilePanel('cpuLoad')"
+                                    [class.hi-tile-toggle-icon--active]="activeTilePanel === 'cpuLoad'"
+                                    matTooltip="Show breakdown"></i>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Shows 1,5 and 15-minute load averages. Indicates the number of processes waiting for CPU resources, helping assess system performance and saturation."></i>
+                            </div>
+                        </div>
+
+                        <!-- Tile dropdown panel -->
+                        <div class="hi-tile-panel" [class.hi-tile-panel--open]="activeTilePanel === 'cpuLoad'">
+                            <div class="hi-tile-list">
+                                <div class="hi-tile-item" *ngFor="let tile of displayCpuLoadTiles">
+                                    <span class="hi-tile-dot" [style.background]="tile.color"></span>
+                                    <span class="hi-tile-name">{{ tile.name }}</span>
+                                    <span class="hi-tile-value">{{ tile.value | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hi-graph-area" [hidden]="avgCpuLoadChart == null" id="avgCpuLoadChart"></div>
+                        <div class="hi-no-data" *ngIf="avgCpuLoadChart == null">No Data Available</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════
+         SECTION: NETWORK
+         ══════════════════════════════════ -->
+            <div class="hi-section">
+                <h3 class="hi-section-heading">Network</h3>
+
+                <div class="hi-cards-row">
+
+                    <!-- Network Bandwidth -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Network Bandwidth (KB/s)</span>
+                            <div class="hi-chart-controls">
+                                <ng-container *ngIf="!isInfraThresholdsEmpty()">
+                                    <select [(ngModel)]="chartData_criteriaForNetworkBandwidth"
+                                        (ngModelChange)="updateChartVisibility('NetworkBandwidth')" class="hi-select">
+                                        <option value="all" selected>All</option>
+                                        <option value="receive">receive</option>
+                                        <option value="transmit">transmit</option>
+                                        <option value="traffic">traffic</option>
+                                    </select>
+                                    <select *ngIf="chartData_criteriaForNetworkBandwidth != 'all'"
+                                        [(ngModel)]="chart_criteriaForNetworkBandwidth" class="hi-select">
+                                        <option value="avg" selected>Average</option>
+                                        <option value="threshold">Threshold</option>
+                                    </select>
+                                    <span
+                                        *ngIf="chart_criteriaForNetworkBandwidth == 'avg' && chartData_criteriaForNetworkBandwidth != 'all'"
+                                        class="hi-badge-avg">
+                                        {{ chartValuesNetworkBandwidth.avg | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForNetworkBandwidth == 'threshold' && chartData_criteriaForNetworkBandwidth != 'all'"
+                                        class="hi-badge-warn">
+                                        {{ chartValuesNetworkBandwidth.warning | number:'1.0-2' }}
+                                    </span>
+                                    <span
+                                        *ngIf="chart_criteriaForNetworkBandwidth == 'threshold' && chartData_criteriaForNetworkBandwidth != 'all'"
+                                        class="hi-badge-crit">
+                                        {{ chartValuesNetworkBandwidth.critical | number:'1.0-2' }}
+                                    </span>
+                                </ng-container>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It measures data transmitted and received per second, giving insight into overall network load, traffic patterns, and potential bottlenecks."></i>
+                            </div>
+                        </div>
+                        <div class="hi-graph-area" [hidden]="networkBandwidthUsageChart == null"
+                            id="networkBandwidthUsageChart"></div>
+                        <div class="hi-no-data" *ngIf="networkBandwidthUsageChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- Network Status -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Network Status</span>
+                            <div class="hi-chart-controls">
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It tracks active TCP/UDP connections, sockets in use, and connections waiting to close, helping identify potential connection spikes or resource exhaustion."></i>
+                            </div>
+                        </div>
+                        <div class="hi-graph-area" [hidden]="networkStatusChart == null" id="networkStatusChart"></div>
+                        <div class="hi-no-data" *ngIf="networkStatusChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- Network Speed -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Network Speed</span>
+                            <div class="hi-chart-controls">
+                                <select class="hi-select" [(ngModel)]="networkSpeedUnit"
+                                    (change)="getAvgNetworkSpeed()">
+                                    <option value="KBps">KBps</option>
+                                    <option value="MBps">MBps</option>
+                                    <option value="GBps">GBps</option>
+                                </select>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="It displays the current network speed."></i>
+                            </div>
+                        </div>
+                        <div class="hi-gauge-wrap">
+                            <app-network-speed-chart [value]="avgNetworkSpeed"
+                                [unit]="networkSpeedUnit"></app-network-speed-chart>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════
+         SECTION: DISK FILE
+         ══════════════════════════════════ -->
+            <div class="hi-section">
+                <h3 class="hi-section-heading">Disk File</h3>
+
+                <div class="hi-cards-row">
+
+                    <!-- File System Usage -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">File System Usage (%)</span>
+                            <div class="hi-chart-controls">
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Displays the status and usage of mounted file systems on the server."></i>
+                            </div>
+                        </div>
+
+                        <div class="hi-graph-area" [hidden]="fileSystemMountpointUsageChart == null"
+                            id="fileSystemMountpointUsageChart"></div>
+                        <div class="hi-no-data" *ngIf="fileSystemMountpointUsageChart == null">No Data Available
+                        </div>
+                        <div *ngIf="fsPinnedTooltipVisible" class="hi-pinned-tooltip"
+                            [ngStyle]="{ left: fsPinnedTooltipPosition.left + 'px', top: fsPinnedTooltipPosition.top + 'px' }">
+                            <div [innerHTML]="fsPinnedTooltipHtml" (mouseleave)="closeFsPinnedTooltip()"
+                                (click)="$event.stopPropagation()"></div>
+                        </div>
+                    </div>
+
+                    <!-- Filefd Allocated -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Filefd Allocated</span>
+                            <div class="hi-chart-controls">
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="File Descriptors Allocated (filefd) shows the number of file descriptors currently allocated on the server. File descriptors represent open files, network sockets, or other I/O resources."></i>
+                            </div>
+                        </div>
+                        <div class="hi-graph-area" [hidden]="filefdAllocatedChart == null" id="filefdAllocatedChart">
+                        </div>
+                        <div class="hi-no-data" *ngIf="filefdAllocatedChart == null">No Data Available</div>
+                    </div>
+
+                    <!-- Disk R/W -->
+                    <div class="hi-chart-card hi-one-third">
+                        <div class="hi-chart-header">
+                            <span class="hi-chart-title">Disk R/W (KB/s)</span>
+                            <div class="hi-chart-controls">
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Rate of data being read from and written to the disk."></i>
+                            </div>
+                        </div>
+                        <div class="hi-graph-area" [hidden]="diskReadWriteChart == null" id="diskReadWriteChart"></div>
+                        <div class="hi-no-data" *ngIf="diskReadWriteChart == null">No Data Available</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════
+         SECTION: DISK SPACE
+         ══════════════════════════════════ -->
+            <div class="hi-disk-section hi-page-end">
+                <h3 class="hi-section-heading" style="margin: 0 0 6px 0;">Disk Space</h3>
+
+                <!-- Table header: title + search -->
+                <div class="hi-disk-header">
+                    <span class="hi-disk-header__title">Disk Usage Details</span>
+                    <div class="hi-disk-search-wrap">
+                        <input type="text" placeholder="Search Disk Name" [(ngModel)]="searchTermDisk"
+                            (input)="onSearchDisk()" autocomplete="off" />
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="hi-disk-table-wrap">
+                    <table class="hi-disk-table">
+                        <thead>
+                            <tr>
+                                <th style="width:18%;" (click)="setDiskSort('name')">
+                                    Name
+                                    <i class="fa"
+                                        [ngClass]="sortColumnDisk === 'name' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th style="width:34%;" (click)="setDiskSort('usedPercent')">
+                                    Used %
+                                    <i class="fa"
+                                        [ngClass]="sortColumnDisk === 'usedPercent' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th style="width:9%;" (click)="setDiskSort('free')">
+                                    Free <span
+                                        style="font-weight:400;color:#94a3b8;text-transform:none;font-size:9px;">(GB)</span>
+                                    <i class="fa"
+                                        [ngClass]="sortColumnDisk === 'free' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th style="width:9%;" (click)="setDiskSort('used')">
+                                    Used <span
+                                        style="font-weight:400;color:#94a3b8;text-transform:none;font-size:9px;">(GB)</span>
+                                    <i class="fa"
+                                        [ngClass]="sortColumnDisk === 'used' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                                <th style="width:10%;" (click)="setDiskSort('total')">
+                                    Total <span
+                                        style="font-weight:400;color:#94a3b8;text-transform:none;font-size:9px;">(GB)</span>
+                                    <i class="fa"
+                                        [ngClass]="sortColumnDisk === 'total' ? (sortDirectionDisk === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of pagedDiscSpaceList">
+                                <td>{{ item.name }}</td>
+                                <td>
+                                    <div class="hi-disk-bar-wrap">
+                                        <div class="hi-disk-bar-fill" [ngClass]="{
+                                        'hi-disk-bar-fill--blue':   item.usedPercent < diskUsageThreshold.warningValue,
+                                        'hi-disk-bar-fill--yellow': item.usedPercent >= diskUsageThreshold.warningValue && item.usedPercent < diskUsageThreshold.criticalValue,
+                                        'hi-disk-bar-fill--red':    item.usedPercent >= diskUsageThreshold.criticalValue
+                                    }" [style.width.%]="item.usedPercent">
+                                            {{ item.usedPercent }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.free }}</td>
+                                <td>{{ item.used }}</td>
+                                <td>{{ item.total }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div *ngIf="pagedDiscSpaceList.length === 0" class="hi-disk-empty">
+                        No data Available
+                    </div>
+                </div>
+
+                <!-- Disk Pagination -->
+                <div class="hi-disk-pager" *ngIf="pagedDiscSpaceList.length !== 0">
+                    <span class="hi-disk-pager__info">
+                        {{ startIndexDisk }}–{{ endIndexDisk }} of {{ filteredDiscSpaceList.length }}
+                    </span>
+                    <div class="hi-disk-pager__controls">
+                        <button class="hi-disk-pager__btn" (click)="previousPageDisk()"
+                            [disabled]="currentPageDisk === 1">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
+                        <input type="number" class="hi-disk-pager__input" [value]="currentPageDisk"
+                            (keydown.enter)="goToPageDisk(+inputPageDisk.value)" #inputPageDisk min="1"
+                            [max]="totalPagesDisk" />
+                        <span class="hi-disk-pager__of">of {{ totalPagesDisk }}</span>
+                        <button class="hi-disk-pager__btn" (click)="nextPageDisk()"
+                            [disabled]="currentPageDisk === totalPagesDisk">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PROCESS LIST -->
+        <div class="tab-pane tab-height fade" id="process_list">
+            <div class="pl-root">
+
+                <!-- ══════════════════════════════════
+                     LEFT PANEL — PROCESS LIST
+                     ══════════════════════════════════ -->
+                <div class="pl-panel pl-panel--left">
+                    <div class="pl-card">
+
+                        <!-- Header -->
+                        <div class="pl-card__header">
+                            <span class="pl-card__title">Process List</span>
+                            <div style="position: relative;">
+                                <input type="text" class="pl-search-input" [(ngModel)]="searchQuery"
+                                    (input)="onSearch()" placeholder="Search processes…" autocomplete="off" />
+                                <i class="fas fa-search pl-search-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Table scroll -->
+                        <div class="pl-table-scroll">
+                            <table class="pl-table">
+                                <colgroup>
+                                    <col style="width: 30%"> <!-- Process Name — widest -->
+                                    <col style="width: 7%"> <!-- Count -->
+                                    <col style="width: 12%"> <!-- State -->
+                                    <col style="width: 10%"> <!-- CPU % -->
+                                    <col style="width: 10%"> <!-- Mem % -->
+                                    <col style="width: 10%"> <!-- PID -->
+                                    <col style="width: 10%"> <!-- PPID -->
+                                    <col style="width: 7%"> <!-- Chart -->
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th (click)="sortData('key')">Process Name <i class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('currentProcessCount')">Count <i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('state')">State <i class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('total_cpu_percent')">CPU % <i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('total_memory_percent')">Mem % <i
+                                                class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('pid')">PID <i class="fa-solid fa-sort"></i></th>
+                                        <th (click)="sortData('ppid')">PPID <i class="fa-solid fa-sort"></i></th>
+                                        <th>Chart</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody *ngIf="pagedProcessList.length !== 0">
+                                    <ng-container *ngFor="let key of pagedProcessList">
+
+                                        <!-- PARENT ROW -->
+                                        <tr class="pl-tr pl-tr--parent" (click)="toggleExpand(key)">
+                                            <td class="pl-td--name" [title]="key">
+                                                <i [ngClass]="isExpanded[key] ? 'fa fa-caret-down' : 'fa fa-caret-right'"
+                                                    class="pl-caret"></i>
+                                                <span class="pl-name-text">{{ key }}</span>
+                                            </td>
+                                            <td>{{ processList[key].currentProcessCount }}</td>
+                                            <td>
+                                                <span class="pl-state-badge">
+                                                    {{ processList[key].processes[0]?.state || 'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ processList[key].total_cpu_percent }}</td>
+                                            <td>{{ processList[key].total_memory_percent }}</td>
+                                            <td class="pl-td--muted">{{ processList[key].isMultiplePID ? 'MULTIPLE' :
+                                                processList[key].processes[0]?.pid }}</td>
+                                            <td class="pl-td--muted">{{ processList[key].isMultiplePPID ? 'MULTIPLE' :
+                                                processList[key].processes[0]?.ppid }}</td>
+                                            <td class="pl-td--center">
+                                                <i class="fa-solid fa-chart-line pl-chart-icon"
+                                                    title="Show Process Chart"
+                                                    (click)="openProcessChartModal(key); $event.stopPropagation();">
+                                                </i>
+                                            </td>
+                                        </tr>
+
+                                        <!-- CHILD ROWS -->
+                                        <ng-container *ngIf="isExpanded[key]">
+                                            <tr *ngFor="let process of processList[key].processes"
+                                                class="pl-tr pl-tr--child">
+                                                <td class="pl-td--name" [title]="process.command"
+                                                    (click)="toggleCommand(key, process.pid)">
+                                                    <div
+                                                        *ngIf="expandedCommandSet.has(key + '-' + process.pid); else truncated">
+                                                        <i class="fa fa-minus pl-child-dash"></i> {{ process.command }}
+                                                    </div>
+                                                    <ng-template #truncated>
+                                                        <div class="ellipsis-cell">
+                                                            <i class="fa fa-minus pl-child-dash"></i> {{ process.command
+                                                            }}
+                                                        </div>
+                                                    </ng-template>
+                                                </td>
+                                                <td></td>
+                                                <td>
+                                                    <span class="pl-state-badge">{{ process.state }}</span>
+                                                </td>
+                                                <td>{{ process.cpu_percent }}</td>
+                                                <td>{{ process.memory_percent }}</td>
+                                                <td class="pl-td--muted">{{ process.pid }}</td>
+                                                <td class="pl-td--muted">{{ process.ppid }}</td>
+                                                <td class="pl-td--center">
+                                                    <i class="fa-solid fa-chart-line pl-chart-icon"
+                                                        title="Show Process Chart {{process.pid}}"
+                                                        (click)="openProcessChartModal(key, process.pid, process.ppid); $event.stopPropagation();">
+                                                    </i>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+
+                                    </ng-container>
+                                </tbody>
+                            </table>
+
+                            <div *ngIf="pagedProcessList.length == 0" class="pl-empty pl-empty--table">
+                                No Data Available
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pl-pager">
+                            <span class="pl-pager__info">{{ startIndex }} – {{ endIndex }} / {{
+                                filteredProcessList.length }}</span>
+                            <div class="pl-pager__controls">
+                                <button class="pl-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </button>
+                                <input type="number" class="pl-pager__input" [value]="currentPage"
+                                    (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1" [max]="totalPages" />
+                                <span class="pl-pager__of">of {{ totalPages }}</span>
+                                <button class="pl-pager__btn" (click)="nextPage()"
+                                    [disabled]="currentPage === totalPages">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════
+                     RIGHT PANEL — SERVICE STATE
+                     ══════════════════════════════════ -->
+                <div class="pl-panel pl-panel--right">
+                    <div class="pl-card">
+
+                        <!-- Header -->
+                        <div class="pl-card__header">
+                            <span class="pl-card__title">Service State</span>
+                            <div class="pl-header-actions">
+
+                                <!-- Filter dropdown -->
+                                <div ngbDropdown class="d-inline-block" style="position:relative;">
+                                    <button class="pl-filter-btn" id="filterDropdown" ngbDropdownToggle>
+                                        <i class="fas fa-filter"></i>
+                                        Filter
+                                        <i class="fas fa-caret-down" style="font-size:9px;"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="filterDropdown" class="pl-filter-dropdown">
+                                        <div class="pl-filter-dropdown__header">
+                                            <span>Filter by State</span>
+                                            <i (click)="clearFilters()" title="Deselect All"
+                                                class="bi bi-dash-square pl-filter-clear"></i>
+                                        </div>
+                                        <div *ngFor="let state of stateFilterOptions" class="pl-filter-option">
+                                            <input class="pl-filter-check" type="checkbox" [id]="state"
+                                                [checked]="selectedStateFilters.has(state)"
+                                                (change)="onToggleState(state)" />
+                                            <label [for]="state" class="pl-filter-label">
+                                                <i class="fa-solid fa-circle pl-dot"
+                                                    [ngClass]="getColorCodingForFilter(state)"></i>
+                                                {{ state }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Search -->
+                                <div style="position:relative;">
+                                    <input type="text" class="pl-search-input"
+                                        [ngClass]="{ 'search-input-hidden': !showSearch2 }" [(ngModel)]="searchQuery2"
+                                        (input)="onSearch2()" placeholder="Search services…" autocomplete="off" />
+                                    <i class="fas fa-search pl-search-icon" (click)="toggleSearch2()"></i>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Table scroll -->
+                        <div class="pl-table-scroll">
+                            <table class="pl-table">
+                                <thead>
+                                    <tr>
+                                        <th>Service State</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="pagedServiceList.length !== 0">
+                                    <tr *ngFor="let item of pagedServiceList" class="pl-tr">
+                                        <td>
+                                            <span [ngClass]="getRowClass(item)" class="pl-service-dot">
+                                                <i class="fa-solid fa-circle"></i>
+                                            </span>
+                                            {{ formatServiceName(item) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div *ngIf="pagedServiceList.length == 0" class="pl-empty pl-empty--table">
+                                No Data Available
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pl-pager">
+                            <span class="pl-pager__info">{{ startIndex2 }} – {{ endIndex2 }} / {{
+                                filteredServiceList.length }}</span>
+                            <div class="pl-pager__controls">
+                                <button class="pl-pager__btn" (click)="previousPage2()" [disabled]="currentPage2 === 1">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </button>
+                                <input type="number" class="pl-pager__input" [value]="currentPage2"
+                                    (keydown.enter)="goToPage2(inputPage.value)" #inputPage min="1"
+                                    [max]="totalPages2" />
+                                <span class="pl-pager__of">of {{ totalPages2 }}</span>
+                                <button class="pl-pager__btn" (click)="nextPage2()"
+                                    [disabled]="currentPage2 === totalPages2">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-pane tab-height fade" id="container">
+            <div class="ct-root">
+
+                <!-- ══════════════════════════════════
+                     CONTAINER IDs CARD
+                     ══════════════════════════════════ -->
+                <div class="ct-card">
+
+                    <!-- Header -->
+                    <div class="ct-card__header">
+                        <span class="ct-card__title">Container IDs</span>
+                        <div style="position: relative;">
+                            <input type="text" class="ct-search-input" [(ngModel)]="searchQuery"
+                                (input)="onSearchContainer()" placeholder="Search containers…" autocomplete="off" />
+                            <i class="fas fa-search ct-search-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Table scroll -->
+                    <div class="ct-table-scroll">
+                        <table class="ct-table">
+                            <colgroup>
+                                <col style="width: 35%"> <!-- Container Name -->
+                                <col style="width: 16%"> <!-- CPU -->
+                                <col style="width: 16%"> <!-- Memory -->
+                                <col style="width: 25%"> <!-- Network -->
+                                <col style="width: 8%"> <!-- Attributes -->
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th style="cursor:pointer;" (click)="sortData('key')">
+                                        Container Name <i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" class="ct-th--center" (click)="sortData('cpu')">
+                                        CPU Usage (%) <i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" class="ct-th--center" (click)="sortData('memory')">
+                                        Memory Usage (%) <i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="cursor:pointer;" class="ct-th--center" (click)="sortData('network')">
+                                        Network Rate (Byte) <i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th class="ct-th--center">Attributes</th>
+                                </tr>
+                            </thead>
+
+                            <tbody *ngIf="pagedContainerId.length !== 0">
+                                <tr *ngFor="let item of pagedContainerId; let i = index" class="ct-tr">
+
+                                    <!-- Container Name -->
+                                    <td class="ct-td--name" [title]="item.ContainerDetailsText"
+                                        (click)="goToContainerDashboard(item.containerName, $event)">
+                                        <span [ngClass]="getContStatus(item.status)" class="ct-status-dot">
+                                            <i class="fa-solid fa-circle"></i>
+                                        </span>
+                                        <span class="ct-name-text">{{ item.ContainerDetailsText }}</span>
+                                    </td>
+
+                                    <!-- CPU -->
+                                    <td class="ct-td--metric ct-th--center">
+                                        <span class="ct-metric-chip ct-metric-chip--cpu">
+                                            <i class="fa-solid fa-hard-drive ct-metric-icon"></i>
+                                            {{ item.cpu }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Memory -->
+                                    <td class="ct-td--metric ct-th--center">
+                                        <span class="ct-metric-chip ct-metric-chip--mem">
+                                            <i class="fa-solid fa-memory ct-metric-icon"></i>
+                                            {{ item.memory }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Network -->
+                                    <td class="ct-td--metric ct-th--center">
+                                        <span class="ct-metric-chip ct-metric-chip--net">
+                                            <i class="fa-solid fa-network-wired ct-metric-icon"></i>
+                                            {{ item.network }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Attributes -->
+                                    <td class="ct-th--center" data-bs-toggle="modal" data-bs-target="#containerProp">
+                                        <i class="fa-solid fa-eye ct-eye-icon" (click)="openModal(item.containerName)"></i>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Empty -->
+                        <div class="ct-empty ct-empty--table" *ngIf="pagedContainerId.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="ct-pager" *ngIf="pagedContainerId.length !== 0">
+                        <span class="ct-pager__info">{{ endContainerIndex }} / {{ filteredContainerId.length }}</span>
+                        <div class="ct-pager__controls">
+                            <button class="ct-pager__btn" (click)="previousContainerPage()"
+                                [disabled]="currentContainerPage === 1">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="ct-pager__input" [value]="currentContainerPage"
+                                (keydown.enter)="goToContainerPage(inputPage.value)" #inputPage min="1"
+                                [max]="totalContainerPages" />
+                            <span class="ct-pager__of">of {{ totalContainerPages }}</span>
+                            <button class="ct-pager__btn" (click)="nextContainerPage()"
+                                [disabled]="currentContainerPage === totalContainerPages">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end container card -->
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<ng-template #commandModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header py-1">
+            <h6 class="modal-title" style="font-weight: 500; color: #275881; margin-bottom: 0%;">COMMAND</h6>
+        </div>
+        <div class="modal-body py-1" style="overflow: auto; max-height: 30vh;">
+            <p class="small">
+                {{ selectedCommand }}
+            </p>
+        </div>
+        <div class="modal-footer" style="padding: 6px 10px;">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+
+
+
+<!-- <div class="modal fade custom-modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style=" margin-top: 10; box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);">
+            <div class="modal-header justify-content-between py-1" style=" background-color: var(--card-header-bg);">
+                <span class="modal-title" id="staticBackdropLabel" style="font-size: 14px;font-weight: 500;">Update
+                    {{selectedMetricName}}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.7rem; line-height: 1;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div *ngIf="!isUpdateThreshold" class="modal-body py-2" style="background-color: var(--card-bg-color);">
+                <div class=" d-flex align-items-center">
+                    <label for="metricName" class="col-sm-4  col-form-label small-font-label">Metric Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" id="metricName"
+                            value="{{selectedMetricForThresholdUpdate}}">
+                    </div>
+                </div>
+                <div class=" d-flex align-items-center">
+                    <label for="warningValue" class="col-sm-4  col-form-label small-font-label">Warning Value:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font"
+                            style="color: rgb(255, 149, 0);" id="warningValue" value="{{selectedMetricWarningValue}}">
+                    </div>
+                </div>
+
+                <div class=" d-flex align-items-center">
+                    <label for="criticalValue" class="col-sm-4 col-form-label small-font-label">Critical Value:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" style="color: red;"
+                            id="criticalValue" value="{{selectedMetricCriticalValue}}">
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isUpdateThreshold" class="modal-body py-2" style="background-color: var(--card-bg-color);">
+                <div *ngIf="isUpdateThreshold" style="font-size: 12px;">
+                    <i class="fa-solid fa-arrow-left " style="cursor:pointer" (click)="isUpdateThreshold = false"></i>
+                </div>
+                <div class=" d-flex align-items-center">
+                    <label for="metricName" class="col-sm-4  col-form-label small-font-label">Metric Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext small-font" id="metricName"
+                            value="{{selectedMetricForThresholdUpdate}}">
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="metricType" class="col-sm-4  col-form-label small-font-label">Metric Type:</label>
+                    <div class="col-sm-8">
+                        <select for="metricType" class="form-select form-control-sm py-1 small-font"
+                            [(ngModel)]="selectedMetricType" (change)="getThresholdMessage()">
+
+                            <option value="Percentage" selected>Percentage</option>
+                        </select>
+                    </div>
+                </div>
+                <small *ngIf="thresholdMessage" class="text-danger small-font">{{thresholdMessage}}</small>
+                <div class=" d-flex align-items-center">
+                    <label for="warningValue" class="col-sm-4  col-form-label small-font-label">Warning %:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control form-control-sm small-font"
+                            style="color: rgb(255, 149, 0);" id="warningValue"
+                            [(ngModel)]="selectedMetricWarningPercent">
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="criticalValue" class="col-sm-4  col-form-label small-font-label">Critical %:</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control form-control-sm small-font" style="color: red;"
+                            id="criticalValue" [(ngModel)]="selectedMetricCriticalPercent">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer px-1 py-0" style="background-color: var(--card-bg-color);">
+                <div class="d-flex justify-content-end me-1 ">
+                   
+
+                    <button type="button" class="btn btn-sm btn-primary mx-1 rounded-1 form-btn"
+                        style="font-size: 12px;" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+<div *ngIf="showChartModal" class="modal-backdrop"></div>
+<div *ngIf="showChartModal" class="modal-custom" role="dialog" aria-modal="true" aria-labelledby="chartModalTitle">
+
+    <div class="modal-content-custom">
+        <div class="modal-header-custom">
+            <h5 class="modal-title-custom" id="chartModalTitle">
+                Time-Series Chart: {{ selectedProcessName }}
+            </h5>
+            <button type="button" class="btn-close" (click)="closeChartModal()" aria-label="Close">
+            </button>
+        </div>
+
+        <div class="modal-body-custom">
+
+            <div *ngIf="!isChartLoading">
+                <highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions"
+                    style="width: 100%; height: 300px; display: block;">
+                </highcharts-chart>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="containerProp" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="containerPropLabel" aria-hidden="true">
+    <div class="modal-dialog" [ngClass]="properties ? 'custom-modal-left' : 'custom-modal-small'">
+        <div class="modal-content"
+            style=" margin-top: 19%;max-height: 60vh;  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);">
+            <div class="modal-header justify-content-between py-1" style=" background-color:  var(--card-header-bg);">
+                <span class="modal-title" id="containerPropLabel" style="font-size: 14px;font-weight: 500;">Attributes
+                </span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    style="font-size: 0.7rem; line-height: 1;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-body" style="font-size: small;" *ngIf="properties; else noData">
+                    <li style="display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"> <i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Name :
+                        </span>
+                        {{properties.name}}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            ID: </span>
+                        {{ properties.id }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Size: </span>
+                        {{ properties.size }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Created:
+                        </span>
+                        {{ properties.created }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Repo Tags:</span>
+                        {{ properties.repoTags }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            CPU Limit: </span>
+                        {{ properties.cpu_limit }}
+                    </li>
+                    <li style="    display: flex;word-wrap: break-word; font-size: small"><span class="me-2" style="font-weight: 450;
+    display: flex;
+    align-items: center;"><i class="fa-solid fa-square mx-1" style="font-size: 4px; background-color: blue;"></i>
+                            Memory Limit: </span>
+                        {{ properties.memory_limit }}
+                    </li>
+                </ul>
+                <ng-template #noData>
+                    <div class="text-center text-muted">No data available</div>
+                </ng-template>
+                <div class="d-flex justify-content-end me-1 mt-2" *ngIf="properties">
+                    <button type="button" class="btn btn-sm btn-primary rounded-1" style="font-size: 12px;"
+                        data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

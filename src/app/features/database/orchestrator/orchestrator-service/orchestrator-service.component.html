@@ -1,0 +1,71 @@
+<main class="sv-root">
+  <!-- HEADER -->
+  <div class="sv-header">
+    <h3 class="sv-header__title raleway-font semi-text">
+      Orchestrator Services
+    </h3>
+
+    <!-- SEARCH -->
+    <div class="sv-search-wrap">
+      <input type="text" class="sv-search-input" placeholder="Search service..." [(ngModel)]="searchQuery" />
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="sv-table-wrap">
+
+    <table class="sv-table">
+      <thead>
+        <tr>
+          <th style="width: 50px;">#</th>
+          <th>Name</th>
+          <th>Base URL</th>
+          <th>Environment</th>
+          <th>Region</th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="filteredServices.length > 0; else noDataTemplate">
+        <tr class="sv-tr" *ngFor="let s of filteredServices;let i = index" (click)="goToOverview(s)">
+
+          <td>{{ i+1 }}</td>
+
+          <td class="sv-td--name">
+            <span class="sv-avatar">
+              <span class="sv-avatar__initials">
+                {{ s.name | slice:0:2 | uppercase }}
+              </span>
+            </span>
+            <span class="sv-name-text">{{ s.name }}</span>
+          </td>
+
+          <td>{{ s.baseUrl }}</td>
+
+          <td>
+            <span class="sv-success-pill">
+              {{ s.environment }}
+            </span>
+          </td>
+
+          <td class="sv-td--muted">
+            {{ s.region }}
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+</main>
+
+<ng-template #noDataTemplate>
+  <tr>
+    <td colspan="5">
+      <div class="d-flex justify-content-center align-items-center p-5 w-100">
+        <img src="assets/images/NoSearch.png" style="height: 5vw;padding-right: 10px;" alt="No Data logo"
+          title="noData" />
+        <div class="text-center fs-5">No Data Available</div>
+      </div>
+    </td>
+  </tr>
+</ng-template>

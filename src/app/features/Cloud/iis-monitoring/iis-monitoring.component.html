@@ -1,0 +1,92 @@
+<main class="bm-root">
+
+  <div class="bm-header">
+    <h3 class="bm-header__title raleway-font semi-text">IIS Applications</h3>
+    <div class="bm-search-wrap">
+      <input type="text" class="bm-search-input" placeholder="Search..." [(ngModel)]="searchQuery"
+        (input)="onSearch()" autocomplete="off" />
+      <i class="fas fa-search bm-search-wrap__icon"></i>
+    </div>
+  </div>
+
+  <div class="bm-table-wrap">
+    <table class="bm-table">
+      <colgroup>
+        <col style="width: 25%">
+        <col style="width: 25%">
+        <col style="width: 25%">
+        <col style="width: 25%">
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th (click)="onSort('ipAddress')">Service Name <i class="fa-solid" [ngClass]="sortColumn === 'ipAddress' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+          <th (click)="onSort('applicationName')">Application Name <i class="fa-solid" [ngClass]="sortColumn === 'applicationName' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+          <th (click)="onSort('status')">Status <i class="fa-solid" [ngClass]="sortColumn === 'status' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+          <th (click)="onSort('uptime')">Uptime <i class="fa-solid" [ngClass]="sortColumn === 'uptime' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="isLoading">
+        <tr class="bm-tr" *ngFor="let i of [].constructor(8)">
+          <td><div class="bm-skeleton"></div></td>
+          <td><div class="bm-skeleton"></div></td>
+          <td><div class="bm-skeleton"></div></td>
+          <td><div class="bm-skeleton"></div></td>
+        </tr>
+      </tbody>
+
+      <tbody *ngIf="!isLoading && pagedTableData.length > 0">
+        <tr class="bm-tr" *ngFor="let item of pagedTableData">
+          <td class="bm-td--name" (click)="setServiceId(item.ipAddress)">
+            <span class="bm-avatar">
+              <img [src]="getImagePath(item.applicationTechnology, item.applicationType)" class="bm-avatar__img" />
+            </span>
+            <span class="bm-name-text">{{ item.ipAddress }}</span>
+          </td>
+          <td>{{ item.applicationName }}</td>
+          <td>
+            <span [ngClass]="item.combinedData?.app_pool_state === 1 ? 'status-up' : 'status-down'">
+              {{ item.combinedData?.app_pool_state === 1 ? 'Up' : 'Down' }}
+            </span>
+          </td>
+          <td>
+            {{ item.combinedData?.app_pool_st != null
+            ? convertSeconds(item.combinedData.app_pool_st)
+            : 'N/A' }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tbody *ngIf="!isLoading && pagedTableData.length === 0">
+        <tr>
+          <td colspan="4" class="bm-td--empty">
+            <div class="bm-empty-container">
+              <i class="fas fa-search bm-empty-icon"></i>
+              <p class="bm-empty-text">No services found</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <div class="bm-pager" *ngIf="pagedTableData.length > 0">
+    <span class="bm-pager__info">
+      Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredTableData.length }} services
+    </span>
+    <div class="bm-pager__controls">
+      <button class="bm-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <input type="number" class="bm-pager__input" [value]="currentPage" (keydown.enter)="goToPage(inputPage.value)"
+        #inputPage min="1" [max]="totalPages" />
+      <span class="bm-pager__of">of {{ totalPages }}</span>
+      <button class="bm-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+
+</main>

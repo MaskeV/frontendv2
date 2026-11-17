@@ -1,0 +1,296 @@
+<div class="space-y-8 animate-in fade-in duration-500 antialiased">
+  
+  <!-- Combined Header & Category Selection -->
+  <div class="premium-card p-8">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <div class="bg-[#f26321]/10 p-2 rounded-lg">
+          <i class="ri-shield-user-line text-[#f26321] text-2xl"></i>
+        </div>
+        <h2 class="text-base font-bold text-slate-900 tracking-tight">Update Existing Mapping</h2>
+      </div>
+      <button (click)="cancel()" class="animate-hover text-sm font-semibold text-slate-400 hover:text-red-500 transition-all flex items-center gap-1.5">
+        <i class="ri-arrow-left-line"></i> Back to List
+      </button>
+    </div>
+
+    <div class="space-y-8">
+      <!-- Row 1: Client & Licenses -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+        <div class="space-y-2">
+          <label class="label-caps">Client Name</label>
+          <div class="relative">
+            <select [(ngModel)]="mappingObj.clientName" disabled
+              class="w-full h-11 px-4 text-sm font-medium border border-slate-200 rounded-lg bg-slate-50 text-slate-500 appearance-none shadow-sm cursor-not-allowed">
+              <option *ngFor="let c of clientList" [value]="c.client_id">{{ c.client_name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2 md:col-span-2">
+          <label class="label-caps">License Types</label>
+          <div class="flex flex-wrap gap-5 p-3.5 bg-slate-50 border border-slate-100 rounded-lg min-h-[44px]">
+            <label *ngFor="let l of licenseList" class="flex items-center gap-2.5 cursor-pointer group transition-all">
+              <input type="radio" name="licenseGroup"
+                [checked]="mappingObj.selectedLicenseIds.includes(l.value)"
+                (change)="onLicenseSelect(l.value)"
+                class="w-4.5 h-4.5 rounded-full border-slate-300 accent-[#f26321] cursor-pointer shadow-sm">
+              <span class="text-sm font-medium text-slate-600 group-hover:text-[#f26321] transition-colors tracking-tight">{{ l.label }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Separate Manage Categories Row -->
+      <div class="pt-6 border-t border-slate-100/60" *ngIf="mappingObj.selectedLicenseIds.length > 0">
+        <label class="label-caps mb-3 block">Manage Categories (Per License)</label>
+        <div class="flex flex-wrap gap-4">
+          <div *ngFor="let licId of mappingObj.selectedLicenseIds" class="relative category-dropdown-wrapper">
+            <button (click)="activeCategoryLicId = (activeCategoryLicId === licId ? null : licId); $event.stopPropagation()"
+              [ngClass]="activeCategoryLicId === licId ? 'bg-[#f26321] text-white shadow-[#f26321]/20' : 'bg-white text-[#f26321]'"
+              class="animate-hover inline-flex items-center gap-2.5 px-5 h-10 rounded-full border border-[#f26321]/10 text-[11px] font-bold shadow-sm hover:shadow-md transition-all">
+              <i class="ri-settings-4-line"></i> {{ getLicenseName(licId) }}
+              <span class="px-2 py-0.5 rounded-full text-[10px] ml-1 transition-colors"
+                [ngClass]="activeCategoryLicId === licId ? 'bg-[#d9581b] text-white' : 'bg-[#f26321]/10 text-[#f26321]'">
+                {{ getSelectedCategories(licId).length }}
+              </span>
+            </button>
+
+            <!-- Per-License Dropdown -->
+            <div *ngIf="activeCategoryLicId === licId"
+              class="absolute left-0 top-full mt-3 z-[9999] bg-white border border-slate-200/60 rounded-xl shadow-2xl py-1 w-[280px] animate-in zoom-in-95 duration-200">
+              <div class="px-5 py-3 border-b border-slate-50 bg-slate-50/40">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Available Monitoring Products</span>
+              </div>
+              <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+                <label *ngFor="let cat of getFilteredCategories(licId); trackBy: trackByCategory"
+                  class="flex items-center gap-3.5 px-5 py-3 hover:bg-[#f26321]/10 cursor-pointer transition-colors group">
+                  <input type="checkbox" class="w-4.5 h-4.5 rounded border-slate-300 accent-[#f26321] cursor-pointer"
+                    [ngModel]="isCategorySelected(licId, cat.value)" (ngModelChange)="onCategoryToggle(licId, cat.value, $event)" />
+                  <span class="text-sm font-medium text-slate-700 group-hover:text-[#f26321] transition-colors">{{ cat.label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Configuration Grid Grouped by License -->
+  <div *ngFor="let licId of mappingObj.selectedLicenseIds; trackBy: trackByLicense" class="animate-in slide-in-from-bottom duration-500">
+    <div class="flex items-center gap-5 my-10 px-4">
+      <div class="h-10 w-10 rounded-2xl bg-[#f26321] text-white flex items-center justify-center shadow-xl shadow-[#f26321]/20">
+        <i class="ri-medal-fill text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">{{ getLicenseName(licId) }}</h2>
+        <p class="text-sx text-slate-500 font-medium tracking-wide">Update product specific monitoring rules</p>
+      </div>
+      <div class="h-[1px] flex-1 bg-slate-100 ml-4"></div>
+    </div>
+
+    <div *ngIf="getSelectedCategories(licId).length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+      <div *ngFor="let catVal of getSelectedCategories(licId)"
+        class="premium-card overflow-hidden"
+        [class.col-span-full]="isFullWidth(licId, catVal)">
+        
+        <!-- Card Header -->
+        <div class="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-slate-50/80 transition-colors border-b border-slate-100/60"
+          (click)="togglePanelCollapse(licId + catVal)">
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 rounded-xl bg-[#f26321]/10 text-[#f26321] shadow-inner">
+              <i [ngClass]="getProductIcon(catVal)" class="text-2xl"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-[15px] tracking-tight">{{ getPanelTitle(catVal) }}</h3>
+              <p class="text-[11px] text-slate-500 font-medium tracking-wide">{{ getPanelDescription(catVal) }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span *ngIf="getAccessCount(licId, catVal) > 0"
+              class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-[#f26321] text-white tracking-widest shadow-sm shadow-[#f26321]/20">
+              {{ getAccessCount(licId, catVal) }} ACTIVE
+            </span>
+            <i class="ri-arrow-down-s-line text-2xl text-slate-300 transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
+              [class.rotate-180]="!isPanelCollapsed(licId + catVal)"></i>
+          </div>
+        </div>
+
+        <div *ngIf="isPanelCollapsed(licId + catVal)" class="flex justify-center pb-4 opacity-50 cursor-pointer" (click)="togglePanelCollapse(licId + catVal)">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <i class="ri-information-line"></i> Click to expand and see data
+          </span>
+        </div>
+
+        <div class="p-6 pt-2" *ngIf="!isPanelCollapsed(licId + catVal)">
+          <!-- 1. GENERIC DESIGN -->
+          <div *ngIf="productState[licId]?.[catVal]?.mode === 'GENERIC'" class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div class="flex flex-col h-full space-y-3">
+              <label class="label-caps">Available for Subscription</label>
+              <div class="relative group">
+                <i class="ri-search-2-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#f26321] transition-colors"></i>
+                <input type="text" appSanitizeInput [(ngModel)]="productState[licId][catVal].searchAvail"
+                  placeholder="Filter applications..."
+                  class="w-full pl-9 h-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26321]/20 focus:border-[#f26321] transition-all bg-slate-50/50">
+              </div>
+              <div cdkDropList [id]="licId + catVal + 'AvailList'"
+                [cdkDropListData]="productState[licId][catVal].available"
+                [cdkDropListConnectedTo]="[licId + catVal + 'AssignedList']"
+                class="border border-slate-100 rounded-xl bg-slate-50/30 flex-1 min-h-[14rem] max-h-[260px] p-2 overflow-y-auto custom-scrollbar"
+                (cdkDropListDropped)="genericDrop($event, licId, catVal)">
+                <div *ngFor="let s of getFilteredAvail(licId, catVal)" cdkDrag
+                  (contextmenu)="onRightClick($event, licId, catVal, s)"
+                  [cdkDragDisabled]="isAppAssignedElsewhere(s.value, licId)"
+                  class="group flex items-center justify-between px-4 py-3 mb-2 bg-white border border-slate-200/60 rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:border-[#f26321]/30 hover:shadow-md transition-all"
+                  [class.opacity-50]="isAppAssignedElsewhere(s.value, licId)"
+                  [class.bg-slate-50]="isAppAssignedElsewhere(s.value, licId)">
+                  <div class="flex items-center gap-3">
+                    <span class="text-[13px] font-medium text-slate-700">{{ s.label }}</span>
+                    <span *ngIf="isAppAssignedElsewhere(s.value, licId)" class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">In Other License</span>
+                  </div>
+                  <i *ngIf="!isAppAssignedElsewhere(s.value, licId)" class="ri-draggable text-slate-300 group-hover:text-[#f26321]/50 transition-colors"></i>
+                  <i *ngIf="isAppAssignedElsewhere(s.value, licId)" class="ri-lock-fill text-slate-300"></i>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col h-full space-y-3">
+              <label class="label-caps">Assigned to Client</label>
+              <div class="relative group">
+                <i class="ri-search-2-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#f26321] transition-colors"></i>
+                <input type="text" appSanitizeInput [(ngModel)]="productState[licId][catVal].searchAssigned"
+                  placeholder="Filter assigned..."
+                  class="w-full pl-9 h-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26321]/20 focus:border-[#f26321] transition-all bg-slate-50/50">
+              </div>
+              <div cdkDropList [id]="licId + catVal + 'AssignedList'"
+                [cdkDropListData]="productState[licId][catVal].assigned"
+                [cdkDropListConnectedTo]="[licId + catVal + 'AvailList']"
+                class="border-2 border-dashed border-[#f26321]/10 bg-[#f26321]/10 rounded-xl flex-1 min-h-[14rem] max-h-[260px] p-2 overflow-y-auto custom-scrollbar"
+                (cdkDropListDropped)="genericDrop($event, licId, catVal)">
+                <div *ngFor="let s of getFilteredAssigned(licId, catVal)" cdkDrag
+                  class="group flex items-center justify-between px-4 py-3 mb-2 bg-white border border-[#f26321]/20 rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:border-[#f26321]/60 hover:shadow-md transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="bg-[#f26321]/10 text-[#f26321] p-1 rounded-md">
+                      <i class="ri-check-line text-sm"></i>
+                    </div>
+                    <span class="text-[13px] font-semibold text-slate-800">{{ s.label }}</span>
+                  </div>
+                  <button (click)="unassignService(licId, catVal, s)" class="text-slate-300 hover:text-red-500 transition-colors p-1">
+                    <i class="ri-close-circle-fill text-xl"></i>
+                  </button>
+                </div>
+                <div *ngIf="productState[licId][catVal].assigned.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 italic text-xs py-10">
+                  <i class="ri-drag-drop-line text-3xl mb-2 opacity-20"></i>
+                  Drag items here to assign
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. TECH TYPE DESIGN -->
+          <div *ngIf="productState[licId]?.[catVal]?.mode === 'TECH_TYPE'" class="space-y-5">
+            <div class="max-h-[360px] overflow-y-auto pr-3 space-y-4 custom-scrollbar">
+              <div *ngFor="let rule of productState[licId][catVal].rules; let i = index"
+                class="flex items-end gap-4 p-4 border border-slate-100 rounded-xl bg-slate-50/50 transition-all hover:border-[#f26321]/30 hover:bg-white hover:shadow-sm group">
+                <div class="flex-1 space-y-2">
+                  <label class="label-caps">Technology Stack</label>
+                  <div class="relative">
+                    <select [(ngModel)]="rule.techType" (change)="onTechTypeChange(licId, catVal, i)"
+                      class="w-full h-10 px-3 text-sm font-medium border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[#f26321]/20 focus:border-[#f26321] shadow-sm appearance-none cursor-pointer overflow-hidden transition-all">
+                      <option value="" disabled selected>Select Technology</option>
+                      <option *ngFor="let tech of productState[licId][catVal].techTypes" [value]="tech.technologyType">{{ tech.technologyType }}</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                  </div>
+                </div>
+                <div class="flex-[2] space-y-2">
+                  <label class="label-caps">Target Application</label>
+                  <div class="relative">
+                    <select [(ngModel)]="rule.appId" [disabled]="!rule.techType" (change)="recalculateAvailability()"
+                      class="w-full h-10 px-3 text-sm font-medium border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-[#f26321]/20 focus:border-[#f26321] shadow-sm appearance-none disabled:bg-slate-100 disabled:text-slate-400 transition-all">
+                      <option [ngValue]="null" disabled selected>Select Application</option>
+                      <option *ngFor="let app of rule.appsList" [value]="app.applicationId" [disabled]="isAppAssignedElsewhere(app.applicationId, licId)">
+                        {{ app.applicationName }} {{ isAppAssignedElsewhere(app.applicationId, licId) ? '(Assigned)' : '' }}
+                      </option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                  </div>
+                </div>
+                <button (click)="removeRule(licId, catVal, i)" class="h-10 w-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                  <i class="ri-delete-bin-6-line text-lg"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 3. COMPLEX TYPE DESIGN (Custom row-based logic) -->
+          <div *ngIf="productState[licId]?.[catVal]?.mode === 'COMPLEX_TYPE'" class="space-y-4">
+            <div class="max-h-[350px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+              <div *ngFor="let rule of productState[licId][catVal].rules; let i = index"
+                class="flex items-end gap-2 p-3 border border-slate-100 rounded-md bg-slate-50/50 transition-all hover:border-[#f26321]/30">
+                
+                <ng-container *ngIf="catVal === 'SRG'">
+                  <div class="flex-1">
+                    <select [(ngModel)]="rule.appId" (change)="onComplexAppChange(licId, 'SRG', i)"
+                      class="w-full h-8 px-2 text-xs border border-slate-200 rounded-md bg-white shadow-sm focus:border-[#f26321]">
+                      <option [value]="null" disabled>Select App</option>
+                      <option *ngFor="let a of srgAvailableAppsList" [value]="a.applicationId" [disabled]="isAppAssignedElsewhere(a.applicationId, licId)">
+                        {{ a.applicationName }} {{ isAppAssignedElsewhere(a.applicationId, licId) ? '(Used)' : '' }}
+                      </option>
+                    </select>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="catVal === 'Host' || catVal === 'HOST'">
+                  <div class="flex-1">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase mb-1 block pl-1">OS</label>
+                    <select [(ngModel)]="rule.osType" (change)="onHostOsChange(licId, i)"
+                      class="w-full h-8 px-2 text-xs border border-slate-200 rounded-md bg-white shadow-sm focus:border-[#f26321]">
+                      <option value="" disabled>OS</option>
+                      <option value="LINUX">LINUX</option>
+                      <option value="WINDOWS">WINDOWS</option>
+                    </select>
+                  </div>
+                  <div class="flex-[2]">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase mb-1 block pl-1">Host Pattern</label>
+                    <select [(ngModel)]="rule.appId" (change)="onHostAppChange(licId, i)"
+                      class="w-full h-8 px-2 text-xs border border-slate-200 rounded-md bg-white shadow-sm focus:border-[#f26321]">
+                      <option [ngValue]="null">Select App</option>
+                      <option *ngFor="let app of rule.appList" [value]="app.applicationId" [disabled]="isAppAssignedElsewhere(app.applicationId, licId)">
+                        {{ app.applicationName }} {{ isAppAssignedElsewhere(app.applicationId, licId) ? '(Used)' : '' }}
+                      </option>
+                    </select>
+                  </div>
+                </ng-container>
+                
+                <button (click)="removeRule(licId, catVal, i)" class="h-8 w-8 text-slate-400 hover:text-red-500 transition-colors">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Actions (Same floating pattern) -->
+  <div class="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white z-10 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <div class="container mx-auto flex items-center justify-between max-w-7xl">
+      <div class="flex items-center gap-3">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest pl-1">Total Mappings:</div>
+        <div class="px-3 py-1 bg-[#f26321]/10 text-[#f26321] rounded-full text-xs font-black">{{ mappingObj.selectedApps.length }}</div>
+      </div>
+      <div class="flex items-center gap-4">
+        <button (click)="cancel()" class="px-6 py-2 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-100 transition-all">
+          Cancel
+        </button>
+        <button (click)="onUpdate()" [disabled]="!canEdit" class="px-8 py-2.5 rounded-lg bg-[#f26321] text-white text-xs font-black shadow-lg shadow-[#f26321]/20 hover:bg-[#d9581b] transition-all active:scale-95 flex items-center gap-2">
+          <i class="ri-save-3-line"></i> Update Mappings
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

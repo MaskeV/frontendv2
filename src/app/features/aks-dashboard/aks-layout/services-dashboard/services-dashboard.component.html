@@ -1,0 +1,107 @@
+<div class="services-dashboard">
+
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('service')">
+          <span>Service Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'service'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'service'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="serviceNameSearch">
+          </div>
+          <div class="option" *ngFor="let svc of filteredServiceNames()" (click)="toggleSelection(svc, selectedServices)">
+            <input type="checkbox" [checked]="selectedServices.has(svc)"
+              (click)="$event.stopPropagation(); toggleSelection(svc, selectedServices)">
+            <span>{{ svc }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title card-title-row">
+      <div>
+        Services Informations <span>(Metrics Kubernetes)</span>
+      </div>
+
+      <button class="btn-download" (click)="downloadServices()" [disabled]="services.length === 0">
+        ⬇ Download
+      </button>
+    </div>
+    <div class="table-wrapper table-wrapper-lg" *ngIf="services.length > 0; else noServices">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Service Name</th>
+            <th>Namespace</th>
+            <th>Type</th>
+            <th>Cluster IP</th>
+            <th>Ingress IP</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let svc of paginatedServices">
+            <td>{{ svc.name }}</td>
+            <td>{{ svc.namespace }}</td>
+            <td>{{ svc.type }}</td>
+            <td>{{ svc.clusterIp }}</td>
+            <td class="muted">{{ svc.ingressIp }}</td>
+            <td>{{ svc.created }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="services.length > 0">
+      <button class="btn-download" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="btn-download" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </div>
+     <ng-template #noServices>
+      <div class="no-data">
+        No services data available
+      </div>
+    </ng-template>
+
+
+  </div>
+
+</div>

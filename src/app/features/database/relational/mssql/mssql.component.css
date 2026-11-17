@@ -1,0 +1,291 @@
+.searchbar {
+    margin-bottom: auto;
+    margin-top: auto;
+    border-radius: 15px;
+    padding: 5px 3px;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+
+}
+
+.h-8 {
+    height: 8%;
+}
+
+.h-92 {
+    height: 100%;
+}
+
+.databaseTable {
+    height: 85vh;
+    overflow-y: auto;
+}
+
+.border-b {
+    border-bottom-width: 0px;
+}
+
+.search_icon {
+    height: 22px;
+    width: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    /* color: rgb(9, 66, 112); */
+    text-decoration: none;
+    /* margin-left: 5px; */
+    cursor: pointer;
+}
+
+.searchbar:hover>.search_icon {
+    color: blue;
+}
+
+.form-control {
+    /* color:var(--text-color) ; */
+    width: 35%;
+}
+
+.searchbar input::placeholder {
+    color: var(--text-color);
+    font-size: small;
+}
+
+.custom-border {
+    border-color: var(--border-color) !important;
+    border-width: 0.3vh;
+}
+
+.text-link {
+    color: var(--accent-dark-blue);
+}
+
+.service-cell {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.service-name {
+    font-size: 12px !important;
+    /* force small size */
+    color: #60a5fa;
+    /* Tailwind blue-400 */
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.service-cell:hover .service-name {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Common */
+td {
+    vertical-align: middle;
+    /* padding: 8px 12px; */
+    font-size: 14px;
+    color: #333;
+}
+
+/* Service Cell */
+.service-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.service-name {
+    font-size: 14px;
+    color: #1f5daa;
+    /* blue-400 */
+}
+
+.service-cell:hover .service-name {
+    color: #1d4ed8;
+    /* blue-700 */
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Status Cell */
+.status-cell {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.status-label {
+    background-color: #16a34abc;
+    /* green-600 */
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* CPU Cell */
+.cpu-cell {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-color);
+    padding-left: 15px;
+
+}
+
+/* Memory Cell */
+.memory-cell {
+    min-width: 140px;
+}
+
+.memory-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.memory-bar-bg {
+    width: 96px;
+    height: 6px;
+    background-color: #90969e;
+    /* gray-600 */
+    border-radius: 4px;
+}
+
+.memory-bar-fill {
+    height: 6px;
+    background-color: #60a5fa;
+    /* blue-400 */
+    border-radius: 4px;
+}
+
+.memory-label {
+    font-size: 12px;
+    color: var(--text-color)
+}
+
+/* TX / RX */
+.tx-cell,
+.rx-cell {
+    font-size: 12px;
+    color: var(--text-color);
+    /* gray-800 */
+    text-align: left;
+}
+
+/* Started Cell */
+.started-cell {
+    font-size: 12px;
+    color: var(--text-color);
+    /* gray-500 */
+    padding-left: 15px;
+
+}
+
+
+.sm-font {
+    font-size: small;
+}
+
+
+th {
+    font-size: small;
+    font-family: system-ui;
+    font-weight: bold;
+    text-align: justify;
+
+
+}
+
+
+td {
+    font-size: smaller;
+    font-family: inherit;
+    font-weight: 400;
+    text-align: justify;
+}
+
+.table th {
+    background-color:
+        #b4c4c799;
+    color: #2b4f55;
+}
+
+.nav-tabs {
+    background-color: transparent;
+    /* border-bottom: 0.5px solid var(--border-color); */
+    display: flex;
+    border: 0;
+    margin-bottom: 10px;
+}
+
+.nav-tabs .nav-link {
+    position: relative;
+    color: #529cb576;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-tabs .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(to right, #E31C1F, #FF9500, #FFC07F);
+    transition: width 0.4s ease;
+    z-index: 1;
+    /* border-radius: 2px; */
+}
+
+/* Active link triggers the underline animation */
+.nav-tabs .nav-link.active::after {
+    width: 100%;
+}
+
+.nav-tabs .nav-link.active {
+    color: #529cb5;
+    /* Active deep red */
+    font-weight: 600;
+}
+
+/* Optional: hover style */
+.nav-tabs .nav-link:hover {
+    color: #60b6d3;
+    /* Hover tint */
+}
+
+.sm-font {
+    font-size: small;
+}
+
+.smm-font {
+    font-size: smaller;
+}
+
+.xsm-font {
+    font-size: x-small;
+
+}
+
+.fontStyle-heading {
+    font-family: system-ui;
+
+}

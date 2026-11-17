@@ -1,0 +1,125 @@
+<div class="deployment-dashboard">
+
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deployment Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('deployment')">
+          <span>Deployment Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'deployment'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'deployment'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="deploymentNameSearch">
+          </div>
+          <div class="option" *ngFor="let d of filteredDeploymentNames()" (click)="toggleSelection(d, selectedDeploymentNames)">
+            <input type="checkbox" [checked]="selectedDeploymentNames.has(d)"
+              (click)="$event.stopPropagation(); toggleSelection(d, selectedDeploymentNames)">
+            <span>{{ d }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Section -->
+      <!-- <div class="section">
+        <div class="section-header" (click)="toggleDropdown('status')">
+          <span>Status</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'status'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'status'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="statusSearch">
+          </div>
+          <div class="option" *ngFor="let s of filteredStatuses()" (click)="toggleSelection(s, selectedStatuses)">
+            <input type="checkbox" [checked]="selectedStatuses.has(s)"
+              (click)="$event.stopPropagation(); toggleSelection(s, selectedStatuses)">
+            <span>{{ s }}</span>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOP METRICS ===== -->
+  <div class="metrics-grid">
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasDesired === 0 }">
+      <div class="metric-title">Replicas Desired</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasDesired === 0 }">
+        {{ replicasDesired }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasAvailable === 0 }">
+      <div class="metric-title">Replicas Available</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasAvailable === 0 }">
+        {{ replicasAvailable }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasUnavailable === 0 }">
+      <div class="metric-title">Replicas Unavailable</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasUnavailable === 0 }">
+        {{ replicasUnavailable }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasUpdated === 0 }">
+      <div class="metric-title">Replicas Updated</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasUpdated === 0 }">
+        {{ replicasUpdated }}
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===== CHART ===== -->
+  <div class="card">
+    <div class="card-title">
+      Replicas per Deployment <span>(Metrics Kubernetes)</span>
+    </div>
+
+    <highcharts-chart *ngIf="replicasChartOptions" [Highcharts]="Highcharts" [options]="replicasChartOptions" [oneToOne]="true"
+      class="chart-lg">
+    </highcharts-chart>
+
+    <div *ngIf="!replicasChartOptions" class="no-data">
+      No data available
+    </div>
+
+  </div>
+
+</div>

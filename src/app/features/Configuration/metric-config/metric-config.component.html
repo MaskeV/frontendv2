@@ -1,0 +1,731 @@
+<main id="{{this.appComponenet.storedTheme}}background" class="mt-3">
+
+    <div class="mx-2 mb-0">
+        <ul class="nav nav-tabs mb-0" id="metricConfig-nav" style="font-size: small;">
+            <li class="nav-item" *ngIf="userTypeCrudMapList.configureMetrics?.tabVisibility === 'true'">
+                <a class="nav-link" [class.active]="activeTab === 'configureMetrics'" data-bs-toggle="tab" role="tab"
+                    href="#configureMetrics" (click)="activeTab = 'configureMetrics'; loadData('configureMetrics')">
+                    <i class="fa-solid fa-user mx-1"></i>Configure Metrics
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="userTypeCrudMapList.manageGlobalMetrics?.tabVisibility === 'true'">
+                <a class="nav-link" [class.active]="activeTab === 'manage'" data-bs-toggle="tab" role="tab"
+                    href="#manage" (click)="activeTab = 'manage'; loadData('manage')">
+                    <i class="fa-solid fa-list-check mx-1"></i>Manage Global Metrics
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="userTypeCrudMapList.configureHealthScoreMetrics?.tabVisibility === 'true'">
+                <a class="nav-link" [class.active]="activeTab === 'configHealthScore'" data-bs-toggle="tab" role="tab"
+                    href="#configHealthScore" (click)="activeTab = 'configHealthScore'">
+                    <i class="fa-solid fa-chart-bar mx-1"></i>Configure Health Score Metrics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="activeTab === 'configureMetrics'"
+        class="tab-pane fade card m-2 mt-0 custom-border border rounded-3 shadow show active" id="configureMetrics">
+        <div id={{this.appComponenet.storedTheme}} *ngIf="!isTable" class="card-header">
+            <div class="d-flex align-items-center justify-content-between">
+                <div style="width: 90%;" *ngIf="isCreation">
+                    <h3 class="sm-font">SET METRIC</h3>
+                </div>
+                <div *ngIf="isUpdation" (click)="showTable()" style="font-size: medium; cursor: pointer;">
+                    <i class="fa fa-arrow-left"></i>
+                </div>
+                <div style="width: 90%;" *ngIf="isUpdation">
+                    <h3 class="sm-font">UPDATE METRIC</h3>
+                </div>
+                <div *ngIf="userTypeCrudMapList?.configureMetrics?.view"
+                    style="font-size: small; cursor: pointer; border-left: 0.2px solid; padding: 0px 2px;"
+                    (click)="showTable()">
+                    <i class="fa fa-list" aria-hidden="true"></i> &nbsp; See All
+                </div>
+            </div>
+        </div>
+
+        <div id="{{this.appComponenet.storedTheme}}CardBody" *ngIf="!isTable" class="card-body"
+            [formGroup]="configureMetricsForm">
+            <div class="row my-2">
+                <div class="col-12 col-md-2 d-flex flex-column align-items-start">
+                    <h4 class="mb-1 sm-font font-style">Metric Name</h4>
+                </div>
+                <div class="col-12 col-md-10">
+                    <div class="row">
+                        <div class="mb-1 col-md-6">
+                            <label for="appType" class="form-label">
+                                Application Type <span class="text-danger">*</span>
+                            </label>
+                            <select formControlName="appType" (change)="onAppTypeChange()" name="appType"
+                                class="form-control form-control-sm" [disabled]="isUpdation">
+                                <option value="" disabled selected>Select Application Type</option>
+                                <option *ngFor="let product of productList" [value]="product">
+                                    {{ product }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" *ngIf="technologyList && technologyList.length > 0">
+                        <label class="form-label">Technology Type</label>
+
+                        <select *ngIf="!isEditMode"
+                            class="form-control form-control-sm"
+                            formControlName="techType"
+                            name="technology"
+                            (change)="onTechTypeChange()">
+                            <option value="">Select Technology</option>
+                            <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                                {{ tech.technologyType }}
+                            </option>
+                        </select>
+
+                        <select *ngIf="isEditMode"
+                            class="form-control form-control-sm"
+                            formControlName="techType"
+                            name="technology"
+                            (change)="onTechTypeChange()">
+                            <option value="">-- None --</option>
+                            <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                                {{ tech.technologyType }}
+                            </option>
+                        </select>
+                        </div>
+                        <div class="mb-1 col-md-6">
+                            <label for="appName" class="form-label">
+                                Application Name <span class="text-danger">*</span>
+                            </label>
+                            <select [disabled]="isUpdation" class="form-control form-control-sm" id="appName"
+                                formControlName="applicationId" (change)="onAppChange()">
+                                <option value="" disabled selected>Select</option>
+                                <option *ngFor="let item of getAppList()" [value]="item.applicationId">
+                                    {{ item.applicationName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-1 col-md-6" *ngIf="selectedAppType === srgApp">
+                            <label for="ruleType" class="form-label">Metric Type <span
+                                    class="text-danger">*</span></label>
+                            <select [disabled]="isUpdation" class="form-control form-control-sm" name="metricType"
+                                formControlName="healthRuleTypeId">
+                                <option label="" value="" disabled selected>Select</option>
+                                <option *ngFor="let item of healthRuleTypeList" [value]="item.id">
+                                    {{item.healthRuleName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-1 col-md-6">
+                            <label for="ruleType" class="form-label">Metric Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" placeholder="Enter Metric Name"
+                                style="margin-bottom: 1%;" formControlName="metricName" [disabled]="isUpdation"
+                                required (ngModelChange)="validateAlphaNumericUnderscore($event,alert_message)"
+                                autocomplete="none" *ngIf="(selectedAppType == srgApp) || isUpdation"
+                                appSanitizeInput>
+                            <select *ngIf="selectedAppType !== srgApp && !isUpdation"
+                                class="form-control form-control-sm"
+                                (change)="callBaselineMetric($any($event.target).value)" formControlName="metricName"
+                                name="metricName" style="margin-bottom: 1%;" required>
+                                <option value="" disabled selected>Select Metric</option>
+                                <option *ngFor="let item of customAlertList" [value]="item.metricName">
+                                    {{ item.metricLabel || item.metricName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row my-2">
+                <div class="col-12 col-md-2 d-flex flex-column align-items-start">
+                    <h4 class="mb-1 sm-font font-style">Unit Set</h4>
+                </div>
+                <div class="col-12 col-md-10">
+                    <div class="row">
+                        <div class="mb-1 col-md-6" *ngIf="showThresholdMode">
+                            <label for="thresholdMode" class="form-label">Threshold Mode <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-control form-control-sm" name="thresholdMode"
+                                formControlName="thresholdMode" (change)="onThresholdModeChange()">
+                                <option value="NORMAL_UNIT">Normal Unit</option>
+                                <option value="BASELINE_PERCENTAGE">Baseline Percentage</option>
+                            </select>
+                        </div>
+                        <div class="mb-1 col-md-6">
+                            <label for="ruleType" class="form-label">Data Unit <span
+                                    class="text-danger">*</span></label>
+                            <select *ngIf="selectedAppType === srgApp" class="form-control form-control-sm"
+                                formControlName="dataUnit">
+                                <option value="" disabled selected>Select</option>
+                                <option value="Value">Number</option>
+                                <option value="Text">Text</option>
+                                <option value="Percentage">Percentage</option>
+                            </select>
+                            <input *ngIf="selectedAppType !== srgApp" type="text"
+                                class="form-control form-control-sm" [value]="getDisplayedUnit()" readonly />
+                        </div>
+                        <div class="mb-1 col-md-6"
+                            *ngIf="configureMetricsForm.get('thresholdMode')?.value === 'BASELINE_PERCENTAGE'">
+                            <label for="baselineValue" class="form-label">Baseline</label>
+                            <input type="text" id="baselineValue" class="form-control form-control-sm"
+                                [value]="baselineValue || thresholdObj.baseline" readonly />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-1 col-md-6">
+                            <label for="ruleType" class="form-label">
+                                {{ configureMetricsForm.get('thresholdMode')?.value === 'BASELINE_PERCENTAGE' ?
+                                'Warning Level (%)' : ('Warning Level' + (getThresholdSuffix() ? ' (' +
+                                getThresholdSuffix() + ')' : '')) }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="warnLable" name="warnLable" class="form-control"
+                                    formControlName="warningPercentage" (ngModelChange)="validateMetricNumber();"
+                                    autocomplete="none" [placeholder]="getThresholdPlaceholder('warning')"
+                                    appSanitizeInput />
+                                <small class="text-danger"
+                                    *ngIf="metricWarningErrorMsg">{{metricWarningErrorMsg}}</small>
+                            </div>
+                            <small class="text-muted"
+                                *ngIf="configureMetricsForm.get('thresholdMode')?.value === 'BASELINE_PERCENTAGE'">Threshold
+                                will be calculated based on baseline value.</small>
+                            <small class="text-muted"
+                                *ngIf="configureMetricsForm.get('thresholdMode')?.value === 'NORMAL_UNIT'">Threshold
+                                will use direct metric values.</small>
+                        </div>
+                        <div class="mb-1 col-md-6">
+                            <label for="ruleType" class="form-label">
+                                {{ configureMetricsForm.get('thresholdMode')?.value === 'BASELINE_PERCENTAGE' ?
+                                'Critical Level (%)' : ('Critical Level' + (getThresholdSuffix() ? ' (' +
+                                getThresholdSuffix() + ')' : '')) }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="criticalLable" name="criticalLable" class="form-control"
+                                    formControlName="criticalPercentage" (ngModelChange)="validateMetricNumber();"
+                                    autocomplete="none" [placeholder]="getThresholdPlaceholder('critical')"
+                                    appSanitizeInput />
+                                <small class="text-danger"
+                                    *ngIf="metricCriticalErrorMsg">{{metricCriticalErrorMsg}}</small>
+                            </div>
+                            <small class="text-muted"
+                                *ngIf="configureMetricsForm.get('thresholdMode')?.value === 'BASELINE_PERCENTAGE'">Threshold
+                                will be calculated based on baseline value.</small>
+                            <small class="text-muted"
+                                *ngIf="configureMetricsForm.get('thresholdMode')?.value === 'NORMAL_UNIT'">Threshold
+                                will use direct metric values.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="col-md-12"
+                *ngIf="userTypeCrudMapList.configureMetrics.create && userTypeCrudMapList.configureMetrics.edit">
+                <div class="form-group d-flex justify-content-end">
+                    <button id="{{this.appComponenet.storedTheme}}button" type="submit"
+                        class="btn btn-outline-primary btn-sm mt-2" (click)="saveThreshold()"
+                        *ngIf="isCreation && userTypeCrudMapList.configureMetrics.create">Set</button>
+                    <button id="{{this.appComponenet.storedTheme}}button" type="submit"
+                        class="btn btn-outline-primary btn-sm mt-2" (click)="updateThreshold(alert_message)"
+                        *ngIf="isUpdation && userTypeCrudMapList.configureMetrics.edit">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'manage'"
+        class="tab-pane fade card m-2 mt-0 custom-border border rounded-3 shadow show active" id="manage">
+
+        <div id="{{ this.appComponenet.storedTheme }}" class="card-header">
+            <div class="d-flex align-items-center justify-content-between">
+                <div *ngIf="!isEditMode" style="width: 90%;">
+                    <h3 class="sm-font">Global Metric Threshold Management</h3>
+                </div>
+                <div style="width: 90%;" *ngIf="isEditMode">
+                    <h3 class="sm-font">Update Metric</h3>
+                </div>
+                <div style="font-size: small; cursor: pointer; border-left: 0.2px solid; padding: 0px 2px;"
+                    *ngIf="!showTableSection && this.userTypeCrudMapList?.manageGlobalMetrics.view"
+                    (click)="showGlobalMetricTable()">
+                    <i class="fa fa-list" aria-hidden="true"></i> &nbsp; See All
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!showTableSection" class="card-body">
+            <form [formGroup]="thresholdForm" (ngSubmit)="onSubmit()">
+
+                <div class="row g-3 mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Metric <span class="text-danger">*</span></label>
+                        <select formControlName="metric" class="form-control form-control-sm" [disabled]="isEditMode"
+                            required>
+                            <option value="">Select Metric</option>
+                            <option *ngFor="let metric of filteredMetricList" [value]="metric">
+                                {{ metric }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Threshold Source <span class="text-danger">*</span></label>
+                        <select formControlName="thresholdSource" class="form-control form-control-sm"
+                            (change)="onThresholdSourceChange(thresholdSource.value)" #thresholdSource>
+                            <option value="">Select</option>
+                            <option *ngFor="let source of thresholdSourceList" [value]="source">
+                                {{ source | titlecase }}
+                            </option>
+                        </select>
+                        <div *ngIf="thresholdMsg" class="text-info small">{{ thresholdMsg | titlecase }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Calculation Type <span class="text-danger">*</span></label>
+                        <select formControlName="calculationType" class="form-control form-control-sm"
+                            [disabled]="calculationTypeDisabled"
+                            (change)="onThresholdSourceChange(calculationType.value)" #calculationType>
+                            <option value="">Select</option>
+                            <option *ngFor="let calcType of filteredCalculationTypeList" [value]="calcType">
+                                {{ calcType | titlecase }}
+                            </option>
+                        </select>
+                        <div *ngIf="calcTypeMsg" class="text-info" style="font-size: x-small;">{{ calcTypeMsg }}</div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-2">
+                    <div class="col-md-4" *ngIf="showValueFields">
+                        <label class="form-label">Warning <span class="text-danger">*</span></label>
+                        <input type="number" formControlName="warning" class="form-control form-control-sm"
+                            placeholder="Warning value" min="0" (keydown)="preventNegative($event)" required />
+                    </div>
+                    <div class="col-md-4" *ngIf="showValueFields">
+                        <label class="form-label">Critical <span class="text-danger">*</span></label>
+                        <input type="number" formControlName="critical" class="form-control form-control-sm"
+                            placeholder="Critical value" min="0" (keydown)="preventNegative($event)" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Metric Unit</label>
+                        <input type="text" formControlName="metricUnit" class="form-control form-control-sm"
+                            placeholder="e.g. ms, %" appSanitizeInput />
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-2">
+                    <div class="col-md-4" *ngIf="showValueFields">
+                        <label class="form-label">Metric Adjustment</label>
+                        <select formControlName="metricAdjustment" class="form-control form-control-sm">
+                            <option value="">Select</option>
+                            <option value="ADD">Add</option>
+                            <option value="SUBTRACT">Subtract</option>
+                            <option value="MULTIPLY">Multiply</option>
+                            <option value="MULTIPLY BY CORE">Multiply By Core</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Application Type</label>
+                        <select formControlName="appType" class="form-control form-control-sm"
+                            (change)="changeGlobAppType($event)">
+                            <option value="" disabled>Select</option>
+                            <option *ngFor="let product of productList" [value]="product">
+                                {{ product }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4" *ngIf="technologyList && technologyList.length > 0">
+                        <label class="form-label">Technology Type</label>
+                        <select class="form-control form-control-sm" formControlName="techType"
+                            name="technology">
+                            <option value="">Select Technology</option>
+                            <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                                {{ tech.technologyType }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Good Direction <span class="text-danger">*</span></label>
+                        <select formControlName="goodDirection" class="form-control form-control-sm" required>
+                            <option value="">Select</option>
+                            <option value="LOW">Low is Good (↓)</option>
+                            <option value="HIGH">High is Good (↑)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 text-end"
+                        *ngIf="this.userTypeCrudMapList?.manageGlobalMetrics.edit || this.userTypeCrudMapList?.manageGlobalMetrics.create">
+                        <button type="submit" class="btn btn-outline-primary btn-sm mt-2 me-2"
+                            [disabled]="thresholdForm.invalid">
+                            {{ isEditMode ? 'Update' : 'Add' }} Threshold
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" *ngIf="!isEditMode"
+                            (click)="resetForm()">Clear</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <div *ngIf="showTableSection" class="hr-wrapper">
+
+            <div class="hr-toolbar">
+                <div class="hr-toolbar__back">
+                    <button type="button" class="hr-btn-back" (click)="hideGlobalMetricTable()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+                <div class="hr-toolbar__search">
+                    <div class="hr-search-wrap">
+                        <input type="text" class="hr-search-input" [(ngModel)]="searchText2"
+                            placeholder="Search Metric…" appSanitizeInput />
+                        <i class="fas fa-search hr-search-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hr-table-scroll">
+                <table class="hr-table">
+                    <thead>
+                        <tr>
+                            <th style="width:4%">Sr No</th>
+                            <th style="width:12%">Metric</th>
+                            <th>Warning</th>
+                            <th>Critical</th>
+                            <th>Metric Unit</th>
+                            <th>Threshold Source</th>
+                            <th>Calculation Type</th>
+                            <th>Application Type</th>
+                            <th>Technology Type</th>
+                            <th>Good Direction</th>
+                            <th>Operation</th>
+                            <th>Created On</th>
+                            <th>Created By</th>
+                            <th style="width:4%"
+                                *ngIf="this.userTypeCrudMapList?.manageGlobalMetrics.edit || this.userTypeCrudMapList?.manageGlobalMetrics.delete">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="hr-tr"
+                            *ngFor="let row of globalThresholdList | grdFilter: { metric: searchText2 }: false; let i = index">
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ row.metric }}</td>
+                            <td>{{ row.warning }}</td>
+                            <td>{{ row.critical }}</td>
+                            <td>{{ row.metricUnit }}</td>
+                            <td>{{ row.thresholdSource }}</td>
+                            <td>{{ row.calculationType }}</td>
+                            <td>{{ row.applicationType || '-' }}</td>
+                            <td>{{ row.technologyTypeName || '-' }}</td>
+                            <td>{{ row.goodDirection }}</td>
+                            <td>{{ row.metricAdjustment }}</td>
+                            <td>{{ row.createdOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+                            <td>{{ row.createdBy }}</td>
+                            <td
+                                *ngIf="this.userTypeCrudMapList?.manageGlobalMetrics.edit || this.userTypeCrudMapList?.manageGlobalMetrics.delete">
+                                <div class="hr-action-group">
+                                    <button class="hr-action-btn hr-action-btn--edit" type="button"
+                                        *ngIf="this.userTypeCrudMapList?.manageGlobalMetrics.edit"
+                                        (click)="editThreshold(row)">
+                                        <em class="fa fa-edit"></em>
+                                    </button>
+                                    <button class="hr-action-btn hr-action-btn--delete" type="button"
+                                        *ngIf="this.userTypeCrudMapList?.manageGlobalMetrics.delete"
+                                        (click)="deleteGlobalThreshold(row.id)">
+                                        <em class="fa fa-trash"></em>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="(globalThresholdList | grdFilter: { metric: searchText2 }: false).length === 0"
+                            style="display:table-row !important;height:57vh">
+                            <td colspan="14" style="border:none">
+                                <div class="hr-empty">No Data Found</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'configHealthScore'"
+        class="tab-pane fade card m-2 mt-0 custom-border border rounded-3 shadow show active" id="configHealthScore">
+        <app-health-score-metric-config></app-health-score-metric-config>
+    </div>
+
+    <div class="row"
+        *ngIf="isTable || (userTypeCrudMapList.configureMetrics.view && !userTypeCrudMapList.configureMetrics.create && !isUpdation)">
+        <div class="col-md-12" style="padding: 8px 12px;">
+
+            <div class="hr-toolbar" style="padding: 8px 12px;">
+                <div class="hr-toolbar__back" *ngIf="isTable || isUpdation">
+                    <button type="button" class="hr-btn-back" (click)="showForm()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+                <div class="hr-toolbar__filter">
+                    <label class="hr-label" id="{{this.appComponenet.storedTheme}}text">
+                        Application Type<span class="hr-required">*</span>
+                    </label>
+                    <select class="hr-select" [(ngModel)]="selectedAppType2" (change)="setAppType2()">
+                        <option value="" disabled>Select</option>
+                        <option *ngFor="let product of productList" [value]="product">{{ product }}</option>
+                    </select>
+                </div>
+                <div class="hr-toolbar__filter" *ngIf="technologyList.length > 0">
+                    <label class="hr-label">Technology Type<span class="hr-required">*</span></label>
+                    <select class="hr-select" [(ngModel)]="technology" name="technology"
+                        (ngModelChange)="onTechChange($event)">
+                        <option value="">Select Technology</option>
+                        <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                            {{ tech.technologyType }}
+                        </option>
+                    </select>
+                </div>
+                <div class="hr-toolbar__filter">
+                    <label class="hr-label" id="{{this.appComponenet.storedTheme}}text">
+                        Application Name<span class="hr-required">*</span>
+                    </label>
+                    <select class="hr-select" id="appName" [(ngModel)]="viewthresholdObj.applicationID"
+                        (change)="getAllthresholdByApplication(viewthresholdObj.applicationID)">
+                        <option selected value="" disabled>Select</option>
+                        <option *ngFor="let data of allApplications" [value]="data.applicationId">
+                            {{ data.applicationName }}
+                        </option>
+                    </select>
+                </div>
+                <div class="hr-toolbar__search">
+                    <div class="hr-search-wrap">
+                        <input type="text" class="hr-search-input" [(ngModel)]="searchText" (keyup)="search()"
+                            placeholder="Search Metric Name…" appSanitizeInput />
+                        <i class="fas fa-search hr-search-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding: 8px 12px;">
+                <div class="col-md-12">
+                    <div class="hr-table-scroll">
+                        <table class="hr-table">
+                            <colgroup>
+                                <col style="width:4%">
+                                <col style="width:13%">
+                                <col style="width:13%">
+                                <col style="width:11%">
+                                <col style="width:8%">
+                                <col style="width:7%">
+                                <col style="width:7%">
+                                <col style="width:13%">
+                                <col style="width:10%">
+                                <col style="width:4%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Sr. No</th>
+                                    <th (click)="sortBy('module')">
+                                        Metric Name
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'module' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('applicationName')">
+                                        Application Name
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'applicationName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('healthRuleName')">
+                                        Metric Type
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'healthRuleName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('dataUnit')">
+                                        Data Unit
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'dataUnit' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('warningPercentage')">
+                                        Warning
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'warningPercentage' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('criticalPercentage')">
+                                        Critical
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'criticalPercentage' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('createdOn')">
+                                        Created On
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'createdOn' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th (click)="sortBy('createdBy')">
+                                        Created By
+                                        <i class="fa"
+                                            [ngClass]="sortparam === 'createdBy' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th
+                                        *ngIf="userTypeCrudMapList.configureMetrics.edit || userTypeCrudMapList.configureMetrics.delete">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hr-tr" *ngFor="let data of thresholdList
+                                    | grdFilter:{ module: searchText } : false
+                                    | sort:[sortparam, sortDirection]
+                                    | slice:(currentPage - 1) * itemsPerPage : currentPage * itemsPerPage;
+                                    let i = index">
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ data.metricLabel || data.module }}</td>
+                                    <td>{{ data.applicationName }}</td>
+                                    <td>{{ data.healthRuleName }}</td>
+                                    <td>{{ data.dataUnit === 'Value' ? 'Number' : data.dataUnit }}</td>
+                                    <td>{{ data.warningPercentage }}</td>
+                                    <td>{{ data.criticalPercentage }}</td>
+                                    <td>{{ data.createdOn | date:'dd-MM-yyyy HH:mm:ss' }}</td>
+                                    <td>{{ data.createdBy }}</td>
+                                    <td
+                                        *ngIf="userTypeCrudMapList.configureMetrics.edit || userTypeCrudMapList.configureMetrics.delete">
+                                        <div class="hr-action-group">
+                                            <button class="hr-action-btn hr-action-btn--edit" type="button"
+                                                *ngIf="userTypeCrudMapList.configureMetrics.edit"
+                                                (click)="openUpdateThreshold(data)">
+                                                <em class="fa fa-edit"></em>
+                                            </button>
+                                            <button class="hr-action-btn hr-action-btn--delete" type="button"
+                                                *ngIf="userTypeCrudMapList.configureMetrics.delete"
+                                                (click)="openDeleteThreshold(template, data)">
+                                                <em class="fa fa-trash"></em>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="(thresholdList | grdFilter:{ module: searchText } : false).length === 0"
+                                    style="display:table-row !important;">
+                                    <td colspan="10" style="border:none;">
+                                        <div class="hr-empty">No Data Found</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <nav class="hr-pagination">
+                        <ul class="hr-page-list">
+                            <li [class.hr-page-item--disabled]="currentPage === 1">
+                                <button type="button" class="hr-page-btn" (click)="previousPage()"
+                                    [disabled]="currentPage === 1">
+                                    <i class="fa-solid fa-angle-left"></i>
+                                </button>
+                            </li>
+                            <li class="hr-page-input-wrap">
+                                <input type="number" class="hr-page-input" [(ngModel)]="currentPage"
+                                    (keydown.enter)="goToPage(currentPage)" min="1" [max]="totalPages" />
+                                <span class="hr-page-of">of {{ totalPages }}</span>
+                            </li>
+                            <li [class.hr-page-item--disabled]="currentPage === totalPages">
+                                <button type="button" class="hr-page-btn" (click)="nextPage()"
+                                    [disabled]="currentPage === totalPages">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div *ngIf="toast.visible" class="toast-box" [ngClass]="toast.type">
+    {{ toast.message }}
+</div>
+
+<div id="alertListDetailsModal" class="modal fade" aria-labelledby="alertDetailsListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <h3 class="modal-title text-center modal-title-margin">Alert Details List</h3>
+            <div class="modal-body text-center">
+                <strong>
+                    <p>This Metric is already set for following Alerts. Kindly Create New Metric.</p>
+                </strong>
+                <table class="table" aria-describedby="">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col"><strong>Sr.No</strong></th>
+                            <th scope="col"><strong>Application Name</strong></th>
+                            <th scope="col"><strong>Alert Name</strong></th>
+                            <th scope="col"><strong>Metric Type</strong></th>
+                            <th scope="col"><strong>Metric Name</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="{{ this.appComponenet.storedTheme }}text"
+                            *ngFor="let data of paginatedAlerts; let i = index">
+                            <td class="table-text-align-center">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                            <td class="table-text-align-center">{{ data.applicationName }}</td>
+                            <td class="table-text-align-center">{{ data.alertName }}</td>
+                            <td class="table-text-align-center">{{ data.healthRuleName }}</td>
+                            <td class="table-text-align-center">{{ data.serviceTypeName }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <nav class="mb-1 mt-2">
+                    <ul class="pagination justify-content-center align-items-center"
+                        style="font-size: small; gap: 0.5rem;">
+                        <li class="page-item" [class.disabled]="alertcurrentPage === 1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary border-none"
+                                (click)="previousPage()" [disabled]="alertcurrentPage === 1" tabindex="0">
+                                <i aria-hidden="true" class="fa-solid fa-angle-left"></i>
+                            </button>
+                        </li>
+                        <li class="page-item d-flex align-items-center">
+                            <input type="number" class="form-control form-control-sm text-center" style="width: 60px"
+                                [value]="alertcurrentPage" (keydown.enter)="goToPage(+pageInput.value)" #pageInput
+                                min="1" [max]="alerttotalPages" aria-label="Page number input" />
+                            <span class="ms-2">of {{ alerttotalPages }}</span>
+                        </li>
+                        <li class="page-item" [class.disabled]="alertcurrentPage === alerttotalPages">
+                            <button type="button" class="btn btn-sm btn-outline-secondary border-none"
+                                (click)="nextPage()" [disabled]="alertcurrentPage === alerttotalPages" tabindex="0">
+                                <i aria-hidden="true" class="fa-solid fa-angle-left"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="modal-footer">
+                <button id="{{this.appComponenet.storedTheme}}button" type="button" class="btn modal-button"
+                    data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #template>
+    <div class="modal-body text-center" id="metricDeleteDiv">
+        <p>This metric might have been used somewhere else. Are you sure you want to delete the metric?</p>
+        <button type="button" class="btn btn-success" (click)="deleteThreshold(alert_message)">Yes,
+            proceed</button>&nbsp;
+        <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+    </div>
+</ng-template>
+
+<ng-template #alert_message>
+    <div class="modal-body text-center">
+        <p>{{alertMessage}}</p>
+        <button type="button" *ngIf="isSuccess" class="btn btn-success" (click)="cancelRequest()">OK</button>&nbsp;
+        <button type="button" *ngIf="isError" class="btn btn-danger" (click)="cancelRequest()">OK</button>&nbsp;
+    </div>
+</ng-template>

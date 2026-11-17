@@ -1,0 +1,520 @@
+<div class="min-h-screen bg-slate-50 pb-6 font-sans">
+    <div class="w-full flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Role Updation</h1>
+            <p class="text-sm text-slate-500 mt-1">Update Role Access Mapping system for the Netraa platform.
+            </p>
+        </div>
+        <button (click)="navigateToManagement()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white transition-all duration-200 border border-transparent rounded-md shadow-sm bg-[#f26321] hover:bg-[#d9581b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f26321]">
+            <i class="ri-eye-line"></i>
+            See All Roles
+        </button>
+    </div>
+
+    <main class="w-full">
+
+        <!-- Role Details Card -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div class="md:col-span-4">
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Role
+                        Name</label>
+                    <input type="text" appSanitizeInput [(ngModel)]="roleName" placeholder="e.g. System Administrator"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                </div>
+                <div class="md:col-span-8">
+                    <label
+                        class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Description</label>
+                    <input type="text" appSanitizeInput [(ngModel)]="description" placeholder="Brief description of this role"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Selector -->
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-[#f26321]/10 text-[#f26321]">
+                        <i class="ri-layout-grid-line text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900">Monitoring Product & Feature Component Selection
+                        </h2>
+                        <p class="text-sm text-slate-500">Enable monitoring products and feature components for this
+                            role</p>
+                    </div>
+                </div>
+                <span *ngIf="selectedProducts.length > 0"
+                    class="text-xs font-bold text-[#f26321] uppercase tracking-wider bg-[#f26321]/10 px-2 py-1 rounded">
+                    Active Selection
+                </span>
+            </div>
+
+            <div class="mt-5 mb-5">
+                <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2.5 block">Monitoring
+                    Products</label>
+                <div class="flex flex-wrap gap-2">
+                    <button *ngFor="let p of availableProducts" (click)="toggleProduct(p)"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 border"
+                        [ngClass]="selectedProducts.includes(p) ? 'bg-[#f26321] text-white border-[#f26321] shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'">
+                        <i *ngIf="selectedProducts.includes(p)" class="ri-checkbox-circle-fill text-base pr-2"></i>
+                        {{ p }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2.5 block">Feature
+                    Components</label>
+                <div class="flex flex-wrap gap-2">
+                    <button *ngFor="let f of availableFeatures" (click)="toggleFeature(f)"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 border"
+                        [ngClass]="selectedFeatures.includes(f) ? 'bg-[#f26321] text-white border-[#f26321] shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'">
+                        <i [ngClass]="getFeatureIcon(f) + ' text-base'"></i>
+                        {{ f }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Configuration Grid -->
+        <div *ngIf="selectedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div *ngFor="let product of sortedProducts"
+                class="rounded-lg border border-slate-200 bg-white overflow-hidden transition-all duration-200"
+                [class.col-span-full]="isFullWidth(product)">
+
+                <!-- Config Panel Header -->
+                <div class="flex items-start justify-between px-5 py-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    (click)="togglePanelCollapse(product)">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2 rounded-lg bg-[#f26321]/10 text-[#f26321] mt-0.5">
+                            <i [class]="getProductIcon(product) + ' text-xl'"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">{{ getPanelTitle(product) }}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">{{ getPanelDescription(product) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div *ngIf="getAccessCount(product) > 0"
+                            class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider">
+                            {{ getAccessCount(product) }} {{ product === 'Service' ? 'Services' : 'Rules' }}
+                        </div>
+                        <i [class]="isPanelCollapsed(product) ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line'"
+                            class="text-slate-400 text-lg"></i>
+                    </div>
+                </div>
+
+                <!-- Config Panel Body -->
+                <div [class.hidden]="isPanelCollapsed(product)"
+                    class="px-5 pb-5 pt-0 border-t border-slate-50 anim-fade-in">
+
+                    <!-- Software Metering Specific UI -->
+                    <ng-container *ngIf="product === 'Software Metering'">
+                        <div class="space-y-3 mt-4">
+                            <div *ngFor="let r of smRules; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Zone</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.zoneId" (change)="onSmZoneChange(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select Zone</option>
+                                            <option *ngFor="let zone of softwareMeteringZones" [value]="zone.id">{{
+                                                zone.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Group</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.groupId"
+                                            [disabled]="!r.zoneId || r.groupList.length === 0"
+                                            (change)="checkDuplicateSm(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321] disabled:bg-slate-50 disabled:text-slate-400">
+                                            <option [value]="null" disabled selected>
+                                                {{ r.zoneId && r.groupList.length === 0 ? 'No groups available' :
+                                                'Select Group' }}
+                                            </option>
+                                            <option *ngFor="let group of r.groupList" [value]="group.id">{{ group.name
+                                                }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button (click)="smRemoveRule(i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><i
+                                        class="ri-delete-bin-line text-lg"></i></button>
+                            </div>
+                            <div *ngIf="smRules.length === 0"
+                                class="text-xs text-slate-500 italic p-4 bg-slate-50 border border-slate-200 border-dashed rounded-lg text-center">
+                                No zone/group rules configured. Click 'Add Rule' to create one.
+                            </div>
+                            <button (click)="smAddRule()"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add Zone/Group Rule
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- GENERIC DRAG AND DROP CONFIG CONTENT -->
+                    <ng-container
+                        *ngIf="productState[product]?.mode === 'GENERIC' || productState[product]?.mode === 'DRAG_DROP'">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Available Services -->
+                            <div class="flex flex-col h-full">
+                                <label
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Available
+                                    Items</label>
+                                <div class="relative mb-2">
+                                    <i class="ri-search-line absolute left-2.5 top-2.5 text-slate-400"></i>
+                                    <input type="text" appSanitizeInput [(ngModel)]="productState[product].searchAvail"
+                                        placeholder="Search..."
+                                        class="w-full pl-8 h-9 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321] transition-colors">
+                                </div>
+                                <div cdkDropList [id]="product + 'AvailList'"
+                                    [cdkDropListData]="productState[product].available"
+                                    [cdkDropListConnectedTo]="[product + 'AssignedList']"
+                                    class="border border-slate-200 rounded-lg bg-slate-50/50 flex-1 min-h-[12rem] scrollable-list p-1"
+                                    (cdkDropListDropped)="genericDrop($event, product)">
+                                    <div *ngFor="let s of getFilteredAvail(product)" cdkDrag
+                                        (contextmenu)="onRightClick($event, product, s)"
+                                        class="group flex items-center justify-between px-3 py-2.5 mb-1 bg-white border border-slate-200 rounded-md shadow-sm cursor-grab active:cursor-grabbing hover:border-[#f26321]/50 transition-all">
+                                        <span class="text-sm text-slate-700">{{ s }}</span>
+                                        <i class="ri-drag-move-2-line text-slate-300 group-hover:text-slate-500"></i>
+                                    </div>
+                                    <div *ngIf="productState[product].available?.length === 0"
+                                        class="h-full flex items-center justify-center text-xs text-slate-400 italic p-4">
+                                        No items available</div>
+                                </div>
+                            </div>
+                            <!-- Assigned Services -->
+                            <div class="flex flex-col h-full">
+                                <label
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Assigned
+                                    to Role</label>
+                                <div class="relative mb-2">
+                                    <i class="ri-search-line absolute left-2.5 top-2.5 text-slate-400"></i>
+                                    <input type="text" appSanitizeInput [(ngModel)]="productState[product].searchAssigned"
+                                        placeholder="Search assigned..."
+                                        class="w-full pl-8 h-9 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321] transition-colors">
+                                </div>
+                                <div cdkDropList [id]="product + 'AssignedList'"
+                                    [cdkDropListData]="productState[product].assigned"
+                                    [cdkDropListConnectedTo]="[product + 'AvailList']"
+                                    class="border border-[#f26321]/20 bg-[#f26321]/20 rounded-lg flex-1 min-h-[12rem] scrollable-list p-1"
+                                    (cdkDropListDropped)="genericDrop($event, product)">
+                                    <div *ngFor="let s of getFilteredAssigned(product)" cdkDrag
+                                        class="group flex items-center justify-between px-3 py-2.5 mb-1 bg-white border border-[#f26321]/30 rounded-md shadow-sm cursor-grab active:cursor-grabbing hover:border-[#f26321]/60 transition-all">
+                                        <div class="flex items-center gap-2"><i
+                                                class="ri-check-double-line text-[#f26321]"></i><span
+                                                class="text-sm font-medium text-slate-800">{{ s }}</span></div>
+                                        <button (click)="unassignService(product, s)"
+                                            class="text-slate-400 hover:text-red-500 transition-colors"><i
+                                                class="ri-close-circle-line text-lg"></i></button>
+                                    </div>
+                                    <div *ngIf="productState[product].assigned?.length === 0"
+                                        class="h-full flex items-center justify-center text-xs text-slate-400 italic p-4">
+                                        Drag items here to assign</div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- SRG CONFIG -->
+                    <ng-container *ngIf="product === 'SRG'">
+                        <div class="space-y-3">
+                            <div *ngFor="let m of srgMappings; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Application</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="m.appId" (change)="onSrgAppChange(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select Application</option>
+                                            <option *ngFor="let app of productState[product]?.appsList || []"
+                                                [value]="app.applicationId">{{ app.applicationName }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Sub
+                                        Feature</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="m.subFeatureID" [disabled]="!m.appId"
+                                            (ngModelChange)="checkDuplicateSrg(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md">
+                                            <option [value]="null" disabled>Select Sub Feature</option>
+                                            <option *ngFor="let sub of m.subFeatureList" [value]="sub.subFeatureId">
+                                                {{ sub.subFeatureName }}
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <button (click)="srgRemoveMapping(i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><i
+                                        class="ri-delete-bin-line text-lg"></i></button>
+                            </div>
+                            <button (click)="srgAddMapping()"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add SRG Mapping
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- NETWORK CONFIG -->
+                    <ng-container *ngIf="product === 'NETWORK' || product === 'Network'">
+                        <div class="space-y-3">
+                            <div *ngFor="let r of networkRules; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Application
+                                        Name</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.appId" (change)="onNetworkAppChange(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select Application</option>
+                                            <option *ngFor="let app of productState[product]?.appsList || []"
+                                                [value]="app.applicationId">{{
+                                                app.applicationName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Host
+                                        Name</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.hostId" [disabled]="!r.appId"
+                                            (ngModelChange)="checkDuplicateNetwork(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option value="" disabled selected>Select Host</option>
+                                            <option *ngFor="let h of r.hostList" [value]="h.hostId">{{ h.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button (click)="networkRemoveRule(i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><i
+                                        class="ri-delete-bin-line text-lg"></i></button>
+                            </div>
+                            <button (click)="networkAddRule()"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add Network Rule
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- HOST CONFIG -->
+                    <ng-container *ngIf="product === 'HOST' || product === 'Host'">
+                        <div class="space-y-3">
+                            <div *ngFor="let r of hostRules; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <div class="w-1/4">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">OS
+                                        Type</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.osType" (change)="onHostOsChange(i)"
+                                            class="w-full h-9 pl-9 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option value="" disabled selected>Select OS</option>
+                                            <option *ngFor="let tech of hostTechTypes" [value]="tech.technologyType">{{
+                                                tech.technologyType }}
+                                            </option>
+                                        </select>
+                                        <i class="ri-ubuntu-line absolute left-3 top-2.5 text-slate-400 pointer-events-none"
+                                            *ngIf="r.osType === 'LINUX' || r.osType === 'Linux'"></i>
+                                        <i class="ri-windows-fill absolute left-3 top-2.5 text-slate-400 pointer-events-none"
+                                            *ngIf="r.osType === 'WINDOWS' || r.osType === 'Windows'"></i>
+                                        <i class="ri-apple-fill absolute left-3 top-2.5 text-slate-400 pointer-events-none"
+                                            *ngIf="r.osType === 'MACOS' || r.osType === 'MacOS'"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.appId" (change)="onHostAppChange(i)"
+                                            [disabled]="!r.osType"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select Host Pattern</option>
+                                            <option *ngFor="let app of r.appList" [value]="app.applicationId">{{
+                                                app.applicationName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.ipRange" [disabled]="!r.appId"
+                                            (ngModelChange)="checkDuplicateHost(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option value="" disabled selected>Select IP Range</option>
+                                            <option *ngFor="let ip of r.ipList" [value]="ip.ipAddress">{{ ip.ipAddress
+                                                }} ({{ ip.environment }})</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button (click)="hostRemoveRule(i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><i
+                                        class="ri-delete-bin-line text-lg"></i></button>
+                            </div>
+                            <button (click)="hostAddRule()"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add Host Rule
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- DATABASE CONFIG -->
+                    <ng-container *ngIf="product === 'DATABASE' || product === 'Database'">
+                        <div class="space-y-3">
+                            <div *ngFor="let r of dbRules; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <div class="w-1/4">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">DB
+                                        Type</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.dbType" (ngModelChange)="checkDuplicateDb(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select DB Type</option>
+                                            <option *ngFor="let tech of productState[product]?.techTypes || []"
+                                                [value]="tech.technologyType">
+                                                {{ tech.technologyType }}
+                                            </option>
+                                            <!-- Fallback if techTypes empty -->
+                                            <ng-container *ngIf="!productState[product]?.techTypes?.length">
+                                                <option value="PostgreSQL">PostgreSQL</option>
+                                                <option value="MySQL">MySQL</option>
+                                                <option value="MongoDB">MongoDB</option>
+                                                <option value="Oracle">Oracle</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Connection
+                                        String / ID</label>
+                                    <input type="text" appSanitizeInput [(ngModel)]="r.connectionId"
+                                        (ngModelChange)="checkDuplicateDb(i)" placeholder="e.g. postgres://prod-db:5432"
+                                        class="w-full h-9 px-3 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                </div>
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Privileges</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="r.privilege" (ngModelChange)="checkDuplicateDb(i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option value="Read/Write">Read/Write</option>
+                                            <option value="Read Only">Read Only</option>
+                                            <option value="Admin">Admin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button (click)="dbRemoveRule(i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><i
+                                        class="ri-delete-bin-line text-lg"></i></button>
+                            </div>
+                            <button (click)="dbAddRule()"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add Database Rule
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- TECH_TYPE CONFIG CONTENT (Kafka, Relational, Non-Relational) -->
+                    <ng-container *ngIf="productState[product]?.mode === 'TECH_TYPE'">
+                        <div class="space-y-3">
+                            <div *ngFor="let rule of productState[product].rules; let i = index"
+                                class="flex items-end gap-3 p-4 border border-slate-100 rounded-lg bg-slate-50/50 hover:border-slate-300 transition-colors">
+                                <!-- Technology Dropdown -->
+                                <div class="w-1/4">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Technology</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="rule.techType"
+                                            (change)="onRuleTechnologyChange(product, i)"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option value="" disabled selected>Select Technology</option>
+                                            <option *ngFor="let tech of productState[product].techTypes"
+                                                [value]="tech.technologyType">
+                                                {{ tech.technologyType }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Application Dropdown -->
+                                <div class="flex-1">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Application</label>
+                                    <div class="relative">
+                                        <select [(ngModel)]="rule.appId" (change)="checkDuplicateTechRule(product, i)"
+                                            [disabled]="!rule.techType"
+                                            class="w-full h-9 pl-3 pr-8 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-[#f26321]">
+                                            <option [value]="null" disabled selected>Select Application</option>
+                                            <option *ngFor="let app of rule.appsList" [value]="app.applicationId">
+                                                {{ app.applicationName }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Remove Button -->
+                                <button (click)="removeTechRule(product, i)"
+                                    class="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                                    <i class="ri-delete-bin-line text-lg"></i>
+                                </button>
+                            </div>
+                            <div *ngIf="!productState[product].rules || productState[product].rules.length === 0"
+                                class="text-xs text-slate-500 italic p-4 bg-slate-50 border border-slate-200 border-dashed rounded-lg text-center">
+                                No rules configured. Click 'Add Rule' to create one.
+                            </div>
+                            <button (click)="addTechRule(product)"
+                                class="w-full py-2.5 border-2 border-dashed border-slate-200 rounded-lg text-sm text-slate-500 font-medium hover:border-[#f26321]/60 hover:text-[#f26321] hover:bg-[#f26321]/10 transition-all flex items-center justify-center gap-2">
+                                <i class="ri-add-line"></i> Add Rule
+                            </button>
+                        </div>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+        <div *ngIf="selectedProducts.length === 0"
+            class="text-center py-10 border-2 border-dashed border-slate-200 rounded-lg">
+            <p class="text-slate-400 text-sm">Select a monitoring product above to configure access rules</p>
+        </div>
+
+        <!-- Action Buttons at bottom of Page -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm mt-6 flex items-center justify-between">
+            <button (click)="navigateToManagement()"
+                class="px-6 py-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-[11px] font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 animate-hover cursor-pointer">
+                Discard Changes <i class="ri-close-line text-base"></i>
+            </button>
+
+            <div class="flex items-center gap-5">
+                <div class="text-right hidden sm:block">
+                    <div class="text-[11px] font-bold text-[#f26321] uppercase tracking-wider">Summary</div>
+                    <div class="text-sm text-slate-500 font-medium">
+                        {{ selectedProducts.length }} Products Enabled • {{ selectedProducts.length +
+                        selectedFeatures.length }} Active Configurations
+                    </div>
+                </div>
+                <button (click)="saveRole()" [disabled]="!canEdit"
+                    class="inline-flex items-center justify-center gap-2 h-10 px-6 rounded-lg bg-[#f26321] text-white font-medium hover:bg-[#d9581b] transition-colors shadow-sm cursor-pointer">
+                    <span>Update Role Configuration</span> <i class="ri-save-line text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+
+</div>

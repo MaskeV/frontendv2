@@ -1,0 +1,278 @@
+:host {
+  color: #000 !important;
+}
+
+:host td,
+:host th,
+:host label,
+:host span,
+:host strong,
+:host p,
+:host div,
+:host small,
+:host input,
+:host select,
+:host option,
+:host button,
+:host a {
+  color: #000 !important;
+}
+
+:host .card-header,
+:host .card-body,
+:host .table,
+:host .table td,
+:host .table th,
+:host .table tr,
+:host .form-control,
+:host .form-group,
+:host .badge {
+  color: #000 !important;
+}
+
+.btn-sm {
+  margin-top: 5px;
+}
+
+.grafanatext::ng-deep .ngx-pagination :hover {
+
+  background-color: #2199EB !important;
+  ;
+}
+
+.grafanatext::ng-deep .ngx-pagination a {
+  color: #fff !important;
+}
+
+.defaulttext::ng-deep .ngx-pagination .current {
+  background: #2199EB !important;
+  color: #fefefe;
+  cursor: default;
+}
+
+.defaulttext::ng-deep .ngx-pagination :hover {
+
+  background-color: #2199EB !important;
+}
+
+.axistext::ng-deep .ngx-pagination .current {
+  background: #97144D !important;
+  color: #fefefe;
+  cursor: default;
+}
+
+.axistext::ng-deep .ngx-pagination :hover {
+
+  background-color: #97144D !important;
+}
+
+.hide-label-when-not-responsive {
+  display: none;
+}
+
+@media only screen and (max-width: 894px) {
+  .row-responsive {
+    flex-wrap: inherit;
+  }
+
+  .application-name-div-responsive {
+    width: 100% !important;
+  }
+
+  .hide-label-div-responsive {
+    display: none !important;
+  }
+
+  .hide-label-row-responsive {
+    display: none !important;
+  }
+
+  .show-label-when-responsive {
+    display: block !important;
+  }
+
+  .font-size-when-responsive {
+    font-size: 1rem !important;
+  }
+
+  .td-actions-when-responsive {
+    padding-left: 0%;
+    padding-right: 0%;
+  }
+}
+
+@media only screen and (max-width: 746px) {
+  .row-responsive {
+    flex-wrap: inherit;
+  }
+
+  .application-name-div-responsive {
+    width: 100% !important;
+  }
+
+  .hide-label-div-responsive {
+    display: none !important;
+  }
+
+  .hide-label-row-responsive {
+    display: none !important;
+  }
+
+  .show-label-when-responsive {
+    display: block !important;
+  }
+
+  .font-size-when-responsive {
+    font-size: 1rem !important;
+  }
+
+  .td-actions-when-responsive {
+    padding-left: 0%;
+    padding-right: 0%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .row-responsive {
+    flex-wrap: inherit;
+  }
+
+  .application-name-div-responsive {
+    width: 100% !important;
+  }
+
+  .hide-label-div-responsive {
+    display: none !important;
+  }
+
+  .hide-label-row-responsive {
+    display: none !important;
+  }
+
+  .show-label-when-responsive {
+    display: block !important;
+  }
+
+  .font-size-when-responsive {
+    font-size: 1rem !important;
+  }
+
+  .td-actions-when-responsive {
+    padding-left: 0%;
+    padding-right: 0%;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .row-responsive {
+    flex-wrap: inherit;
+  }
+
+  .application-name-div-responsive {
+    width: 100% !important;
+  }
+
+  .hide-label-div-responsive {
+    display: none !important;
+  }
+
+  .hide-label-row-responsive {
+    display: none !important;
+  }
+
+  .show-label-when-responsive {
+    display: block !important;
+  }
+
+  .font-size-when-responsive {
+    font-size: 1rem !important;
+  }
+
+  .td-actions-when-responsive {
+    padding-left: 0%;
+    padding-right: 0%;
+  }
+}
+
+@media only screen and (max-width: 360px) {
+  .row-responsive {
+    flex-wrap: inherit;
+  }
+
+  .application-name-div-responsive {
+    width: 100% !important;
+  }
+
+  .hide-label-div-responsive {
+    display: none !important;
+  }
+
+  .hide-label-row-responsive {
+    display: none !important;
+  }
+
+  .show-label-when-responsive {
+    display: block !important;
+  }
+
+  .font-size-when-responsive {
+    font-size: 1rem !important;
+  }
+
+  .td-actions-when-responsive {
+    padding-left: 0%;
+    padding-right: 0%;
+  }
+}
+
+.line {
+  border-bottom: 2px solid rgb(254, 252, 252);
+  margin-top: -4px;
+  width: 96%;
+  float: right;
+  margin: 0 auto;
+  margin-left: 15px;
+  margin-right: 25px;
+}
+
+.headings {
+  height: 40px;
+}
+
+.myHeader {
+  position: fixed;
+  top: 0;
+}
+
+.form-control {
+  font-size: small;
+  padding: 4px;
+}
+
+.card-header {
+  font-size: small;
+  text-transform: uppercase;
+  padding: 5px;
+}
+
+.form-group input {
+  font-size: small;
+  padding: 2px;
+  height: 28px;
+}
+
+.form-group select {
+  font-size: small;
+  padding: 2px;
+  height: 28px;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 6px;
+  background: lightgrey;
+  font-family: system-ui;
+  letter-spacing: .8px;
+  font-weight: 500;
+  border-radius: 11px;
+}

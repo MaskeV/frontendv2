@@ -1,0 +1,161 @@
+/* Modern UI Styles for Redis Instance inspired by Kafka */
+
+main {
+    height: 100%;
+    width: 100%;
+    background-color: #F8FAFC;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.icons {
+    height: 15px;
+    background: transparent;
+}
+
+.icon-sm {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+}
+
+.nav-link {
+    font-size: small;
+    padding: 5px 10px;
+    color: #64748b;
+}
+
+.nav-link.active {
+    background-color: #F8FAFC !important;
+}
+
+.nav-link:focus, .nav-link:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.tab-content {
+    width: 100%;
+    height: 82vh;
+    overflow-y: auto;
+    overflow-x: hidden !important;
+    background-color: #F8FAFC;
+}
+
+.small {
+    font-size: 0.7rem;
+}
+
+.fs-lg {
+    font-size: 0.9rem;
+}
+
+.ls-wider {
+    letter-spacing: 0.05em;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+/* Card Styles */
+.card {
+    background-color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-soft {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.05);
+    background: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-soft:hover {
+    border-color: #60A5FA !important;
+    box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+/* Charts Wrapper */
+.h-26 {
+    height: 26vh;
+}
+
+.chart-wrapper-sm {
+    height: 20vh;
+}
+
+/* Metric Card (KPI) */
+.metric-card {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    height: 100%;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 0.25rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.chart-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Utilities */
+.text-primary {
+    color: #3b82f6 !important;
+}
+
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-info {
+    color: #06b6d4 !important;
+}
+
+.custom-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
+    color: #94a3b8;
+}

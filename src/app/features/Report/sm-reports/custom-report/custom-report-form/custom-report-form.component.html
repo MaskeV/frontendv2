@@ -1,0 +1,230 @@
+<main class="py-0 my-0">
+    <div class="container-fluid   px-0 mx-0" style="">
+        <div class="container-fluid py-1">
+            <!-- <header class="pb-1 mb-1 ">
+                <ul class="nav nav-tabs border-bottom">
+                    <li class="nav-item ">
+                        <a class="nav-link active  sm-font" aria-current="page" href="#">Custom Reports</a>
+                    </li>
+                </ul>
+            </header> -->
+
+            <div class="container-fluid py-0">
+                <div class="row mb-3 ">
+                    <div class="col-2 themed-grid-col ">
+                        <label for="staticEmail" class="form-label smm-font">Select Sub Module </label>
+                    </div>
+                    <div class="col-3 themed-grid-col ">
+                        <div class="d-flex align-items-center">
+
+                            <span class="me-3">:</span>
+                            <div class="container py-0 d-flex justify-content-between  align-items-center">
+
+                                <div class="form-check fs-6">
+                                    <input class="form-check-input" type="radio" name="SubModule" id="Hardware" checked>
+                                    <label class="form-check-label smm-font" for="Hardware">
+                                        Hardware
+                                    </label>
+                                </div>
+                                <div class="form-check fs-6">
+                                    <input class="form-check-input" type="radio" name="SubModule" id="Software" checked>
+                                    <label class="form-check-label smm-font" for="Software">
+                                        Software
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mb-3 ">
+                    <div class="col-2 themed-grid-col ">
+                        <label for="staticEmail" class="form-label smm-font">Report Name <span
+                                class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-4 themed-grid-col ">
+                        <div class="d-flex align-items-center">
+
+                            <span class="me-3">:</span>
+                            <input type="text" class="form-control py-0 rounded-0" id="reportName">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="py-1 px-2 mb-1   rounded-0 custom-bg">
+                <div class="container-fluid py-2">
+
+
+
+                    <div class="ms-3 mb-1">
+                        <h5 class=" sm-font fw-bold start-0  mt-1  sub-headers pe-0"
+                            style="z-index: 1;">
+                            Select Criteria
+                        </h5>
+
+                        <div class="pb-2 card-shadow rounded-0">
+                            <div class="container-fluid py-1">
+                                <div class="row mt-1" *ngFor="let row of criteriaRows; let i = index">
+
+                                    <div class="col-sm-1 mx-2 px-0">
+                                        <label *ngIf="i === 0" class="form-label smm-font opacity-0">Condition</label>
+                                        <select class="form-select form-select-sm rounded-0 pe-0 mx-0 smm-font"
+                                            [(ngModel)]="row.condition" [hidden]="i === 0">
+                                            <option value="AND">AND</option>
+                                            <option value="OR">OR</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <label *ngIf="i === 0" for="Columns" class="form-label smm-font">Columns</label>
+                                        <select class="form-select form-select-sm rounded-0 smm-font" id="Columns"
+                                            required [(ngModel)]="row.column">
+                                            <option value="" selected>Select Column</option>
+                                            <option>Server name</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3 mx-4">
+                                        <label *ngIf="i === 0" for="Criteria" class="form-label smm-font">Criteria
+                                            Type</label>
+                                        <select class="form-select form-select-sm rounded-0 smm-font" id="Criteria"
+                                            required [(ngModel)]="row.type">
+                                            <option value="" selected>Select Criteria </option>
+                                            <option>equal</option>
+                                            <option>not equal</option>
+                                            <option>like</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-3 me-2">
+                                        <label *ngIf="i === 0" for="value"
+                                            class="form-label smm-font opacity-0">Value</label>
+                                        <input type="text" class="form-control py-1 rounded-0 smm-font" id="value"
+                                            placeholder="NA" required [(ngModel)]="row.value" />
+                                    </div>
+
+                                    <div class="col-sm-1">
+                                        <label *ngIf="i === 0" for="value"
+                                            class="form-label smm-font opacity-0">Action</label>
+                                        <div class="container py-2 d-flex align-items-center">
+                                            <i class="fa-solid fa-xmark me-2 smm-font" style="cursor: pointer"
+                                                *ngIf="criteriaRows.length > 1" (click)="removeCriteriaRow(i)"></i>
+                                            <i class="fa-solid fa-plus sm-font" style="cursor: pointer"
+                                                *ngIf="i === criteriaRows.length - 1" (click)="addCriteriaRow()"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- select col -->
+
+                    <div class=" ms-3 mb-1">
+                        <h5 class="sm-font fw-bold start-0  mt-2  sub-headers pe-0"
+                            style="z-index: 1;">
+                            Select Columns
+                        </h5>
+
+                        <div class="py-2 card-shadow rounded-0">
+                            <div class="container-fluid pt-1 pb-3">
+                                <div class="row mt-2 justify-content-evenly">
+                                    <!-- Available Columns -->
+                                    <div class="col-sm-3 themed-grid-col">
+                                        <div class="smm-font bold-heading">Columns List</div>
+                                        <div class="border columns-box overflow-auto scroll-color">
+                                            <dl *ngFor="let group of availableColumns">
+                                                <dt>{{ group.group }}</dt>
+                                                <dd *ngFor="let col of group.items"
+                                                    [class.selected]="selectedFromAvailable.includes(col)"
+                                                    (mousedown)="onMouseDown(); toggleAvailableSelection(col, $event)"
+                                                    (mouseup)="onMouseUp()"
+                                                    (mouseenter)="toggleAvailableSelection(col, $event, true)"
+                                                    style="cursor: pointer;">
+                                                    {{ col }}
+                                                </dd>
+
+                                            </dl>
+                                        </div>
+                                    </div>
+
+                                    <!-- Arrow -->
+                                    <div class="col-sm-1 themed-grid-col align-self-center">
+                                        <i class="fa-solid fa-angles-right angles-right xsm-font fw-bolder py-1 px-2"
+                                            (click)="moveToSelected()" style="cursor: pointer;"></i>
+                                    </div>
+
+                                    <!-- Selected Columns -->
+                                    <div class="col-sm-4 themed-grid-col d-flex">
+                                        <div class="flex-grow-1 me-2">
+                                            <div class="d-flex py-0 justify-content-between">
+                                                <div class="container-fluid mx-0 py-0 my-0 px-0 smm-font  bold-heading">
+                                                    Selected Columns</div>
+                                                <div class="container d-flex py-0 my-0 align-items-center">
+                                                    <i class="fa-solid fa-xmark xsm-font mx-2"
+                                                        (click)="deleteFromSelected()" style="cursor: pointer;"></i>
+                                                    <span class="text-primary smm-font">Delete</span>
+                                                </div>
+                                            </div>
+                                            <div class=" overflow-auto columns-box border scroll-color" #selectedBox>
+                                                <div *ngFor="let col of selectedColumns"
+                                                    [class.selected]="selectedFromSelected.includes(col)"
+                                                    (mousedown)="onMouseDown(); toggleSelectedSelection(col, $event)"
+                                                    (mouseup)="onMouseUp()"
+                                                    (mouseenter)="toggleSelectedSelection(col, $event, true)"
+                                                    class="selected-col-box" style="cursor: pointer;">
+                                                    {{ col }}
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Optional up/down buttons (inactive for now) -->
+                                        <div class="d-flex flex-column justify-content-center p-2">
+                                            <i (click)="scrollSelectedBox('up')"
+                                                class="fa-solid fa-up-long mb-1 arrows text-primary xsm-font py-1 px-1 pointor"></i>
+                                            <i (click)="scrollSelectedBox('down')"
+                                                class="fa-solid fa-down-long mt-1 arrows text-primary xsm-font py-1 px-1 pointor"></i>
+                                        </div>
+                                        <div class="d-flex mx-4 flex-column justify-content-center  p-2">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- schedule -->
+                    <div class=" ms-3 mb-1">
+                        <h5 class="  sm-font fw-bold start-0  sub-headers mt-2  pe-0"
+                            style="z-index: 1;">
+                            Schedule
+                        </h5>
+
+                        <div class="py-2 card-shadow rounded-0">
+                            <div class="container-fluid py-2" style="height: 200px;">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class=" my-1 ">
+                    <div class="container w-auto d-flex align-items-center justify-content-end py-0 ">
+                        <button class="btn btn-sm save-btn  rounded-0  smm-font fw-bold  me-2" mat-button (click)="onSaveOrCancel()" >Execute & Save</button>
+
+                        <button class="btn btn-sm  cancel-btn rounded-0  smm-font fw-bold " mat-button (click)="onSaveOrCancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</main>

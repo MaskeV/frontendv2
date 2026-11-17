@@ -1,0 +1,61 @@
+<main class="root">
+    <header class="card-header p-3 d-flex justify-content-between align-items-center">
+        <span class="main-header">Redis Monitoring</span>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search Application Name..." [(ngModel)]="searchQuery"
+                (input)="onSearch()" />
+        </div>
+    </header>
+
+    <div class="table-container">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Application Name</th>
+                        <th style="width: 20%;">Connected Clients</th>
+                        <th style="width: 20%;">DB Keys</th>
+                        <th style="width: 20%;">Uptime</th>
+                    </tr>
+                </thead>
+
+            <tbody *ngIf="metricsData?.length !== 0">
+                    <tr *ngFor="let r of metricsData">
+                        <td (click)="gotoRedisDetails(r)">
+                            <div class="app-name-cell">
+                                <span class="avatar" style="background: transparent; display: flex; align-items: center;">
+                                    <img [src]="getImagePath(r.technology, r.appType)" class="avatar-img" (error)="onImageError($event)" />
+                                </span>
+                                {{ r.name }}
+                            </div>
+                        </td>
+
+                        <td class="fw-medium text-dark">
+                            <i class="bi bi-people text-primary me-2"></i>
+                            {{ r.meter_redis_connected_clients !== undefined && r.meter_redis_connected_clients !== null ? r.meter_redis_connected_clients : '0' }}
+                        </td>
+
+                        <td class="fw-medium text-dark">
+                            <i class="bi bi-key text-warning me-2"></i>
+                            {{ r.meter_redis_db_keys !== undefined && r.meter_redis_db_keys !== null ? r.meter_redis_db_keys : '0' }}
+                        </td>
+
+                        <td class="fw-medium text-dark">
+                            <i class="bi bi-clock-history text-success me-2"></i>
+                            {{ r.meter_redis_uptime ? formatUptime(r.meter_redis_uptime) : 'No Data' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="noData" *ngIf="!metricsData || metricsData.length === 0">
+                <div class="d-flex flex-column align-items-center gap-3">
+                    <img src="assets/images/NoSearch.png" style="height: 5vw;" alt="no data" />
+                    <div class="fs-5">No Data Available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

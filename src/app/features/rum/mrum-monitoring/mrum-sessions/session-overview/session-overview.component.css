@@ -1,0 +1,657 @@
+.custom-breadcrumb {
+    --bs-breadcrumb-divider: '>';
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tab-content {
+    width: 100%;
+    height: auto;
+    margin-top: 1%;
+    overflow: visible;
+}
+
+.flex-space {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wAvg-30 {
+    width: 15.5%;
+    height: 27.0px;
+    margin-left: 1%;
+}
+
+.w-30 {
+    width: 32.1%;
+    margin-left: 11.0px;
+    height: 193.0px;
+}
+
+.widt {
+    width: 48.7%;
+    height: 193.0px;
+    margin-left: 10.0px;
+}
+
+.widt1 {
+    width: 48.7%;
+    height: 228.0px;
+    margin-top: -2.8%;
+    margin-left: 10.0px;
+}
+
+.icon {
+    margin-top: 2%;
+    font-size: 14.0px;
+    margin-left: 10%;
+    color: #14d2ff;
+}
+
+.AvgText {
+    margin-left: 7%;
+    font-size: x-small;
+    margin-top: 8.0px;
+}
+
+.apdex {
+    font-size: x-small;
+    margin-left: 5%;
+}
+
+.icon2 {
+    margin-top: 2%;
+    font-size: 14.0px;
+    margin-left: 11%;
+    color: #fcbf49;
+}
+
+.AvgText2 {
+    margin-left: 5%;
+     font-size: x-small;
+    margin-top: 8.0px;
+}
+
+.apdex2 {
+   font-size: x-small;
+    margin-left: 3%;
+}
+
+.icon3 {
+    margin-top: 2%;
+    font-size: 14.0px;
+    margin-left: 8%;
+    color: #ff94ba;
+}
+
+.AvgText3 {
+    margin-left: 4%;
+     font-size: x-small;
+    margin-top: 8.0px;
+}
+
+.apdex3 {
+    font-size: x-small;
+    margin-left: 2%;
+}
+
+.scrollable1 {
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 78%;
+}
+
+.h-11 {
+    height: 4.0px;
+}
+
+.progress {
+    margin-top: 0%;
+    margin-bottom: 2%;
+    height: 4.0px;
+}
+
+.progress-bar {
+    background-color: #219ebc;
+}
+
+.scrollable2 {
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 56vh;
+}
+
+.tableScroll {
+     overflow-y: auto;
+     overflow-x: auto;
+    height: 56vh;
+}
+
+.tableScrollLog {
+     overflow-y: auto;
+     overflow-x: auto;
+    height: 57vh;
+}
+
+.popup-container {
+    position: fixed;
+    bottom: 20.0px;
+    right: 20.0px;
+    width: 320.0px;
+    height: 270.0px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.377);
+    z-index: 1000;
+    padding: 15.0px;
+}
+
+.popup-content {
+    position: relative;
+    padding: 10.0px;
+    height: 300.0px;
+    /* overflow: auto; */
+}
+
+.close-button {
+    position: absolute;
+    top: 5.0px;
+    right: 10.0px;
+    font-size: 20.0px;
+    cursor: pointer;
+    color: black;
+}
+
+.load-graph {
+    width: 111%;
+    height: 210.0px;
+    margin-left: -16px;
+    overflow: hidden;
+}
+
+.custom-modal-left {
+    position: absolute;
+    right: auto;
+    left: 63%;
+    top: calc(50% - 150px);
+    transform: translateX(-100%);
+}
+
+.list-body {
+    margin-top: -7px;
+    height: 36vh;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-bottom: 3.0px;
+}
+
+.no-data {
+  color: rgb(255, 255, 255);
+}
+
+.has-data {
+  color: rgb(198, 255, 105);
+}
+
+.pagination .page-link {
+    color: #454a81;
+    background-color: transparent;
+    border: 1px solid #454a81;
+    padding: 0x 0px;         
+    font-size: 12.0px;         
+    line-height: 1.2;
+      gap: 4.0px; 
+}
+
+.pagination .page-item.active .page-link {
+    border-color: #bb3e03 !important;
+    color: #454a81 !important;
+}
+
+.pagination .page-link:hover {
+    color: #bb3e03 !important;
+}
+
+
+.w-49 {
+  width: 49.6%;
+  height: 193.0px;
+}
+
+.alert {
+  position: absolute;
+  top: 0;
+  left: 70%;
+  transform: translateX(-50%);
+  background-color: rgb(194, 207, 207);
+  color: black;
+  padding: 10.0px;
+  display: inline-block;
+}
+
+.border-custom {
+    border-color: #4f5a74 !important;
+}
+
+.graph-container {
+  border: 2px solid #103c47;
+  margin-left: -1%;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+.scrollable {
+  overflow-y: auto;
+  height: 70vh;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 25fr 75fr;
+  width: 100%;
+  height: 64vh;
+  border-radius: 5px;
+  font-size: 12.0px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  color: black;
+  height: 63vh;
+  overflow: auto;
+}
+
+.right-grid {
+  display: flex;
+  flex-direction: column;
+  height: 106vh;
+}
+
+.left,
+.right-top,
+.right-bottom {
+  border: 1px solid gray;
+  border-radius: 2.5px;
+}
+
+.right-top {
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  height: 17%;
+}
+
+.right-top {
+  display: flex;
+  flex-direction: column;
+  padding: 10.0px;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+
+.right-bottom {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+
+.right-top {
+  position: relative;
+}
+
+.right-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.right-top-left {
+  flex: 1;
+  min-width: 200.0px;
+}
+
+.right-top-right {
+  display: flex;
+  gap: 26.0px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.icon-btn {
+  font-size: 15.0px; /* Bigger icon size */
+  cursor: pointer;
+  color: #cbc0d3;
+  transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.2);
+}
+
+.scrollable-right{
+    overflow-y: auto;
+  height: 50.8vh;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+  width: 6.0px;
+  height: 6.0px;
+}
+
+::-webkit-scrollbar-track {
+  /* background: #2a2a2a; */
+  /* Dark background */
+}
+
+::-webkit-scrollbar-thumb {
+  /* background-color: #555; */
+  /* Dark gray thumb */
+  border-radius: 3px;
+}
+
+/* Scrollbar for Firefox */
+* {
+  scrollbar-width: thin;
+  /* scrollbar-color: #555 #2a2a2a; */
+}
+
+.wt-30 {
+  width: 32.1%;
+    margin-left: 11.0px;
+    height: 172.0px;
+}
+
+.text-ellipsis-cell {
+  max-width: 200.0px; /* adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block; /* crucial for ellipsis */
+  vertical-align: middle;
+}
+
+.custom-input {
+     background-color: transparent !important;
+     border: 1px solid #555d75;
+     color: white;
+     border-radius: 6px;
+     height: 30.0px;
+     font-size: 0.875rem;
+ }
+
+ .custom-input::placeholder {
+     color: #888;
+ }
+
+ .custom-input:focus {
+     border-color: #5a9ee0;
+     outline: none;
+     box-shadow: none;
+ }
+
+.custom-select {
+     background-color: transparent !important;
+     border: 1px solid #555d75;
+     color: white;
+     border-radius: 6px;
+     height: 30.0px;
+     font-size: 0.875rem;
+     padding-left: 8.0px;
+ }
+
+ .custom-select option {
+     background-color: #333;
+     color: white;
+ }
+
+ .custom-select:focus {
+     border-color: #5a9ee0;
+     outline: none;
+     box-shadow: none;
+ }
+
+.custom-select2 {
+     background-color: transparent !important;
+     border: 1px solid #555d75;
+     color: white;
+     border-radius: 6px;
+     height: 30.0px;
+     font-size: 0.875rem;
+     padding-left: 8.0px;
+ }
+
+ .custom-select2 option {
+     background-color: #333;
+     color: white;
+ }
+
+ .custom-select2:focus {
+     border-color: #5a9ee0;
+     outline: none;
+     box-shadow: none;
+ }
+
+.select-box {
+  height: 20.0px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    font-size: xx-small;
+    border-radius: 4px;
+}
+
+.text-ellipsis-cell1 {
+  max-width: 100%; /* adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table tbody tr {
+  border-bottom: 0.5px solid #80808050; /* light grey with opacity */
+}
+
+.reduce-horizontal-gutter > [class*="col-"] {
+  padding-left: 6.0px !important;  /* smaller left padding */
+  padding-right: 6.0px !important; /* smaller right padding */
+}
+
+#csv {
+    display: none;
+}
+
+#geo-map {
+  width: 100% !important;
+  height: 600.0px;
+}
+/* Modern Dashboard Styles */
+.mrum-dashboard-modern {
+    padding: 15.0px 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mrum-dashboard-modern .dash-card {
+    transition: all 0.2s ease-in-out;
+    overflow: visible !important;
+}
+
+.mrum-dashboard-modern .dash-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+    z-index: 100;
+}
+
+.mrum-dashboard-modern table {
+    margin-bottom: 0;
+}
+
+.mrum-dashboard-modern table th {
+    font-size: 11.0px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 8.0px;
+}
+
+.mrum-dashboard-modern table td {
+    padding: 10.0px 8px;
+    vertical-align: middle;
+    font-size: 12.0px;
+}
+
+/* Ensure tables inside dash cards inherit the card's custom background color */
+.mrum-dashboard-modern table,
+.mrum-dashboard-modern table th,
+.mrum-dashboard-modern table td,
+.mrum-dashboard-modern table tr {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Custom Theme Tooltip */
+.tooltip-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+}
+
+.custom-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220.0px;
+    background-color: var(--card-bg, #ffffff);
+    color: inherit; /* Matches the text color of the card! */
+    text-align: left;
+    border: 1.5px solid currentColor;
+    border-radius: 6px;
+    padding: 8.0px 12px;
+    font-size: 11.0px;
+    font-weight: 500;
+    z-index: 1050;
+    line-height: 1.4;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    pointer-events: none;
+}
+
+.custom-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5.0px;
+    border-style: solid;
+    border-color: currentColor transparent transparent transparent;
+}
+
+.tooltip-wrap:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+/* Fix Bootstrap overriding row backgrounds with td backgrounds */
+.dash-card table td {
+    background-color: transparent !important;
+}
+
+/* Custom Table Striping and Hover for Angular loops */
+.table-row-even {
+    background-color: #f8fafc !important;
+}
+.table-row-odd {
+    background-color: #f1f5f9 !important;
+}
+.table-row-hoverable {
+    transition: background-color 0.2s ease !important;
+}
+.table-row-hoverable:hover {
+    background-color: #e2e8f0 !important;
+}
+
+/* Responsive Breakpoints & Overrides */
+@media (min-width: 1920.0px) {
+    .dash-card { padding: 1.5rem !important; }
+}
+@media (max-width: 1919.0px) and (min-width: 1600.0px) {
+    .dash-card { padding: 1.25rem !important; }
+    .table th, .table td { padding: 10.0px 12px !important; }
+}
+@media (max-width: 1599.0px) and (min-width: 1440.0px) {
+    .dash-card { padding: 1rem !important; }
+    .table th, .table td { padding: 8.0px 10px !important; font-size: 11px !important; }
+}
+@media (max-width: 1439.0px) and (min-width: 1366.0px) {
+    .dash-card { padding: 0.85rem !important; }
+    .table th, .table td { padding: 6.0px 8px !important; font-size: 11px !important; }
+    /* Compact the layout */
+    .mrum-dashboard-modern { padding: 10.0px 0 !important; }
+}
+@media (max-width: 1365.0px) and (min-width: 1280.0px) {
+    .dash-card { padding: 0.75rem !important; }
+    .table th, .table td { padding: 5.0px 6px !important; font-size: 10.0px !important; }
+}
+@media (max-width: 1279.0px) and (min-width: 1024.0px) {
+    .dash-card { padding: 0.5rem !important; }
+    .table th, .table td { padding: 4.0px 5px !important; font-size: 9.0px !important; }
+}
+
+/* Make SVG text scale nicely */
+svg text {
+    font-size: 11px;
+}
+
+/* Ensure tooltips remain readable */
+.custom-tooltip {
+    width: max-content;
+    max-width: 300.0px;
+    font-size: 13px !important;
+    white-space: normal !important;
+}
+
+/* Force flex wrapping if constrained */
+
+.flex-nowrap {
+    flex-wrap: nowrap !important;
+}
+
+/* Edge alignment modifiers for tooltips */
+.tooltip-wrap.tooltip-left .custom-tooltip {
+    left: 0;
+    transform: translateX(-15px);
+}
+.tooltip-wrap.tooltip-left .custom-tooltip::after {
+    left: 15px;
+    margin-left: 0;
+}
+.tooltip-wrap.tooltip-left:hover .custom-tooltip {
+    transform: translateX(-15px) translateY(-5px);
+}
+
+.tooltip-wrap.tooltip-right .custom-tooltip {
+    left: auto;
+    right: 0;
+    transform: translateX(15px);
+}
+.tooltip-wrap.tooltip-right .custom-tooltip::after {
+    left: auto;
+    right: 15px;
+    margin-left: 0;
+}
+.tooltip-wrap.tooltip-right:hover .custom-tooltip {
+    transform: translateX(15px) translateY(-5px);
+}

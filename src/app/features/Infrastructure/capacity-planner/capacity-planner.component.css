@@ -1,0 +1,59 @@
+.card {
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+}
+
+.card-body{
+    letter-spacing: 0.6px;
+}
+
+.form-select {
+    color: var(--text-color);
+    background-color: var(--input-bg-color);
+}
+
+.form-label {
+    color: var(--text-color);
+}
+
+.card-header {
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.text-muted {
+    color: var(--disabled-text-color) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--primary-hover-color);
+    color: white;
+}
+
+.noData {
+    height: 33vh;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.list-group {
+  background-color: var(--card-bg-color);
+  color: var(--text-color);
+}
+
+.list-group-item {
+  background-color: var(--card-bg-color) !important;
+  color: var(--text-color) !important;
+  border: none;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+}

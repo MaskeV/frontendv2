@@ -1,0 +1,21 @@
+<div class="client-shell">
+
+  <header class="top-header">
+    <nav class="nav-links">
+      <a *ngIf="userType === 'super admin' || userType === 'superadmin'" routerLink="addclient"
+        routerLinkActive="active" class="nav-item">
+        <i class="fa fa-plus"></i>
+        <span>Add Client</span>
+      </a>
+      <a *ngIf="userType === 'super admin' || userType === 'superadmin' || userType === 'admin'" routerLink="clientappmapping" routerLinkActive="active" class="nav-item">
+        <i class="fa fa-list"></i>
+        <span>License Application Mapping</span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="content-area">
+    <router-outlet />
+  </main>
+
+</div>

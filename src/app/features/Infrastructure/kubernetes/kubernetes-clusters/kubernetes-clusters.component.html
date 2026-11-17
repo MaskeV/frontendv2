@@ -1,0 +1,725 @@
+<div class="app-shell">
+
+    <div class="body-wrap">
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Tabs and Breadcrumb Header -->
+            <app-kubernetes-tab-header activeTab="cluster"
+                [selectedCluster]="selectedCluster"></app-kubernetes-tab-header>
+
+            <!-- ================= Summary Cards ================= -->
+            <div class="summary-grid">
+
+                <!-- 1. Nodes -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-blue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="4" width="20" height="4" rx="1.5"></rect>
+                                    <rect x="2" y="10" width="20" height="4" rx="1.5"></rect>
+                                    <rect x="2" y="16" width="20" height="4" rx="1.5"></rect>
+                                    <circle cx="6" cy="6" r="0.8" fill="#2563eb"></circle>
+                                    <circle cx="6" cy="12" r="0.8" fill="#2563eb"></circle>
+                                    <circle cx="6" cy="18" r="0.8" fill="#2563eb"></circle>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <div class="tile-title-row">
+                                    <span class="tile-title">Nodes</span>
+                                    <span class="info-wrap" (mouseenter)="placeTip($event)">
+                                        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+                                        <div class="tile-tip">
+                                            <b>Nodes</b>
+                                            <p>Total number of nodes in the cluster and their readiness status.</p>
+                                            <p><strong>Ready:</strong> Node is healthy and can run workloads.</p>
+                                            <p><strong>Not Ready:</strong> Node is not healthy or unable to run
+                                                workloads.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <span class="tile-value">{{ clusterSummary.totalNodes }}</span>
+                                <span class="tile-sub">Total nodes</span>
+                            </div>
+                        </div>
+                        <div class="tile-dots">
+                            <span class="dot-item"><span class="dot green"></span>{{ clusterSummary.totalNodes }}
+                                Ready</span>
+                            <span class="dot-item"><span class="dot red"></span>0 Not Ready</span>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="100 100">
+                                </circle>
+                            </svg>
+                            <span class="donut-text">100%</span>
+                        </div>
+                        <span class="donut-sub">Ready</span>
+                    </div>
+                </div>
+
+                <!-- 2. Namespaces -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-orange">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <div class="tile-title-row">
+                                    <span class="tile-title">Namespaces</span>
+                                    <span class="info-wrap" (mouseenter)="placeTip($event)">
+                                        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+                                        <div class="tile-tip">
+                                            <b>Namespaces</b>
+                                            <p>Namespaces are logical partitions for organizing cluster resources.</p>
+                                            <p><strong>Active:</strong> Namespace exists and is not being deleted.</p>
+                                            <p><strong>Terminating:</strong> Namespace is in the process of deletion.
+                                            </p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <span class="tile-value">{{ clusterSummary.namespaces }}</span>
+                                <span class="tile-sub">Total namespaces</span>
+                            </div>
+                        </div>
+                        <div class="tile-dots">
+                            <span class="dot-item"><span class="dot green"></span>{{ clusterSummary.namespaces }}
+                                Active</span>
+                            <span class="dot-item"><span class="dot orange"></span>0 Terminating</span>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="100 100">
+                                </circle>
+                            </svg>
+                            <span class="donut-text">100%</span>
+                        </div>
+                        <span class="donut-sub">Active</span>
+                    </div>
+                </div>
+
+                <!-- 3. Deployments -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-purple">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"></path>
+                                    <path d="M12 11l8-4.5M12 11L4 6.5M12 11v9"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <div class="tile-title-row">
+                                    <span class="tile-title">Deployments</span>
+                                    <span class="info-wrap" (mouseenter)="placeTip($event)">
+                                        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+                                        <div class="tile-tip">
+                                            <b>Deployments</b>
+                                            <p>Total number of deployments and their availability status.</p>
+                                            <p><strong>Available:</strong> Desired replicas are available and
+                                                deployment is healthy.</p>
+                                            <p><strong>Requiring attention:</strong> Fewer available replicas than
+                                                desired, or progressing with issues.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <span class="tile-value">{{ clusterSummary.deployments }}</span>
+                                <span class="tile-sub">Total deployments</span>
+                            </div>
+                        </div>
+                        <div class="tile-dots">
+                            <span class="dot-item"><span class="dot green"></span>{{
+                                clusterSummary.deploymentsHealthy }} Available</span>
+                            <span class="dot-item"><span class="dot orange"></span>{{
+                                clusterSummary.deploymentsUnhealthy }} Requiring attention</span>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track warn" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill purple" cx="18" cy="18" r="15.9155"
+                                    [attr.stroke-dasharray]="deploymentsHealthyPct + ' 100'"></circle>
+                            </svg>
+                            <span class="donut-text">{{ deploymentsHealthyPct }}%</span>
+                        </div>
+                        <span class="donut-sub">Available</span>
+                    </div>
+                </div>
+
+                <!-- 4. Services -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-blue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="5" cy="12" r="2.5" fill="#2563eb"></circle>
+                                    <circle cx="19" cy="6" r="2.5" fill="#2563eb"></circle>
+                                    <circle cx="19" cy="18" r="2.5" fill="#2563eb"></circle>
+                                    <path d="M5 12h5a4 4 0 0 0 4-4V6M10 12a4 4 0 0 1 4 4v2"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <div class="tile-title-row">
+                                    <span class="tile-title">Services</span>
+                                    <span class="info-wrap" (mouseenter)="placeTip($event)">
+                                        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+                                        <div class="tile-tip">
+                                            <b>Services</b>
+                                            <p>Total number of Kubernetes Service objects in the cluster.</p>
+                                            <p><strong>Configured:</strong> Service exists and has a valid
+                                                configuration.</p>
+                                            <p><strong>No Endpoints:</strong> Service has no ready endpoints (no
+                                                matching pods).</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <span class="tile-value">{{ clusterSummary.services }}</span>
+                                <span class="tile-sub">Total services</span>
+                            </div>
+                        </div>
+                        <div class="tile-dots">
+                            <span class="dot-item"><span class="dot green"></span>{{ clusterSummary.services }}
+                                Configured</span>
+                            <span class="dot-item"><span class="dot orange"></span>0 No Endpoints</span>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="100 100">
+                                </circle>
+                            </svg>
+                            <span class="donut-text">100%</span>
+                        </div>
+                        <span class="donut-sub">Configured</span>
+                    </div>
+                </div>
+
+                <!-- 5. Cluster Health -->
+                <div class="summary-card health-card">
+                    <div class="tile-top">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-green">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z">
+                                    </path>
+                                    <path d="M7.5 12h2.5l1.5-3 2 6 1.5-3H17"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <div class="tile-title-row">
+                                    <span class="tile-title">Cluster Health</span>
+                                    <span class="info-wrap" (mouseenter)="placeTip($event)">
+                                        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+                                        <div class="tile-tip">
+                                            <b>Cluster Health</b>
+                                            <p>Overall operational health of the cluster based on nodes, workloads, and
+                                                alerts.</p>
+                                            <p><strong>Healthy:</strong> No critical issues detected.</p>
+                                            <p><strong>Warning:</strong> Non-critical issues detected.</p>
+                                            <p><strong>Critical:</strong> Critical issues detected.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="health-pill-wrap">
+                                    <span class="health-pill healthy">Healthy</span>
+                                </div>
+                                <span class="tile-sub">No critical alerts detected</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-bottom">
+                        <div class="tile-dots health-dots">
+                            <span class="dot-item"><span class="dot red"></span>0 Critical</span>
+                            <span class="dot-item"><span class="dot orange"></span>1 Warning</span>
+                            <span class="dot-item"><span class="dot blue"></span>0 Info</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= Row 1: CPU & Memory Utilization ================= -->
+            <div class="row row-trends">
+                <div class="panel" *ngFor="let c of cpuMemCharts">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg *ngIf="c.kind === 'cpu'" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="3" />
+                                <path d="M8 12l3 3 5-6" />
+                            </svg>
+                            <svg *ngIf="c.kind === 'mem'" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                stroke-width="2.4" stroke-linecap="round">
+                                <path d="M5 20v-6M10 20V9M15 20v-9M20 20V5" />
+                            </svg>
+                            <span>{{ c.title }}</span>
+                            <ng-container *ngTemplateOutlet="infoTpl; context: { title: c.title, text: c.infoText }">
+                            </ng-container>
+                        </div>
+                    </div>
+                    <ng-container *ngTemplateOutlet="chartTpl; context: { $implicit: c }"></ng-container>
+                </div>
+            </div>
+
+            <!-- ================= Row 2: Top CPU / Memory Consumers ================= -->
+            <div class="row row-consumers">
+                <div class="panel" *ngFor="let p of consumers">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="#2563eb">
+                                <path d="M3 14h4v7H3zM10 9h4v12h-4zM17 4h4v17h-4z" />
+                            </svg>
+                            <span>{{ p.title }}</span>
+                            <ng-container *ngTemplateOutlet="infoTpl; context: { title: p.title, text: p.infoText }">
+                            </ng-container>
+                        </div>
+                        <a class="view-all">View all</a>
+                    </div>
+                    <table class="data-table consumers-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 24%;">Workload</th>
+                                <th style="width: 16%;">Namespace</th>
+                                <th style="width: 44%;">{{ p.usageHeader }}</th>
+                                <th style="width: 16%;" class="num">% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let w of p.items">
+                                <td class="strong tip-host">
+                                    {{ w.name }}
+                                    <div class="row-tip up">
+                                        <div class="row-tip-head dark">{{ w.name }} ({{ w.namespace }})</div>
+                                        <div class="row-tip-body">
+                                            <div class="rt-row"><span>{{ p.kind }} Usage</span><b>{{ w.value }} {{
+                                                    p.unit }}</b></div>
+                                            <div class="rt-row"><span>Share of Total {{ p.kind }} Usage</span><b>{{
+                                                    w.pct }}%</b></div>
+                                            <div class="rt-row"><span>{{ p.kind }} Requests</span><b>{{ w.request
+                                                    }}</b></div>
+                                            <div class="rt-row"><span>{{ p.kind }} Limits</span><b>{{ w.limit }}</b>
+                                            </div>
+                                            <div class="rt-note">Percent shows this workload's share of total cluster
+                                                {{ p.kind | lowercase }} usage.</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><a class="link" (click)="goToNamespace(w.namespace)">{{ w.namespace }}</a></td>
+                                <td>
+                                    <div class="usage-cell">
+                                        <span class="usage-val">{{ w.value }}</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill" [style.width.%]="w.bar" [style.background]="p.color">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="num strong">{{ w.pct }}%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= Row 3: Namespaces | Nodes | Pod Restarts ================= -->
+            <div class="row row-bottom">
+                <!-- Top Namespaces -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                stroke-linecap="round">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M8 8h3v3H8zM13 8h3v3h-3zM8 13h3v3H8zM13 13h3v3h-3z" />
+                            </svg>
+                            <span>Top Namespaces</span>
+                            <ng-container
+                                *ngTemplateOutlet="infoTpl; context: { title: 'Top Namespaces', text: 'Namespaces ranked by their share of pods, CPU, memory or restarts in the cluster.' }">
+                            </ng-container>
+                        </div>
+                        <div class="ns-tools">
+                            <div class="seg">
+                                <button type="button" *ngFor="let t of nsTabs" [class.active]="activeNsTab === t"
+                                    (click)="activeNsTab = t">{{ t }}</button>
+                            </div>
+                            <a class="view-all" (click)="goToNamespace(selectedCluster)">View all</a>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Namespace</th>
+                                <th style="width: 24%;">{{ activeNsTab }}</th>
+                                <th style="width: 36%;">% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let ns of nsRows">
+                                <td><a class="link" (click)="goToNamespace(ns.name)">{{ ns.name }}</a></td>
+                                <td>{{ ns.value }}</td>
+                                <td class="tip-host">
+                                    <div class="pct-cell">
+                                        <span class="pct-text">{{ ns.percent }}%</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill" [style.width.%]="ns.percent * 2.2"
+                                                style="background:#2563eb"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row-tip below right">
+                                        <div class="row-tip-head light">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                                stroke-linecap="round">
+                                                <circle cx="12" cy="12" r="9" />
+                                                <path d="M8 8h3v3H8zM13 8h3v3h-3zM8 13h3v3H8zM13 13h3v3h-3z" />
+                                            </svg>
+                                            <b>Top Namespaces</b>
+                                        </div>
+                                        <div class="row-tip-body">
+                                            <div class="rt-row"><span>{{ nsMeta.usageLabel }}</span><b>{{ ns.value
+                                                    }}</b></div>
+                                            <div class="rt-row"><span>{{ nsMeta.shareLabel }}</span><b>{{ ns.percent
+                                                    }}%</b></div>
+                                            <div class="rt-row"><span>{{ nsMeta.totalLabel }}</span><b>{{
+                                                    nsMeta.total }}</b></div>
+                                            <div class="rt-row"><span>Scope</span><b>All namespaces</b></div>
+                                            <div class="rt-note">{{ nsMeta.note }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Nodes -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                stroke-linecap="round">
+                                <circle cx="12" cy="13" r="8" />
+                                <path d="M12 9v4l2 2M9 3h6" />
+                            </svg>
+                            <span>Nodes ({{ podsPerNode.length }})</span>
+                            <ng-container
+                                *ngTemplateOutlet="infoTpl; context: { title: 'Nodes', text: 'Node readiness, pod count and CPU / memory utilization for each node in the cluster.' }">
+                            </ng-container>
+                        </div>
+                        <a class="view-all" (click)="goToNodes()">View all</a>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Pods</th>
+                                <th>CPU</th>
+                                <th>Memory</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let node of podsPerNode">
+                                <td class="tip-host">
+                                    <a class="link" (click)="goToNodes(node.name)">{{ node.name }}</a>
+                                    <div class="row-tip below">
+                                        <div class="row-tip-head light">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="2" y="4" width="20" height="6" rx="1.5" />
+                                                <rect x="2" y="14" width="20" height="6" rx="1.5" />
+                                            </svg>
+                                            <b>{{ node.name }}</b>
+                                        </div>
+                                        <div class="row-tip-body">
+                                            <div class="rt-row"><span>Node Status</span><span class="mini-pill green">{{
+                                                    node.status }}</span></div>
+                                            <div class="rt-row"><span>Pods</span><b>{{ node.pods }} / {{
+                                                    node.podsCapacity }} ({{ podPct(node) }}%)</b></div>
+                                            <div class="rt-row"><span>CPU Usage</span><b>{{ node.cpuUsed }} / {{
+                                                    node.cpuCap }} cores ({{ node.cpu }}%)</b></div>
+                                            <div class="rt-row"><span>Memory Usage</span><b>{{ node.memUsed }} / {{
+                                                    node.memCap }} GiB ({{ node.memory }}%)</b></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="mini-pill green">{{ node.status }}</span></td>
+                                <td>{{ node.pods }} / {{ node.podsCapacity }}</td>
+                                <td>
+                                    <div class="node-bar">
+                                        <div class="bar-track">
+                                            <div class="bar-fill" [style.width.%]="node.cpu"
+                                                [style.background]="node.cpu >= 80 ? '#ef4444' : '#3b82f6'"></div>
+                                        </div>
+                                        <span>{{ node.cpu }}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="node-bar">
+                                        <div class="bar-track">
+                                            <div class="bar-fill" [style.width.%]="node.memory"
+                                                style="background:#22c55e"></div>
+                                        </div>
+                                        <span>{{ node.memory }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pod Restarts Trend -->
+                <div class="panel restarts-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12a9 9 0 1 1-3-6.7" />
+                                <path d="M21 4v5h-5" />
+                            </svg>
+                            <span>Pod Restarts Trend</span>
+                            <ng-container
+                                *ngTemplateOutlet="infoTpl; context: { title: 'Pod Restarts Trend', text: 'Number of pod / container restarts recorded over time.' }">
+                            </ng-container>
+                        </div>
+                    </div>
+                    <ng-container *ngTemplateOutlet="chartTpl; context: { $implicit: restartsChart }"></ng-container>
+                </div>
+            </div>
+
+            <!-- ================= Row 4: Cluster Events ================= -->
+            <div class="row row-events">
+                <div class="panel events-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                            <span>Cluster Events ({{ filteredEvents.length }})</span>
+                            <ng-container
+                                *ngTemplateOutlet="infoTpl; context: { title: 'Cluster Events', text: 'Recent cluster-wide events across all namespaces including pod scheduling, scaling, container lifecycle, and warnings.' }">
+                            </ng-container>
+                        </div>
+
+                        <div class="events-header-actions">
+                            <!-- Search -->
+                            <div class="k8s-table-search">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="7" />
+                                    <path d="M21 21l-4.35-4.35" />
+                                </svg>
+                                <input type="text" placeholder="Search events..." [(ngModel)]="evSearch" (ngModelChange)="evPage = 1" />
+                            </div>
+
+                            <!-- Type Filter -->
+                            <div class="ev-filter-wrap">
+                                <select class="ev-type-select" [(ngModel)]="evTypeFilter" (ngModelChange)="evPage = 1">
+                                    <option value="All">All Types</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Warning">Warning</option>
+                                </select>
+                            </div>
+
+                            <!-- Export -->
+                            <div class="k8s-export-wrap">
+                                <button type="button" class="k8s-export-btn" (click)="toggleExportMenu(); $event.stopPropagation()" title="Download cluster events">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                                    <span>Export</span>
+                                </button>
+                                <div class="k8s-export-menu" *ngIf="exportMenuOpen" (click)="$event.stopPropagation()">
+                                    <button type="button" class="k8s-export-item" (click)="exportEvents('xlsx')">
+                                        <span class="k8s-export-badge xlsx">XLSX</span>
+                                        <span>Download Excel</span>
+                                    </button>
+                                    <button type="button" class="k8s-export-item" (click)="exportEvents('csv')">
+                                        <span class="k8s-export-badge csv">CSV</span>
+                                        <span>Download CSV</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-scroll-wrap">
+                        <table class="data-table events-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 160px;">Timestamp</th>
+                                    <th style="width: 90px;">Type</th>
+                                    <th style="width: 170px;">Reason</th>
+                                    <th style="width: 230px;">Object</th>
+                                    <th style="width: 140px;">Namespace</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let e of pagedEvents">
+                                    <td class="nowrap strong">{{ e.time }}</td>
+                                    <td>
+                                        <span class="mini-pill" [class.green]="e.type === 'Normal'" [class.warn]="e.type === 'Warning'">
+                                            {{ e.type }}
+                                        </span>
+                                    </td>
+                                    <td><span class="reason-tag">{{ e.reason }}</span></td>
+                                    <td class="nowrap">
+                                        <span class="object-text" [title]="e.object">{{ e.object }}</span>
+                                    </td>
+                                    <td>
+                                        <a class="link" (click)="goToNamespace(e.namespace)">{{ e.namespace }}</a>
+                                    </td>
+                                    <td class="msg-cell" [title]="e.message">{{ e.message }}</td>
+                                </tr>
+                                <tr *ngIf="filteredEvents.length === 0">
+                                    <td colspan="6" class="empty-events">No cluster events found matching your search.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mrum-pagination-container">
+                        <div class="mrum-showing-text">
+                            Showing {{ evStartIndex }} to {{ evEndIndex }} of {{ filteredEvents.length }} events
+                        </div>
+                        <div class="mrum-pagination-controls">
+                            <div class="mrum-per-page">
+                                <input type="number" min="1" [(ngModel)]="evItemsPerPage"
+                                    (ngModelChange)="onEvItemsPerPageChange()" />
+                                <span>per page</span>
+                            </div>
+                            <div class="mrum-pager">
+                                <button class="mrum-pager-btn" (click)="previousEvPage()" [disabled]="evPage === 1">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <button class="mrum-pager-btn" *ngFor="let p of evTotalPagesArray"
+                                    [class.active]="evPage === p" (click)="p !== '...' && goToEvPage(p)"
+                                    [disabled]="p === '...'">
+                                    {{ p }}
+                                </button>
+                                <button class="mrum-pager-btn" (click)="nextEvPage()" [disabled]="evPage === evTotalPages">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reusable info icon -->
+<ng-template #infoIcon>
+    <svg class="info-svg" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5M12 8h.01" />
+    </svg>
+</ng-template>
+
+<!-- Reusable info tooltip (panel titles) -->
+<ng-template #infoTpl let-title="title" let-text="text">
+    <span class="info-wrap" (mouseenter)="placeTip($event)">
+        <ng-container *ngTemplateOutlet="infoIcon"></ng-container>
+        <div class="tile-tip">
+            <b>{{ title }}</b>
+            <p>{{ text }}</p>
+        </div>
+    </span>
+</ng-template>
+
+<!-- Reusable chart block with hover tooltip -->
+<ng-template #chartTpl let-c>
+    <div class="trend-plot-area" (mousemove)="onChartMouseMove($event, c)" (mouseleave)="onChartMouseLeave(c)">
+
+        <!-- Tooltip card -->
+        <div class="chart-tooltip-box" *ngIf="c.hovered" [class.flip]="c.flip" [style.left.%]="c.tooltipPct"
+            [style.border-color]="c.color">
+            <div class="ct-head">
+                <span class="ct-icon" [style.background]="c.color + '22'" [style.color]="c.color">
+                    <svg *ngIf="c.kind === 'cpu'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                        <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" />
+                    </svg>
+                    <svg *ngIf="c.kind === 'mem'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="10" rx="2" />
+                        <path d="M6 11v2M10 11v2M14 11v2M18 11v2" />
+                    </svg>
+                    <svg *ngIf="c.kind === 'rst'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 1 1-3-6.7" />
+                        <path d="M21 4v5h-5" />
+                    </svg>
+                </span>
+                <b class="ct-title">{{ c.tipTitle }}</b>
+                <span class="ct-time">{{ c.hoverTime }}</span>
+            </div>
+            <div class="ct-big" *ngIf="c.hoverBig" [style.color]="c.color">{{ c.hoverBig }}</div>
+            <div class="ct-row" *ngFor="let r of c.hoverRows">
+                <span>{{ r.label }}</span><b>{{ r.value }}</b>
+            </div>
+            <div class="ct-note">{{ c.hoverNote }}</div>
+        </div>
+
+        <svg class="trend-svg" [attr.viewBox]="'0 0 ' + c.vbW + ' ' + c.vbH">
+            <defs>
+                <linearGradient [attr.id]="c.id" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" [attr.stop-color]="c.color" stop-opacity="0.35" />
+                    <stop offset="100%" [attr.stop-color]="c.color" stop-opacity="0.04" />
+                </linearGradient>
+            </defs>
+            <g *ngFor="let t of c.yTicks">
+                <line class="grid-line" [attr.x1]="c.plot.l" [attr.x2]="c.plot.r" [attr.y1]="t.y" [attr.y2]="t.y" />
+                <text class="axis-text" [attr.x]="c.plot.l - 8" [attr.y]="t.y + 4" text-anchor="end">{{ t.label
+                    }}</text>
+            </g>
+            <path class="chart-area" [attr.d]="c.area" [attr.fill]="'url(#' + c.id + ')'" />
+            <path class="chart-line" pathLength="1" [attr.d]="c.line" fill="none" [attr.stroke]="c.color"
+                stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" />
+
+            <!-- Vertical guide line -->
+            <line *ngIf="c.hovered" class="chart-guide-line" [attr.x1]="c.hoverX" [attr.x2]="c.hoverX"
+                [attr.y1]="c.plot.t" [attr.y2]="c.plot.b" [attr.stroke]="c.color" stroke-dasharray="3 3"
+                stroke-width="1.2" vector-effect="non-scaling-stroke" />
+
+            <!-- Active point -->
+            <circle *ngIf="c.hovered" class="trend-active-dot" [attr.cx]="c.hoverX" [attr.cy]="c.hoverY" r="5"
+                [attr.fill]="c.color" stroke="#ffffff" stroke-width="2" />
+
+            <text *ngFor="let x of c.xTicks" class="axis-text" [attr.x]="x.x" [attr.y]="c.labelY"
+                text-anchor="middle">{{ x.label }}</text>
+        </svg>
+    </div>
+</ng-template>

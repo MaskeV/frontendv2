@@ -1,0 +1,83 @@
+<!-- <div class="bg-gradient-to-b from-white/10 via-[#2b314a]/60 to-[#1f253a]/100 backdrop-blur-md text-white p-2 duration-300 transform hover:scale-[1.02] min-h-[220px] h-full w-full"> -->
+  <div class="row h-full w-full">
+    <h3 class="text-sm text-white">{{ title }}</h3>
+  
+    <div class="w-full h-full">
+      <!-- Highcharts: Line Chart -->
+      <div *ngIf="chartType === 'line'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="lineChartOptions"
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart>
+      </div>  
+  
+      <!-- Highcharts: Tilemap Chart -->
+      <div *ngIf="chartType === 'tilemap'" class="w-full h-full flex items-center">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="tilemapChartOptions"
+          style="height: 26vh; width: 100%; display: block;"
+          class="self-start"
+        ></highcharts-chart>
+      </div>
+  
+      <!-- Highcharts: Area Chart -->
+      <div *ngIf="chartType === 'area'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="areaChartOptions" 
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart> 
+        
+      </div>
+  
+  
+      <!-- Highcharts: Bar Chart -->
+      <div *ngIf="chartType === 'bar'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="barChartOptions"
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart>
+      </div>
+  
+          <!-- Highcharts: column Chart -->
+      
+      <div *ngIf="chartType === 'column'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="columnChartOptions"
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart>
+      </div>    
+      
+          <!-- Highcharts: scatter Chart -->
+      
+      <div *ngIf="chartType === 'scatter'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="scatterChartOptions"
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart>
+      </div>
+      
+      
+      <!-- Highcharts: spline Chart -->
+      
+      <div *ngIf="chartType === 'spline'" class="w-full h-full">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="splineChartOptions"
+          style="width: 100%; height: 26vh; display: block"
+        ></highcharts-chart>
+      </div>
+  </div>
+  

@@ -1,0 +1,253 @@
+<div class="top-error-bar" *ngIf="showError">
+    <span class="error-icon">!</span>
+    <span>{{ errorMessage }}</span>
+</div>
+
+<div class="top-success-bar" *ngIf="showSuccess">
+    <span class="success-icon">✓</span>
+    <span>{{ successMessage }}</span>
+</div>
+
+<div class="top-update-bar" *ngIf="showUpdateSuccess">
+    <span class="update-icon">↻</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="top-delete-bar" *ngIf="showDelete">
+    <span class="delete-icon1">✖</span>
+    <span>{{ deleteMessage }}</span>
+</div>
+
+<div class="page-wrapper">
+    <div class="card">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <div class="icon interface-icon" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Create Data Source" (click)="openCreateDatasource()">
+                </div>
+
+                <div>
+                    <h2>Data Source</h2>
+                    <p>Configure your data source</p>
+                </div>
+            </div>
+
+            <button class="table-toggle-btn" title="View Interfaces" (click)="showDatasourceList()">
+                ☰
+            </button>
+        </div>
+        <!-- ======================
+         FORM
+    ====================== -->
+        <form *ngIf="isForm" autocomplete="off">
+            <section>
+                <h4>Data Source Details</h4>
+                <div class="grid-2">
+                    <div>
+                        <label>Data Source Name *</label>
+                        <input type="text" name="datasourceName" [(ngModel)]="datasourceObj.datasourceName"
+                            autocomplete="off"/>
+                    </div>
+                    <div>
+                        <label>Enter URL *</label>
+                        <input type="text" name="datasourceURL" [(ngModel)]="datasourceObj.datasourceURL"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label>Enter Index Name *</label>
+                        <input type="text" name="indexName" [(ngModel)]="datasourceObj.indexName" autocomplete="off" />
+                    </div>
+                    <div class="field-with-toggle">
+                        <div class="field-head">
+                            <label>Enter Time Field Name *</label>
+                            <div class="inline-toggle-group">
+                                <div class="inline-toggle">
+                                    <span>Auth</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" [(ngModel)]="isDatasourceAuthEnabled"
+                                            name="authToggle" />
+                                        <span class="toggle-track">
+                                            <span class="toggle-text on">ON</span>
+                                            <span class="toggle-text off">OFF</span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="inline-toggle">
+                                    <span>CA</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" [(ngModel)]="isCAcertificate" name="caToggle" />
+                                        <span class="toggle-track">
+                                            <span class="toggle-text on">ON</span>
+                                            <span class="toggle-text off">OFF</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" name="timeFieldName" [(ngModel)]="datasourceObj.timeFieldName"
+                            autocomplete="off" />
+                    </div>
+
+                </div>
+                <div class="grid-2" *ngIf="isDatasourceAuthEnabled">
+                    <div>
+                        <label>User Name *</label>
+                        <input type="text" [(ngModel)]="datasourceObj.datasourceUsername" name="datasourceUsername"
+                            autocomplete="off" autocorrect="off" maxlength="25" autocapitalize="off" spellcheck="false"
+                            [readonly]="false" />
+                    </div>
+                    <div>
+                        <label>Password *</label>
+                        <div class="password-wrapper">
+                            <input [type]="fieldTextType ? 'text' : 'password'"
+                                [(ngModel)]="datasourceObj.datasourcePassword" name="datasourcePassword"
+                                autocomplete="off" />
+
+                            <button type="button" class="eye-btn" (click)="fieldTextType = !fieldTextType">
+                                <i class="fa-regular" [ngClass]="fieldTextType ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="isCAcertificate">
+                        <label>TLS / SSL Certificate *</label>
+                        <input type="text" [(ngModel)]="datasourceObj.caCertificate" name="caCertificate" />
+                    </div>
+                </div>
+            </section>
+            <div class="action-bar">
+                <button class="submit" type="button" *ngIf="!isUpdation" (click)="addDatasource()">
+                    Create Datasource
+                </button>
+
+                 <button class="submit" type="button" *ngIf="!isUpdation" (click)="testConnection()">
+                    Test Connection
+                </button>
+
+                <button class="submit" type="button" *ngIf="isUpdation" (click)="updateDatasource()">
+                    Update Datasource
+                </button>
+
+                <button class="submit" type="button" *ngIf="isUpdation" (click)="testConnection()">
+                    Test Connection
+                </button>
+            </div>
+        </form>
+        <div class="card mt-4" style="width:96%; margin-left:2%;" *ngIf="isTable">
+
+            <h4 style="margin-left:2%; margin-top:1%;">
+                Data Sources
+            </h4>
+
+            <div class="table-glass" style="overflow-x:auto;">
+
+                <!-- 🔍 SEARCH -->
+                <div class="table-toolbar">
+                    <div class="table-search">
+                        <input type="text" name="searchText" [(ngModel)]="searchText" (ngModelChange)="onSearch()"
+                            placeholder="Search infra groups..." />
+
+                    </div>
+                </div>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th style="cursor: pointer;" (click)="sortBy('datasourceName')">Datasource Name</th>
+                            <th style="cursor: pointer;" (click)="sortBy('sourceType')">Datasource Type</th>
+                            <th style="cursor: pointer;" (click)="sortBy('indexName')">Index Name</th>
+                            <th style="cursor: pointer;" (click)="sortBy('datasourceURL')">URL</th>
+                            <th style="cursor: pointer;" (click)="sortBy('createdBy')">Created By</th>
+                            <th style="cursor: pointer;" (click)="sortBy('createdOn')">Created On</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let g of pagedDatasourceList">
+
+                            <td>{{ g.datasourceName || 'No Data' }}</td>
+                            <td>{{ g.sourceType || 'No Data' }}</td>
+                            <td>{{ g.indexName || 'No Data' }}</td>
+                            <td>{{ g.datasourceURL || 'No Data' }}</td>
+                            <td>{{ g.createdBy || 'No Data' }}</td>
+                            <td>{{ (g.createdOn | date:'dd/MM/yyyy') || 'No Data' }}</td>
+
+                            <td>
+                                <button class="icon-btn" title="Edit" (click)="openUpdateDatasource(g)">
+                                    ✏️
+                                </button>
+
+                                <button class="icon-btn" title="Delete" (click)="openDeleteConfirm(g, deleteConfirmTemplate)">
+                                    🗑️
+                                </button>
+                            </td>
+
+                        </tr>
+                        <tr *ngIf="pagedDatasourceList.length === 0">
+                            <td colspan="6" style="text-align:center; padding:30px; font-weight:600;">
+                                No data found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- PAGINATION -->
+                <div class="pagination minimal-pagination" *ngIf="totalPages > 1">
+
+                    <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                        ‹ Previous
+                    </button>
+
+                    <span class="page-indicator">
+                        <strong>{{ page }}</strong> / {{ totalPages }}
+                    </span>
+
+                    <button class="page-btn" (click)="nextPage()" [disabled]="page === totalPages">
+                        Next ›
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #deleteConfirmTemplate let-modal>
+    <div class="delete-modal-wrapper">
+
+        <!-- HEADER -->
+        <div class="delete-header">
+            <div class="delete-icon-circle">
+                !
+            </div>
+            <div class="delete-header-text">
+                <h3>Confirm Deletion</h3>
+                <p>
+                    You are about to delete this Data Source.
+                    This will remove all associated data.
+                </p>
+            </div>
+        </div>
+
+        <!-- CAUTION -->
+        <div class="delete-warning">
+            <span class="warn-icon">⚠</span>
+            <span><strong>Caution:</strong> This action cannot be undone.</span>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="delete-actions">
+            <button class="btn btn-outline-secondary" (click)="modal.dismiss()">
+                No, Keep It
+            </button>
+
+            <button class="btn btn-danger" [disabled]="isDeleting" (click)="deleteDatasource()">
+                {{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}
+            </button>
+        </div>
+
+    </div>
+</ng-template>

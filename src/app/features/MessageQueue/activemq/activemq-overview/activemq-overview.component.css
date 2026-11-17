@@ -1,0 +1,299 @@
+/* Icon css */
+
+.lag-content {
+    height: 55px;
+    overflow-y: auto;
+}
+
+.icons {
+    height: 15px;
+    background: transparent;
+}
+
+.icon-sm {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+}
+
+main {
+    height: 100%;
+    width: 100%;
+    background-color: #F8FAFC;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* overwrite bootstrap */
+
+.nav-link.active {
+    background-color: #F8FAFC;
+}
+
+.small {
+    font-size: 0.7rem;
+}
+
+.fs-lg {
+    font-size: 0.9rem;
+}
+
+.ls-wider {
+    letter-spacing: 0.05em;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.text-purple {
+    color: #8B5CF6;
+}
+
+.card {
+    /* transition: box-shadown 0.2s ease; */
+    background-color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    /* border-color: #60A5FA !important; */
+    transform: translateY(-4px);
+    box-shadow:
+        inset 1px 1px 3px rgba(0, 0, 0, 0.08),
+        inset -1px -1px 3px rgba(255, 255, 255, 0.7),
+        4px 4px 10px rgba(0, 0, 0, 0.1),
+        -4px -4px 10px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* For section 2 */
+
+.card-soft {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.05);
+    background: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-soft:hover {
+    border-color: #60A5FA !important;
+    box-shadow: 0 4px 20px -5px rgba(96, 165, 250, 0.3);
+}
+
+.badge-soft {
+    font-size: 10px;
+    border-radius: 0.5rem;
+    padding: 2px 6px;
+    font-weight: bold;
+}
+
+.text-10 {
+    font-size: 10px;
+}
+
+.text-11 {
+    font-size: 11px;
+}
+
+.rounded-xl {
+    border-radius: 1rem !important;
+}
+
+/* Charts css */
+.chart-wrapper {
+    height: 30vh;
+}
+
+.chart-wrapper-sm {
+    height: 20vh;
+}
+
+.chart-wrapper-xsm {
+    height: 15vh;
+}
+
+
+/* ___________Broker Page____________ */
+.raleway-font {
+    font-family: 'Raleway', sans-serif;
+}
+
+.scrollable {
+    margin-left: 1%;
+    overflow-y: auto;
+    height: 58vh;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -6px;
+    position: relative;
+    overflow-wrap: break-word;
+}
+
+.noData {
+    text-align: center;
+    padding-top: 13%;
+    font-size: large;
+    letter-spacing: 1px;
+    color: #a0a0a0;
+    font-weight: 600;
+}
+
+.table-container {
+    position: relative;
+    height: 64vh;
+    overflow: hidden;
+}
+
+thead {
+    position: sticky;
+}
+
+.table th {
+    padding: 5px;
+    font-size: smaller;
+    font-family: system-ui;
+    text-align: left;
+    letter-spacing: 0.5px;
+    background-color: #F8FAFC;
+    ;
+    color: #219ebc;
+}
+
+.table tr {
+    text-align: center;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table td {
+    padding-left: 8px;
+    font-size: small;
+    text-align: left;
+    letter-spacing: 0.5px;
+    background-color: #FAFAFA;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.form-control {
+    font-size: x-small;
+    padding: 2px 4px;
+    transition: opacity 0.3s linear, width 0.3s linear;
+    opacity: 1;
+}
+
+/* Common css */
+.root {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #F8FAFC;
+}
+
+.card-body {
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    right: 10px;
+    top: 25%;
+    font-size: 13px;
+    color: #888;
+    pointer-events: none;
+}
+
+
+/* For Pagination */
+
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 16px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    height: 20px;
+}
+
+
+.page-btn:disabled {
+    cursor: not-allowed;
+}
+
+.page-number {
+    /* color: #ccc; */
+    font-size: 12px;
+}
+
+.page-input {
+    width: 50px;
+    margin: 0 3px;
+    padding: 2px;
+    color: var(--text-color);
+    font-size: smaller;
+    border: 1px solid #979B9F;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* For Skeleton view */
+.skeleton {
+    background: linear-gradient(90deg, #ececec 0px, #f3f3f3 40px, #ececec 80px);
+    background-size: 600px;
+    border-radius: 4px;
+    animation: shimmer 1.4s infinite linear;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -600px 0;
+    }
+
+    100% {
+        background-position: 600px 0;
+    }
+}
+
+/* Row height */
+.skeleton-row td {
+    padding: 12px 6px;
+    height: 20px;
+}
+
+/* Icon circle */
+.skeleton-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Long text */
+.skeleton-text {
+    width: 120px;
+    height: 12px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Short number cells */
+.skeleton-short {
+    width: 50px;
+    height: 12px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+}

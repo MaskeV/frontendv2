@@ -1,0 +1,258 @@
+<main class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img src="assets/img/technologies/REDIS.png" class="icons" alt="redis logo" title="redis" />
+                <a style="cursor: pointer; color: #3b82f6;" (click)="gotoRedisDetails()">{{selectedEntity}}</a>
+            </li>
+            <li class="breadcrumb-item active">General Service</li>
+        </ol>
+    </nav>
+
+    <!-- Navigation Tabs -->
+    <div class="p-1 px-2 rounded">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom small mb-0" id="service-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instance"
+                        (click)="loadData('instance')">Instance</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <div class="tab-content p-2">
+        <!-- OVERVIEW TAB -->
+        <div class="tab-pane fade in active show" id="overview">
+            <!-- KPI Section -->
+            <section class="mb-4">
+                <div class="d-flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Service Health</h3>
+                </div>
+                <div class="row g-3">
+                    <!-- Uptime -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">Uptime</span>
+                                <span class="text-success fs-6"><i class="bi bi-clock-history"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_uptime === null ? 'No Data' : formatUptime(redisStats.meter_redis_uptime) }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Connected Clients -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">Connected Clients</span>
+                                <span class="text-primary fs-6"><i class="bi bi-people"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_connected_clients !== null ? redisStats.meter_redis_connected_clients : 'No Data' }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Blocked Clients -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">Blocked Clients</span>
+                                <span class="text-danger fs-6"><i class="bi bi-person-x"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_blocked_clients !== null ? redisStats.meter_redis_blocked_clients : 'No Data' }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- DB Keys -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">DB Keys</span>
+                                <span class="text-info fs-6"><i class="bi bi-key"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_db_keys !== null ? redisStats.meter_redis_db_keys : 'No Data' }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Expired Keys -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">Expired Keys</span>
+                                <span class="text-warning fs-6"><i class="bi bi-hourglass-split"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_expired_keys_total !== null ? redisStats.meter_redis_expired_keys_total : 'No Data' }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Evicted Keys -->
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="metric-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="kpi-label">Evicted Keys</span>
+                                <span class="text-danger fs-6"><i class="bi bi-trash"></i></span>
+                            </div>
+                            <div class="kpi-value">
+                                {{ redisStats.meter_redis_evicted_keys_total !== null ? redisStats.meter_redis_evicted_keys_total : 'No Data' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metrics Visualized Section -->
+            <section>
+                <div class="d-flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Metrics Visualized</h3>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Memory Usage (%)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="memoryUsageChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Uptime</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="redisUptimeChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Network (bytes)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="networkMetricsChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Keys Trend (count)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="dBKeysChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Clients Connected/Blocked</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="clientMetricsChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Hit Rate (%)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="hitRateChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Command Rate (count/sec)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="totalCommandRateChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-soft">
+                            <div class="chart-title">Avg Time Spent By Command (sec)</div>
+                            <div class="p-2 chart-wrapper-sm">
+                                <div id="averageTimeSpentChartContainer" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- INSTANCE TAB -->
+        <div class="tab-pane fade" id="instance">
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="table-container">
+                    <table class="table w-full mb-0">
+                        <thead>
+                            <tr>
+                                <th>Instance</th>
+                                <th>Connected Clients</th>
+                                <th>DB Keys</th>
+                                <th>Expired Keys</th>
+                                <th>Memory Usage</th>
+                                <th>Uptime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let redisKey of objectKeys(redisInstances)">
+                                <tr *ngFor="let inst of redisInstances[redisKey]">
+                                    <td class="fw-medium">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-server text-primary"></i>
+                                            <span style="cursor: pointer;" (click)="gotoRedisInstanceDetails(inst.instance)">
+                                                {{ inst.instance }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-graph-up text-info"></i>
+                                            {{ inst.metrics.meter_redis_instance_connected_clients }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-key text-warning"></i>
+                                            {{ inst.metrics.meter_redis_instance_db_keys }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-trash text-danger"></i>
+                                            {{ inst.metrics.meter_redis_instance_expired_keys_total }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-memory text-purple"></i>
+                                            {{ inst.metrics.meter_redis_instance_memory_usage }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-speedometer2"></i>
+                                            {{ formatUptime(inst.metrics.meter_redis_instance_uptime) }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

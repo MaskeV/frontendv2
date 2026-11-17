@@ -1,0 +1,271 @@
+.screens-dashboard {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafc;
+}
+
+.kpi-card {
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.dash-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.dash-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.flow-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.flow-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.table-theme-orange,
+.table-theme-orange tbody,
+.table-theme-orange tr,
+.table-theme-orange td {
+  background-color: transparent !important;
+}
+
+.table-theme-orange th {
+  background-color: #ffedd5 !important;
+  color: #9a3412 !important;
+  border-bottom: none !important;
+  font-weight: 700;
+}
+
+.table-theme-green,
+.table-theme-green tbody,
+.table-theme-green tr,
+.table-theme-green td {
+  background-color: transparent !important;
+}
+
+.table-theme-green th {
+  background-color: #dcfce7 !important;
+  color: #14532d !important;
+  border-bottom: none !important;
+  font-weight: 700;
+}
+
+.table-theme-red,
+.table-theme-red tbody,
+.table-theme-red tr,
+.table-theme-red td {
+  background-color: transparent !important;
+}
+
+.table-theme-red th {
+  background-color: #fecaca !important;
+  color: #7f1d1d !important;
+  border-bottom: none !important;
+  font-weight: 700;
+}
+
+.screens-main-table, .screens-main-table tbody, .screens-main-table tr {
+  background-color: transparent !important;
+}
+
+.screens-main-table th {
+  background-color: #ede9fe !important;
+  color: #4c1d95 !important;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 12px;
+  white-space: nowrap;
+  border-bottom: none !important;
+  text-transform: none;
+}
+
+.screens-main-table th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.screens-main-table th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.screens-main-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ede9fe !important;
+  color: #4c1d95;
+}
+
+.screens-main-table tbody tr:nth-child(even) td {
+  background-color: #f5f3ff !important;
+}
+
+.screens-main-table tbody tr:nth-child(odd) td {
+  background-color: #ffffff !important;
+}
+
+.screens-main-table tbody tr:hover td {
+  background-color: #ddd6fe !important;
+}
+
+.input-group-text {
+  border: 1px solid #e2e8f0;
+  border-left: none;
+  color: #64748b;
+}
+
+.form-control {
+  border: 1px solid #e2e8f0;
+  border-right: none;
+  font-size: 12px;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #e2e8f0;
+}
+
+/* Scrollbar styling for a cleaner look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* Custom Theme Tooltip */
+.tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+}
+
+.custom-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background-color: var(--tooltip-bg, #ffffff) !important;
+  color: var(--tooltip-color, inherit) !important;
+  text-align: left;
+  border: 1.5px solid var(--tooltip-border, currentColor) !important;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 1050;
+  line-height: 1.4;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  white-space: normal !important;
+}
+
+.custom-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--tooltip-border, currentColor) transparent transparent transparent !important;
+}
+
+.custom-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--tooltip-bg, #ffffff) transparent transparent transparent !important;
+}
+
+.tooltip-wrap:hover .custom-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.custom-tooltip.align-right {
+  left: auto;
+  right: -10px;
+  transform: none;
+}
+
+.custom-tooltip.align-right::before {
+  left: auto;
+  right: 13px;
+  margin-left: 0;
+}
+
+.custom-tooltip.align-right::after {
+  left: auto;
+  right: 14px;
+  margin-left: 0;
+}
+
+.tooltip-wrap:hover .custom-tooltip.align-right {
+  transform: translateY(-5px);
+}
+
+/* Fix z-index for tooltips to display over other cards and Highcharts */
+.dash-card,
+.kpi-card {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+}
+
+.dash-card:hover,
+.kpi-card:hover {
+  z-index: 9999 !important;
+}
+
+.col-lg-6,
+.col-lg-4,
+.col-lg-2,
+.col-lg-3,
+.col-md-4 {
+  position: relative;
+  z-index: 1;
+}
+
+.col-lg-6:hover,
+.col-lg-4:hover,
+.col-lg-2:hover,
+.col-lg-3:hover,
+.col-md-4:hover {
+  z-index: 9998 !important;
+}

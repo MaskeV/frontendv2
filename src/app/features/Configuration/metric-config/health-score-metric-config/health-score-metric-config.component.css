@@ -1,0 +1,248 @@
+/* Page container */
+.page-container {
+  height: 85vh;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+}
+
+/* Header */
+.page-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: small;
+  font-weight: 600;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--card-headder);
+}
+
+/* Labels */
+.form-label {
+  font-size: small;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+/* Inputs & Select */
+.form-select,
+.form-input {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  outline: none;
+  font-size: small;
+}
+
+.form-select:focus,
+.form-input:focus {
+  border-color: #6366f1;
+  background-color: #fff;
+}
+
+/* Metric add row */
+.metric-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Selected metrics box */
+.metrics-box {
+  border-radius: 14px;
+  background: #f8fbff;
+}
+
+/* Each metric card */
+.metric-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 4px 14px;
+  margin-bottom: 10px;
+}
+
+/* Metric name */
+.metric-name {
+  font-size: small;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Weight section */
+.weight-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Weight badge */
+.weight-badge {
+  font-size: 12px;
+  color: #ea580c;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* Weight input */
+.weight-input {
+  width: 60px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: small;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+
+/* BUTTON */
+.remove-btn {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  color: #ef4444;
+}
+
+.add-btn {
+  background: #446D74;
+  color: white;
+  border: none;
+  padding: 4px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.custom-btn{
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(to right, #446D74, #66a1ab);
+  transition: 0.3s;
+}
+
+.custom-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.save-btn {
+  color: white;
+  background: linear-gradient(to right, #446D74, #66a1ab);
+}
+
+.clear-btn {
+  color: #111827;
+  background: white;
+  border: 1px solid lightgray;
+}
+
+/* No Data */
+
+.noDataAvailable{
+  color: #a2a5a8;
+  border: 2px dashed #a2a5a8;
+  border-radius: 2%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Table */
+
+.table th {
+  padding: 4px 8px;
+  font-size: x-small;
+  font-family: system-ui;
+  text-align: left;
+}
+
+.table tr {
+  text-align: center;
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table td {
+  text-align: center;
+  padding: 4px 8px;
+  font-size: smaller;
+  text-align: left;
+  letter-spacing: 0.5px;
+  word-wrap: break-word;
+  word-break: break-word;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.table tbody {
+  overflow-y: auto;
+  display: block;
+}
+
+/* Icons */
+
+.fa-edit{
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.fa-edit:hover{
+  color: #446D74;
+}
+
+.fa-trash{
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.fa-trash:hover{
+  color: #ef4444;
+}
+
+/* Skeleton */
+
+.skeleton-text {
+  height: 14px;
+  width: 40%;
+  border-radius: 4px;
+}
+
+.skeleton-badge {
+  height: 18px;
+  width: 120px;
+  border-radius: 12px;
+}
+
+.skeleton-input {
+  height: 34px;
+  width: 70px;
+  border-radius: 6px;
+}

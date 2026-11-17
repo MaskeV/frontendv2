@@ -1,0 +1,26 @@
+<div class="dat d-flex px-3" style="font-size: small; padding-top: 2px; padding-bottom: 2px;">
+ 
+
+  <div class="custom-dropdown-wrapper" #dropdownWrapper>
+  <button class="btn btn-primary dropdown-toggle present-time-btn" (click)="toggleDropdown()">
+    {{ selectedOptionLabel }}
+  </button>
+
+  <ul *ngIf="dropdownOpen" class="custom-dropdown-menu">
+    <li (click)="onPresetSelect('last1day')">Last 1 day</li>
+    <li (click)="onPresetSelect('last7days')">Last 7 day</li>
+    <li (click)="onPresetSelect('last15days')">Last 15 days</li>
+    <li (click)="onPresetSelect('last30days')">Last 30 days</li>
+  </ul>
+</div>
+
+
+  <!-- Existing datetime pickers -->
+  <input id="startDateTime" class="form-control start-time" type="date" [(ngModel)]="startDateTime"
+    (change)="onStartDateTimeChange()" [min]="minStartDate" [max]="maxStartDate" 
+    placeholder="YYYY-MM-DD">
+  <input id="endDateTime" class="form-control end-time" type="date" [(ngModel)]="endDateTime"
+    [min]="minEndDate" [max]="maxEndDate" placeholder="YYYY-MM-DD">
+  <i class="bi bi-stopwatch set ml-2" (click)="onSetDateTime()" (click)="Preset()"  title="Set Time"></i>
+  
+</div>

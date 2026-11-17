@@ -1,0 +1,124 @@
+<main>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb custom-breadcrumb mb-0">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img src="assets/images/api gateway.png" class="icons" alt="API Gateway Logo" />
+                <a routerLink="/aws-gateway">API Gateway</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{selectedService}}</li>
+        </ol> 
+    </nav>
+
+    <div class="tab-content custom-bg p-2">
+
+
+        <div class="bs-cards-row ps-2 pe-3 mt-3">
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Total number of API requests handled during the selected time period."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="serviceCountChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count 4xx</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Count of client-side error responses (4xx) returned by the API."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="serviceCount4xxChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Service Count 5xx</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Count of client-side error responses (5xx) returned by the API."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="serviceCount5xxChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bs-cards-row ps-2 pe-3 mt-2">
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Request Average Latency (ms)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Average time taken by the API to process and respond to requests."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="reqAvgLatencyChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Request Average Integration Latency (ms)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Average time spent by the API Gateway communicating with backend integrations."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="reqAvgIntLatencyChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+
+            <div class="bs-card w-33">
+                <div class="bs-card__header">
+                    <span>Data Processed (KB, HTTP API Only)</span>
+                    <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Total volume of data processed by the HTTP API in kilobytes."></i>
+                </div>
+                <div class="bs-card__body h-26 p-0">
+                    <div id="dataProcessCountChartContainer" style="width: 100%; height: 26vh;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ps-2 pe-3 mt-3">
+            <div class="bs-details">
+                <div class="bs-details__header">
+                    <span class="bs-details__title">Endpoint Details</span>
+                    <div class="bs-search-wrap">
+                        <i class="fas fa-search bs-search-wrap__icon"></i>
+                        <input type="text" class="bs-search-input" placeholder="Search..." [(ngModel)]="endpointSearch" (input)="getEndpointNames()" />
+                    </div>
+                </div>
+                <div class="bs-table-scroll" style="max-height: 50vh; min-height: 30vh; overflow: auto;">
+                    <table class="bs-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Service Name</th>
+                                <th style="width: 15%;">Count</th>
+                                <th style="width: 15%;">DATA PROCESSED (KB)</th>
+                                <th style="width: 15%;">Latency (ms)</th>
+                                <th style="width: 15%;">INTEGRATION LATENCY (MS)</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="pagedServiceName.length !== 0">
+                            <tr class="bs-tr" *ngFor="let item of pagedServiceName">
+                                <td style="width: 40%;"><a class="bs-link" (click)="setServiceId($event)">{{item}}</a></td>
+                                <td style="width: 15%;"></td>
+                                <td style="width: 15%;"></td>
+                                <td style="width: 15%;"></td>
+                                <td style="width: 15%;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div *ngIf="pagedServiceName.length === 0" class="bs-empty bs-empty--table">
+                        No Data Available
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

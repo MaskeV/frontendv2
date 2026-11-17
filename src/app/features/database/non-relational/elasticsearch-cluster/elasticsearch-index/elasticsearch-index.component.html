@@ -1,0 +1,186 @@
+<main class="pt-1">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mx-2 my-1">
+      <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+          <li class="breadcrumb-item d-flex align-items-center gap-1">
+              <img [src]="getImagePath()" class="Mongoicon" alt="elasticsearch logo" />
+              <a (click)="goToNonRelational()" class="prevPage pointer">{{decodedSelectedElasticService}}</a>
+          </li>
+          <li class="breadcrumb-item d-flex align-items-center gap-1">
+              <i class="fa-solid fa-server text-secondary mt-1 mx-1"></i>
+              <a (click)="goToElasticsearchCluster()" class="prevPage pointer">Elasticsearch Cluster</a>
+          </li>
+          <li class="breadcrumb-item active">{{decodedSelectedElasticInstance}} (Index)</li>
+      </ol>
+  </nav>
+
+  <div class="content-container">
+      <main class="flex-fill p-2 d-flex flex-column gap-2">
+          <!-- KPI Section -->
+          <section class="mb-1">
+              <div class="d-flex flex-wrap gap-2">
+                  <!-- Documents Count (Primary Shard) -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Documents (Primary)</span>
+                              <i class="fa-solid fa-file-lines text-info fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.documents_count_primary | numericData}}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Deleted Documents Count (Primary Shard) -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Deleted Docs (Primary)</span>
+                              <i class="fa-solid fa-trash text-danger fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.deleted_documents_count_primary | numericData}}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Data (Primary Shards) -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Data (Primary)</span>
+                              <i class="fa-solid fa-hard-drive text-warning fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.data_primary | numericData}}</span>
+                              <span class="text-muted small fw-medium mb-1" *ngIf="totalKpis.data_primary != null">GB</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Data -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Data (Total)</span>
+                              <i class="fa-solid fa-database text-warning fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.data_total | numericData}}</span>
+                              <span class="text-muted small fw-medium mb-1" *ngIf="totalKpis.data_total != null">GB</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Segments Count (Primary Shards) -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Segments (Primary)</span>
+                              <i class="fa-solid fa-layer-group text-primary fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.segments_count_primary | numericData}}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Segments Memory (Primary Shards) -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Segments Mem (Primary)</span>
+                              <i class="fa-solid fa-memory text-purple fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.segments_memory_primary | numericData}}</span>
+                              <span class="text-muted small fw-medium mb-1" *ngIf="totalKpis.segments_memory_primary != null">MB</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Segments Count -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Segments (Total)</span>
+                              <i class="fa-solid fa-layer-group text-primary fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.segments_count_total | numericData}}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Segments Memory -->
+                  <div class="col-auto flex-grow-1" style="min-width: 150px;">
+                      <div class="card p-2 rounded-2 shadow-sm border d-flex flex-column h-100">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="text-capitalize small fw-semibold text-secondary ls-wider">Segments Mem (Total)</span>
+                              <i class="fa-solid fa-memory text-purple fs-5"></i>
+                          </div>
+                          <div class="d-flex align-items-end gap-2 mt-auto">
+                              <span class="fs-lg fw-bold text-dark">{{totalKpis.segments_memory_total | numericData}}</span>
+                              <span class="text-muted small fw-medium mb-1" *ngIf="totalKpis.segments_memory_total != null">MB</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Categorized Graphs with Dynamic Sizing -->
+          <ng-container *ngFor="let section of [
+              {id: 'req_rate', title: 'Indexing & Searching Rates'},
+              {id: 'all_ops', title: 'All Operations'},
+              {id: 'search_avg', title: 'Search Averages & Shards'},
+              {id: 'docs_size', title: 'Documents & Size'}
+          ]">
+              <section *ngIf="getGraphsByCategory(section.id).length > 0" class="mb-2">
+                  <div class="d-flex flex-wrap justify-content-start gap-2">
+                      <div class="card flex-grow-1" [style.width]="getCardWidth(section.id, getGraphsByCategory(section.id).length)" *ngFor="let g of getGraphsByCategory(section.id)">
+                          <div class="p-1 border-bottom" style="font-weight: 599;">
+                              <div class="d-flex justify-content-between align-items-center px-1">
+                                  <span style="font-size: small; font-weight: 500;">
+                                      {{g.title}}
+                                  </span>
+                                  <div class="d-flex align-items-center">
+                                      <i class="fa-solid fa-circle-info text-primary" style="font-size: 13px;" [matTooltip]="g.title + ' Info'"></i>
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <!-- Render Chart -->
+                          <div class="card-body p-0" style="height: 33vh;" *ngIf="g.title !== 'Shards Documents'">
+                              <div [id]="g.id" class="h-100 w-100"></div>
+                          </div>
+                          
+                          <!-- Render Table for Shards Documents -->
+                          <div class="card-body p-2" style="height: 33vh; overflow-y: auto;" *ngIf="g.title === 'Shards Documents'">
+                              <div class="table-responsive h-100">
+                                  <table class="table table-bordered table-sm text-center mb-0" style="font-size: 11px;">
+                                      <thead class="bg-light sticky-top">
+                                          <tr>
+                                              <th class="fw-medium">Time</th>
+                                              <th class="fw-medium">Docs</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr *ngFor="let row of shardsDocumentsTableData">
+                                              <td class="text-muted">{{row.time | date:'yyyy-MM-dd HH:mm'}}</td>
+                                              <td class="text-muted">{{row.docs | shortNumber}}</td>
+                                          </tr>
+                                          <tr *ngIf="shardsDocumentsTableData.length === 0">
+                                              <td colspan="2" class="text-muted p-4">No data available</td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </section>
+          </ng-container>
+      </main>
+  </div>
+</main>

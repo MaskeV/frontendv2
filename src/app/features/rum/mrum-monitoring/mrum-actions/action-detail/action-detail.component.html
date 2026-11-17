@@ -1,0 +1,409 @@
+<div class="mrum-page-container p-4" style="background-color: #fafafa; height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden;">
+  <!-- Breadcrumbs -->
+  <app-mrum-breadcrumb 
+    [breadcrumbs]="breadcrumbData" 
+    (backClicked)="goBack()">
+  </app-mrum-breadcrumb>
+
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-file-earmark-text fs-3 text-dark"></i>
+      <h1 class="page-title m-0 fw-bold text-dark" style="font-size: 26px; letter-spacing: -0.5px;">{{ actionName }}</h1>
+      <span class="badge bg-purple-subtle text-purple rounded-1 px-3 py-2 fw-semibold" style="font-size: 12px; background-color: #f3e8ff; color: #7c3aed; border: 1px solid #e9d5ff;">
+        <i class="bi bi-hand-index-thumb me-1"></i> Tap Action
+      </span>
+    </div>
+    <div class="d-flex align-items-center gap-4">
+      <div class="text-muted" style="font-size: 13px; font-weight: 500;">
+        Last seen: 2 mins ago <span class="badge rounded-circle bg-success p-1 ms-1" style="width: 8px; height: 8px; display: inline-block;"></span>
+      </div>
+      <button class="btn btn-outline-primary btn-sm fw-semibold px-3 py-2" style="border-radius: 6px; font-size: 12px; border-color: #d8b4fe; color: #7c3aed; background-color: #faf5ff;">
+        View Full Waterfall
+      </button>
+    </div>
+  </div>
+
+  <p class="text-muted mb-4" style="font-size: 13px;">Users tapped on product item to open product details screen</p>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-4">
+    <!-- Total Executions -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #f5f3ff;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #ede9fe; color: #8b5cf6;">
+              <i class="bi bi-activity" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #6d28d9; font-size: 11px;">Total Executions</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ totalExecutions }}</h3>
+          <div id="execSparkline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avg Duration -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #eff6ff;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #dcfce7; color: #16a34a;">
+              <i class="bi bi-clock" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #15803d; font-size: 11px;">Avg. Duration</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ avgDuration }}</h3>
+          <div id="durSparkline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P90 Duration -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #f0fdf4;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #fef3c7; color: #d97706;">
+              <i class="bi bi-stopwatch" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #b45309; font-size: 11px;">P90 Duration</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ p90Duration }}</h3>
+          <div id="p90Sparkline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P95 Duration -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #fffbeb;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #ffedd5; color: #ea580c;">
+              <i class="bi bi-stopwatch-fill" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #c2410c; font-size: 11px;">P95 Duration</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ p95Duration }}</h3>
+          <div id="p95Sparkline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Rate -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #fef2f2;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #fee2e2; color: #ef4444;">
+              <i class="bi bi-bug" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #b91c1c; font-size: 11px;">Error Rate</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ errorRate }}</h3>
+          <div id="errSparkline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apdex -->
+    <div class="col-12 col-md-2">
+      <div class="dash-card h-100" style="background-color: #f0fdf4;">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="rounded d-flex justify-content-center align-items-center" style="width: 24px; height: 24px; background-color: #e2e8f0; color: #475569;">
+              <i class="bi bi-bar-chart" style="font-size: 12px;"></i>
+            </div>
+            <span class="ms-2 fw-semibold" style="color: #334155; font-size: 11px;">Apdex</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-1" style="font-size: 22px;">{{ apdex }}</h3>
+          <div class="d-flex align-items-center mb-3" style="font-size: 12px; font-weight: 600;">
+            <span class="text-dark">Excellent</span>
+          </div>
+          <!-- Apdex small bar chart -->
+          <div class="d-flex" style="height: 6px; border-radius: 3px; overflow: hidden;">
+            <div style="background-color: #8b5cf6; width: 70%;"></div>
+            <div style="background-color: #34d399; width: 25%;"></div>
+            <div style="background-color: #9ca3af; width: 5%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Duration Over Time -->
+      <div class="col-12 col-lg-4">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Action Duration Over Time (ms)</h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="durationChartOptions" style="width: 100%; height: 300px; display: block;"></highcharts-chart>
+          </div>
+        </div>
+      </div>
+      <!-- Frequency -->
+      <div class="col-12 col-lg-4">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Action Frequency <span class="text-muted fw-normal">(per min)</span></h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="frequencyChartOptions" style="width: 100%; height: 300px; display: block;"></highcharts-chart>
+          </div>
+        </div>
+      </div>
+      <!-- Success vs Failed -->
+      <div class="col-12 col-lg-4">
+        <div class="dash-card h-100">
+          <div class="card-body position-relative">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Success vs Failed Executions</h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="successDonutOptions" style="width: 100%; height: 260px; display: block; margin-top: 20px;"></highcharts-chart>
+            <!-- Center Text for Donut -->
+            <div style="position: absolute; top: 60%; left: 35%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+              <div style="font-size: 20px; font-weight: bold;">24,562</div>
+              <div style="font-size: 11px; color: #64748b;">Executions</div>
+            </div>
+            <!-- Legend on the right -->
+            <div style="position: absolute; top: 50%; right: 10%; transform: translateY(-50%);">
+              <div class="mb-3">
+                <div class="d-flex align-items-center mb-1">
+                  <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; margin-right: 8px;"></div>
+                  <span style="font-size: 12px; font-weight: 600; color: #334155;">Success</span>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-left: 16px;">24,120 (98.20%)</div>
+              </div>
+              <div>
+                <div class="d-flex align-items-center mb-1">
+                  <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; margin-right: 8px;"></div>
+                  <span style="font-size: 12px; font-weight: 600; color: #334155;">Failed</span>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-left: 16px;">442 (1.80%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Apdex Over Time -->
+      <div class="col-12 col-lg-8">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Apdex Over Time</h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="apdexOverTimeOptions" style="width: 100%; height: 250px; display: block;"></highcharts-chart>
+          </div>
+        </div>
+      </div>
+      <!-- Apdex Score Gauge -->
+      <div class="col-12 col-lg-4">
+        <div class="dash-card h-100">
+          <div class="card-body position-relative">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Apdex Score</h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="apdexGaugeOptions" style="width: 100%; height: 200px; display: block;"></highcharts-chart>
+            <!-- Legend inside gauge card -->
+            <div style="position: absolute; right: 20px; top: 40px; font-size: 12px;">
+              <div class="d-flex justify-content-between mb-2 gap-3"><span class="d-flex align-items-center"><div style="width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px"></div>Excellent</span><span>73.3%</span></div>
+              <div class="d-flex justify-content-between mb-2 gap-3"><span class="d-flex align-items-center"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-right:6px"></div>Good</span><span>3.85%</span></div>
+              <div class="d-flex justify-content-between mb-2 gap-3"><span class="d-flex align-items-center"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:6px"></div>Fair</span><span>22.8%</span></div>
+              <div class="d-flex justify-content-between gap-3"><span class="d-flex align-items-center"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:6px"></div>Poor</span><span>0.05%</span></div>
+            </div>
+            <div class="text-center mt-2 text-muted" style="font-size: 11px;">Threshold: 0.84 - 1.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Top Errors -->
+      <div class="col-12 col-lg-6">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h6 class="fw-bold m-0" style="font-size: 13px;">Top Errors Occurred</h6>
+              <button class="btn btn-sm btn-outline-primary" style="font-size: 11px; font-weight: 600; border-radius: 6px; padding: 4px 12px; border-color: #d8b4fe; color: #7c3aed; background-color: #faf5ff;" (click)="viewAllErrors()">View All</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-borderless table-hover align-middle mb-0" style="font-size: 12px;">
+                <thead class="border-bottom text-muted">
+                  <tr>
+                    <th class="fw-semibold pb-2">Error</th>
+                    <th class="fw-semibold pb-2 text-center">Occurrences</th>
+                    <th class="fw-semibold pb-2 text-center">Error Rate</th>
+                    <th class="fw-semibold pb-2 text-center">Affected Sessions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">HTTP 500 Internal Server Error</td>
+                    <td class="text-center py-3">312</td>
+                    <td class="text-center py-3">0.82%</td>
+                    <td class="text-center py-3">288</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">Network Timeout</td>
+                    <td class="text-center py-3">128</td>
+                    <td class="text-center py-3">0.34%</td>
+                    <td class="text-center py-3">116</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">JSON Parse Exception</td>
+                    <td class="text-center py-3">96</td>
+                    <td class="text-center py-3">0.25%</td>
+                    <td class="text-center py-3">88</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">HTTP 403 Forbidden</td>
+                    <td class="text-center py-3">64</td>
+                    <td class="text-center py-3">0.17%</td>
+                    <td class="text-center py-3">60</td>
+                  </tr>
+                  <tr>
+                    <td class="text-primary fw-semibold py-3">Connection Reset</td>
+                    <td class="text-center py-3">52</td>
+                    <td class="text-center py-3">0.14%</td>
+                    <td class="text-center py-3">49</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- View all link moved to header -->
+          </div>
+        </div>
+      </div>
+      <!-- Failed Executions Over Time -->
+      <div class="col-12 col-lg-6">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3" style="font-size: 13px;">Failed Executions Over Time</h6>
+            <highcharts-chart [Highcharts]="Highcharts" [options]="failedExecutionsChartOptions" style="width: 100%; height: 250px; display: block;"></highcharts-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Failed Executions by Sessions -->
+      <div class="col-12 col-lg-6">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h6 class="fw-bold m-0" style="font-size: 13px;">Failed Executions by Sessions</h6>
+              <button class="btn btn-sm btn-outline-primary" style="font-size: 11px; font-weight: 600; border-radius: 6px; padding: 4px 12px; border-color: #d8b4fe; color: #7c3aed; background-color: #faf5ff;" (click)="viewAllSessions()">View All</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-borderless table-hover align-middle mb-0" style="font-size: 12px;">
+                <thead class="border-bottom text-muted">
+                  <tr>
+                    <th class="fw-semibold pb-2">Session ID</th>
+                    <th class="fw-semibold pb-2">User</th>
+                    <th class="fw-semibold pb-2">Device</th>
+                    <th class="fw-semibold pb-2">Failure Time</th>
+                    <th class="fw-semibold pb-2">Error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">47f8de30-2f01-41...</td>
+                    <td class="py-3">rahul&#64;gmail.com</td>
+                    <td class="py-3">Galaxy S24 Ultra</td>
+                    <td class="py-3">10:32:14</td>
+                    <td class="py-3">HTTP 500</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">b0c4d80b-4e25-4...</td>
+                    <td class="py-3">priya&#64;gmail.com</td>
+                    <td class="py-3">iPhone 15 Pro</td>
+                    <td class="py-3">10:31:57</td>
+                    <td class="py-3">Network Timeout</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">635ef977-f8bd-48...</td>
+                    <td class="py-3">sayyad&#64;gmail.com</td>
+                    <td class="py-3">Pixel 8 Pro</td>
+                    <td class="py-3">10:31:22</td>
+                    <td class="py-3">JSON Parse Error</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="text-primary fw-semibold py-3">2c6ffe1d-7a34-41...</td>
+                    <td class="py-3">ankit&#64;gmail.com</td>
+                    <td class="py-3">OnePlus 12</td>
+                    <td class="py-3">10:30:48</td>
+                    <td class="py-3">HTTP 500</td>
+                  </tr>
+                  <tr>
+                    <td class="text-primary fw-semibold py-3">8a6d9fb2-9cd4-42...</td>
+                    <td class="py-3">neha&#64;gmail.com</td>
+                    <td class="py-3">Galaxy S23</td>
+                    <td class="py-3">10:30:15</td>
+                    <td class="py-3">Connection Reset</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- View all link moved to header -->
+          </div>
+        </div>
+      </div>
+      <!-- Failed Executions by Users -->
+      <div class="col-12 col-lg-6">
+        <div class="dash-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h6 class="fw-bold m-0" style="font-size: 13px;">Failed Executions by Users</h6>
+              <button class="btn btn-sm btn-outline-primary" style="font-size: 11px; font-weight: 600; border-radius: 6px; padding: 4px 12px; border-color: #d8b4fe; color: #7c3aed; background-color: #faf5ff;" (click)="viewAllUsers()">View All</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-borderless table-hover align-middle mb-0" style="font-size: 12px;">
+                <thead class="border-bottom text-muted">
+                  <tr>
+                    <th class="fw-semibold pb-2">User</th>
+                    <th class="fw-semibold pb-2 text-center">Failed Executions</th>
+                    <th class="fw-semibold pb-2 text-center">Error Rate</th>
+                    <th class="fw-semibold pb-2 text-center">Affected Sessions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-bottom">
+                    <td class="fw-semibold py-3 text-dark">rahul&#64;gmail.com</td>
+                    <td class="text-center py-3">88</td>
+                    <td class="text-center py-3">2.45%</td>
+                    <td class="text-center py-3">74</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="fw-semibold py-3 text-dark">priya&#64;gmail.com</td>
+                    <td class="text-center py-3">62</td>
+                    <td class="text-center py-3">1.72%</td>
+                    <td class="text-center py-3">55</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="fw-semibold py-3 text-dark">sayyad&#64;gmail.com</td>
+                    <td class="text-center py-3">48</td>
+                    <td class="text-center py-3">1.35%</td>
+                    <td class="text-center py-3">43</td>
+                  </tr>
+                  <tr class="border-bottom">
+                    <td class="fw-semibold py-3 text-dark">ankit&#64;gmail.com</td>
+                    <td class="text-center py-3">34</td>
+                    <td class="text-center py-3">0.95%</td>
+                    <td class="text-center py-3">32</td>
+                  </tr>
+                  <tr>
+                    <td class="fw-semibold py-3 text-dark">neha&#64;gmail.com</td>
+                    <td class="text-center py-3">29</td>
+                    <td class="text-center py-3">0.81%</td>
+                    <td class="text-center py-3">26</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- View all link moved to header -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center py-4 text-muted" style="font-size: 12px;">
+      All times are in IST (Asia/Kolkata) time zone
+    </div>
+</div>

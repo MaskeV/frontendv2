@@ -1,0 +1,2849 @@
+<main>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb custom-breadcrumb mb-0" style="padding: 5px 10px; font-size: small;">
+            <li class="breadcrumb-item"><a routerLink="/service-page">Service</a></li>
+            <li class="breadcrumb-item active" aria-current="page" routerLink="/service-page/general-service">
+                {{selectedService}}</li>
+        </ol>
+    </nav>
+    <div class="p-1 rounded" style="margin-bottom: -4px;">
+        <header class="pb-0 mb-0">
+            <ul class="mb-0 nav nav-tabs border-bottom" id="service-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instance"
+                        (click)="loadData('instance')">Instance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#endpoint"
+                        (click)="loadData('endpoint')">Endpoint</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#topology"
+                        (click)="loadData('topology')">Topology</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#trace"
+                        (click)="loadData('trace')">Trace</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#log" (click)="loadData('log')">Log</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#db" (click)="loadData('db')">Database</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+    <div class="tab-content custom-bg ">
+        <!-- OVERVIEW -->
+        <div class="tab-pane fade in active show" id="overview" style="background: #F8FAFC;">
+
+            <div class="alert-container" (clickOutside)="showAlerts = false">
+
+                <!-- Trigger Button -->
+                <div class="alert-trigger" (click)="toggleAlerts()">
+
+                    <!-- Bell Icon + Badge -->
+                    <div class="bell-wrap">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2a6 6 0 0 1 6 6c0 3.5 1.5 5 1.5 5h-15s1.5-1.5 1.5-5a6 6 0 0 1 6-6z" />
+                            <path d="M8.3 17a2 2 0 0 0 3.4 0" />
+                        </svg>
+                        <span class="alert-badge" *ngIf="getTotalAlerts() > 0">
+                            {{ getTotalAlerts() }}
+                        </span>
+                    </div>
+
+                    <span class="trigger-label">Alerts</span>
+
+                    <!-- Live Critical / Warning counts -->
+                    <div class="trigger-counts">
+                        <span class="tc crit" *ngIf="getTotalCritical() > 0">
+                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                <path
+                                    d="M6 1L1 10h10L6 1zm0 2.5 3.1 5.5H2.9L6 3.5zm-.5 1.5v2h1v-2H5.5zm0 2.5v1h1v-1H5.5z" />
+                            </svg>
+                            {{ getTotalCritical() }}
+                        </span>
+                        <span class="tc warn" *ngIf="getTotalWarning() > 0">
+                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 2a4 4 0 1 0 0 8A4 4 0 0 0 6 2zm-.5 2h1v3h-1V4zm0 3.5h1v1h-1v-1z" />
+                            </svg>
+                            {{ getTotalWarning() }}
+                        </span>
+                    </div>
+
+                    <button class="hi-alert-label"
+                        (click)="$event.stopPropagation(); goToProblemPage()">Failures</button>
+
+                    <!-- Chevron -->
+                    <svg class="chevron" [class.open]="showAlerts" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="2,4 6,8 10,4" />
+                    </svg>
+
+                </div>
+
+                <!-- Dropdown Panel -->
+                <div class="alert-dropdown" *ngIf="showAlerts">
+
+                    <!-- Header -->
+                    <div class="dd-header">
+                        <div class="dd-title">
+                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M7 1.5a4.5 4.5 0 0 1 4.5 4.5c0 2.6 1 3.7 1 3.7H1.5s1-1.1 1-3.7A4.5 4.5 0 0 1 7 1.5z" />
+                                <path d="M5.7 12.5a1.5 1.5 0 0 0 2.6 0" />
+                            </svg>
+                            Alerts Summary
+                        </div>
+                        <span class="dd-live">● Live</span>
+                    </div>
+
+                    <!-- Body — looped from alertData (same binding as before) -->
+                    <div class="dd-body">
+
+                        <ng-container *ngFor="let alert of alertData">
+
+                            <!-- Has Alerts -->
+                            <div *ngIf="alert.openalertcount > 0 || alert.closealertcount > 0" class="alert-row">
+                                <div class="row-top">
+                                    <div class="row-counts">
+                                        <span class="rc crit" *ngIf="alert.openalertcount > 0">
+                                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                                <path
+                                                    d="M6 1L1 10h10L6 1zm0 2.2 3 5.3H3L6 3.2zm-.4 1.3v2h.8v-2h-.8zm0 2.5v.9h.8v-.9h-.8z" />
+                                            </svg>
+                                            {{ alert.openalertcount }} open
+                                        </span>
+                                        <span class="rc warn" *ngIf="alert.closealertcount > 0">
+                                            <svg viewBox="0 0 12 12" fill="currentColor">
+                                                <path
+                                                    d="M6 2a4 4 0 1 0 0 8A4 4 0 0 0 6 2zm-.4 1.8h.8v3h-.8v-3zm0 3.5h.8v.8h-.8v-.8z" />
+                                            </svg>
+                                            {{ alert.closealertcount }} closed
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Proportional bar -->
+                                <div class="bar-track">
+                                    <div class="bar-crit" *ngIf="alert.openalertcount > 0"
+                                        [class.bar-only]="alert.closealertcount === 0" [style.flex]="alert.openalertcount">
+                                    </div>
+                                    <div class="bar-warn" *ngIf="alert.closealertcount > 0"
+                                        [class.bar-only]="alert.openalertcount === 0" [style.flex]="alert.closealertcount">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- No Alerts -->
+                            <div *ngIf="alert.openalertcount === 0 && alert.closealertcount === 0" class="no-alert">
+                                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="2,7 5.5,10.5 12,3" />
+                                </svg>
+                                No active alerts
+                            </div>
+
+                        </ng-container>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="dd-footer">
+                        <span class="footer-total">
+                            Total: <strong>{{ getTotalAlerts() }}</strong> alerts
+                        </span>
+                        <span class="footer-breakdown">
+                            <span class="fc crit" *ngIf="getTotalCritical() > 0">{{ getTotalCritical() }}
+                                open</span>
+                            <span class="fc-sep" *ngIf="getTotalCritical() > 0 && getTotalWarning() > 0">·</span>
+                            <span class="fc warn" *ngIf="getTotalWarning() > 0">{{ getTotalWarning() }} closed</span>
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="row mr-1 justify-content-between" style="    padding: 10px 10px 10px 10px;
+    background: aliceblue;  border-bottom: 1px solid #dce8f5;">
+                <div class="w-8">
+                    <img *ngIf="logoPath" [src]="'assets/images/' + (logoPath)" />
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="success-rate-metric" [ngStyle]="{'border': (getThresholdDisplay('service_sla', successRate).color === 'red' || getThresholdDisplay('service_sla', successRate).color === 'orange')
+                                 ? '1px solid ' + getThresholdDisplay('service_sla', successRate).color : '' }">
+                    <div class="small fw-semibold text-secondary ">Success rate <span
+                            *ngIf="getThresholdDisplay('service_sla', successRate).value"
+                            [ngStyle]="{'color': getThresholdDisplay('service_sla', successRate).color == 'red' ? 'red' : 'orange'}"
+                            class="badge me-1 rounded-0 py-0 px-1 m-0 threshold">
+                            {{ getThresholdDisplay('service_sla', successRate).value }}</span></div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('service_sla', successRate).color}">
+                        {{ successRate != null ? successRate : 'N/A' }} <span *ngIf="successRate"
+                            class="mini-text">%</span>
+                    </div>
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="appdex-metric" [ngStyle]="{
+                    'border': (getThresholdDisplay('service_apdex', apdexValue).color === 'red' || 
+                               getThresholdDisplay('service_apdex', apdexValue).color === 'orange')
+                              ? '1px solid ' + getThresholdDisplay('service_apdex', apdexValue).color
+                              : '' 
+                  }">
+                    <div class="small fw-semibold text-secondary">Apdex <span
+                            *ngIf="getThresholdDisplay('service_apdex', apdexValue).value"
+                            [ngStyle]="{'color': getThresholdDisplay('service_apdex', apdexValue).color == 'red' ? 'red' : 'orange'}"
+                            class="badge  me-1  rounded-0 py-0 px-1 m-0 threshold">{{
+                            getThresholdDisplay('service_apdex', apdexValue).value }}</span></div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('service_apdex', apdexValue).color}">
+                        {{ apdexValue != null ? apdexValue : 'N/A' }} </div>
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="latency-metric" [ngStyle]="{
+                    'border': (getThresholdDisplay('service_resp_time', latencyValue).color === 'red' || 
+                               getThresholdDisplay('service_resp_time', latencyValue).color === 'orange')
+                              ? '1px solid ' + getThresholdDisplay('service_resp_time', latencyValue).color
+                              : '' 
+                  }">
+                    <div class="small fw-semibold text-secondary">Latency <span
+                            *ngIf="getThresholdDisplay('service_resp_time', latencyValue).value"
+                            [ngStyle]="{'color': getThresholdDisplay('service_resp_time', latencyValue).color == 'red' ? 'red' : 'orange'}"
+                            class="badge  me-1  rounded-0 py-0 px-1 m-0 threshold">{{
+                            getThresholdDisplay('service_resp_time', latencyValue).value }}</span></div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('service_resp_time', latencyValue).color}">
+                        {{ latencyValue != null ? latencyValue : 'N/A' }} <span *ngIf="latencyValue"
+                            class="mini-text">ms</span></div>
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="avgLoadValue-metric" [ngStyle]="{
+                    'border': (getThresholdDisplay('service_cpm', avgLoadValue).color === 'red' || 
+                               getThresholdDisplay('service_cpm', avgLoadValue).color === 'orange')
+                              ? '1px solid ' + getThresholdDisplay('service_cpm', avgLoadValue).color
+                              : '' 
+                  }">
+                    <div class="small fw-semibold text-secondary">Avg Load <span
+                            *ngIf="getThresholdDisplay('service_cpm', avgLoadValue).value"
+                            [ngStyle]="{'color': getThresholdDisplay('service_cpm', avgLoadValue).color == 'red' ? 'red' : 'orange'}"
+                            class="badge  me-1  rounded-0 py-0 px-1 m-0 threshold">{{
+                            getThresholdDisplay('service_cpm', avgLoadValue).value }}</span></div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('service_cpm', avgLoadValue).color}">
+                        {{ avgLoadValue != null ? avgLoadValue : 'N/A' }} <span *ngIf="avgLoadValue"
+                            class="mini-text">call/min</span></div>
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="Total hits">
+                    <div class="small fw-semibold text-secondary">Total hits <i
+                            class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Total API Hits between the time range"></i></div>
+                    <div class="fw-bold kpi-value">{{ totalHitsValue }}</div>
+                </div>
+                <div class="metric-box w-14 shadow-sm border rounded-3" data-testid="Errors"
+                    [style.border]="(errorValue === 0 && ignoredErrorCount === 0) ? '' : '1px solid red'">
+                    <div class="small fw-semibold text-secondary">Errors <i class="fa-solid fa-circle-info gradiantIcon"
+                            matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Trace count where error occured"></i></div>
+                    <div class="fw-bold kpi-value d-flex align-items-center justify-content-center gap-1"
+                        style="cursor: pointer;" (click)="openTraceTabSucessRate()">
+                        <span [style.color]="errorValue === 0 ? 'green' : 'red'"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="HTTP Response failures">{{ errorValue }}</span>
+                        <span class="text-secondary fw-normal">|</span>
+                        <span [style.color]="ignoredErrorCount === 0 ? 'green' : 'red'"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Internal Processing failures">{{ ignoredErrorCount }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="row col-md-12 ms-2  alertRow">
+                <div class="problemPage"
+                    style="width: 6.5%; display: flex; align-items: center; cursor: pointer; justify-content: space-around;height: 28px;"
+                    (click)="goToProblemPage()">
+                    <span class="badge" data-bs-toggle="tooltip" matButton="elevated" title="See what went wrong"
+                        data-bs-placement="right"
+                        style="font-size: 10px; padding: 0%; font-family: system-ui;font-weight: 600;">
+                        Failures
+                    </span>
+                </div>
+                <div style="width: 93.5%; padding: 0%;">
+                    <ng-container *ngFor="let alert of alertData">
+                        <div *ngIf="alert.Critical > 0 || alert.Warning > 0" class="d-flex align-items-center">
+                            <div class="p-0 alert-bar d-flex w-100 custom-shadow">
+                                <div class="alert-section critical-section" *ngIf="alert.Critical > 0"
+                                    [style.minWidth.px]="70" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Critical Alert: {{alert.Critical}} | Warning Alert: {{alert.Warning}}"
+                                    [style.flex]="alert.Critical">
+                                    Critical: {{ alert.Critical }}
+                                </div>
+                                <div class="alert-section warning-section" *ngIf="alert.Warning > 0"
+                                    [style.minWidth.px]="70" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Critical Alert: {{alert.Critical}} | Warning Alert: {{alert.Warning}}"
+                                    [style.flex]="alert.Warning">
+                                    Warn: {{ alert.Warning }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-0 alert-bar d-flex w-100 custom-shadow"
+                            *ngIf="alert.Critical === 0 && alert.Warning === 0">
+                            <div class="alert-section alert-empty w-100 p-2 text-center text-white small">
+                                No alerts
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div> -->
+
+
+
+            <div class="mt-2 ps-2 pe-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Health</h3>
+                </div>
+                <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 100%;gap: 4px;">
+                    <div class="card w-33 rounded-3 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Application Score</span>
+                            <span>
+                                <i class="mx-1 fa-solid fa-circle-info gradiantIcon" data-bs-placement="top"
+                                    title="Weightage: {{appWt}}% Application + {{dbWt}}% DB + {{infraWt}}% Infra"></i>
+                                <i class="fa-solid fa-exclamation-triangle gradiantIcon2" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="See metrices where problem occured" style="cursor: pointer;"
+                                    (click)="openProblemErrorModal()"></i>
+                                <i *ngIf="currentUser?.userType?.trim() === 'Super Admin'"
+                                    class="mx-1 fa-solid fa-edit gradiantIcon3" matButton="elevated"
+                                    title="Edit Weightage" style="cursor: pointer;" (click)="openHealthWtModal()"></i>
+                            </span>
+                        </div>
+                        <div class="card-body card-body-modern">
+
+                            <!-- ================= HEALTH ================= -->
+                            <div *ngIf="projectHealthChart" class="health-card-compact">
+
+                                <!-- Header -->
+                                <div class="health-header">
+                                    <div class="title" style="display:flex">
+                                        <img src="assets/images/honeycomb.png" class="icon-honeycomb">
+                                        <span>{{ selectedService }} Health</span>
+                                    </div>
+
+                                    <!-- TOP RIGHT HEALTH -->
+                                    <!-- <div class="overall-score" [style.color]="getColor(projectHealthScore)">
+                                        {{ projectHealthScore }}%
+                                    </div> -->
+                                </div>
+
+                                <!-- Breakdown -->
+                                <div class="health-scores-wrap">
+                                    <ng-container *ngFor="let item of getHealthItems()">
+                                        <div class="score-item">
+                                            {{ item.name }}:
+                                            <span [style.color]="getColor(item.value)">
+                                                {{ item.value | number:'1.0-2' }}%
+                                            </span>
+                                        </div>
+                                    </ng-container>
+                                </div>
+
+                                <!-- 🔥 CHART + HEALTH LABEL (NEW FIX) -->
+                                <div class="health-chart-row">
+
+                                    <span class="health-label" [style.color]="getColor(projectHealthScore)">
+                                        Health: {{ projectHealthScore }}%
+                                    </span>
+
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="projectHealthChart"
+                                        [oneToOne]="true" class="health-chart">
+                                    </highcharts-chart>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ================= HEX ================= -->
+                            <div class="hex-card-compact">
+
+                                <div class="hex-wrapper">
+
+                                    <div class="hex-row" style="justify-content:center"
+                                        *ngFor="let row of getRows(getHealthItems()); let i = index"
+                                        [class.shifted]="i % 2 !== 0">
+
+                                        <div *ngFor="let item of row" class="hex modern-hex"
+                                            (click)="item.type === 'Infra' ? goToInfra() : item.type === 'Database' ? goToDatabase(item.name) : null"
+                                            [style.cursor]="item.type === 'Infra' || item.type === 'Database' ? 'pointer' : 'default'"
+                                            [style.background]="getColor2(item.value)" data-bs-toggle="tooltip"
+                                            title="{{ item.type }}: {{ item.name }}">
+
+                                            <div class="hex-content">
+                                                <div class="hex-value">
+                                                    {{ item.value | number:'1.0-2' }}%
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card w-33 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Uptime</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Uptime of Application"></i>
+                        </div>
+                        <div class="card-body h-26 px-0 pt-0"
+                            style="display: flex; flex-direction: column; justify-content: space-around;">
+                            <div *ngIf="uptime1DaysChart" class="px-1" style="height: 8vh;">
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <div>
+                                        <span style="font-size: 11px;">Past 1 Day :</span>
+                                        <strong class="text-success ms-1" style="font-size: 11px;">
+                                            {{uptimeData1Day?.availability_percentage }} %</strong>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 11px;">Downtime for :</span>
+                                        <strong
+                                            [ngClass]="uptimeData1Day?.downtime_duration_minutes === 0 ? 'text-success' : 'text-danger'"
+                                            class="ms-1" style="font-size: 11px;">
+                                            {{ convertMinutes(uptimeData1Day?.downtime_duration_minutes) }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <highcharts-chart [Highcharts]="Highcharts" [options]="uptime1DaysChart"
+                                    [oneToOne]="true" class="d-block w-100 border"
+                                    style="height: 5vh; border-color: var(--border-color);">
+                                </highcharts-chart>
+                            </div>
+
+                            <div *ngIf="uptime5DaysChart" class="px-1" style="height: 8vh;">
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <div>
+                                        <span style="font-size: 11px;">Past 5 Days :</span>
+                                        <strong class="text-success ms-1" style="font-size: 11px;">{{
+                                            uptimeData5Day?.availability_percentage }} %</strong>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 11px;">Downtime for :</span>
+                                        <strong
+                                            [ngClass]="uptimeData5Day?.downtime_duration_minutes === 0 ? 'text-success' : 'text-danger'"
+                                            class="ms-1" style="font-size: 11px;">
+                                            {{convertMinutes(uptimeData5Day?.downtime_duration_minutes)}}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <highcharts-chart [Highcharts]="Highcharts" [options]="uptime5DaysChart"
+                                    [oneToOne]="true" class="d-block w-100 border"
+                                    style="height: 5vh; border-color: var(--border-color);">
+                                </highcharts-chart>
+                            </div>
+
+                            <div *ngIf="uptime10DaysChart" class="px-1" style="height: 8vh;">
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <div>
+                                        <span style="font-size: 11px;">Past 10 Days :</span>
+                                        <strong class="text-success ms-1" style="font-size: 11px;">{{
+                                            uptimeData10Day?.availability_percentage }} %</strong>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 11px;">Downtime for :</span>
+                                        <strong
+                                            [ngClass]="uptimeData10Day?.downtime_duration_minutes === 0 ? 'text-success' : 'text-danger'"
+                                            class="ms-1" style="font-size: 11px;">
+                                            {{convertMinutes(uptimeData10Day?.downtime_duration_minutes)}}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <highcharts-chart [Highcharts]="Highcharts" [options]="uptime10DaysChart"
+                                    [oneToOne]="true" class="d-block w-100 border"
+                                    style="height: 5vh; border-color: var(--border-color);">
+                                </highcharts-chart>
+                            </div>
+
+                            <div *ngIf="!uptime1DaysChart && !uptime5DaysChart && !uptime10DaysChart" class="noData">
+                                No Data Available
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card w-33 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Endpoint</span>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Endpoint type and their count"></i>
+                        </div>
+                        <table class="table table-hover h-26 mb-0">
+                            <tbody *ngIf="endpointData?.length !== 0" style="max-height: 25vh; overflow: auto;">
+                                <tr *ngFor="let item of endpointData">
+                                    <td class="text-ellipsis"
+                                        style="width: 40%; border-right: 0.5px solid var(--border-color);"
+                                        [title]="item.type">
+                                        {{item.type}}
+                                    </td>
+                                    <td style="width: 15%; border-right: 0.5px solid var(--border-color);">
+                                        {{item.success_rate}}%</td>
+                                    <td style="width: 35%; border-right: 0.5px solid var(--border-color);"
+                                        matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Success Count: {{item.count - item.error_count}} | Error Count: {{item.error_count}}"
+                                        (click)="openEndpointTabSearch(item.type)">
+                                        <div class="progress"
+                                            style="height: 15px; border-radius: 3px; position: relative; background-color: #e9ecef;">
+                                            <div [style.width.%]="getProgressWidth(item.count, endpointData, 'count') * item.success_rate / 100"
+                                                style="height: 100%; background-color: #22c55e; float: left;">
+                                            </div>
+                                            <div [style.width.%]="getProgressWidth(item.count, endpointData, 'count') * (100 - item.success_rate) / 100"
+                                                style="height: 100%; background-color: #ff0000; float: left;">
+                                            </div>
+                                            <span
+                                                [style.left.%]="getProgressWidth(item.count, endpointData, 'count') * item.success_rate / 200"
+                                                style="position: absolute; top: 50%; transform: translate(-50%, -50%);
+                                                    font-size: 12px; color: white; font-weight: 500;">
+                                                {{ item.count }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td style="width: 10%; text-align: center;">
+                                        <i class="fa-solid fa-eye gradiantIcon" matButton="elevated"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Go To Endpoint Tab"
+                                            style="cursor: pointer;" (click)="openEndpointTabSearch(item.type)"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <div *ngIf="endpointData?.length === 0 || !endpointData" class="noData">
+                                No Data Available
+                            </div>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-2 ps-2 pe-2">
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">
+                        Performance
+                    </h3>
+                </div>
+            </div>
+
+            <div class=" my-2 ps-2 pe-2">
+                <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 100%;gap: 4px;">
+                    <div class="card w-33 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Success Rate (%)</span>
+                            <div class=" d-flex align-items-center justify-content-between">
+                                <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90x;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <div *ngIf="chart_criteria=='avg'"
+                                    class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#0e38f1; background-color: var(--bg-color);">
+                                    {{ successRate }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                    style="color:#e07e23; background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_sla"]?.warningValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                    style="background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_sla"]?.criticalValue }}</div>
+
+                                <i class="fa-solid fa-circle-info ms-1 gradiantIcon" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" matButton="elevated" title="{{ successRateInfo }}"></i>
+                            </div>
+                        </div>
+                        <div class="card-body h-26 p-0">
+                            <div id="successRateTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                        </div>
+                    </div>
+                    <div class="card w-33 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Apdex</span>
+                            <div class=" d-flex align-items-center justify-content-between">
+                                <select [(ngModel)]="chart_criteria" style="width: 90px;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <div *ngIf="chart_criteria=='avg'"
+                                    class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#0e38f1; background-color: var(--bg-color);">
+                                    {{ apdexValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                    style="color:#e07e23; background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_apdex"]?.warningValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                    style="background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_apdex"]?.criticalValue }}</div>
+
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ apdexInfo }}"></i>
+                            </div>
+                        </div>
+                        <div class="card-body h-26 p-0">
+                            <div id="serviceApdexTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                        </div>
+                    </div>
+                    <div class="card w-33 rounded-3">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Load (call/min)</span>
+                            <div class=" d-flex align-items-center justify-content-between">
+                                <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90px;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <div *ngIf="chart_criteria=='avg'"
+                                    class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#0e38f1; background-color: var(--bg-color);">
+                                    {{ avgLoadValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                    style="color:#e07e23; background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_cpm"]?.warningValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                    style="background-color: var(--bg-color);">
+                                    {{ thresholds?.["service_cpm"]?.criticalValue }}</div>
+
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ loadInfo }}"></i>
+                            </div>
+                        </div>
+                        <div class="card-body h-26 p-0">
+                            <div id="serviceLoadTimeValueChartContainer" style="width: 100%; height: 26vh;"></div>
+                        </div>
+                    </div>
+                    <div class="card w-33 rounded-3 mt-2">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>Latency (ms)</span>
+                            <div class=" d-flex align-items-center justify-content-between">
+                                <!-- <select [(ngModel)]="latency_chart_data" style="line-height: 1.5;width: 90px;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="service_resp_time" selected>Avg Lat</option>
+                                    <option value="service_percentile">Lat %ile</option>
+                                </select> -->
+                                <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90px;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <div *ngIf="chart_criteria=='avg'"
+                                    class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#0e38f1; background-color: var(--bg-color);">
+                                    {{ latencyValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="rounded-2  px-1 chart-threshold fw-bold font-11"
+                                    style="color:#e07e23; background-color: var(--bg-color);">
+                                    {{ thresholds[latency_chart_data]?.warningValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                    style="background-color: var(--bg-color);">
+                                    {{ thresholds[latency_chart_data]?.criticalValue }}</div>
+
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ latencyInfo }}"></i>
+                            </div>
+                        </div>
+                        <div class="card-body h-26 p-0">
+                            <div id="combinedResponseTimeChartContainer" style="width: 100%; height: 26vh;"></div>
+                        </div>
+                    </div>
+                    <div style="width: 66%;"></div>
+                </div>
+            </div>
+            <app-trace-details #traceDetails></app-trace-details>
+        </div>
+
+        <!-- INSTANCE -->
+        <div class="tab-pane fade" id="instance">
+            <div style="padding: 12px 12px 0;">
+
+                <!-- ══════════════════════════════════
+     TOP 3 SUMMARY CARDS — endpoint style
+     ══════════════════════════════════ -->
+                <div class="ins-row">
+
+                    <!-- CARD 1: Instance Load -->
+                    <div class="ins-card">
+                        <!-- <div class="ins-card__meta">THROUGHPUT</div> -->
+                        <div class="ins-card__heading">
+                            Instance Load
+                            <span class="ins-card__unit">(calls / min)</span>
+                            <i class="fa-solid fa-arrow-trend-up ins-corner-icon"></i>
+                        </div>
+
+                        <div class="ins-bar-list" *ngIf="instanceLoadData.length !== 0">
+                            <div class="ins-bar-row" *ngFor="let item of instanceLoadData">
+                                <span class="ins-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.instance">
+                                    {{ item.instance }}
+                                </span>
+                                <div class="ins-bar-track">
+                                    <div class="ins-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, instanceLoadData, 'value')"
+                                        [ngClass]="{
+                            'bg-normal-bar':  item.value < 100,
+                            'bg-warning-bar': item.value >= 100 && item.value < 300,
+                            'bg-danger-bar':  item.value >= 300
+                        }">
+                                    </div>
+                                </div>
+                                <span class="ins-bar-val">{{ item.value }} calls/min</span>
+                                <i class="fa-solid fa-eye ins-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabInstance(item.instance)"></i>
+                            </div>
+                        </div>
+                        <div class="ins-empty" *ngIf="instanceLoadData.length === 0">No Data Available</div>
+                    </div>
+
+                    <!-- CARD 2: Slow Instances -->
+                    <div class="ins-card ins-card--amber">
+                        <!-- <div class="ins-card__meta">LATENCY ISSUES</div> -->
+                        <div class="ins-card__heading">
+                            Slow Instances
+                            <span class="ins-card__unit">(ms)</span>
+                            <i class="fa-solid fa-circle-exclamation ins-corner-icon ins-corner-icon--amber"
+                                *ngIf="slowInstanceData && slowInstanceData.length > 0"></i>
+                        </div>
+
+                        <div class="ins-bar-list" *ngIf="slowInstanceData.length !== 0">
+                            <div class="ins-bar-row" *ngFor="let item of slowInstanceData">
+                                <span class="ins-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.instance">
+                                    {{ item.instance }}
+                                </span>
+                                <div class="ins-bar-track">
+                                    <div class="ins-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, slowInstanceData, 'value')"
+                                        [ngClass]="{
+                            'bg-danger-bar':  item.value > 500,
+                            'bg-warning-bar': item.value > 200 && item.value <= 500,
+                            'bg-normal-bar':  item.value <= 200
+                        }">
+                                    </div>
+                                </div>
+                                <span class="ins-bar-val">{{ item.value }} ms</span>
+                                <i class="fa-solid fa-eye ins-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabInstance(item.instance)"></i>
+                            </div>
+                        </div>
+                        <div class="ins-empty" *ngIf="slowInstanceData.length === 0">No Data Available</div>
+                    </div>
+
+                    <!-- CARD 3: Success Rate -->
+                    <div class="ins-card ins-card--green">
+                        <!-- <div class="ins-card__meta">RELIABILITY</div> -->
+                        <div class="ins-card__heading">
+                            Success Rate
+                            <span class="ins-card__unit">(%)</span>
+                            <i class="fa-solid fa-circle-check ins-corner-icon ins-corner-icon--green"
+                                *ngIf="instanceSuccessRateData && instanceSuccessRateData.length > 0"></i>
+                        </div>
+
+                        <div class="ins-bar-list"
+                            *ngIf="instanceSuccessRateData && instanceSuccessRateData.length !== 0">
+                            <div class="ins-bar-row" *ngFor="let item of instanceSuccessRateData">
+                                <span class="ins-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.instance">
+                                    {{ item.instance }}
+                                </span>
+                                <div class="ins-bar-track">
+                                    <div class="ins-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, instanceSuccessRateData, 'value')"
+                                        [ngClass]="{
+                            'bg-normal-bar':  item.value >= 99,
+                            'bg-warning-bar': item.value >= 80 && item.value < 99,
+                            'bg-danger-bar':  item.value < 80
+                        }">
+                                    </div>
+                                </div>
+                                <span class="ins-bar-val">{{ item.value }}%</span>
+                                <i class="fa-solid fa-eye ins-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabInstance(item.instance)"></i>
+                            </div>
+                        </div>
+                        <div class="ins-empty" *ngIf="!instanceSuccessRateData || instanceSuccessRateData.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end top 3 cards -->
+
+
+                <!-- ══════════════════════════════════
+         INSTANCE DETAILS TABLE
+         ══════════════════════════════════ -->
+                <div class="ins-details">
+
+                    <!-- Header -->
+                    <div class="ins-details__header">
+                        <span class="ins-details__title">Instance Details</span>
+                        <div class="ins-search">
+                            <i class="fas fa-search ins-search__icon"></i>
+                            <input type="text" class="ins-search__input" placeholder="Search instance name"
+                                [(ngModel)]="searchQuery" (input)="onSearch()" />
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="ins-table-scroll">
+                        <table class="ins-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%">Instances</th>
+                                    <th style="width:15%">Load (call/min)</th>
+                                    <th style="width:15%">Success Rate (%)</th>
+                                    <th style="width:15%">Latency (ms)</th>
+                                    <th style="width:10%">Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="filteredInstanceNames.length !== 0">
+                                <tr class="ins-tr" *ngFor="let items of filteredInstanceNames">
+
+                                    <!-- Instance name -->
+                                    <td style="width: 35%; color: var(--accent-dark-blue); cursor: pointer;"
+                                        (click)="setServiceInstance($event)">{{items}}</td>
+
+                                    <!-- Load -->
+                                    <td style="width:15%">
+                                        <div class="ins-metric">
+                                            <i class="fa-solid fa-chart-line ins-metric__icon ins-metric__icon--indigo"
+                                                (click)="openInstLoadPopup($event, items)"></i>
+                                            {{ instanceId[items]?.service_load ?? 'N/A' }}
+                                        </div>
+                                    </td>
+
+                                    <!-- Success Rate with inline mini bar -->
+                                    <td style="width:15%">
+                                        <div class="ins-metric">
+                                            <i class="fa-regular fa-circle-check ins-metric__icon"
+                                                (click)="openInstSrPopup($event, items)" [ngClass]="(instanceId[items]?.success_rate ?? 0) >= 99
+                                                    ? 'ins-metric__icon--green' : 'ins-metric__icon--red'">
+                                            </i>
+                                            <span [class.ins-val--ok]="(instanceId[items]?.success_rate ?? 0) >= 99"
+                                                [class.ins-val--err]="(instanceId[items]?.success_rate ?? 0) < 99 && instanceId[items]?.success_rate != null">
+                                                {{ instanceId[items]?.success_rate ?? 'N/A' }}
+                                            </span>
+                                            <!-- inline bar -->
+                                            <div class="ins-inline-bar" *ngIf="instanceId[items]?.success_rate != null">
+                                                <div class="ins-inline-bar__fill" [ngClass]="(instanceId[items]?.success_rate ?? 0) >= 99
+                                                        ? 'ins-inline-bar__fill--ok' : 'ins-inline-bar__fill--warn'"
+                                                    [style.width.%]="instanceId[items]?.success_rate ?? 0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Latency badge pill -->
+                                    <td style="width:15%">
+                                        <div class="ins-metric">
+                                            <i class="fa-regular fa-hourglass ins-metric__icon ins-metric__icon--amber"
+                                                (click)="openInstLtPopup($event, items)"></i>
+                                            <span class="ins-lat-pill"
+                                                [class.ins-lat-pill--warn]="(instanceId[items]?.avg_latency ?? 0) > 200"
+                                                *ngIf="instanceId[items]?.avg_latency != null">
+                                                {{ instanceId[items]?.avg_latency }}ms
+                                            </span>
+                                            <span *ngIf="instanceId[items]?.avg_latency == null">N/A</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Attributes -->
+                                    <td style="width:10%; text-align:center;">
+                                        <i class="fa-solid fa-eye gradiantIcon" style="cursor:pointer; font-size:13px;"
+                                            (click)="openAttributeModal(instanceId[items])"></i>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- No data -->
+                        <div class="ins-empty ins-empty--table" *ngIf="filteredInstanceNames.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="ins-pager" *ngIf="filteredInstanceNames.length !== 0">
+                        <span class="ins-pager__info">
+                            Showing {{ (currentPageInstance - 1) * 10 + 1 }}
+                            to {{ currentPageInstance * 10 > filteredInstanceNames.length ? filteredInstanceNames.length
+                            : currentPageInstance * 10 }}
+                            of {{ filteredInstanceNames.length }} instances
+                        </span>
+                        <div class="ins-pager__controls">
+                            <button class="ins-pager__btn" [disabled]="currentPageInstance === 1"
+                                (click)="previousInstancePage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="ins-pager__input" [value]="currentPageInstance"
+                                (keydown.enter)="goToInstancePage(+inputInstancePage.value)" #inputInstancePage min="1"
+                                [max]="totalPagesInstance" />
+                            <span class="ins-pager__of">of {{ totalPagesInstance }}</span>
+                            <button class="ins-pager__btn" [disabled]="currentPageInstance === totalPagesInstance"
+                                (click)="nextInstancePage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end details -->
+
+            </div>
+        </div>
+        <!-- ENDPOINT -->
+        <div class="tab-pane fade" id="endpoint">
+            <div style="padding: 12px 12px 0;">
+
+                <!-- ══════════════════════════════════
+         TOP 3 SUMMARY CARDS
+         ══════════════════════════════════ -->
+                <div class="ep-row">
+
+                    <!-- CARD 1: Endpoint Load -->
+                    <div class="ep-card">
+                        <!-- <div class="ep-card__meta">THROUGHPUT</div> -->
+                        <div class="ep-card__heading">
+                            Endpoint Load
+                            <span class="ep-card__unit">(calls / min)</span>
+                            <i class="fa-solid fa-arrow-trend-up ep-corner-icon"></i>
+                        </div>
+
+                        <div class="ep-bar-list" *ngIf="endpointLoadData.length !== 0">
+                            <div class="ep-bar-row" *ngFor="let item of endpointLoadData">
+                                <span class="ep-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.endpoint">
+                                    {{ item.endpoint }}
+                                </span>
+                                <div class="ep-bar-track">
+                                    <div class="ep-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, endpointLoadData, 'value')"
+                                        [ngClass]="{
+                  'bg-normal-bar':  item.value < 100,
+                  'bg-warning-bar': item.value >= 100 && item.value < 300,
+                  'bg-danger-bar':  item.value >= 300
+                }">
+                                    </div>
+                                </div>
+                                <span class="ep-bar-val">{{ item.value }} calls/min</span>
+                                <i class="fa-solid fa-eye ep-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabEndoint(item.endpoint)"></i>
+                            </div>
+                        </div>
+                        <div class="ep-empty" *ngIf="endpointLoadData.length === 0">No Data Available</div>
+                    </div>
+
+                    <!-- CARD 2: Slow Endpoints -->
+                    <div class="ep-card ep-card--amber">
+                        <!-- <div class="ep-card__meta">LATENCY ISSUES</div> -->
+                        <div class="ep-card__heading">
+                            Slow Endpoints
+                            <span class="ep-card__unit">(ms)</span>
+                            <i class="fa-solid fa-circle-exclamation ep-corner-icon ep-corner-icon--amber"
+                                *ngIf="slowEndpointData && slowEndpointData.length > 0"></i>
+                        </div>
+
+                        <div class="ep-bar-list" *ngIf="slowEndpointData.length !== 0">
+                            <div class="ep-bar-row" *ngFor="let item of slowEndpointData">
+                                <span class="ep-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.endpoint">
+                                    {{ item.endpoint }}
+                                </span>
+                                <div class="ep-bar-track">
+                                    <div class="ep-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, slowEndpointData, 'value')"
+                                        [ngClass]="{
+                  'bg-danger-bar':  item.value > 500,
+                  'bg-warning-bar': item.value > 200 && item.value <= 500,
+                  'bg-normal-bar':  item.value <= 200
+                }">
+                                    </div>
+                                </div>
+                                <span class="ep-bar-val">{{ item.value }} ms</span>
+                                <i class="fa-solid fa-eye ep-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabEndoint(item.endpoint)"></i>
+                            </div>
+                        </div>
+                        <div class="ep-empty" *ngIf="slowEndpointData.length === 0">No Data Available</div>
+                    </div>
+
+                    <!-- CARD 3: Endpoint Success Rate -->
+                    <div class="ep-card ep-card--green">
+                        <!-- <div class="ep-card__meta">RELIABILITY</div> -->
+                        <div class="ep-card__heading">
+                            Success Rate
+                            <span class="ep-card__unit">(%)</span>
+                            <i class="fa-solid fa-circle-check ep-corner-icon ep-corner-icon--green"
+                                *ngIf="endpointSuccessRateData && endpointSuccessRateData.length > 0"></i>
+                        </div>
+
+                        <div class="ep-bar-list"
+                            *ngIf="endpointSuccessRateData && endpointSuccessRateData.length !== 0">
+                            <div class="ep-bar-row" *ngFor="let item of endpointSuccessRateData">
+                                <span class="ep-bar-label text-ellipsis" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" [title]="item.endpoint">
+                                    {{ item.endpoint }}
+                                </span>
+                                <div class="ep-bar-track">
+                                    <div class="ep-bar-fill"
+                                        [style.width.%]="getProgressWidth(item.value, endpointSuccessRateData, 'value')"
+                                        [ngClass]="{
+                  'bg-normal-bar':  item.value >= 99,
+                  'bg-warning-bar': item.value >= 80 && item.value < 99,
+                  'bg-danger-bar':  item.value < 80
+                }">
+                                    </div>
+                                </div>
+                                <span class="ep-bar-val">{{ item.value }}%</span>
+                                <i class="fa-solid fa-eye ep-eye" matButton="elevated" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="View Trace"
+                                    (click)="openTraceTabEndoint(item.endpoint)"></i>
+                            </div>
+                        </div>
+                        <div class="ep-empty" *ngIf="!endpointSuccessRateData || endpointSuccessRateData.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end top 3 cards -->
+
+
+                <!-- ══════════════════════════════════
+         ENDPOINT DETAILS TABLE
+         ══════════════════════════════════ -->
+                <div class="ep-details">
+
+                    <!-- Header -->
+                    <div class="ep-details__header">
+                        <span class="ep-details__title">Endpoint Details</span>
+
+                        <div class="ep-details__controls">
+                            <span class="ep-stat-badge ep-stat-badge--neutral" style="cursor:pointer;"
+                                [style.box-shadow]="endpointFilter === '' ? '0 0 0 2px var(--text-color, #fff)' : 'none'"
+                                (click)="seeAllEndpoint()">
+                                Total : {{ totalHitsEndpoint }}
+                            </span>
+                            <span class="ep-stat-badge ep-stat-badge--success" style="cursor:pointer;"
+                                [style.box-shadow]="endpointFilter === 'success' ? '0 0 0 2px #4caf50' : 'none'"
+                                (click)="seeSuccessEndpoint()">
+                                Success : {{ totalHitsEndpoint - errorCountEndpoint }}
+                            </span>
+                            <span class="ep-stat-badge" style="cursor:pointer;"
+                                [ngClass]="errorCountEndpoint === 0 ? 'ep-stat-badge--success' : 'ep-stat-badge--error'"
+                                [style.box-shadow]="endpointFilter === 'error' ? '0 0 0 2px #f44336' : 'none'"
+                                (click)="seeErrorEndpoint()">
+                                Error : {{ errorCountEndpoint }}
+                            </span>
+
+                            <div class="ep-column-selector-wrap" style="position: relative; display: inline-block;">
+                                <button class="ep-stat-badge ep-stat-badge--neutral"
+                                    style="cursor:pointer; display: flex; align-items: center; gap: 6px; border: none; height: 32px;"
+                                    (click)="toggleColumnDropdown($event)">
+                                    <i class="fa-solid fa-table-columns"></i>
+                                    View
+                                    <i class="fas fa-caret-down"></i>
+                                </button>
+
+                                <ul *ngIf="columnDropdownOpen" class="ep-column-dropdown columnList">
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('endpoints', $event)">
+                                        <input type="checkbox" [checked]="showColumns.endpoints"
+                                            style="cursor: pointer;" />
+                                        Endpoints
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('latency', $event)">
+                                        <input type="checkbox" [checked]="showColumns.latency"
+                                            style="cursor: pointer;" />
+                                        Latency (ms)
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('successRate', $event)">
+                                        <input type="checkbox" [checked]="showColumns.successRate"
+                                            style="cursor: pointer;" />
+                                        Success Rate (%)
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('failureCount', $event)">
+                                        <input type="checkbox" [checked]="showColumns.failureCount"
+                                            style="cursor: pointer;" />
+                                        Failure Count
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('load', $event)">
+                                        <input type="checkbox" [checked]="showColumns.load" style="cursor: pointer;" />
+                                        Load (call/min)
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('hits', $event)">
+                                        <input type="checkbox" [checked]="showColumns.hits" style="cursor: pointer;" />
+                                        Hits
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('c1xx', $event)">
+                                        <input type="checkbox" [checked]="showColumns.c1xx" style="cursor: pointer;" />
+                                        1xx
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('c2xx', $event)">
+                                        <input type="checkbox" [checked]="showColumns.c2xx" style="cursor: pointer;" />
+                                        2xx
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('c3xx', $event)">
+                                        <input type="checkbox" [checked]="showColumns.c3xx" style="cursor: pointer;" />
+                                        3xx
+                                    </li>
+                                    <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('c4xx', $event)">
+                                        <input type="checkbox" [checked]="showColumns.c4xx" style="cursor: pointer;" />
+                                        4xx
+                                    </li>
+                                    <li style="display: flex; align-items: center; gap: 8px; color: var(--text-color, #fff); font-size: 12px; cursor: pointer;"
+                                        (click)="toggleColumn('c5xx', $event)">
+                                        <input type="checkbox" [checked]="showColumns.c5xx" style="cursor: pointer;" />
+                                        5xx
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="ep-search">
+                                <i class="fas fa-search ep-search__icon"></i>
+                                <input type="text" class="ep-search__input" placeholder="Search Endpoint Name"
+                                    [(ngModel)]="searchTextEndpoint" (input)="getEndpointNames()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="ep-table-scroll">
+                        <table class="ep-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:25%" *ngIf="showColumns.endpoints">Endpoints</th>
+                                    <th style="width:12%" *ngIf="showColumns.latency" (click)="toggleEndpointLatency()">
+                                        Latency (ms)
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'latency' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:13%" *ngIf="showColumns.successRate"
+                                        (click)="toggleEndpointSuccessRate()">
+                                        Success Rate (%)
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'success_rate' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:13%" *ngIf="showColumns.failureCount"
+                                        (click)="toggleEndpointFailureCount()">
+                                        Failure Count
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'failure_count' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:12%" *ngIf="showColumns.load" (click)="toggleEndpointLoad()">
+                                        Load (call/min)
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'endpoint_load' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:12%" *ngIf="showColumns.hits" (click)="toggleEndpointTotalHit()">
+                                        Hits
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'total_hits' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:8%" *ngIf="showColumns.c1xx" (click)="toggleEndpoint1xx()">
+                                        1xx
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'c1xx' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:8%" *ngIf="showColumns.c2xx" (click)="toggleEndpoint2xx()">
+                                        2xx
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'c2xx' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:8%" *ngIf="showColumns.c3xx" (click)="toggleEndpoint3xx()">
+                                        3xx
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'c3xx' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:8%" *ngIf="showColumns.c4xx" (click)="toggleEndpoint4xx()">
+                                        4xx
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'c4xx' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:8%" *ngIf="showColumns.c5xx" (click)="toggleEndpoint5xx()">
+                                        5xx
+                                        <i class="fa"
+                                            [ngClass]="endpointSortBy === 'c5xx' ? (endpointOrder === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <!-- Skeleton loader -->
+                            <tbody *ngIf="loadingEndpoints">
+                                <tr class="ep-tr" *ngFor="let i of [].constructor(8)">
+                                    <td style="width:25%" *ngIf="showColumns.endpoints">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:12%" *ngIf="showColumns.latency">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:13%" *ngIf="showColumns.successRate">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:13%" *ngIf="showColumns.failureCount">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:12%" *ngIf="showColumns.load">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:12%" *ngIf="showColumns.hits">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:8%" *ngIf="showColumns.c1xx">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:8%" *ngIf="showColumns.c2xx">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:8%" *ngIf="showColumns.c3xx">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:8%" *ngIf="showColumns.c4xx">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td style="width:8%" *ngIf="showColumns.c5xx">
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Data rows -->
+                            <tbody *ngIf="!loadingEndpoints && endPointNames.length !== 0">
+                                <tr class="ep-tr" *ngFor="let items of endPointNames">
+
+                                    <!-- Endpoint name -->
+                                    <td style="width:25%" *ngIf="showColumns.endpoints">
+                                        <span class="ep-name"
+                                            [ngClass]="items.metrics.success_rate === 100 ? '' : 'ep-name--error'"
+                                            (click)="setServiceEndpoints($event)">
+                                            {{ items.endpoint_id }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Latency badge pill -->
+                                    <td style="width:12%" *ngIf="showColumns.latency">
+                                        <div class="ep-metric">
+                                            <i class="fa-regular fa-hourglass ep-metric__icon ep-metric__icon--amber"
+                                                (click)="openLtPopup($event, items.endpoint_id)"></i>
+                                            <span class="ep-lat-pill"
+                                                [class.ep-lat-pill--warn]="(items.metrics.latency ?? 0) > 200"
+                                                *ngIf="items.metrics.latency != null">
+                                                {{ items.metrics.latency }}ms
+                                            </span>
+                                            <span *ngIf="items.metrics.latency == null">N/A</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Success Rate with inline mini bar -->
+                                    <td style="width:13%" *ngIf="showColumns.successRate">
+                                        <div class="ep-metric">
+                                            <i class="fa-regular fa-circle-check ep-metric__icon"
+                                                [ngClass]="items.metrics.success_rate === 100 ? 'ep-metric__icon--green' : 'ep-metric__icon--red'"
+                                                (click)="openSrPopup($event, items.endpoint_id)"></i>
+                                            <span [class.ep-val--ok]="(items.metrics.success_rate ?? 0) >= 99"
+                                                [class.ep-val--err]="(items.metrics.success_rate ?? 0) < 99 && items.metrics.success_rate != null">
+                                                {{ items.metrics.success_rate ?? 'N/A' }}
+                                            </span>
+                                            <div class="ep-inline-bar" *ngIf="items.metrics.success_rate != null">
+                                                <div class="ep-inline-bar__fill"
+                                                    [ngClass]="(items.metrics.success_rate ?? 0) >= 99 ? 'ep-inline-bar__fill--ok' : 'ep-inline-bar__fill--warn'"
+                                                    [style.width.%]="items.metrics.success_rate ?? 0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Failure Count -->
+                                    <td style="width:13%" *ngIf="showColumns.failureCount">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.failure_count ?? 0) === 0">
+                                                {{ items.metrics.failure_count ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Load -->
+                                    <td style="width:12%" *ngIf="showColumns.load">
+                                        <div class="ep-metric">
+                                            <i class="fa-solid fa-chart-line ep-metric__icon ep-metric__icon--indigo"
+                                                (click)="openLoadPopup($event, items.endpoint_id)"></i>
+                                            {{ items.metrics.endpoint_load ?? 'N/A' }}
+                                        </div>
+                                    </td>
+
+                                    <!-- Hits -->
+                                    <td style="width:12%" *ngIf="showColumns.hits">{{ items.metrics.total_hits ?? 'N/A'
+                                        }}</td>
+
+                                    <!-- 1xx Count -->
+                                    <td style="width:8%" *ngIf="showColumns.c1xx">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.c1xx ?? 0) === 0"
+                                                [style.background-color]="(items.metrics.c1xx ?? 0) > 0 ? '#e0f2fe' : ''"
+                                                [style.color]="(items.metrics.c1xx ?? 0) > 0 ? '#0369a1' : ''">
+                                                {{ items.metrics.c1xx ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- 2xx Count -->
+                                    <td style="width:8%" *ngIf="showColumns.c2xx">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.c2xx ?? 0) === 0"
+                                                [style.background-color]="(items.metrics.c2xx ?? 0) > 0 ? '#dcfce7' : ''"
+                                                [style.color]="(items.metrics.c2xx ?? 0) > 0 ? '#15803d' : ''">
+                                                {{ items.metrics.c2xx ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- 3xx Count -->
+                                    <td style="width:8%" *ngIf="showColumns.c3xx">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.c3xx ?? 0) === 0"
+                                                [style.background-color]="(items.metrics.c3xx ?? 0) > 0 ? '#fef3c7' : ''"
+                                                [style.color]="(items.metrics.c3xx ?? 0) > 0 ? '#b45309' : ''">
+                                                {{ items.metrics.c3xx ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- 4xx Count -->
+                                    <td style="width:8%" *ngIf="showColumns.c4xx">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.c4xx ?? 0) === 0"
+                                                [style.background-color]="(items.metrics.c4xx ?? 0) > 0 ? '#fee2e2' : ''"
+                                                [style.color]="(items.metrics.c4xx ?? 0) > 0 ? '#b91c1c' : ''">
+                                                {{ items.metrics.c4xx ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- 5xx Count -->
+                                    <td style="width:8%" *ngIf="showColumns.c5xx">
+                                        <div class="ep-metric">
+                                            <span class="ep-fail-pill"
+                                                [class.ep-fail-pill--neutral]="(items.metrics.c5xx ?? 0) === 0"
+                                                [style.background-color]="(items.metrics.c5xx ?? 0) > 0 ? '#fee2e2' : ''"
+                                                [style.color]="(items.metrics.c5xx ?? 0) > 0 ? '#b91c1c' : ''">
+                                                {{ items.metrics.c5xx ?? 0 }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- No data -->
+                        <div class="ep-empty ep-empty--table" *ngIf="!loadingEndpoints && endPointNames.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="ep-pager" *ngIf="!loadingEndpoints && endPointNames.length !== 0">
+                        <span class="ep-pager__info">
+                            Showing {{ (currentPageEndpoint - 1) * 10 + 1 }}
+                            to {{ currentPageEndpoint * 10 > endPointNames.length ? endPointNames.length :
+                            currentPageEndpoint * 10 }}
+                            of {{ endPointNames.length }} endpoints
+                        </span>
+                        <div class="ep-pager__controls">
+                            <button class="ep-pager__btn" [disabled]="currentPageEndpoint === 1"
+                                (click)="previousEndpointPage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="ep-pager__input" [value]="currentPageEndpoint"
+                                (keydown.enter)="goToEndpointPage(+inputEndpointPage.value)" #inputEndpointPage min="1"
+                                [max]="totalPagesEndpoint" />
+                            <span class="ep-pager__of">of {{ totalPagesEndpoint }}</span>
+                            <button class="ep-pager__btn" [disabled]="currentPageEndpoint === totalPagesEndpoint"
+                                (click)="nextEndpointPage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end details -->
+
+            </div>
+        </div>
+
+        <!-- TOPOLOGY -->
+        <div class="tab-pane fade p-2" id="topology">
+            <div class="topo-card" style="display: flex; flex-direction: row; min-height: 80vh; padding: 0;">
+
+                <!-- SIDEBAR -->
+                <div class="topo-sidebar">
+                    <div class="topo-sidebar-header">
+                         <div class="topo-header__left">
+                            <i class="fa-solid fa-circle-nodes topo-header__icon"></i>
+                            <span class="topo-header__title">Service Topology</span>
+                        </div>
+                   
+                    </div>
+                    <ul class="topo-layer-list">
+                        <li *ngFor="let layer of availableLayers" 
+                            class="topo-layer-item"
+                            [class.active]="selectedTopologyLayer === layer"
+                            [ngStyle]="{'border-left-color': selectedTopologyLayer === layer ? getLayerColor(layer) : 'transparent', 'border-left-width': '4px', 'border-left-style': 'solid'}"
+                            (click)="selectLayer(layer)">
+                            <div class="layer-info">
+                                <i class="fa-solid" 
+                                   [ngStyle]="{'color': getLayerColor(layer)}"
+                                   [ngClass]="{
+                                     'fa-globe': layer === 'ALL',
+                                     'fa-server': layer === 'Service',
+                                     'fa-envelope': layer === 'Message Queue',
+                                     'fa-database': layer === 'Database',
+                                     'fa-bolt': layer === 'Cache',
+                                     'fa-cloud': layer === 'External API',
+                                     'fa-layer-group': layer === 'Other'
+                                   }"></i>
+                                <span class="layer-name">{{ layer }}</span>
+                            </div>
+                            <span class="layer-count" [ngStyle]="{'background-color': getLayerColor(layer), 'color': '#ffffff', 'border': 'none'}">{{ getLayerCount(layer) }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- MAIN CONTENT -->
+                <div class="topo-main" style="flex: 1; display: flex; flex-direction: column;">
+                    <!-- Header -->
+                    <div class="topo-header" style="border-bottom: 1px solid #e2e8f0;">
+                        <!-- <div class="topo-header__left">
+                            <i class="fa-solid fa-circle-nodes topo-header__icon"></i>
+                            <span class="topo-header__title">Service Topology</span>
+                        </div> -->
+                        <div class="topo-header__right" style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Depth Level</span>
+                            <div style="display: flex; background: #f1f5f9; padding: 3px; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center; gap: 4px;">
+                                <button class="btn btn-sm topo-btn" 
+                                        [ngClass]="selectedTopologyLevel === 1 ? 'btn-gradiant shadow-sm fw-bold' : 'text-muted'"
+                                        [ngStyle]="{'background': selectedTopologyLevel === 1 ? '' : 'transparent', 'border': 'none', 'border-radius': '6px', 'font-size': '12px', 'padding': '4px 12px', 'transition': 'all 0.2s ease'}"
+                                        (click)="selectedTopologyLevel = 1; loadTopologyData()">
+                                     Level 1 
+                                </button>
+                                
+                                <button class="btn btn-sm topo-btn" 
+                                        [ngClass]="selectedTopologyLevel === 2 ? 'btn-gradiant shadow-sm fw-bold' : 'text-muted'"
+                                        [ngStyle]="{'background': selectedTopologyLevel === 2 ? '' : 'transparent', 'border': 'none', 'border-radius': '6px', 'font-size': '12px', 'padding': '4px 12px', 'transition': 'all 0.2s ease'}"
+                                        (click)="selectedTopologyLevel = 2; loadTopologyData()">
+                                     Level 2
+                                </button>
+                                <button class="btn btn-sm topo-btn" 
+                                        [ngClass]="selectedTopologyLevel === 3 ? 'btn-gradiant shadow-sm fw-bold' : 'text-muted'"
+                                        [ngStyle]="{'background': selectedTopologyLevel === 3 ? '' : 'transparent', 'border': 'none', 'border-radius': '6px', 'font-size': '12px', 'padding': '4px 12px', 'transition': 'all 0.2s ease'}"
+                                        (click)="selectedTopologyLevel = 3; loadTopologyData()">
+                                    Level 3
+                                </button>
+                                <button class="btn btn-sm topo-btn" 
+                                        [ngClass]="selectedTopologyLevel === -1 ? 'btn-gradiant shadow-sm fw-bold' : 'text-muted'"
+                                        [ngStyle]="{'background': selectedTopologyLevel === -1 ? '' : 'transparent', 'border': 'none', 'border-radius': '6px', 'font-size': '12px', 'padding': '4px 12px', 'transition': 'all 0.2s ease'}"
+                                        (click)="selectedTopologyLevel = -1; loadTopologyData()">
+                                    Entire Topology
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SVG Canvas -->
+                    <div class="topo-canvas" style="flex: 1; position: relative;">
+                        <svg #svgElement class="topo-svg" style="width: 100%; height: 100%;"></svg>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade p-2" id="trace">
+            <div class="m-0">
+
+                <!-- ══════════════════════════════════
+             FILTER BAR
+             ══════════════════════════════════ -->
+                <div class="trc-filter-bar">
+
+                    <!-- Criteria trigger button -->
+                    <div class="trc-criteria-wrap" style="position: relative;">
+                        <div #criteriaCard class="trc-criteria-btn" (click)="toggleDropdown()" tabindex="0"
+                            [style.pointerEvents]="allCriteriaSelected ? 'none' : 'auto'"
+                            [style.opacity]="allCriteriaSelected ? '0.5' : '1'">
+                            <i class="fa-solid fa-plus trc-criteria-btn__icon"></i>
+                            Criteria
+                            <i class="fas fa-caret-down trc-criteria-btn__caret"></i>
+                        </div>
+
+                        <!-- Dropdown -->
+                        <ul *ngIf="dropdownOpen && !allCriteriaSelected" #criteriaDropdown class="trc-dropdown">
+                            <li *ngFor="let c of availableCriteria" (click)="selectCriteria(c.key)"
+                                class="trc-dropdown__item">
+                                {{ c.label }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="trc-filter-divider"></div>
+
+                    <!-- Scrollable filter pills -->
+                    <div class="trc-filters-scroll">
+                        <div class="trc-filter-pill" *ngFor="let c of criteriaList" [hidden]="!shownCriteria[c.key]">
+                            <label class="trc-filter-pill__label">{{ c.label }}</label>
+
+                            <ng-container [ngSwitch]="c.key">
+
+                                <select *ngSwitchCase="'instance'" [(ngModel)]="instNameTrace"
+                                    (ngModelChange)="autoSearch()" class="trc-filter-pill__input">
+                                    <option *ngFor="let e of instancesTraces" [value]="e.value">{{ e.name }}</option>
+                                </select>
+
+                                <div *ngSwitchCase="'endpoint'" style="position:relative;">
+                                    <select *ngIf="endpointTrace !== 'custom'" class="trc-filter-pill__input"
+                                        [(ngModel)]="endpointTrace" (ngModelChange)="autoSearch()">
+                                        <option value="custom" style="background-color:#f4bf69;">Text</option>
+                                        <option *ngFor="let e of endpointsTraces" [value]="e.value">{{ e.name }}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="endpointTrace === 'custom'" style="position:relative;">
+                                        <input type="text" [(ngModel)]="textEndpoint" (ngModelChange)="autoSearch()"
+                                            class="trc-filter-pill__input" placeholder="Enter custom endpoint"
+                                            style="padding-right:22px;" />
+                                        <i class="fas fa-times trc-filter-pill__clear"
+                                            (click)="cancelCustomEndpoint()"></i>
+                                    </div>
+                                </div>
+
+                                <select *ngSwitchCase="'status'" [(ngModel)]="traceState" (ngModelChange)="autoSearch()"
+                                    class="trc-filter-pill__input" style="width:100px;">
+                                    <option value="">All</option>
+                                    <option value="success">Success</option>
+                                    <option value="error">Error</option>
+                                </select>
+
+                                <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDTrace"
+                                    (ngModelChange)="autoSearch(true)" class="trc-filter-pill__input"
+                                    style="width:150px;" autocomplete="off" />
+
+                                <input *ngSwitchCase="'minDuration'" type="number" [(ngModel)]="minDuration"
+                                    (ngModelChange)="autoSearch()" class="trc-filter-pill__input" style="width:100px;"
+                                    autocomplete="off" />
+
+                                <input *ngSwitchCase="'maxDuration'" type="number" [(ngModel)]="maxDuration"
+                                    (ngModelChange)="autoSearch()" class="trc-filter-pill__input" style="width:100px;"
+                                    autocomplete="off" />
+
+                                <ng-container *ngSwitchCase="'statusCode'">
+                                    <select [(ngModel)]="statusCodeTrace" (ngModelChange)="autoSearch()"
+                                        class="trc-filter-pill__input" style="width:100px;">
+                                        <option value="All">All</option>
+                                        <option value="1xx">1xx</option>
+                                        <option value="2xx">2xx</option>
+                                        <option value="3xx">3xx</option>
+                                        <option value="4xx">4xx</option>
+                                        <option value="5xx">5xx</option>
+                                        <option value="text">text</option>
+                                    </select>
+                                    <input *ngIf="statusCodeTrace === 'text'" type="text"
+                                        [(ngModel)]="customStatusCodeTrace" (ngModelChange)="autoSearch(true)"
+                                        class="trc-filter-pill__input" style="width:80px; margin-left: 6px;"
+                                        placeholder="Code..." autocomplete="off" />
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="'tags'">
+                                    <div class="trc-tags-input" (click)="tagInput.focus()">
+                                        <span *ngFor="let tag of tagsList; let i = index" class="trc-tag-pill">
+                                            {{ tag }}
+                                            <button type="button" (click)="removeTag(i); $event.stopPropagation()">
+                                                <i class="fa-solid fa-x" style="font-size: xx-small;"></i>
+                                            </button>
+                                        </span>
+                                        <input #tagInput type="text" [(ngModel)]="tagsTrace" (keydown)="onTagKeydown($event)" (blur)="onTagBlur()"
+                                            class="trc-filter-pill__input" placeholder="key = value" autocomplete="off" />
+                                    </div>
+                                    <div *ngIf="tagValidationError" class="trc-tag-error">
+                                        Format must be <strong>key = value</strong>
+                                    </div>
+                                </ng-container>
+
+                            </ng-container>
+
+                            <i class="fas fa-times trc-filter-pill__remove" (click)="removeCriteria(c.key)"></i>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end filter bar -->
+
+
+                <!-- ══════════════════════════════════
+             TRACES TABLE
+             ══════════════════════════════════ -->
+                <div class="trc-details">
+
+                    <!-- Header -->
+                    <div class="trc-details__header">
+                        <span class="trc-details__title">Traces</span>
+                        <span class="trc-details__count" *ngIf="totalHitsTrace">
+                            {{ totalHitsTrace }} results
+                        </span>
+                    </div>
+
+                    <!-- Table scroll -->
+                    <div class="trc-table-scroll">
+                        <table class="trc-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:5%" (click)="toggleSort('isError')">
+                                        Status
+                                        <i class="fa" [ngClass]="sortParameter === 'isError'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:24%">
+                                        Endpoint <span class="trc-th-count">({{ totalHitsTrace }})</span>
+                                    </th>
+                                    <th style="width:12%">
+                                        Status Code
+                                    </th>
+                                    <th style="width:11%" (click)="toggleSort('duration')">
+                                        Duration
+                                        <i class="fa" [ngClass]="sortParameter === 'duration'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:18%" (click)="toggleSort('start_time')">
+                                        Start Time
+                                        <i class="fa" [ngClass]="sortParameter === 'start_time'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                    </th>
+                                    <th style="width:30%">Trace ID</th>
+                                </tr>
+                            </thead>
+
+                            <!-- Skeleton -->
+                            <tbody *ngIf="loadingTrace">
+                                <tr class="trc-tr" *ngFor="let i of [].constructor(8)">
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Data -->
+                            <tbody *ngIf="!loadingTrace">
+                                <tr class="trc-tr" *ngFor="let item of traceNames" (click)="selectItem(item)"
+                                    [ngClass]="{'trc-tr--active': selectedTraceId?.trim() === item.traceId?.trim()}">
+
+                                    <!-- Status bar -->
+                                    <td style="width:5%">
+                                        <div class="trc-status-bar"
+                                            [ngClass]="item.isError ? 'trc-status-bar--err' : 'trc-status-bar--ok'">
+                                        </div>
+                                    </td>
+
+                                    <!-- Endpoint -->
+                                    <td style="width:24%" class="text-ellipsis"
+                                        [ngClass]="item.isError ? 'trc-td--err' : 'trc-td--link'"
+                                        [title]="decodeBase64(item.endpointId)">
+                                        {{ decodeBase64(item.endpointId) }}
+                                    </td>
+
+                                    <!-- Status Code -->
+                                    <td style="width:12%">
+                                        <span class="trc-lat-pill"
+                                            [style.background-color]="item.httpStatusCode && item.httpStatusCode.startsWith('2') ? '#dcfce7' : (item.httpStatusCode && (item.httpStatusCode.startsWith('4') || item.httpStatusCode.startsWith('5')) ? '#fee2e2' : '#f1f5f9')"
+                                            [style.color]="item.httpStatusCode && item.httpStatusCode.startsWith('2') ? '#15803d' : (item.httpStatusCode && (item.httpStatusCode.startsWith('4') || item.httpStatusCode.startsWith('5')) ? '#b91c1c' : '#475569')"
+                                            *ngIf="item.httpStatusCode">
+                                            {{ item.httpStatusCode }}
+                                        </span>
+                                        <span *ngIf="!item.httpStatusCode">-</span>
+                                    </td>
+
+                                    <!-- Duration -->
+                                    <td style="width:11%">
+                                        <span class="trc-lat-pill" [class.trc-lat-pill--warn]="item.latency > 200">
+                                            {{ item.latency }} ms
+                                        </span>
+                                    </td>
+
+                                    <!-- Start Time -->
+                                    <td style="width:18%" class="trc-td--muted">
+                                        {{ item.startTime | date: 'dd-MM-yyyy HH:mm:ss' }}
+                                    </td>
+
+                                    <!-- Trace ID -->
+                                    <td style="width:30%" class="trc-td--mono trc-td--muted">
+                                        {{ item.traceId }}
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- No data -->
+                        <div class="trc-empty trc-empty--table" *ngIf="!loadingTrace && traceNames.length === 0">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="trc-pager" *ngIf="traceNames.length !== 0">
+                        <span class="trc-pager__info">{{ traceItemRange }}</span>
+                        <div class="trc-pager__controls">
+                            <button class="trc-pager__btn" [disabled]="currentPageTrace === 1"
+                                (click)="previousTracePage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="trc-pager__input" [value]="currentPageTrace"
+                                (keydown.enter)="goToTracePage(+inputTracePage.value)" #inputTracePage min="1"
+                                [max]="totalPagesTrace" />
+                            <span class="trc-pager__of">of {{ totalPagesTrace }}</span>
+                            <button class="trc-pager__btn" [disabled]="currentPageTrace === totalPagesTrace"
+                                (click)="nextTracePage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end traces table -->
+
+
+                <!-- ══════════════════════════════════
+             TRACE DETAILS SECTION
+             ══════════════════════════════════ -->
+                <div class="row mt-2" #traceDetailsSection>
+                    <div class="col">
+
+                        <!-- View switcher toolbar -->
+                        <div class="trc-view-bar">
+                            <div class="trc-view-bar__left"></div>
+                            <div class="trc-view-bar__right">
+
+                                <div class="trc-view-switcher">
+                                    <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View Table" [class.trc-view-btn--active]="selectedView === 'table'"
+                                        (click)="changeView('table')" class="fa fa-table trc-view-btn">
+                                    </i>
+
+                                    <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View List" [class.trc-view-btn--active]="selectedView === 'list'"
+                                        (click)="changeView('list')" class="fas fa-list trc-view-btn">
+                                    </i>
+
+                                    <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View Tree" [class.trc-view-btn--active]="selectedView === 'tree'"
+                                        (click)="changeView('tree')" class="fas fa-network-wired trc-view-btn">
+                                    </i>
+
+                                    <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View Statistics" [class.trc-view-btn--active]="selectedView === 'stat'"
+                                        (click)="changeView('stat')" class="fa fa-bar-chart trc-view-btn">
+                                    </i>
+
+                                    <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View Logs" (click)="openLogTabTraceId(selectedTraceId)"
+                                        class="fa-solid fa-file-lines trc-view-btn">
+                                    </i>
+                                </div>
+
+                                <!-- Trace ID info tooltip -->
+                                <div class="trc-id-info">
+                                    <i class="fa-solid fa-circle-info trc-id-info__icon"></i>
+                                    <div class="trc-id-info__popup">
+                                        <span class="trc-id-info__label">Trace ID</span>
+                                        <span class="trc-id-info__val">{{ selectedTraceId }}</span>
+                                        <i class="fa-regular fa-copy trc-id-info__copy" title="Copy Trace Id"
+                                            (click)="copyTraceId(selectedTraceId, $event)">
+                                        </i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Trace Details card -->
+                        <div class="trc-details trc-details--inner">
+                            <div class="trc-details__header">
+                                <span class="trc-details__title">Trace Details</span>
+                            </div>
+                            <div class="trc-details__body">
+                                <ng-container *ngIf="selectedView === 'table'">
+                                    <app-table-view [traceMetaData]="traceMetaData"
+                                        (itemSelected)="onTableRowSelected($event)">
+                                    </app-table-view>
+                                </ng-container>
+                                <ng-container *ngIf="selectedView === 'list'">
+                                    <app-list-view [hierarchicalList]="hierarchicalList"
+                                        (itemSelected)="onListItemSelected($event)">
+                                    </app-list-view>
+                                </ng-container>
+                                <ng-container *ngIf="selectedView === 'tree'">
+                                    <div style="height:100%; width:100%;">
+                                        <app-tree-view [traceData]="traceData" (selectedNode)="openModal($event)">
+                                        </app-tree-view>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="selectedView === 'stat'">
+                                    <app-stat-view [traceMetaData]="traceMetaData">
+                                    </app-stat-view>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end trace details -->
+
+
+                <!-- Modal -->
+                <app-trace-details-modal *ngIf="showModal" [modalData]="modalData" (closeModal)="closeModal()">
+                </app-trace-details-modal>
+
+            </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="tab-pane fade" id="log">
+            <div class="log-root">
+
+                <!-- ══════════════════════════════════
+         FILTER BAR
+         ══════════════════════════════════ -->
+                <div class="log-filter-bar">
+
+                    <!-- Criteria trigger button -->
+                    <div class="log-criteria-wrap" style="position: relative;">
+                        <div #criteriaCard class="log-criteria-btn" (click)="toggleDropdownLogs()" tabindex="0"
+                            [style.pointerEvents]="allCriteriaSelectedLogs ? 'none' : 'auto'"
+                            [style.opacity]="allCriteriaSelectedLogs ? '0.5' : '1'">
+                            <i class="fa-solid fa-plus log-criteria-btn__icon"></i>
+                            Criteria
+                            <i class="fas fa-caret-down log-criteria-btn__caret"></i>
+                        </div>
+
+                        <!-- Dropdown -->
+                        <ul *ngIf="dropdownOpenLogs && !allCriteriaSelectedLogs" #criteriaDropdown class="log-dropdown">
+                            <li *ngFor="let c of availableCriteriaLogs" (click)="selectCriteriaLogs(c.key)"
+                                class="log-dropdown__item">
+                                {{ c.label }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="log-filter-divider"></div>
+
+                    <!-- Scrollable filter pills -->
+                    <div class="log-filters-scroll">
+                        <div class="log-filter-pill" *ngFor="let c of criteriaListLogs"
+                            [hidden]="!shownCriteriaLogs[c.key]">
+                            <label class="log-filter-pill__label">{{ c.label }}</label>
+
+                            <ng-container [ngSwitch]="c.key">
+
+                                <select *ngSwitchCase="'instance'" [(ngModel)]="instNameLogs"
+                                    class="log-filter-pill__input">
+                                    <option *ngFor="let e of instancesLogs" [value]="e.value">{{ e.name }}</option>
+                                </select>
+
+                                <select *ngSwitchCase="'endpoint'" [(ngModel)]="endpointLog"
+                                    class="log-filter-pill__input">
+                                    <option *ngFor="let e of endpointsLogs" [value]="e.value">{{ e.name }}</option>
+                                </select>
+
+                                <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDLogs"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                                <select *ngSwitchCase="'tags'" [(ngModel)]="tags" class="log-filter-pill__input">
+                                    <option *ngFor="let key of getLogKeys()" [value]="key">{{ key }}</option>
+                                </select>
+
+                                <input *ngSwitchCase="'incContent'" type="text" [(ngModel)]="keywordsOfContent"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                                <input *ngSwitchCase="'excContent'" type="text" [(ngModel)]="excludingKeywordsOfContent"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                            </ng-container>
+
+                            <i class="fas fa-times log-filter-pill__remove" (click)="removeCriteriaLogs(c.key)"></i>
+                        </div>
+                    </div>
+
+                    <!-- Search trigger -->
+                    <div class="log-filter-divider"></div>
+                    <button class="log-search-btn" (click)="searchLogs()">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+
+                </div>
+                <!-- end filter bar -->
+
+
+                <!-- ══════════════════════════════════
+         LOGS COUNT CHART
+         ══════════════════════════════════ -->
+                <div class="log-card mb-10">
+                    <div class="log-card__header">
+                        <span class="log-card__title">Logs Count</span>
+                    </div>
+                    <div class="log-card__body" style="height:33vh; padding:0;">
+                        <div *ngIf="logsTimeSeriesChart" style="height:100%; width:100%;">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="logsTimeSeriesChart"
+                                [oneToOne]="true" style="height:33vh; width:100%; display:block;">
+                            </highcharts-chart>
+                        </div>
+                        <div *ngIf="!logsTimeSeriesChart" class="log-empty log-empty--tall">
+                            No Data Available
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ══════════════════════════════════
+         LOGS DETAILS TABLE
+         ══════════════════════════════════ -->
+                <div class="log-card">
+
+                    <!-- Header -->
+                    <div class="log-card__header">
+                        <span class="log-card__title">Logs Details</span>
+                        <span class="log-card__count" *ngIf="totalHitsLog">{{ totalHitsLog }} results</span>
+
+                        <!-- Level filter buttons -->
+                        <div class="log-level-btns" *ngIf="logStats">
+                            <ng-container *ngFor="let key of getLogKeys()">
+                                <button class="log-level-btn"
+                                    [ngClass]="[getBtnColor(key), isSelected(key) ? getSelectedBtnColor(key) : '']"
+                                    (click)="toggleSelection(key)">
+                                    {{ key.toLowerCase() }}&nbsp;:&nbsp;{{ logStats[key] }}
+                                </button>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Table scroll -->
+                    <div class="log-table-scroll">
+                        <table class="log-table">
+
+                            <thead>
+                                <tr>
+                                    <th style="width:2%"></th>
+                                    <th style="width:13%">Date</th>
+                                    <th style="width:6%" (click)="toggleSortLogs()">
+                                        Status <i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="width:57%">Content</th>
+                                    <th style="width:10%">HTTP Method</th>
+                                </tr>
+                            </thead>
+
+                            <!-- Skeleton -->
+                            <tbody *ngIf="loadingLogs">
+                                <tr class="log-tr" *ngFor="let i of [].constructor(15)">
+                                    <td>
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td>
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td>
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td>
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td>
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Data -->
+                            <tbody *ngIf="!loadingLogs">
+                                <ng-container *ngFor="let item of logNames; let i = index">
+
+                                    <!-- Main row -->
+                                    <tr class="log-tr" [class.log-tr--active]="selectedRowIndex === i"
+                                        (click)="toggleRowSelection(i)">
+
+                                        <!-- Trace link icon -->
+                                        <td style="width:2%">
+                                            <i class="fas fa-code-branch log-trace-icon" *ngIf="item.traceId"
+                                                matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Trace-link" (click)="openTraceTabWithTraceId(item.traceId)"
+                                                [ngClass]="getLevelColor(item.tags?.level)"></i>
+                                        </td>
+
+                                        <!-- Date -->
+                                        <td style="width:13%" class="log-td--muted">
+                                            {{ formatDate1(item.timeBucket) }}
+                                        </td>
+
+                                        <!-- Status / Level -->
+                                        <td style="width:6%" [ngClass]="getLevelColor(item.tags?.level)">
+                                            <span class="log-level-badge"
+                                                [ngClass]="'log-level-badge--' + item.tags?.level?.toLowerCase()">
+                                                {{ item.tags.level }}
+                                            </span>
+                                        </td>
+
+                                        <!-- Content -->
+                                        <td style="width:57%; cursor:pointer;" class="log-td--content"
+                                            (click)="toggleDetailApp(i)">
+                                            <span class="log-expand-icon">{{ expandedLogIndex === i ? '▼' : '▶'
+                                                }}</span>
+                                            {{ item.content }}
+                                        </td>
+
+                                        <!-- HTTP Method -->
+                                        <td style="width:10%" class="log-td--muted">
+                                            {{ formatEndpointId(item.endpointId) }}
+                                        </td>
+
+                                    </tr>
+
+                                    <!-- Expanded detail row -->
+                                    <tr *ngIf="expandedLogIndex === i" class="log-tr-detail">
+                                        <td colspan="5" style="padding:0;">
+                                            <div class="log-detail-panel">
+
+                                                <div class="log-detail-row" *ngIf="item.traceId">
+                                                    <span class="log-detail-label">Trace ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.traceId"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Time</span>
+                                                    <input type="text" class="log-detail-input"
+                                                        [value]="formatDate1(item.timeBucket)" readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Service ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.ServiceId"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Instance ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.instance"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Endpoint ID</span>
+                                                    <input type="text" class="log-detail-input"
+                                                        [value]="item.endpointId" readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Tags</span>
+                                                    <div class="log-tags-wrap">
+                                                        <span *ngFor="let tag of item.tags | keyvalue"
+                                                            class="log-tag-badge">
+                                                            <span class="log-tag-key">{{ tag.key }}</span>: {{ tag.value
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Content</span>
+                                                    <textarea class="log-detail-textarea" [(ngModel)]="item.content"
+                                                        rows="4" readonly></textarea>
+                                                </div>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </ng-container>
+                            </tbody>
+
+                        </table>
+
+                        <!-- No data -->
+                        <div *ngIf="logNames.length === 0 && !loadingLogs" class="log-empty log-empty--table">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="log-pager" *ngIf="logNames.length !== 0">
+                        <span class="log-pager__info">{{ logItemRange }}</span>
+                        <div class="log-pager__controls">
+                            <button class="log-pager__btn" [disabled]="currentPageLog === 1"
+                                (click)="previousLogPage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="log-pager__input" [value]="currentPageLog"
+                                (keydown.enter)="goToLogPage(+inputLogPage.value)" #inputLogPage min="1"
+                                [max]="totalPagesLog" />
+                            <span class="log-pager__of">of {{ totalPagesLog }}</span>
+                            <button class="log-pager__btn" [disabled]="currentPageLog === totalPagesLog"
+                                (click)="nextLogPage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end logs details -->
+
+            </div>
+        </div>
+
+        <!-- DB -->
+        <div class="tab-pane fade" id="db" style="background:#F8FAFC;">
+
+            <!-- ===================== TOP METRICS ===================== -->
+            <div class="row justify-content-between" style="padding: 10px 10px 10px 22px;
+    background: aliceblue;
+    gap: 6px;">
+
+                <!-- Latency -->
+                <div class="metric-box w-14 shadow-sm border rounded-3" [ngStyle]="{
+                'border': (getThresholdDisplay('database_access_resp_time', databaseLatency).color === 'red' || 
+                           getThresholdDisplay('database_access_resp_time', databaseLatency).color === 'orange')
+                          ? '1px solid ' + getThresholdDisplay('database_access_resp_time', databaseLatency).color
+                          : ''
+            }">
+                    <div class="small fw-semibold text-secondary">
+                        Latency
+                        <span *ngIf="getThresholdDisplay('database_access_resp_time', databaseLatency).value"
+                            class="badge me-1 rounded-0 py-0 px-1 m-0 threshold" [ngStyle]="{
+                        'color': getThresholdDisplay('database_access_resp_time', databaseLatency).color == 'red' ? 'red' : 'orange'
+                    }">
+                            {{ getThresholdDisplay('database_access_resp_time', databaseLatency).value }}
+                        </span>
+                    </div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('database_access_resp_time', databaseLatency).color}">
+                        {{ databaseLatency != null ? databaseLatency : 'N/A' }}
+                        <span *ngIf="databaseLatency" class="mini-text">ms</span>
+                    </div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="metric-box w-14 shadow-sm border rounded-3" [ngStyle]="{
+                'border': (getThresholdDisplay('database_access_sla', databaseSuccessRate).color === 'red' || 
+                           getThresholdDisplay('database_access_sla', databaseSuccessRate).color === 'orange')
+                          ? '1px solid ' + getThresholdDisplay('database_access_sla', databaseSuccessRate).color
+                          : ''
+            }">
+                    <div class="small fw-semibold text-secondary">
+                        Success rate
+                        <span *ngIf="getThresholdDisplay('database_access_sla', databaseSuccessRate).value"
+                            class="badge me-1 rounded-0 py-0 px-1 m-0 threshold" [ngStyle]="{
+                        'color': getThresholdDisplay('database_access_sla', databaseSuccessRate).color == 'red' ? 'red' : 'orange'
+                    }">
+                            {{ getThresholdDisplay('database_access_sla', databaseSuccessRate).value }}
+                        </span>
+                    </div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('database_access_sla', databaseSuccessRate).color}">
+                        {{ databaseSuccessRate != null ? databaseSuccessRate : 'N/A' }}
+                        <span *ngIf="databaseSuccessRate" class="mini-text">%</span>
+                    </div>
+                </div>
+
+                <!-- Load -->
+                <div class="metric-box w-14 shadow-sm border rounded-3" [ngStyle]="{
+                'border': (getThresholdDisplay('database_access_cpm', databaseLoad).color === 'red' || 
+                           getThresholdDisplay('database_access_cpm', databaseLoad).color === 'orange')
+                          ? '1px solid ' + getThresholdDisplay('database_access_cpm', databaseLoad).color
+                          : ''
+            }">
+                    <div class="small fw-semibold text-secondary">
+                        Avg Load
+                        <span *ngIf="getThresholdDisplay('database_access_cpm', databaseLoad).value"
+                            class="badge me-1 rounded-0 py-0 px-1 m-0 threshold" [ngStyle]="{
+                        'color': getThresholdDisplay('database_access_cpm', databaseLoad).color == 'red' ? 'red' : 'orange'
+                    }">
+                            {{ getThresholdDisplay('database_access_cpm', databaseLoad).value }}
+                        </span>
+                    </div>
+                    <div class="fw-bold kpi-value"
+                        [ngStyle]="{'color': getThresholdDisplay('database_access_cpm', databaseLoad).color}">
+                        {{ databaseLoad != null ? databaseLoad : 'N/A' }}
+                        <span *ngIf="databaseLoad" class="mini-text">call/min</span>
+                    </div>
+                </div>
+
+                <!-- DB Selector -->
+                <div class="db-select-wrapper ms-auto">
+                    <div class="db-select-box">
+                        <i class="fa-solid fa-database db-icon"></i>
+                        <select class="db-select" [(ngModel)]="selectedDb" (change)="setDb($event)">
+                            <option *ngFor="let item of dbNames" [value]="item">
+                                {{ item }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===================== PERFORMANCE ===================== -->
+            <div class="mt-2 ps-2 pe-2 mb-2">
+                <div class="flex align-items-center px-1">
+                    <h3 class="fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">
+                        Performance
+                    </h3>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between px-2">
+
+                <!-- ================= ROW 1 ================= -->
+
+                <!-- DB Avg Resp Time -->
+                <div class="card w-33 rounded-3">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>DB Avg Resp Time (ms)</span>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90px;"
+                                class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                <option value="avg" selected>Average</option>
+                                <option value="threshold">Threshold</option>
+                            </select>
+                            <div *ngIf="chart_criteria=='avg'"
+                                class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                style="color:#0e38f1; background-color: var(--bg-color);">
+                                {{ databaseLatency }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="rounded-2 px-1 chart-threshold fw-bold font-11"
+                                style="color:#e07e23; background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_resp_time"]?.warningValue }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                style="background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_resp_time"]?.criticalValue }}
+                            </div>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ dbAvgRespTime }}"></i>
+                        </div>
+                    </div>
+                    <div class="card-body h-26 p-0">
+                        <div id="databaseAvgResponseTimeChartContainer" style="height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- DB Access Success Rate -->
+                <div class="card w-33 rounded-3">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>DB Access Success Rate (%)</span>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90px;"
+                                class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                <option value="avg" selected>Average</option>
+                                <option value="threshold">Threshold</option>
+                            </select>
+                            <div *ngIf="chart_criteria=='avg'"
+                                class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                style="color:#0e38f1; background-color: var(--bg-color);">
+                                {{ databaseSuccessRate }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="rounded-2 px-1 chart-threshold fw-bold font-11"
+                                style="color:#e07e23; background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_sla"]?.warningValue }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                style="background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_sla"]?.criticalValue }}
+                            </div>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ dbSuccessRate }}"></i>
+                        </div>
+                    </div>
+                    <div class="card-body h-26 p-0">
+                        <div id="databaseAccessSuccessRateChartContainer" style="height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- DB Traffic -->
+                <div class="card w-33 rounded-3">
+                    <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                        <span>DB Traffic (calls/min)</span>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width:90px;"
+                                class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                <option value="avg" selected>Average</option>
+                                <option value="threshold">Threshold</option>
+                            </select>
+                            <div *ngIf="chart_criteria=='avg'"
+                                class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                style="color:#0e38f1; background-color: var(--bg-color);">
+                                {{ databaseLoad }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="rounded-2 px-1 chart-threshold fw-bold font-11"
+                                style="color:#e07e23; background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_cpm"]?.warningValue }}
+                            </div>
+                            <div *ngIf="chart_criteria=='threshold'"
+                                class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                style="background-color: var(--bg-color);">
+                                {{ thresholds?.["database_access_cpm"]?.criticalValue }}
+                            </div>
+                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ dbTraffic }}"></i>
+                        </div>
+                    </div>
+                    <div class="card-body h-26 p-0">
+                        <div id="databaseTrafficChartContainer" style="height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- ================= ROW 2 ================= -->
+
+                <div class="d-flex justify-content-between w-100">
+
+                    <!-- DB Latency Percentile (LEFT — fixed 33%) -->
+                    <div class="card w-33 rounded-3 mt-2">
+                        <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                            <span>DB Access Latency Percentile (ms)</span>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <select [(ngModel)]="chart_criteria" style="line-height: 1.5;width: 90px;"
+                                    class="form-select form-select-sm py-0 ps-1 pe-3 me-1 ng-valid ng-dirty ng-touched font-11">
+                                    <option value="avg" selected>Average</option>
+                                    <option value="threshold">Threshold</option>
+                                </select>
+                                <div *ngIf="chart_criteria=='avg'"
+                                    class="rounded-2 me-1 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#0e38f1; background-color: var(--bg-color);">
+                                    {{ successRate }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="rounded-2 px-1 chart-threshold fw-bold font-11"
+                                    style="color:#e07e23; background-color: var(--bg-color);">
+                                    {{ thresholds?.["database_access_resp_time"]?.warningValue }}
+                                </div>
+                                <div *ngIf="chart_criteria=='threshold'"
+                                    class="mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold font-11"
+                                    style="background-color: var(--bg-color);">
+                                    {{ thresholds?.["database_access_resp_time"]?.criticalValue }}
+                                </div>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="{{ dbLatencyPercentile }}"></i>
+                            </div>
+                        </div>
+                        <div class="card-body h-26 p-0">
+                            <div id="databaseAccessLatencyPercentileChartContainer" style="height:26vh;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Top 10 Slow Statements (RIGHT — takes remaining space) -->
+                    <div class="card rounded-3 mt-2 ms-2" style="flex:1;">
+                        <div class="card-header chart-title d-flex justify-content-left align-items-center">
+                            <span>Top 10 Slow Statements (ms)</span>
+                        </div>
+                        <div class="card-body p-0" style="max-height:26vh; overflow:auto;">
+                            <table class="table modern-table mb-0">
+                                <tbody *ngIf="slowStatementData?.length">
+                                    <tr *ngFor="let item of slowStatementData"
+                                        [attr.data-testid]="'slow-statement-row'">
+                                        <td class="text-ellipsis"
+                                            style="width:65%; border-right: 0.5px solid var(--border-color);"
+                                            matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{{item.statement}}">
+                                            {{ item.statement }}
+                                        </td>
+                                        <td style="width:25%; border-right: 0.5px solid var(--border-color);">
+                                            <div class="modern-progress">
+                                                <div class="progress-bar"
+                                                    [style.width.%]="getProgressWidth(item.latency, slowStatementData, 'latency')"
+                                                    style="white-space: nowrap; overflow: visible; color: rgb(255, 255, 255)"
+                                                    [ngClass]="getProgressBarClass(item.status)"
+                                                    [attr.data-testid]="'progress-' + item.status.toLowerCase()"
+                                                    matButton="elevated" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="{{item.latency}}">
+                                                    {{ item.latency }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width:10%; text-align:center;">
+                                            <i class="fa-solid fa-eye text-link" matButton="elevated"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title="View Trace"
+                                                style="cursor: pointer;"
+                                                (click)="openTraceTabWithTraceId(item.trace_id)"></i>
+                                            <i class="fa-solid fa-copy text-link ms-3" matButton="elevated"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Copy Query Statement" style="cursor: pointer;"
+                                                (click)="copyDbStatement(item.statement, $event)"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <div *ngIf="!slowStatementData?.length" class="noData">
+                                    No Data Available
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div *ngIf="isAttributeModal" class="fixed inset-0 flex items-center justify-center bg-black/60 px-4"
+    style="z-index: 1000;">
+    <div class="w-full max-w-lg relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b p-2 mb-2" style="border-color: var(--border-color);">
+            <h2 class="font-semibold" style="font-size: medium;">Attributes</h2>
+            <button (click)="closeAttributeModal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-2 space-y-4 max-h-96 overflow-y-auto" style="font-size: small;">
+            <ul class="list-body space-y-2">
+                <li *ngFor="let key of getKeys(selectedInstance?.properties)" style="word-wrap: break-word;">
+                    <span style="font-weight: 500;">{{ key }} :</span>
+                    <span>
+                        {{
+                        selectedInstance?.properties?.[key] && selectedInstance?.properties?.[key] !== ''
+                        ? selectedInstance?.properties?.[key]
+                        : 'No Data'
+                        }}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isProblemErrorModal" class="fixed inset-0 flex items-center justify-center bg-black/60 px-4"
+    style="z-index: 1000;">
+    <div class="w-full max-w-5xl relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <div class="flex justify-between items-center border-b p-2 mb-2" style="border-color: var(--border-color);">
+            <span style="font-size: medium; font-weight: 500;">
+                Failures
+                <i class="mx-1 fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                    data-bs-placement="top" title="{{healthScoreTitle}}"></i>
+            </span>
+            <button (click)="closeProblemErrorModal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">&times;</button>
+        </div>
+
+        <div class="p-2 space-y-4 max-h-[80vh] overflow-y-auto" style="font-size: small;">
+            <!-- No Problem -->
+            <div *ngIf="appHealthScore !== 100 && !infraNotMapped && infraHealthScore !== 100 &&
+                !dbNotMapped && !hasDbProblems()">
+
+                <span class="noData">
+                    No Problem in the time range
+                </span>
+
+            </div>
+
+            <!-- Application -->
+            <div *ngIf="appHealthScore !== 100">
+                <span style="font-size: small; font-weight: 500;">Application</span>
+                <div class="overflow-x-auto mt-1">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 28%;" class="px-2 py-1">Metric Name</th>
+                                <th style="width: 12%;" class="px-2 py-1">Critical</th>
+                                <th style="width: 12%;" class="px-2 py-1">Warning</th>
+                                <th style="width: 12%;" class="px-2 py-1">Avg Value</th>
+                                <th style="width: 12%;" class="px-2 py-1">Status</th>
+                                <th style="width: 12%;" class="px-2 py-1">Metric Weight</th>
+                                <th style="width: 12%;" class="px-2 py-1">Weighted Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of applicationMetrics | keyvalue">
+                                <td style="width: 28%;">{{ item?.key }}</td>
+                                <td style="width: 12%;">{{ item.value?.criticalValue | number:'1.0-2' }}</td>
+                                <td style="width: 12%;">{{ item.value?.warningValue | number:'1.0-2' }}</td>
+                                <td style="width: 12%;">{{ item.value?.aggregatedValue | number:'1.0-2' }}</td>
+                                <td style="width: 12%;">{{ item.value?.status }}</td>
+                                <td style="width: 12%;">{{ item.value?.metricWeight }}</td>
+                                <td style="width: 12%;">{{ item.value?.weightedScore | number:'1.0-2' }}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div *ngIf="appHealthScore !== 100" class="mt-2 p-2"
+                    style="border-radius:4px;border:1px solid #e0e0e0;">
+
+                    <div style="font-size: x-small; font-weight: 500;">
+                        Application Health Score Calculation
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        Project Health Score = ( Σ Weighted Scores ) / ( Σ Metric Weights )
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        = {{ getTotalWeightedScore() | number:'1.0-2' }} / {{ getTotalMetricWeight() | number:'1.0-2' }}
+                        &nbsp;=&nbsp;
+                        {{ appHealthScore | number:'1.0-2' }}%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Infra -->
+            <div *ngIf="infraNotMapped">
+                <span style="font-size: small; font-weight: 500;">Infra</span>
+                <div style="font-size: x-small;">Infra not mapped</div>
+            </div>
+
+            <div *ngIf="!infraNotMapped && infraHealthScore !== 100">
+                <span style="font-size: small; font-weight: 500;">Infra</span>
+                <div class="overflow-x-auto mt-1">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 28%;">Metric Name</th>
+                                <th style="width: 12%;">Critical</th>
+                                <th style="width: 12%;">Warning</th>
+                                <th style="width: 12%;">Avg Value</th>
+                                <th style="width: 12%;">Status</th>
+                                <th style="width: 12%;">Metric Weight</th>
+                                <th style="width: 12%;">Weighted Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of infraMetrics | keyvalue">
+                                <td style="width: 28%;">{{ item.key }}</td>
+                                <td style="width: 12%;">{{ item.value?.criticalValue }}</td>
+                                <td style="width: 12%;">{{ item.value?.warningValue }}</td>
+                                <td style="width: 12%;">{{ item.value?.aggregatedValue }}</td>
+                                <td style="width: 12%;">{{ item.value?.status }}</td>
+                                <td style="width: 12%;">{{ item.value?.metricWeight }}</td>
+                                <td style="width: 12%;">{{ item.value?.weightedScore }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div *ngIf="infraHealthScore !== 100" class="mt-2 p-2"
+                    style="border-radius:4px;border:1px solid #e0e0e0;">
+
+                    <div style="font-size: x-small; font-weight: 500;">
+                        Infra Health Score Calculation
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        Project Health Score = ( Σ Weighted Scores ) / ( Σ Metric Weights )
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        = {{ getTotalWeightedScoreInfra() | number:'1.0-2' }} / {{ getTotalMetricWeightInfra() |
+                        number:'1.0-2' }}
+                        &nbsp;=&nbsp;
+                        {{ appHealthScore | number:'1.0-2' }}%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Databases -->
+            <div *ngIf="dbNotMapped">
+                <span style="font-size: small; font-weight: 500;">Databases</span>
+                <div style="font-size: x-small;">DB not mapped</div>
+            </div>
+
+            <div *ngIf="!dbNotMapped && hasDbProblems()">
+                <span style="font-size: small; font-weight: 500;">Databases</span>
+                <div *ngFor="let entry of dbFailingEntries()" class="mt-2">
+                    <div style="font-size: x-small; font-weight: 600;">{{ entry.db }}</div>
+                    <div class="overflow-x-auto mt-1">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 28%;">Metric Name</th>
+                                    <th style="width: 12%;">Critical</th>
+                                    <th style="width: 12%;">Warning</th>
+                                    <th style="width: 12%;">Avg Value</th>
+                                    <th style="width: 12%;">Status</th>
+                                    <th style="width: 12%;">Metric Weight</th>
+                                    <th style="width: 12%;">Weighted Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let m of entry.metrics">
+                                    <td style="width: 28%;">{{ m.key }}</td>
+                                    <td style="width: 12%;">{{ m.criticalValue | number:'1.0-2' }}</td>
+                                    <td style="width: 12%;">{{ m.warningValue | number:'1.0-2' }}</td>
+                                    <td style="width: 12%;">{{ m.aggregatedValue | number:'1.0-2' }}</td>
+                                    <td style="width: 12%;">{{ m.status }}</td>
+                                    <td style="width: 12%;">{{ m.metricWeight }}</td>
+                                    <td style="width: 12%;">{{ m.weightedScore }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div *ngFor="let db of dbHealthScore" class="mt-2 p-2"
+                    style="border-radius:4px;border:1px solid #e0e0e0;">
+
+                    <div style="font-size: x-small; font-weight: 500;">
+                        {{ db.name }} Health Score Calculation
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        Project Health Score = ( Σ Weighted Scores ) / ( Σ Metric Weights )
+                    </div>
+
+                    <div style="font-size: x-small;" class="mt-1">
+                        = {{ getTotalWeightedScoreDb(db.name) | number:'1.0-2' }}
+                        /
+                        {{ getTotalMetricWeightDb(db.name) | number:'1.0-2' }}
+                        &nbsp;=&nbsp;
+                        {{ db.value | number:'1.0-2' }}%
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="isHealthWtModal" class="fixed inset-0 flex items-center justify-center bg-black/60 px-4"
+    style="z-index: 1000;">
+    <div class="w-full max-w-md relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <div class="flex justify-between items-center border-b p-2 mb-2" style="border-color: var(--border-color);">
+            <span style="font-size: medium; font-weight: 500;">
+                Health score weightage
+            </span>
+            <button (click)="closeHealthWtModal()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">&times;</button>
+        </div>
+
+        <div class="p-2 space-y-4 max-h-[80vh] overflow-y-auto" style="font-size: small;">
+            <div class="p-2">
+
+                <!-- Application -->
+                <div class="mb-3">
+                    <label class="form-label">Application Weightage (%)</label>
+                    <input type="number" class="form-control form-control-sm" step="0.01" [(ngModel)]="appWt"
+                        (ngModelChange)="onWeightChange()">
+                </div>
+
+                <!-- Infra -->
+                <div class="mb-3">
+                    <label class="form-label">Infra Weightage (%)</label>
+                    <input type="number" class="form-control form-control-sm" step="0.01" [(ngModel)]="infraWt"
+                        (ngModelChange)="onWeightChange()">
+                </div>
+
+                <!-- DB -->
+                <div class="mb-4">
+                    <label class="form-label">DB Weightage (%)</label>
+                    <input type="number" class="form-control form-control-sm" step="0.01" [(ngModel)]="dbWt"
+                        (ngModelChange)="onWeightChange()">
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4">
+
+                    <!-- Reset only if NOT default -->
+                    <button *ngIf="!isDefault" class="btn btn-reset" (click)="deleteAppWeight()">
+                        Reset to Default
+                    </button>
+
+                    <button class="btn btn-gradiant" [disabled]="!isDirty || (appWt + infraWt + dbWt) !== 100"
+                        (click)="saveAppWeight()">
+                        Update
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- POPUP -->
+<!-- Instance -->
+<div *ngIf="instShowPopup" class="popup-container"
+    [ngStyle]="{'left': (instPopupX - 350) + 'px', 'top': (instPopupY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closeInstPopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Instance Load Graph</h3>
+        <div *ngIf="serviceInstanceLoadTimeValueChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="serviceInstanceLoadTimeValueChart" [oneToOne]="true"
+                style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!serviceInstanceLoadTimeValueChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>
+
+<div *ngIf="instShowSrPopup" class="popup-container"
+    [ngStyle]="{'left': (instPopupSrX - 350) + 'px', 'top': (instPopupSrY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closeInstSrPopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Instance Success Graph</h3>
+        <div *ngIf="serviceInstanceSuccessRateTimevaluesChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="serviceInstanceSuccessRateTimevaluesChart"
+                [oneToOne]="true" style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!serviceInstanceSuccessRateTimevaluesChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>
+
+<div *ngIf="instShowLtPopup" class="popup-container"
+    [ngStyle]="{'left': (instPopupLtX - 350) + 'px', 'top': (instPopupLtY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closeInstLtPopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Instance Latency Graph</h3>
+        <div *ngIf="serviceInstanceLatencyTimevaluesChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="serviceInstanceLatencyTimevaluesChart"
+                [oneToOne]="true" style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!serviceInstanceLatencyTimevaluesChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>
+
+<!-- Endpoint -->
+
+<div *ngIf="showPopup" class="popup-container"
+    [ngStyle]="{'left': (popupX - 350) + 'px', 'top': (popupY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closePopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Endpoint Load Graph</h3>
+        <div *ngIf="EndpointLoadChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="EndpointLoadChart" [oneToOne]="true"
+                style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!EndpointLoadChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showSRPopup" class="popup-container"
+    [ngStyle]="{'left': (popupSrX - 350) + 'px', 'top': (popupSrY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closeSrPopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Endpoint Success Rate Graph</h3>
+        <div *ngIf="EndpointSuccessRateChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="EndpointSuccessRateChart" [oneToOne]="true"
+                style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!EndpointSuccessRateChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showLtPopup" class="popup-container"
+    [ngStyle]="{'left': (popupLtX - 350) + 'px', 'top': (popupLtY - 100) + 'px'}">
+    <div class="popup-content">
+        <span class="close-button" (click)="closeLtPopup()">&times;</span>
+        <h3 style="color: rgb(36, 36, 36); margin-top: -10px; margin-bottom: 13px;">Endpoint Latency Graph</h3>
+        <div *ngIf="EndpointAvgResponseTimeChart">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="EndpointAvgResponseTimeChart" [oneToOne]="true"
+                style="height: 23vh; width: 100%; display: block;">
+            </highcharts-chart>
+        </div>
+        <div *ngIf="!EndpointAvgResponseTimeChart" class="noData">
+            No Data Available
+        </div>
+    </div>
+</div>

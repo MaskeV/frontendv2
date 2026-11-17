@@ -1,0 +1,65 @@
+.not-found-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-color);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+.illustration {
+  max-width: 26vw;
+  height: 26vh;
+  margin-bottom: 0;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.error-title {
+  font-size: 8rem;
+  font-weight: 800;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1;
+}
+
+.error-subtitle {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text-color);
+  margin: 0.5rem 0;
+}
+
+.error-text {
+  font-size: 0.9rem;
+  color: var(--disabled-text-color);
+  max-width: 600px;
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+}
+
+.return-btn {
+  background-color: var(--navBar-bg-color);
+  color: var(--navBar-text-color);
+  border: none;
+  padding: 0.6rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 0;
+  transition: opacity 0.3s ease;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+  height: 50px;
+}
+
+.return-btn:hover {
+  background-color: var(--navBar-bg-color);
+  opacity: 0.85;
+  color: var(--navBar-text-color);
+}

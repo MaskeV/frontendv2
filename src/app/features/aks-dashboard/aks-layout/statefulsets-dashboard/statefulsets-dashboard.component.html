@@ -1,0 +1,110 @@
+<div class="statefulsets-container">
+  
+  <!-- FILTER SECTION -->
+  <div class="filter-root">
+    <div class="filter-btn" (click)="toggleFilter()">
+      <i class="fas fa-filter"></i>
+      <div class="count" *ngIf="totalSelected > 0">{{ totalSelected }}</div>
+    </div>
+
+    <div class="filter-card" *ngIf="isFilterOpen">
+      <!-- Namespace Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('namespace')">
+          <span>Namespace</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'namespace'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'namespace'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="namespaceSearch">
+          </div>
+          <div class="option" *ngFor="let ns of filteredNamespaces()" (click)="toggleSelection(ns, selectedNamespaces)">
+            <input type="checkbox" [checked]="selectedNamespaces.has(ns)"
+              (click)="$event.stopPropagation(); toggleSelection(ns, selectedNamespaces)">
+            <span>{{ ns }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- StatefulSet Name Section -->
+      <div class="section">
+        <div class="section-header" (click)="toggleDropdown('statefulSet')">
+          <span>StatefulSet Name</span>
+          <i class="fas fa-chevron-down" [class.rotate]="activeDropdown === 'statefulSet'"></i>
+        </div>
+        <div class="section-body" *ngIf="activeDropdown === 'statefulSet'">
+          <div class="search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." [(ngModel)]="statefulSetNameSearch">
+          </div>
+          <div class="option" *ngFor="let ss of filteredStatefulSetNames()" (click)="toggleSelection(ss, selectedStatefulSets)">
+            <input type="checkbox" [checked]="selectedStatefulSets.has(ss)"
+              (click)="$event.stopPropagation(); toggleSelection(ss, selectedStatefulSets)">
+            <span>{{ ss }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" (click)="resetFilters()">Reset</button>
+        <button class="primary" (click)="applyFilters()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOP METRICS ===== -->
+  <div class="metrics-grid">
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasObserved === 0 }">
+      <div class="metric-title">Replicas Observed</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasObserved === 0 }">
+        {{ replicasObserved }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasDesired === 0 }">
+      <div class="metric-title">Replicas Desired</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasDesired === 0 }">
+        {{ replicasDesired }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': replicasReady === 0 }">
+      <div class="metric-title">Replicas Ready</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': replicasReady === 0 }">
+        {{ replicasReady }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': generationObserved === 0 }">
+      <div class="metric-title">Generation Observed</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': generationObserved === 0 }">
+        {{ generationObserved }}
+      </div>
+    </div>
+
+    <div class="metric-card" [ngClass]="{ 'zero-card': generationDesired === 0 }">
+      <div class="metric-title">Generation Desired</div>
+      <div class="metric-value" [ngClass]="{ 'zero-value': generationDesired === 0 }">
+        {{ generationDesired }}
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===== MAIN CHART ===== -->
+  <div class="card">
+    <div class="card-title">
+      Replicas per StatefulSet <span>(Metrics Kubernetes)</span>
+    </div>
+
+    <highcharts-chart *ngIf="replicasChartOptions" [Highcharts]="Highcharts" [options]="replicasChartOptions" class="chart-lg">
+    </highcharts-chart>
+    <div *ngIf="!replicasChartOptions" class="no-data">
+      No data available
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,268 @@
+<div class="cluster-overview-dashboard">
+
+    <!-- ===== TOP ROW ===== -->
+    <div class="top-grid">
+
+        <!-- 1. RUNNING PODS PER NAMESPACE -->
+        <div class="card small-card namespace-card">
+            <div class="card-header">
+                <span class="card-title">Running Pods per Namespace</span>
+                <span class="card-icon ns-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v4l3 3" />
+                    </svg>
+                </span>
+            </div>
+            <div class="namespace-list" *ngIf="runningPodsChartOptions; else noDataNs">
+                <div class="ns-row" *ngFor="let ns of namespacePodsList">
+                    <span class="ns-name">{{ ns.namespace }}</span>
+                    <span class="ns-count">{{ ns.count }}</span>
+                    <div class="ns-bar-track">
+                        <div class="ns-bar-fill" [style.width.%]="ns.pct"></div>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noDataNs>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+        <!-- 2. NODES -->
+        <div class="card small-card metric-card">
+            <div class="card-header">
+                <span class="card-title">Nodes</span>
+                <span class="card-icon nodes-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <path d="M8 21h8M12 17v4" />
+                    </svg>
+                </span>
+            </div>
+            <div class="metric-body" *ngIf="nodesSummary; else noDataNodes">
+                <div class="metric-main">
+                    <span class="metric-number">{{ nodesSummary.total }}</span>
+                    <span class="metric-label">Total</span>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-green">
+                        <span class="dot dot-green"></span>
+                        {{ nodesSummary.total - nodesSummary.notReady }} Ready
+                    </span>
+                    <span class="badge badge-red">
+                        <span class="dot dot-red"></span>
+                        {{ nodesSummary.notReady }} NotReady
+                    </span>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stack-seg seg-green" [style.width.%]="nodesSummary.readyPct"></div>
+                    <div class="stack-seg seg-red" [style.width.%]="100 - nodesSummary.readyPct"></div>
+                </div>
+            </div>
+            <ng-template #noDataNodes>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+        <!-- 3. PODS -->
+        <div class="card small-card metric-card">
+            <div class="card-header">
+                <span class="card-title">Pods</span>
+                <span class="card-icon pods-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                </span>
+            </div>
+            <div class="metric-body" *ngIf="podsSummary; else noDataPods">
+                <div class="metric-main">
+                    <span class="metric-number">{{ podsSummary.total }}</span>
+                    <span class="metric-label">Total</span>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-green">
+                        <span class="dot dot-green"></span>
+                        {{ podsSummary.running }} Running
+                    </span>
+                    <span class="badge badge-blue">
+                        <span class="dot dot-blue"></span>
+                        {{ podsSummary.succeeded }} Succeeded
+                    </span>
+                    <span class="badge badge-red" *ngIf="podsSummary.failed > 0">
+                        <span class="dot dot-red"></span>
+                        {{ podsSummary.failed }} Failed
+                    </span>
+                    <span class="badge badge-yellow" *ngIf="podsSummary.pending > 0">
+                        <span class="dot dot-yellow"></span>
+                        {{ podsSummary.pending }} Pending
+                    </span>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stack-seg seg-green" [style.width.%]="podsSummary.runningPct"></div>
+                    <div class="stack-seg seg-blue" [style.width.%]="podsSummary.succeededPct"></div>
+                    <div class="stack-seg seg-red" [style.width.%]="podsSummary.failedPct"></div>
+                    <div class="stack-seg seg-yellow" [style.width.%]="podsSummary.pendingPct"></div>
+                </div>
+            </div>
+            <ng-template #noDataPods>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+        <!-- 4. DEPLOYMENTS -->
+        <div class="card small-card metric-card">
+            <div class="card-header">
+                <span class="card-title">Deployments</span>
+                <span class="card-icon deploy-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                </span>
+            </div>
+            <div class="metric-body" *ngIf="deploymentsSummary; else noDataDeploy">
+                <div class="metric-main">
+                    <span class="metric-number">{{ deploymentsSummary.total }}</span>
+                    <span class="metric-label">Total</span>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-green">
+                        <span class="dot dot-green"></span>
+                        {{ deploymentsSummary.total - deploymentsSummary.notReady }} Ready
+                    </span>
+                    <span class="badge badge-red">
+                        <span class="dot dot-red"></span>
+                        {{ deploymentsSummary.notReady }} NotReady
+                    </span>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stack-seg seg-green" [style.width.%]="deploymentsSummary.readyPct"></div>
+                    <div class="stack-seg seg-red" [style.width.%]="100 - deploymentsSummary.readyPct"></div>
+                </div>
+            </div>
+            <ng-template #noDataDeploy>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+        <!-- 5. DAEMONSETS -->
+        <div class="card small-card metric-card">
+            <div class="card-header">
+                <span class="card-title">DaemonSets</span>
+                <span class="card-icon daemon-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+                    </svg>
+                </span>
+            </div>
+            <div class="metric-body" *ngIf="daemonSetsSummary; else noDataDaemon">
+                <div class="metric-main">
+                    <span class="metric-number">{{ daemonSetsSummary.total }}</span>
+                    <span class="metric-label">Total</span>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-green">
+                        <span class="dot dot-green"></span>
+                        {{ daemonSetsSummary.total - daemonSetsSummary.notReady }} Ready
+                    </span>
+                    <span class="badge badge-red">
+                        <span class="dot dot-red"></span>
+                        {{ daemonSetsSummary.notReady }} NotReady
+                    </span>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stack-seg seg-green" [style.width.%]="daemonSetsSummary.readyPct"></div>
+                    <div class="stack-seg seg-red" [style.width.%]="100 - daemonSetsSummary.readyPct"></div>
+                </div>
+            </div>
+            <ng-template #noDataDaemon>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+        <!-- 6. REPLICASETS -->
+        <div class="card small-card metric-card">
+            <div class="card-header">
+                <span class="card-title">ReplicaSets</span>
+                <span class="card-icon replica-icon">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="8" y="8" width="13" height="13" rx="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                </span>
+            </div>
+            <div class="metric-body" *ngIf="replicaSetsSummary; else noDataReplica">
+                <div class="metric-main">
+                    <span class="metric-number">{{ replicaSetsSummary.total }}</span>
+                    <span class="metric-label">Total</span>
+                </div>
+                <div class="badge-row">
+                    <span class="badge badge-green">
+                        <span class="dot dot-green"></span>
+                        {{ replicaSetsSummary.total - replicaSetsSummary.notReady }} Ready
+                    </span>
+                    <span class="badge badge-red">
+                        <span class="dot dot-red"></span>
+                        {{ replicaSetsSummary.notReady }} NotReady
+                    </span>
+                </div>
+                <div class="stacked-bar">
+                    <div class="stack-seg seg-green" [style.width.%]="replicaSetsSummary.readyPct"></div>
+                    <div class="stack-seg seg-red" [style.width.%]="100 - replicaSetsSummary.readyPct"></div>
+                </div>
+            </div>
+            <ng-template #noDataReplica>
+                <div class="no-data">No data available</div>
+            </ng-template>
+        </div>
+
+    </div>
+    <!-- ===== END TOP ROW ===== -->
+
+    <!-- ===== MIDDLE ===== -->
+    <div class="chart-grid">
+        <div class="card">
+            <div class="card-title">Memory used vs total memory</div>
+            <highcharts-chart *ngIf="memoryUsageChartOptions" [Highcharts]="Highcharts"
+                [options]="memoryUsageChartOptions" class="chart-md"></highcharts-chart>
+            <div *ngIf="!memoryUsageChartOptions" class="no-data">No data available</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Cores used vs total cores</div>
+            <highcharts-chart *ngIf="cpuUsageChartOptions" [Highcharts]="Highcharts" [options]="cpuUsageChartOptions"
+                class="chart-md"></highcharts-chart>
+            <div *ngIf="!cpuUsageChartOptions" class="no-data">No data available</div>
+        </div>
+    </div>
+
+    <!-- ===== BOTTOM ===== -->
+    <div class="bottom-grid">
+        <div class="card">
+            <div class="card-title">Top CPU intensive pods per Node</div>
+            <highcharts-chart *ngIf="cpuNodeChart" [Highcharts]="Highcharts"
+                [options]="cpuNodeChart"></highcharts-chart>
+            <div *ngIf="!cpuNodeChart" class="no-data">No data available</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Top CPU intensive pods per Pod Limit</div>
+            <highcharts-chart *ngIf="cpuLimitChart" [Highcharts]="Highcharts"
+                [options]="cpuLimitChart"></highcharts-chart>
+            <div *ngIf="!cpuLimitChart" class="no-data">No data available</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Top Memory intensive pods per Node</div>
+            <highcharts-chart *ngIf="memoryNodeChart" [Highcharts]="Highcharts"
+                [options]="memoryNodeChart"></highcharts-chart>
+            <div *ngIf="!memoryNodeChart" class="no-data">No data available</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Top Memory intensive pods per Pod Limit</div>
+            <highcharts-chart *ngIf="memoryLimitChart" [Highcharts]="Highcharts"
+                [options]="memoryLimitChart"></highcharts-chart>
+            <div *ngIf="!memoryLimitChart" class="no-data">No data available</div>
+        </div>
+    </div>
+
+</div>

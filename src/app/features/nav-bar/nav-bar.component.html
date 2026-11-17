@@ -1,0 +1,351 @@
+<!-- <link rel="stylesheet"  href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"> -->
+<nav class="navbar navbar-expand-lg sticky-top top-nav-bar" [ngClass]="{ 'collapsed': isSidebarCollapsed }">
+  <div class="container-fluid d-flex align-items-center" style="padding-left: 4px; padding-right: 4px;">
+    <div>
+      <div class="toggle-container no-select d-flex align-items-center" (click)="toggleSidebar2()"
+        style="cursor: pointer;">
+        <img src="/assets/images/NETRAA_LOGO_1.png" alt="Logo" class="logo-toggle" />
+        <span class="neo-tech-font brand-text ms-2">netraa</span>
+      </div>
+
+    </div>
+
+    <div class="d-flex ms-auto">
+      <div class="d-flex flex-column align-items-end">
+
+        <!-- Date Pickers -->
+        <div class="d-flex align-items-center" *ngIf="shouldShowDatePicker()" #datePickerContainer>
+          <app-control-zone-management style="margin-right: 8px;"></app-control-zone-management>
+          <app-date-picker style="margin-right: 0px;"></app-date-picker>
+        </div>
+
+        <div class="date-picker" *ngIf="!shouldShowDatePicker()" #datePickerSMContainer>
+          <app-date-picker-smetering style="margin-right: 455px; margin-top: 6%;"></app-date-picker-smetering>
+        </div>
+
+        <!-- License Alert -->
+
+        <div *ngIf="showMessage" class="license-alert mt-2">
+          <div class="icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+
+          <div class="content">
+            <div class="header">
+              <span class="title">License Expiring Soon</span>
+              <i class="fa-solid fa-xmark close-icon" (click)="closeLicenseAlert()"></i>
+            </div>
+
+            <div class="message">
+              {{ expiryMessage }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KEEP THIS OUTSIDE so it stays inline -->
+      <div class="auto-refresh-indicator ms-2" *ngIf="isAutoRefreshEnabled" title="Auto refresh is on">
+        <span class="spinner-border spinner-border-sm"></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<app-profile-side-bar [isSidebarCollapsed]="isSidebarCollapsed"></app-profile-side-bar>
+
+<!-- Layout -->
+<div class="d-flex">
+
+  <div id="sidebar" class="sidebar" [ngClass]="{ 'collapsed': isSidebarCollapsed, 'expanded': !isSidebarCollapsed }">
+    <div #menuContainer>
+      <ul class="nav flex-column" style="cursor: pointer;">
+        <li class="nav-item" *ngFor="let item of menuList; let i = index">
+          <div class="nav-link menu-item menu-text" style="width: 100%;" (mouseenter)="showSubmenu(item, i)"
+            (mouseleave)="hideSubmenu()">
+            <div class="menu-content">
+              <i [class]="item.className" class="menu-icon  menu-text"></i>
+              <span class="menu-label menu-text " [class.collapsed]="isSidebarCollapsed" (click)="showSubmenu(item, i)">
+                {{ item.name }}
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- <hr class="divider"> -->
+    <div class="rad" (click)="toggleSidebar()">
+      <i class="bi bi-person-circle"></i>
+      <span class="profile-button">
+        <b></b>
+      </span>
+    </div>
+    <div class="pending-approval cursor-pointer" *ngIf="user.userType != 'User'">
+      <div class="icon-wrapper">
+        <i class="bi bi-person-check" *ngIf="pendingApprovalCount===0" (click)="openPendingApproval()"></i>
+        <i class="bi bi-person" *ngIf="pendingApprovalCount!==0" (click)="openPendingApproval()"></i>
+        <span id="notifCount" *ngIf="pendingApprovalCount!==0"
+          (click)="openPendingApproval()">{{pendingApprovalCount}}</span>
+      </div>
+    </div>
+
+    <!-- AUTO REFRESH TOGGLE -->
+    <div class="auto-refresh">
+      <label class="toggle-switch my-2" data-bs-toggle="tooltip" data-bs-placement="right" title="Auto Refresh Mode">
+        <input type="checkbox" [checked]="isAutoRefreshPanelOpen" (change)="toggleAutoRefreshPanel($event)" />
+        <span class="toggle-track">
+          <span class="toggle-text on">ON</span>
+          <span class="toggle-text off">OFF</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="sidebar-toggle-btn pb-1 cursor-pointer" (click)="toggleSidebar2()">
+      <!-- Sidebar toggle icon -->
+      <span class="mt-1 d-flex align-items-center justify-content-center cursor-pointer">
+        <!-- Right pointing (when expanded) -->
+        <svg *ngIf="!isSidebarCollapsed" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+          width="24px">
+          <path
+            d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z" />
+        </svg>
+        <!-- Left pointing (when collapsed) -->
+        <svg *ngIf="isSidebarCollapsed" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+          width="24px">
+          <path
+            d="M383-480 200-664l56-56 240 240-240 240-56-56 183-184Zm264 0L464-664l56-56 240 240-240 240-56-56 183-184Z" />
+        </svg>
+      </span>
+    </div>
+
+    <!-- First-level floating submenu -->
+    <div *ngIf="activeSubmenu" class="floating-submenu" [style.top.px]="submenuTopPosition"
+      [style.left]="isSidebarCollapsed ? '40px' : '14%'" (mouseenter)="keepSubmenuVisible()"
+      (mouseleave)="hideSubmenu()">
+      <ul class="py-0">
+        <li class="submenuHeading submenu-item py-0 my-0" *ngIf="isSidebarCollapsed==true"><a
+            class="submenu-link fw-bolder menu-text py-1">{{ activeSubmenu.name }}</a></li>
+        <li *ngFor="let sub of activeSubmenu.subFeature" class="submenu-item py-0 "
+          (mouseenter)="showNestedSubmenu(sub)">
+
+          <a [routerLink]="['/' + sub.routeName]" class="submenu-link  menu-text py-1"
+            (click)="setFeatureType(sub.name)">
+            {{ sub.name }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Nested (second-level) floating submenu -->
+    <div *ngIf="activeNestedSubmenu" class="floating-submenu" [style.top.px]="submenuTopPosition"
+      [style.left]="isSidebarCollapsed ? '100px' : '20%'" (mouseenter)="keepSubmenuVisible()"
+      (mouseleave)="hideSubmenu()">
+      <ul class="py-1">
+        <li *ngFor="let nested of activeNestedSubmenu.subFeature" class="submenu-item py-0">
+          <a [routerLink]="['/' + nested.routeName]" class="submenu-link menu-text py-1"
+            (click)="setFeatureType(nested.name)">
+            {{ nested.name }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div id="sidebar-modal-container"></div>
+
+  <main class="flex-grow-1">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- <ng-template #pendingApprovalTemplate>
+  <div *ngIf="pendingApprovalCount !== 0" class="modal-header justify-content-between">
+    <h4 class="modal-title" style="font-family:sans-serif;">Pending Approvals ({{pendingApprovalCount}})
+    </h4>
+  </div>
+  <div *ngIf="pendingApprovalCount !== 0" class="modal-body text-center" style="height: 60vh;">
+    <table class="table" aria-describedby="">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">User ID</th>
+          <th scope="col">User Type</th>
+          <th scope="col">Mail ID</th>
+          <th scope="col" class="text-right">Created On</th>
+          <th scope="col" class="text-right">Approval Type</th>
+          <th scope="col" class="text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pendinglist">
+          <td>{{row.fullName}}</td>
+          <td>{{row.userId}}</td>
+          <td>{{row.userType}}</td>
+          <td>{{row.mailId}}</td>
+          <td style="text-align: right;">{{row.createdOn | date:'dd-MM-yyyy'}}</td>
+          <td style="text-align: right;">{{row.approveStatus}}</td>
+          <td style="text-align: right;">
+            <em class="fa fa-edit" style="font-size: 18px; cursor: pointer;" (click)="openModal(template,row)">
+            </em>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-header" *ngIf="pendingApprovalCount === 0">
+    <span style="text-align: right; font-weight: bold; padding-left: 40%;"> No approvals pending</span>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal"
+      (click)="closePendingApprovalModal()">Close</button>
+  </div>
+</ng-template> -->
+
+<!-- <ng-template #template>
+  <div class="modal-body text-center">
+    <p>Are you sure want to approve <strong>{{approvalUser.fullName}}</strong> User </p>
+    <button type="button" class="btn btn-success" (click)="confirmApproveUser(alert_messageuser)">Approve</button>&nbsp;
+    <button type="button" class="btn btn-danger" (click)="confirmRejectUser(alert_messageuser)">Reject</button>&nbsp;
+    <button type="button" class="btn btn-info" (click)="closeConfirmModal()">Cancel</button>
+  </div>
+</ng-template> -->
+
+<!-- <ng-template #alert_messageuser>
+  <div class="modal-body text-center">
+    <p>{{alertMessage}}</p>
+    <button type="button" class="btn btn-success" (click)="closeAlertModal()">OK</button>&nbsp;
+  </div>
+</ng-template> -->
+
+<div class="pending-approval-panel" *ngIf="isPendingApprovalOpen" [ngClass]="{
+    'expanded': !isSidebarCollapsed,
+    'collapsed': isSidebarCollapsed
+  }">
+  <div class="panel-header">
+    <h4 *ngIf="pendingApprovalCount !== 0">
+      Pending Approvals ({{ pendingApprovalCount }})
+    </h4>
+    <h4 *ngIf="pendingApprovalCount === 0">
+      No approvals pending
+    </h4>
+    <button class="panel-close-btn" (click)="closePendingApprovalModal()" aria-label="Close">
+      ✕
+    </button>
+  </div>
+  <!-- EMPTY STATE -->
+  <div class="pending-empty-state" *ngIf="pendingApprovalCount === 0">
+    <img src="assets/images/no-approvals.png" alt="No approvals" (error)="emptyImg.style.display='none'" />
+
+
+    <div class="empty-title">No Approvals Pending</div>
+    <div class="empty-subtitle">Approval Box Empty</div>
+  </div>
+
+  <div class="panel-body" *ngIf="pendingApprovalCount !== 0">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>User ID</th>
+          <th>User Type</th>
+          <th>Mail ID</th>
+          <th class="text-right">Created On</th>
+          <th class="text-right">Approval Type</th>
+          <th class="text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pendinglist">
+          <td>{{row.fullName}}</td>
+          <td>{{row.userId}}</td>
+          <td>{{row.userType}}</td>
+          <td>{{row.mailId}}</td>
+          <td class="text-right">{{row.createdOn | date:'dd-MM-yyyy'}}</td>
+          <td class="text-right">{{row.approveStatus}}</td>
+          <td class="text-right">
+            <em class="fa fa-edit" style="cursor:pointer" (click)="openModal(row)">
+            </em>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- <div class="panel-footer">
+    <button class="btn btn-default" (click)="closePendingApprovalModal()">
+      X
+    </button>
+  </div> -->
+</div>
+
+<!-- CONFIRMATION OVERLAY -->
+<div class="approval-confirm-overlay" *ngIf="isApprovalConfirmOpen">
+  <div class="approval-confirm-box">
+    <p>
+      Are you sure you want to approve
+      <strong>{{ approvalUser.fullName }}</strong> user?
+    </p>
+
+    <div class="confirm-actions">
+      <button class="btn btn-success btn-sm" (click)="confirmApproveUser(alertMessage)">
+        Approve
+      </button>
+
+      <button class="btn btn-danger btn-sm" (click)="confirmRejectUser(alert_messageuser)">
+        Reject
+      </button>
+
+      <button class="btn btn-secondary btn-sm" (click)="closeConfirmModal()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT OVERLAY -->
+<div class="approval-confirm-overlay" *ngIf="isAlertOpen">
+  <div class="approval-confirm-box">
+    <p>{{ alertMessage }}</p>
+
+    <div class="confirm-actions">
+      <button class="btn btn-success btn-sm" (click)="closeAlertModal()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Auto Refresh -->
+<div class="pending-approval-panel1 auto-refresh-panel" *ngIf="isAutoRefreshPanelOpen" [ngClass]="{
+    expanded: !isSidebarCollapsed,
+    collapsed: isSidebarCollapsed
+  }">
+  <div class="panel-header">
+    <h4>Auto Refresh</h4>
+    <button class="panel-close-btn" (click)="closeAutoRefreshPanel()" aria-label="Close">
+      ✕
+    </button>
+  </div>
+
+  <div class="panel-body">
+    <!-- Toggle -->
+    <div class="d-flex align-items-center mb-3">
+      <label class="me-2" style="font-size: small;">Enable Auto Refresh</label>
+      <input type="checkbox" [checked]="isAutoRefreshEnabled" (change)="onToggleAutoRefresh($event)" />
+    </div>
+
+    <!-- Interval -->
+    <div class="d-flex align-items-center gap-2">
+      <label class="" style="font-size: small;">Interval (sec)</label>
+      <input type="number" min="5" class="form-control form-control-sm w-50" style="font-size: small;"
+        [value]="refreshInterval" (change)="onIntervalChange($event)" />
+
+      <button class="btn btn-sm btn-outline-primary" (click)="onSetButtonClick()" style="font-size: small;">
+        Set
+      </button>
+    </div>
+    <div class="pending-empty-state1">
+      <img src="assets/images/auto-refresh.png" alt="No approvals" (error)="emptyImg.style.display='none'" />
+      <div class="empty-title1">Automate your page refresh rate</div>
+    </div>
+  </div>
+</div>

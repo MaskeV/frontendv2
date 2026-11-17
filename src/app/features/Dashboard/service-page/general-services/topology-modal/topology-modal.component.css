@@ -1,0 +1,9 @@
+.modal-body {
+    padding: 10px;
+  }
+  .list-group-item {
+    cursor: pointer;
+  }
+  .list-group-item:hover {
+    background-color: #f8f9fa;
+  }

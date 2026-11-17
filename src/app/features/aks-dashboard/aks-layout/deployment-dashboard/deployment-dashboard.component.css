@@ -1,0 +1,294 @@
+/* ================= CONTAINER ================= */
+.deployment-dashboard {
+  padding: 20px;
+  background-color: #f8fafc;
+  height: 86vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* ================= METRICS ================= */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.metric-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ================= CARD ================= */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 14px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.card-title span {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* ================= CHART ================= */
+.chart-lg {
+  height: 360px;
+}
+
+/* ================= HIGHCHARTS THEME ================= */
+.highcharts-background {
+  fill: transparent !important;
+}
+
+.highcharts-grid-line {
+  stroke: #e5e7eb !important;
+}
+
+.highcharts-axis-line {
+  stroke: #cbd5e1 !important;
+}
+
+.highcharts-text-outline {
+  display: none !important;
+}
+
+.zero-card {
+  background-color: #fef2f2;   /* light red */
+  border-color: #fecaca;
+}
+
+.zero-value {
+  color: #dc2626;              /* red text */
+}
+
+.no-data {
+  text-align: center;
+  color: #64748b;
+  padding: 16px;
+  font-size: 12px;
+}
+
+/*  */
+/* ROOT */
+.filter-root {
+  position: relative;
+  /* Make sure it sits nicely above or inside the flow */
+  margin-bottom: 10px;
+}
+
+/* FILTER ICON BUTTON */
+.filter-btn {
+  position: relative;
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  color: #475569;
+  border-radius: 7px;
+
+  transition: background 0.15s ease;
+}
+
+.filter-btn:hover {
+  background: #f1f5f9;
+}
+
+/* COUNT BADGE (ICON ATTACHED) */
+.filter-btn .count {
+  position: absolute;
+  top: 0px;
+  right: -5px;
+
+  min-width: 14px;
+  height: 14px;
+
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
+/* FILTER PANEL CARD */
+.filter-card {
+  margin-bottom: 8px;
+  width: 250px;
+  position: absolute; /* Floating if needed, or static if inline */
+  z-index: 1000;      /* Ensure it's on top */
+  top: 100%;          /* Below the button */
+  left: 0;
+
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px;
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.08),
+    0 2px 4px rgba(15, 23, 42, 0.04);
+}
+
+/* SECTION WRAPPER */
+.section {
+  background: #f8fafc;
+  border-radius: 9px;
+  padding: 7px;
+  margin-bottom: 8px;
+}
+
+/* SECTION HEADER */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+
+  cursor: pointer;
+}
+
+.section-header i {
+  font-size: 10px;
+  color: #64748b;
+  transition: transform 0.15s ease;
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+/* SECTION BODY */
+.section-body {
+  margin-top: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+/* SEARCH BAR */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 5px 7px;
+  border-radius: 7px;
+  margin-bottom: 6px;
+}
+
+.search i {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.search input {
+  border: none;
+  outline: none;
+  font-size: 11px;
+  background: transparent;
+  width: 100%;
+}
+
+/* OPTIONS (CHECKBOX ROWS) */
+.option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-size: 11px;
+  color: #334155;
+
+  padding: 5px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: #eef2ff;
+}
+
+.option input {
+  accent-color: #2563eb;
+}
+
+.option input:checked + span {
+  color: #1e40af;
+  font-weight: 500;
+}
+
+/* ACTION BUTTONS */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  border-top: 1px solid #e5e7eb;
+  padding-top: 6px;
+}
+
+/* BASE BUTTON */
+.actions button {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* RESET – subtle but visible */
+.actions .ghost {
+  background: #f1f5f9;              /* soft slate */
+  color: #334155;
+}
+
+.actions .ghost:hover {
+  background: #e2e8f0;              /* hover clarity */
+}
+
+/* APPLY – strong primary */
+.actions .primary {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.actions .primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+}

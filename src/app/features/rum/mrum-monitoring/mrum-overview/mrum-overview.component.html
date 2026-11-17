@@ -1,0 +1,768 @@
+<main style="height: calc(100vh - 65px); overflow-y: auto; overflow-x: hidden;">
+    <!-- breadcrumb part -->
+    <app-mrum-breadcrumb 
+        [breadcrumbs]="breadcrumbData">
+    </app-mrum-breadcrumb>
+    <!-- Body -->
+    <div>
+        <div class="border-2 custom-border rounded-3 rounded shadow mx-auto"
+            style="width: 100%; height: auto; overflow: visible; padding: 0 10px;">
+            <div class="w-100 h-8">
+                <ul class="nav nav-tabs" id="service-nav" style="font-weight: bold; font-size: small; width: 100%;">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                            (click)="loadData('overview')">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#versions"
+                            (click)="loadData('versions')">Versions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#screens"
+                            (click)="loadData('screens')">Screens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#sessions"
+                            (click)="loadData('sessions')">Users & Sessions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#errors"
+                            (click)="loadData('errors')">Errors & Crashes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#serviceMap"
+                            (click)="loadData('serviceMap')">Service Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#dependencies"
+                            (click)="loadData('dependencies')">Dependencies</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Tab Body -->
+            <div class="tab-content rounded-3 rounded">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade in active show" id="overview">
+
+                    <!-- ===================== NEW MODERN DASHBOARD ===================== -->
+                    <div class="mrum-dashboard-modern">
+                        <!-- Top Row: Metric Cards -->
+                        <div class="row g-2 mb-2">
+                            <!-- Technology Logo -->
+                            <div class="col-auto d-flex align-items-center justify-content-center px-2">
+                                <div class="d-flex justify-content-center align-items-center rounded shadow-sm"
+                                    style="width: 72px; height: 72px; background-color: #ffffff;; --card-bg: #ffffff;">
+                                    <img *ngIf="technologyType === 'ReactNative'" src="/assets/images/reactnative.png"
+                                        style="width: 52px; height: 52px; object-fit: contain;" alt="React Native">
+                                    <img *ngIf="technologyType === 'Kotlin'" src="/assets/images/kotlin.png"
+                                        style="width: 52px; height: 52px; object-fit: contain;" alt="Kotlin">
+                                    <img *ngIf="technologyType === 'Swift'" src="/assets/images/swift.png"
+                                        style="width: 52px; height: 52px; object-fit: contain;" alt="Swift"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                    <i *ngIf="technologyType !== 'ReactNative' && technologyType !== 'Kotlin' && technologyType !== 'Swift'"
+                                        class="bi bi-diagram-3-fill"
+                                        style="color: #4db8ff; font-size: 50px; line-height: 1;"></i>
+                                </div>
+                            </div>
+
+                            <!-- User Count -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+                                    style="background-color: #f3e8ff; color: #4c1d95;; --card-bg: #f3e8ff;">
+                                    <div class="d-flex flex-column justify-content-between"
+                                        style="flex: 0 0 max-content; padding-right: 5px;">
+                                        <div class="mb-2">
+                                            <h6 class="m-0 fw-bold" style="font-size: 13px;">Users
+                                                <span class="tooltip-wrap tooltip-right">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 11px;"></i>
+                                                    <span class="custom-tooltip">Total unique users based on unique
+                                                        session identifiers or device IDs during the selected
+                                                        timeframe.</span>
+                                                </span>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                                                style="width: 36px; height: 36px; color: #9333ea; flex-shrink: 0;">
+                                                <i class="bi bi-people-fill fs-6"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="fs-5 fw-bold lh-1">{{ (httpRequestMetricData.aggregated ??
+                                                    0) |
+                                                    number:'1.0-0' }}</div>
+                                                <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Total
+                                                    Users</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sparkline -->
+                                    <div class="rounded flex-grow-1 p-1"
+                                        style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+                                        <div id="usersSparkline" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Session Count -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+                                    style="background-color: #dcfce7; color: #14532d;; --card-bg: #dcfce7;">
+                                    <div class="d-flex flex-column justify-content-between"
+                                        style="flex: 0 0 max-content; padding-right: 5px;">
+                                        <div class="mb-2">
+                                            <h6 class="m-0 fw-bold" style="font-size: 13px;">Sessions
+                                                <span class="tooltip-wrap">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 11px;"></i>
+                                                    <span class="custom-tooltip">Total application sessions. A session
+                                                        groups consecutive user interactions together.</span>
+                                                </span>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                                                style="width: 36px; height: 36px; color: #16a34a; flex-shrink: 0;">
+                                                <i class="bi bi-graph-up fs-6"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="fs-5 fw-bold lh-1">{{ (sessionsMetricData.aggregated ||
+                                                    totalSessions || 0) | number:'1.0-0' }}</div>
+                                                <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Total
+                                                    Sessions</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sparkline -->
+                                    <div class="rounded flex-grow-1 p-1"
+                                        style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+                                        <div id="sessionsSparkline" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Error Rate -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+                                    style="background-color: #fee2e2; color: #7f1d1d;; --card-bg: #fee2e2;">
+                                    <div class="d-flex flex-column justify-content-between"
+                                        style="flex: 0 0 max-content; padding-right: 5px;">
+                                        <div class="mb-2">
+                                            <h6 class="m-0 fw-bold" style="font-size: 13px;">Error Rate
+                                                <span class="tooltip-wrap tooltip-right">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 11px;"></i>
+                                                    <span class="custom-tooltip">Percentage of backend transactions
+                                                        (HTTP requests) that returned a failed outcome (e.g., 4xx or
+                                                        5xx).</span>
+                                                </span>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                                                style="width: 36px; height: 36px; color: #dc2626; flex-shrink: 0;">
+                                                <i class="bi bi-exclamation-triangle fs-6"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="fs-5 fw-bold lh-1">{{ (errorMetricData.aggregated ?? 0) |
+                                                    number:'1.2-2'
+                                                    }}%</div>
+                                                <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Avg
+                                                    Failure</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sparkline -->
+                                    <div class="rounded flex-grow-1 p-1"
+                                        style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+                                        <div id="errorRateSparkline" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Crash Rate -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+                                    style="background-color: #ffedd5; color: #7c2d12;; --card-bg: #ffedd5;">
+                                    <div class="d-flex flex-column justify-content-between"
+                                        style="flex: 0 0 max-content; padding-right: 5px;">
+                                        <div class="mb-2">
+                                            <h6 class="m-0 fw-bold" style="font-size: 13px;">Crash Rate
+                                                <span class="tooltip-wrap tooltip-right">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 11px;"></i>
+                                                    <span class="custom-tooltip">Percentage of total sessions that ended
+                                                        abruptly due to a fatal application crash or unhandled
+                                                        exception.</span>
+                                                </span>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                                                style="width: 36px; height: 36px; color: #ea580c; flex-shrink: 0;">
+                                                <i class="bi bi-shield-exclamation fs-6"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="fs-5 fw-bold lh-1">{{ (crashMetricData.aggregated ?? 0) |
+                                                    number:'1.2-2' }}%
+                                                </div>
+                                                <div class="opacity-75" style="font-size: 12px; font-weight: 600;">Avg
+                                                    Crash</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sparkline -->
+                                    <div class="rounded flex-grow-1 p-1"
+                                        style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+                                        <div id="crashRateSparkline" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Count -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-row align-items-stretch gap-2"
+                                    style="background-color: #e0f2fe; color: #0c4a6e;; --card-bg: #e0f2fe;">
+                                    <div class="d-flex flex-column justify-content-between"
+                                        style="flex: 0 0 max-content; padding-right: 5px;">
+                                        <div class="mb-2">
+                                            <h6 class="m-0 fw-bold" style="font-size: 13px;">Actions
+                                                <span class="tooltip-wrap tooltip-left">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 11px;"></i>
+                                                    <span class="custom-tooltip">Total number of tracked user interface
+                                                        interactions, such as button clicks, swipes, and navigation
+                                                        events.</span>
+                                                </span>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded d-flex justify-content-center align-items-center bg-white shadow-sm"
+                                                style="width: 36px; height: 36px; color: #0284c7; flex-shrink: 0;">
+                                                <i class="bi bi-lightning-charge-fill fs-6"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="fs-5 fw-bold lh-1">{{ (actionMetricData.aggregated ?? 0) |
+                                                    number:'1.0-0' }}
+                                                </div>
+                                                <div class="opacity-75" style="font-size: 12px; font-weight: 600;">total
+                                                    actions</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Sparkline -->
+                                    <div class="rounded flex-grow-1 p-1"
+                                        style="position: relative; flex: 1 1 0; min-width: 50px; min-height: 50px;">
+                                        <div id="actionsSparkline" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- Second Row: Charts -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-12 col-xl-6">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0"
+                                    style="background-color: #f0fdf4; color: #14532d;; --card-bg: #f0fdf4;">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="m-0 fw-bold">User Experience (Apdex) Over Time
+                                            <span class="tooltip-wrap tooltip-right">
+                                                <i class="bi bi-info-circle opacity-75 ms-1"
+                                                    style="font-size: 12px;"></i>
+                                                <span class="custom-tooltip">Application Performance Index (Apdex).
+                                                    Measures user satisfaction based on transaction response times
+                                                    against a defined threshold.</span>
+                                            </span>
+                                        </h6>
+                                        <div class="d-flex gap-3" style="font-size: 12px; font-weight: 600;">
+                                            <div><span
+                                                    style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; margin-right:4px;"></span>
+                                                Excellent (0.94 - 1.00)</div>
+                                            <div><span
+                                                    style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; margin-right:4px;"></span>
+                                                Good (0.85 - 0.93)</div>
+                                            <div><span
+                                                    style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f59e0b; margin-right:4px;"></span>
+                                                Fair (0.70 - 0.84)</div>
+                                            <div><span
+                                                    style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444; margin-right:4px;"></span>
+                                                Poor (0.50 - 0.69)</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex flex-column align-items-center" style="width: 140px;">
+                                            <div style="position: relative; width: 120px; height: 120px;">
+                                                <svg viewBox="0 0 100 100" width="100%" height="100%">
+                                                    <path d="M 20 80 A 40 40 0 1 1 80 80" fill="none" stroke="#f3f4f6"
+                                                        stroke-width="10" stroke-linecap="round" />
+                                                    <path d="M 20 80 A 40 40 0 1 1 80 80" fill="none"
+                                                        [attr.stroke]="getApdexColor(apdexScore)" stroke-width="10"
+                                                        stroke-linecap="round"
+                                                        [attr.stroke-dasharray]="(apdexScore ?? 0) * 188.4 + ' 200'" />
+                                                    <text x="50" y="48" font-size="18" font-weight="bold"
+                                                        text-anchor="middle" [attr.fill]="getApdexColor(apdexScore)">{{
+                                                        apdexScore === null || apdexScore === undefined ? '-' :
+                                                        (apdexScore | number:'1.2-2') }}</text>
+                                                    <text x="50" y="65" font-size="8" font-weight="500"
+                                                        text-anchor="middle" [attr.fill]="getApdexColor(apdexScore)">{{
+                                                        getApdexLabel(apdexScore) }}</text>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1" style="height: 160px; position: relative;">
+                                            <div id="apdexChartContainer" style="width:100%;height:100%;"
+                                                [style.display]="apdexMetricData.timeSeries && apdexMetricData.timeSeries.length ? 'block' : 'none'">
+                                            </div>
+                                            <div *ngIf="!apdexMetricData.timeSeries || !apdexMetricData.timeSeries.length"
+                                                class="text-center d-flex align-items-center justify-content-center h-100"
+                                                style="color: rgb(137, 137, 137); font-weight: bold;">
+                                                <p class="m-0">No Data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0"
+                                    style="background-color: #f0fdfa; color: #115e59;; --card-bg: #f0fdfa;">
+                                    <h6 class="m-0 fw-bold mb-3">Devices
+                                        <span class="tooltip-wrap">
+                                            <i class="bi bi-info-circle opacity-75 ms-1" style="font-size: 12px;"></i>
+                                            <span class="custom-tooltip" style="bottom: auto; top: 120%;">Distribution
+                                                of physical device models and manufacturers used to access the
+                                                application.</span>
+                                        </span>
+                                    </h6>
+                                    <div style="height: 180px;">
+                                        <ng-container *ngIf="pieChartConfigs.device; else noDataTemplate">
+                                            <highcharts-chart [Highcharts]="Highcharts"
+                                                [options]="pieChartConfigs.device"
+                                                style="width:100%;height:100%;display:block;">
+                                            </highcharts-chart>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0"
+                                    style="background-color: #eef2ff; color: #3730a3;; --card-bg: #eef2ff;">
+                                    <h6 class="m-0 fw-bold mb-3">Network
+                                        <span class="tooltip-wrap">
+                                            <i class="bi bi-info-circle opacity-75 ms-1" style="font-size: 12px;"></i>
+                                            <span class="custom-tooltip" style="bottom: auto; top: 120%;">Breakdown of
+                                                the network connection types used by users (e.g., WiFi, 4G, 5G,
+                                                Unknown).</span>
+                                        </span>
+                                    </h6>
+                                    <div style="height: 180px;">
+                                        <ng-container
+                                            *ngIf="pieChartConfigs.networkConnectionType; else noDataTemplate">
+                                            <highcharts-chart [Highcharts]="Highcharts"
+                                                [options]="pieChartConfigs.networkConnectionType"
+                                                style="width:100%;height:100%;display:block;">
+                                            </highcharts-chart>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Third & Fourth Rows Combined -->
+                        <div class="row g-2">
+                            <div class="col-12 col-xl-7">
+                                <!-- Associated Services -->
+                                <div class="row g-2 mb-2">
+                                    <div class="col-12">
+                                        <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-column"
+                                            style="min-height: 120px; background-color: #f0f9ff; color: #0c4a6e;; --card-bg: #f0f9ff;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="m-0 fw-bold" style="font-size: 13px;">Associated
+                                                    Services
+                                                    <span class="tooltip-wrap">
+                                                        <i class="bi bi-info-circle opacity-75 ms-1"
+                                                            style="font-size: 11px;"></i>
+                                                        <span class="custom-tooltip">Backend services called by this
+                                                            application and their frequency of use.</span>
+                                                    </span>
+                                                </h6>
+
+                                                <!-- Pagination controls -->
+                                                <div *ngIf="associatedServices.length > associatedServicesPageSize"
+                                                    class="d-flex gap-1">
+                                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                        style="font-size: 12px; font-weight: 600;"
+                                                        [disabled]="associatedServicesPage === 1"
+                                                        (click)="associatedServicesPage = associatedServicesPage - 1">
+                                                        <i class="bi bi-chevron-left"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                        style="font-size: 12px; font-weight: 600;"
+                                                        [disabled]="associatedServicesPage * associatedServicesPageSize >= associatedServices.length"
+                                                        (click)="associatedServicesPage = associatedServicesPage + 1">
+                                                        <i class="bi bi-chevron-right"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex-grow-1" style="font-size: 10px; line-height: 1.2;">
+                                                <div class="row g-3 h-100 align-content-start"
+                                                    *ngIf="associatedServices.length > 0">
+                                                    <div *ngFor="let srv of paginatedAssociatedServices; let i = index"
+                                                        [class]="getServiceColumnClass(paginatedAssociatedServices.length, i)">
+                                                        <div class="d-flex align-items-center w-100">
+                                                            <div style="flex: 0 0 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; font-weight: 600;"
+                                                                [title]="srv.name">{{ srv.name }}</div>
+                                                            <div
+                                                                style="flex: 1; height: 4px; background-color: #bae6fd; border-radius: 2px; margin: 0 6px; overflow: hidden;; --card-bg: #bae6fd;">
+                                                                <div [style.width]="srv.usage + '%'"
+                                                                    style="height: 100%; background-color: #0284c7;; --card-bg: #0284c7;">
+                                                                </div>
+                                                            </div>
+                                                            <div style="width: 35px; text-align: right;"
+                                                                class="opacity-75">{{ srv.usage.toFixed(1) }}%</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="associatedServices.length === 0"
+                                                    class="d-flex align-items-center justify-content-center h-100 opacity-75"
+                                                    style="font-size: 12px; font-weight: 500;">
+                                                    No services available
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Third Row Content -->
+                                <div class="row g-2 mb-2">
+                                    <div class="col-12 col-md-6">
+                                        <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-column"
+                                            style="background-color: #f5f3ff; color: #4c1d95;; --card-bg: #f5f3ff;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="m-0 fw-bold">Top 5 Actions
+                                                    <span class="tooltip-wrap tooltip-right">
+                                                        <i class="bi bi-info-circle opacity-75 ms-1"
+                                                            style="font-size: 12px;"></i>
+                                                        <span class="custom-tooltip">The most frequently performed user
+                                                            actions, sorted by total time consumed.</span>
+                                                    </span>
+                                                </h6>
+                                                <a [routerLink]="['/mrum/actions']" [queryParamsHandling]="'preserve'"
+                                                    class="text-primary text-decoration-none"
+                                                    style="font-size: 12px; font-weight: 500;">View all</a>
+                                            </div>
+                                            <div class="table-responsive flex-grow-1">
+                                                <table class="table table-borderless m-0" style="font-size: 11px;">
+                                                    <thead style="background-color: #ddd6fe;; --card-bg: #ddd6fe;">
+                                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                            <th class="fw-bold p-2">#</th>
+                                                            <th class="fw-bold p-2">Action</th>
+                                                            <th class="fw-bold p-2">Time Consumed</th>
+                                                            <th class="fw-bold p-2">Actions / min</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let item of topActions; let i = index">
+                                                            <td class="p-2">{{ i + 1 }}.</td>
+                                                            <td class="p-2 fw-medium">
+                                                                <a [routerLink]="['/mrum/actions', item.name]"
+                                                                    [queryParamsHandling]="'preserve'"
+                                                                    class="text-decoration-none text-primary"
+                                                                    style="cursor: pointer; font-weight: 600;">
+                                                                    {{ item.name }}
+                                                                </a>
+                                                            </td>
+                                                            <td class="p-2 align-middle">
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <div
+                                                                        style="flex-grow: 1; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden;">
+                                                                        <div [style.width.%]="item.timeConsumedPct"
+                                                                            style="height: 100%; background: #6366f1;">
+                                                                        </div>
+                                                                    </div>
+                                                                    <span style="width: 35px;">{{ item.timeConsumedPct |
+                                                                        number:'1.0-1' }}%</span>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-2">{{ item.perMin | number:'1.0-4' }}</td>
+                                                        </tr>
+                                                        <tr *ngIf="topActions.length === 0">
+                                                            <td colspan="4" class="text-center p-3 text-muted">No
+                                                                actions recorded</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-column"
+                                            style="background-color: #f5f3ff; color: #4c1d95;; --card-bg: #f5f3ff;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="m-0 fw-bold">Top 5 Screens
+                                                    <span class="tooltip-wrap tooltip-right">
+                                                        <i class="bi bi-info-circle opacity-75 ms-1"
+                                                            style="font-size: 12px;"></i>
+                                                        <span class="custom-tooltip">The most frequently viewed screens
+                                                            or pages within the application.</span>
+                                                    </span>
+                                                </h6>
+                                                <a href="javascript:void(0)" (click)="selectTab('screens')"
+                                                    class="text-primary text-decoration-none"
+                                                    style="font-size: 12px; font-weight: 500;">View all</a>
+                                            </div>
+                                            <div class="table-responsive flex-grow-1">
+                                                <table class="table table-borderless m-0" style="font-size: 11px;">
+                                                    <thead style="background-color: #ddd6fe;; --card-bg: #ddd6fe;">
+                                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                            <th class="fw-bold p-2">#</th>
+                                                            <th class="fw-bold p-2">Page</th>
+                                                            <th class="fw-bold p-2">Usage</th>
+                                                            <th class="fw-bold p-2">Views / min</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let item of topPages; let i = index">
+                                                            <td class="p-2">{{ i + 1 }}.</td>
+                                                            <td class="p-2 fw-medium">
+                                                                <a [routerLink]="['/mrum/screens', item.name]"
+                                                                    [queryParamsHandling]="'preserve'"
+                                                                    class="text-decoration-none text-primary"
+                                                                    style="cursor: pointer; font-weight: 600;">
+                                                                    {{ item.name }}
+                                                                </a>
+                                                            </td>
+                                                            <td class="p-2 align-middle">
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <div
+                                                                        style="flex-grow: 1; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden;">
+                                                                        <div [style.width.%]="item.usage"
+                                                                            style="height: 100%; background: #8b5cf6;">
+                                                                        </div>
+                                                                    </div>
+                                                                    <span style="width: 35px;">{{ item.usage |
+                                                                        number:'1.0-1' }}%</span>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-2">{{ item.perMin | number:'1.0-4' }}</td>
+                                                        </tr>
+                                                        <tr *ngIf="topPages.length === 0">
+                                                            <td colspan="4" class="text-center p-3 text-muted">No pages
+                                                                recorded</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fourth Row Content -->
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <div class="dash-card h-100 p-3 rounded shadow-sm border-0"
+                                            style="background-color: #ecfdf5; color: #064e3b;; --card-bg: #ecfdf5;">
+                                            <h6 class="m-0 fw-bold mb-3">OS Version Breakdown
+                                                <span class="tooltip-wrap">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 12px;"></i>
+                                                    <span class="custom-tooltip">Distribution of the Operating System
+                                                        versions used to run the application.</span>
+                                                </span>
+                                            </h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-borderless m-0" style="font-size: 11px;">
+                                                    <thead style="background-color: #a7f3d0;; --card-bg: #a7f3d0;">
+                                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                            <th class="fw-bold p-2">OS</th>
+                                                            <th class="fw-bold p-2 text-center">Users</th>
+                                                            <th class="fw-bold p-2 w-50">% Users</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let item of osVersionStats">
+                                                            <td class="p-2"><i
+                                                                    class="bi bi-gear text-success me-2"></i>{{
+                                                                item.name }}</td>
+                                                            <td class="p-2 text-center">{{ item.count }}</td>
+                                                            <td class="p-2 align-middle">
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <div
+                                                                        style="flex-grow: 1; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden;">
+                                                                        <div [style.width.%]="item.usage"
+                                                                            style="height: 100%; background: #6366f1;">
+                                                                        </div>
+                                                                    </div>
+                                                                    <span style="width: 35px;">{{ item.usage |
+                                                                        number:'1.0-1' }}%</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr *ngIf="osVersionStats.length === 0">
+                                                            <td colspan="3" class="text-center p-3 text-muted">No OS
+                                                                versions recorded</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="dash-card h-100 p-3 rounded shadow-sm border-0"
+                                            style="background-color: #ecfdf5; color: #064e3b;; --card-bg: #ecfdf5;">
+                                            <h6 class="m-0 fw-bold mb-3">App Version Breakdown
+                                                <span class="tooltip-wrap">
+                                                    <i class="bi bi-info-circle opacity-75 ms-1"
+                                                        style="font-size: 12px;"></i>
+                                                    <span class="custom-tooltip">Distribution of the Application
+                                                        versions currently installed or in use by your users.</span>
+                                                </span>
+                                            </h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-borderless m-0" style="font-size: 11px;">
+                                                    <thead style="background-color: #a7f3d0;; --card-bg: #a7f3d0;">
+                                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                            <th class="fw-bold p-2">Version</th>
+                                                            <th class="fw-bold p-2 text-center">Users</th>
+                                                            <th class="fw-bold p-2 w-50">% Users</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let item of appVersionStats">
+                                                            <td class="p-2">{{ item.name }}</td>
+                                                            <td class="p-2 text-center">{{ item.count }}</td>
+                                                            <td class="p-2 align-middle">
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <div
+                                                                        style="flex-grow: 1; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden;">
+                                                                        <div [style.width.%]="item.usage"
+                                                                            style="height: 100%; background: #6366f1;">
+                                                                        </div>
+                                                                    </div>
+                                                                    <span style="width: 35px;">{{ item.usage |
+                                                                        number:'1.0-1' }}%</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr *ngIf="appVersionStats.length === 0">
+                                                            <td colspan="3" class="text-center p-3 text-muted">No app
+                                                                versions recorded</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Map Column (spanning full height) -->
+                            <div class="col-12 col-xl-5">
+                                <div class="dash-card h-100 p-3 rounded shadow-sm border-0 d-flex flex-column"
+                                    style="background-color: #f0f9ff; color: #0c4a6e;; --card-bg: #f0f9ff;">
+                                    <h6 class="m-0 fw-bold mb-3">Geographical (Top 5)
+                                        <span class="tooltip-wrap">
+                                            <i class="bi bi-info-circle opacity-75 ms-1" style="font-size: 12px;"></i>
+                                            <span class="custom-tooltip" style="bottom: auto; top: 120%;">Top geographic
+                                                regions by user session count and application performance
+                                                metrics.</span>
+                                        </span>
+                                    </h6>
+
+                                    <div class="map-container flex-grow-1 d-flex flex-column mb-3"
+                                        style="min-height: 350px;">
+                                        <div id="geo-map-overview" style="flex: 1; width: 100%; min-height: 350px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless m-0" style="font-size: 11px;">
+                                            <thead style="background-color: #bae6fd;; --card-bg: #bae6fd;">
+                                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                    <th class="fw-bold p-2">Country Name</th>
+                                                    <th class="fw-bold p-2 text-center">Usage</th>
+                                                    <th class="fw-bold p-2 text-center">Apdex</th>
+                                                    <th class="fw-bold p-2 text-center">Session Count</th>
+                                                    <th class="fw-bold p-2 text-center">Crash Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let country of countryData | slice:0:5">
+                                                    <td class="p-2">{{ getFlagEmoji(country.countryCode) }} {{
+                                                        country.countryName }}</td>
+                                                    <td class="p-2 text-center">{{ country.usagePercent }}%</td>
+                                                    <td class="p-2 text-center">{{ country.apdex }}</td>
+                                                    <td class="p-2 text-center">{{ country.sessions | number }}</td>
+                                                    <td class="p-2 text-center">{{ country.crashPercent }}%</td>
+                                                </tr>
+                                                <tr *ngIf="!countryData || countryData.length === 0">
+                                                    <td colspan="5" class="text-center p-3 text-muted">No geographical
+                                                        data available</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center py-3">
+                            <span class="text-muted" style="font-size: 11px;">All times are in GMT+05:30 (IST) <i
+                                    class="bi bi-info-circle ms-1"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Overview Tab Body -->
+
+                <!-- Versions Tab Body -->
+                <div class="tab-pane fade" id="versions">
+                    <app-version-overview [context]="this"></app-version-overview>
+                </div>
+                <!-- End of Versions Tab Body -->
+
+                <!-- Screens Tab Body -->
+                <div class="tab-pane fade" id="screens">
+                    <app-screens-overview *ngIf="currentTabName === 'Screens'"></app-screens-overview>
+                </div>
+                <!-- End of Screens Tab Body -->
+
+                <!-- Sessions Tab Body -->
+                <div class="tab-pane fade" id="sessions">
+                    <app-session-overview *ngIf="currentTabName === 'Users & Sessions'"></app-session-overview>
+                </div>
+                <!-- End of Sessions Tab Body -->
+
+                <!-- Errors Tab Body -->
+                <div class="tab-pane fade" id="errors">
+                    <app-error-overview [context]="this"></app-error-overview>
+                </div>
+                <!-- End of Errors Tab Body -->
+
+                <!-- Service Map Tab Body -->
+                <div class="tab-pane fade" id="serviceMap">
+                    <app-service-map-overview [context]="this"></app-service-map-overview>
+                </div>
+                <!-- End of Service Map Tab Body -->
+
+                <!-- Dependencies Tab Body -->
+                <div class="tab-pane fade" id="dependencies">
+                    <app-dependency-overview [context]="this"></app-dependency-overview>
+                </div>
+                <!-- End of Dependencies Tab Body -->
+            </div>
+            <!-- End of Tab Content -->
+
+        </div>
+    </div>
+    <ng-template #noDataTemplate>
+        <div class="text-center" style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+            <p>No Data</p>
+        </div>
+    </ng-template>
+</main>

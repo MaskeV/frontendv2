@@ -1,0 +1,370 @@
+<main class="mrum-container">
+    <div class="mrum-header">
+        <h1 class="mrum-title">MRUM Monitoring</h1>
+        <div class="mrum-search">
+            <i class="bi bi-search"></i>
+            <input type="text" [(ngModel)]="searchText" (input)="applySearchFilter()"
+                placeholder="Search Application Name">
+        </div>
+    </div>
+
+    <div class="mrum-filters-row">
+        <div class="mrum-filter-group" style="flex-direction: row; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span class="mrum-filter-label">Filtered by:</span>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <img #columnIcon src="/assets/images/filter.png" alt="Filter" class="filter"
+                    style="width: 22px; height: 26px; cursor: pointer; z-index: 1;"
+                    (click)="toggleColumnModal(columnIcon)" />
+                <!-- Pills Next to Filter -->
+                <ng-container *ngIf="selectedColumnFilters.length > 0">
+                    <span *ngFor="let col of selectedColumnFilters" class="mrum-filter-pill me-2"
+                        (click)="openValueFilterModal($event, col)">
+                        {{ getColumnLabel(col) }}
+                        <i class="bi bi-sliders"></i>
+                    </span>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="mrum-view-toggle">
+            <button class="mrum-view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+                <i class="bi bi-list-ul"></i> List
+            </button>
+            <button class="mrum-view-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+                <i class="bi bi-grid-fill"></i> Grid
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards Layout -->
+    <div *ngIf="viewMode === 'grid'" class="mrum-grid" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+        <ng-container *ngIf="isLoading">
+            <div *ngFor="let i of [1, 2, 3]" class="mrum-card skeleton-card">
+                <!-- Header -->
+                <div class="mrum-card-header" style="display: flex; align-items: flex-start; margin-bottom: 16px;">
+                    <div class="skeleton-box" style="height: 48px; width: 48px; border-radius: 12px; margin-right: 12px;"></div>
+                    <div class="mrum-app-info" style="flex: 1;">
+                        <div class="skeleton-box" style="height: 20px; width: 60%; margin-bottom: 6px;"></div>
+                        <div class="skeleton-box" style="height: 20px; width: 80px; border-radius: 4px;"></div>
+                    </div>
+                </div>
+                <!-- Apdex -->
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div class="skeleton-box" style="height: 80px; width: 80px; border-radius: 50%;"></div>
+                    <div style="margin-left: 20px; flex: 1;">
+                        <div class="skeleton-box" style="height: 24px; width: 100px; border-radius: 20px; margin-bottom: 8px;"></div>
+                        <div class="skeleton-box" style="height: 14px; width: 90%;"></div>
+                        <div class="skeleton-box" style="height: 14px; width: 60%; margin-top: 4px;"></div>
+                    </div>
+                </div>
+                <!-- Metrics -->
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #f0f0f0; padding-top: 16px;">
+                    <div style="flex: 1;"><div class="skeleton-box" style="height: 36px; width: 80%;"></div></div>
+                    <div style="flex: 1; padding-left: 12px;"><div class="skeleton-box" style="height: 36px; width: 80%;"></div></div>
+                    <div style="flex: 1; padding-left: 12px;"><div class="skeleton-box" style="height: 36px; width: 80%;"></div></div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="!isLoading && pagedTableData.length > 0">
+            <div class="mrum-card" *ngFor="let row of pagedTableData" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" (click)="setServiceId(row)" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.05)'">
+                <div class="mrum-card-header" style="display: flex; align-items: flex-start; margin-bottom: 16px;">
+                    <div class="mrum-app-icon" style="background-color: white; border: 1px solid #f0f0f0; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 8px; margin-right: 12px;">
+                        <img *ngIf="row.technologyType === 'ReactNative'" src="/assets/images/reactnative.png" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img *ngIf="row.technologyType === 'Kotlin'" src="/assets/images/kotlin.png" style="width: 100%; height: 100%; object-fit: contain;">
+                        <i *ngIf="row.technologyType !== 'ReactNative' && row.technologyType !== 'Kotlin'" class="bi bi-diagram-3-fill" style="color: #4db8ff; font-size: 28px;"></i>
+                    </div>
+                    <div class="mrum-app-info" style="flex: 1;">
+                        <h3 class="mrum-app-title" style="margin: 0 0 6px 0; font-size: 15px; font-weight: 500; color: #0066cc;">{{ row.serviceName }}</h3>
+                        <div class="mrum-os-badge" style="display: inline-flex; align-items: center; padding: 2px 8px; background-color: rgba(40, 167, 69, 0.1); color: #28a745; font-size: 11px; font-weight: 600; border-radius: 4px;">
+                            <i class="bi" [ngClass]="row.osType === 'iOS' ? 'bi-apple' : 'bi-android2'" style="margin-right: 4px;"></i> {{ row.osType }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mrum-apdex-section" style="margin-bottom: 20px;">
+                    <div class="mrum-apdex-header" style="font-size: 12px; color: #333; font-weight: 600; margin-bottom: 12px;">Apdex <i class="bi bi-info-circle" style="color: #888; font-size: 12px; margin-left: 4px;"></i></div>
+                    <div class="mrum-apdex-body" style="display: flex; align-items: center;">
+                        <div class="mrum-apdex-gauge" style="width: 80px; height: 80px; position: relative;">
+                            <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: rotate(135deg);">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#f0f0f0" stroke-width="8" stroke-dasharray="188.5 251.2" />
+                                <circle cx="50" cy="50" r="40" fill="none" [attr.stroke]="getApdexColor(row.apdex)" stroke-width="8" 
+                                        [attr.stroke-dasharray]="(188.5 * (row.apdex || 0)) + ' 251.2'" stroke-linecap="round" />
+                            </svg>
+                            <div class="mrum-apdex-value" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 700; color: #111;">
+                                {{ row.apdex ? (row.apdex | number:'1.2-2') : '-' }}
+                            </div>
+                        </div>
+                        
+                        <div class="mrum-apdex-status" style="margin-left: 20px; max-width: 130px;">
+                            <div class="mrum-badge" [ngClass]="getApdexClass(row.apdex)" style="display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; margin-bottom: 8px;">
+                                <i [ngClass]="getApdexIcon(row.apdex)" style="margin-right: 6px;"></i> {{ getApdexLabel(row.apdex) }}
+                            </div>
+                            <div style="font-size: 12px; color: #666; line-height: 1.4;">
+                                {{ getApdexDescription(row.apdex) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mrum-metrics-bottom" style="display: flex; justify-content: space-between; border-top: 1px solid #f0f0f0; padding-top: 16px;">
+                    <div class="mrum-metric-col" style="flex: 1; cursor: pointer;" (click)="openThrouputPopup($event, row.serviceName); $event.stopPropagation()">
+                        <div class="mrum-metric-title" style="font-size: 11px; color: #555; font-weight: 600; display: flex; align-items: center; margin-bottom: 6px;">
+                            <i class="bi bi-lightning-fill" style="color: #3498db; margin-right: 4px; font-size: 14px;"></i> Actions
+                        </div>
+                        <div class="mrum-metric-value" style="font-size: 16px; font-weight: 700; color: #111;">
+                            {{ row.throughput !== null && row.throughput !== undefined ? (row.throughput | number:'1.2-2') : '-' }} <span style="font-size: 11px; font-weight: normal; color: #888;">/min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mrum-metric-col" style="flex: 1; border-left: 1px solid #f0f0f0; padding-left: 12px; cursor: pointer;" (click)="openFailureRatePopup($event, row.serviceName); $event.stopPropagation()">
+                        <div class="mrum-metric-title" style="font-size: 11px; color: #555; font-weight: 600; display: flex; align-items: center; margin-bottom: 6px;">
+                            <i class="bi bi-x-diamond" style="color: #9b59b6; margin-right: 4px; font-size: 14px;"></i> Crashes
+                        </div>
+                        <div class="mrum-metric-value" style="font-size: 16px; font-weight: 700; color: #111;">
+                            {{ row.failure_rate !== null && row.failure_rate !== undefined ? (row.failure_rate | number:'1.2-2') : '-' }} <span style="font-size: 11px; font-weight: normal; color: #888;">/min</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mrum-metric-col" style="flex: 1; border-left: 1px solid #f0f0f0; padding-left: 12px;">
+                        <div class="mrum-metric-title" style="font-size: 11px; color: #555; font-weight: 600; display: flex; align-items: center; margin-bottom: 6px;">
+                            <i class="bi bi-exclamation-triangle" style="color: #e67e22; margin-right: 4px; font-size: 14px;"></i> Request errors
+                        </div>
+                        <div class="mrum-metric-value" style="font-size: 16px; font-weight: 700; color: #111;">
+                            {{ row.failure_rate !== null && row.failure_rate !== undefined ? ((row.failure_rate || 0) * 5 | number:'1.2-2') : '-' }} <span style="font-size: 11px; font-weight: normal; color: #888;">/min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <!-- Table Layout -->
+    <div *ngIf="viewMode === 'list'" class="mrum-card mrum-table-responsive" style="padding: 0; margin-bottom: 24px;">
+        <table class="table w-100 table-hover mb-0" style="font-size: 14px;">
+            <thead style="background-color: #f8f9fa;; --card-bg: #f8f9fa;">
+                <tr>
+                    <th scope="col" (click)="sortTable('serviceName')" style="cursor: pointer; padding: 12px 20px;">
+                        Application Name <i *ngIf="sortColumn === 'serviceName'" class="bi"
+                            [ngClass]="sortDirection === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                    </th>
+                    <th scope="col" style="padding: 12px 20px;">OS</th>
+                    <th scope="col" (click)="sortTable('apdex')" style="cursor: pointer; padding: 12px 20px;">
+                        Apdex <i *ngIf="sortColumn === 'apdex'" class="bi"
+                            [ngClass]="sortDirection === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                    </th>
+                    <th scope="col" (click)="sortTable('throughput')" style="cursor: pointer; padding: 12px 20px;">
+                        Actions <i *ngIf="sortColumn === 'throughput'" class="bi"
+                            [ngClass]="sortDirection === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                    </th>
+                    <th scope="col" (click)="sortTable('failure_rate')" style="cursor: pointer; padding: 12px 20px;">
+                        Crashes <i *ngIf="sortColumn === 'failure_rate'" class="bi"
+                            [ngClass]="sortDirection === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                    </th>
+                    <th scope="col" style="padding: 12px 20px;">Request errors</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="isLoading">
+                <tr *ngFor="let i of [1, 2, 3, 4, 5]">
+                    <td colspan="6" style="padding: 12px 20px;">
+                        <div class="skeleton-box" style="height: 20px; width: 100%;"></div>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody *ngIf="!isLoading && pagedTableData.length > 0">
+                <tr *ngFor="let row of pagedTableData" style="cursor: pointer;" (click)="setServiceId(row)">
+                    <td style="padding: 12px 20px; color: #0066cc; font-weight: 500; display: flex; align-items: center;">
+                        <img *ngIf="row.technologyType === 'ReactNative'" src="/assets/images/reactnative.png"
+                            style="width: 20px; height: 20px; object-fit: contain; margin-right: 8px;">
+                        <img *ngIf="row.technologyType === 'Kotlin'" src="/assets/images/kotlin.png"
+                            style="width: 20px; height: 20px; object-fit: contain; margin-right: 8px;">
+                        <i *ngIf="row.technologyType !== 'ReactNative' && row.technologyType !== 'Kotlin'"
+                            class="bi bi-diagram-3-fill" style="margin-right: 8px; color: #4db8ff;"></i>
+                        {{ row.serviceName }}
+                    </td>
+                    <td style="padding: 12px 20px;">
+                        <div class="mrum-os-badge" style="background-color: transparent; padding: 0;">
+                            <i class="bi" [ngClass]="row.osType === 'iOS' ? 'bi-apple' : 'bi-android2'"></i> {{
+                            row.osType }}
+                        </div>
+                    </td>
+                    <td style="padding: 12px 20px; cursor: pointer;" (click)="openApdexPopup($event, row.serviceName); $event.stopPropagation()">
+                        <span class="mrum-badge" [ngClass]="getApdexClass(row.apdex)"
+                            style="margin: 0; margin-right: 8px;">
+                            {{ getApdexLabel(row.apdex) }}
+                        </span>
+                        <span style="font-weight: 600;">{{ row.apdex ? (row.apdex | number:'1.2-2') : '-' }}</span>
+                    </td>
+                    <td style="padding: 12px 20px; cursor: pointer;"
+                        (click)="openThrouputPopup($event, row.serviceName); $event.stopPropagation()">
+                        {{ row.throughput !== null && row.throughput !== undefined ? (row.throughput | number:'1.2-2') + ' /min' : '-' }}
+                    </td>
+                    <td style="padding: 12px 20px; cursor: pointer;"
+                        (click)="openFailureRatePopup($event, row.serviceName); $event.stopPropagation()">
+                        {{ row.failure_rate !== null && row.failure_rate !== undefined ? (row.failure_rate | number:'1.2-2') + ' /min' : '-' }}
+                    </td>
+                    <td style="padding: 12px 20px;">
+                        {{ row.failure_rate !== null && row.failure_rate !== undefined ? ((row.failure_rate || 0) * 5 | number:'1.2-2') + ' /min' : '-' }}
+                    </td>
+                </tr>
+            </tbody>
+            <tbody *ngIf="!isLoading && pagedTableData.length === 0">
+                <tr>
+                    <td colspan="5" style="padding: 40px; text-align: center; color: #888;">No Data Found</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="mrum-pagination-container">
+        <div class="mrum-showing-text">
+            Showing {{ startIndex }} to {{ endIndex }} of {{ filteredTableData.length }} applications
+        </div>
+        <div class="mrum-pagination-controls">
+            <div class="mrum-per-page">
+                <input type="number" min="1" [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange()"
+                    style="width: 60px; padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; text-align: center; height: 32px;" />
+                <span style="color: #666; font-size: 14px;">per page</span>
+            </div>
+            <div class="mrum-pager" style="display: flex; gap: 8px;">
+                <button class="mrum-pager-btn" (click)="previousPage()" [disabled]="currentPage === 1"
+                    style="height: 32px; width: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #d9d9d9; background: white; border-radius: 4px; color: #666; cursor: pointer;">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="mrum-pager-btn" *ngFor="let page of totalPagesArray"
+                    [ngStyle]="currentPage === page ? {'border': '1px solid #1677ff', 'color': '#1677ff', 'background': '#e6f4ff'} : {'border': '1px solid #d9d9d9', 'color': '#666', 'background': 'white'}"
+                    (click)="page !== '...' && goToPage(page)"
+                    [disabled]="page === '...'"
+                    style="height: 32px; min-width: 32px; padding: 0 8px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                    {{ page }}
+                </button>
+                <button class="mrum-pager-btn" (click)="nextPage()" [disabled]="currentPage === totalPages"
+                    style="height: 32px; width: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #d9d9d9; background: white; border-radius: 4px; color: #666; cursor: pointer;">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Popup Container -->
+<div *ngIf="showPopup" #popupContainerForThroughput
+    [ngStyle]="{ position: 'fixed', top: popupY + 'px', left: popupX + 'px', width: '320px', height: '300px', zIndex: '1050' }"
+    class="mat-elevation-z8 rounded p-2"
+    style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-1 mb-1">
+        <div style="font-weight: 600; font-family: sans-serif; color: #3498db;">
+            Throughput (transaction/min)
+        </div>
+        <button mat-icon-button (click)="closePopup()" aria-label="Close" style="color: #666;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <!-- Chart Body -->
+    <div style="width: 100%; height: 247px;" id="ServiceThroughputTimeValue"></div>
+</div>
+
+<div *ngIf="showFailurePopup" #popupContainerForFailureRate
+    [ngStyle]="{ position: 'fixed', top: popupSrY + 'px', left: popupSrX + 'px', width: '320px', height: '300px', zIndex: '1050' }"
+    class="mat-elevation-z8 rounded p-2"
+    style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-1 mb-1">
+        <div style="font-weight: 600; font-family: sans-serif; color: #9b59b6;">
+            Failure Rate (%)
+        </div>
+        <button mat-icon-button (click)="closeFailureRatePopup()" aria-label="Close" style="color: #666;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <!-- Chart Body -->
+    <div style="width: 100%; height: 247px;" id="FailureRateTimeValue"></div>
+</div>
+
+<div *ngIf="showLatencyPopup" #popupContainerForLatency
+    [ngStyle]="{ position: 'fixed', top: popupLatencyY + 'px', left: popupLatencyX + 'px', width: '320px', height: '300px', zIndex: '1050' }"
+    class="mat-elevation-z8 rounded p-2"
+    style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-1 mb-1">
+        <div style="font-weight: 600; font-family: sans-serif; color: #e67e22;">
+            Latency (ms)
+        </div>
+        <button mat-icon-button (click)="closeLatencyPopup()" aria-label="Close" style="color: #666;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <!-- Chart Body -->
+    <div style="width: 100%; height: 247px;" id="serviceAverageResponseTime"></div>
+</div>
+
+<div *ngIf="showApdexPopup" #popupContainerForApdex
+    [ngStyle]="{ position: 'fixed', top: popupApdexY + 'px', left: popupApdexX + 'px', width: '320px', height: '300px', zIndex: '1050' }"
+    class="mat-elevation-z8 rounded p-2"
+    style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center pb-1 mb-1">
+        <div style="font-weight: 600; font-family: sans-serif; color: #f39c12;">
+            Apdex
+        </div>
+        <button mat-icon-button (click)="closeApdexPopup()" aria-label="Close" style="color: #666;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <!-- Chart Body -->
+    <div style="width: 100%; height: 247px;" id="serviceApdexTimeValue"></div>
+</div>
+
+<!--Filter Modal-->
+<div *ngIf="showColumnModal" style="position: fixed; inset: 0; z-index: 2000;" (click)="showColumnModal = false">
+    <div #columnModal [ngStyle]="{ position: 'absolute', top: modalY + 'px', left: modalX + 'px' }"
+        class="mrum-filter-popup" style="width: 250px; background: white; padding: 20px;" (click)="$event.stopPropagation()">
+        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 16px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin: 0; color: #2c3e50;">Select Columns</h3>
+            <i class="bi bi-dash-square" title="Deselect All"
+                style="font-size: 14px; cursor: pointer; color: #888; transition: color 0.2s;" 
+                onmouseover="this.style.color='#dc3545'" onmouseout="this.style.color='#888'"
+                (click)="deselectAllColumns()"></i>
+        </div>
+        <div style="max-height: 250px; overflow-y: auto;">
+            <div *ngFor="let col of availableColumns" style="display: flex; align-items: center; margin-bottom: 12px;">
+                <input type="checkbox" [checked]="selectedColumnFilters.includes(col.key)"
+                    (change)="toggleColumnSelection(col.key)" [id]="'col-' + col.key" style="margin: 0; cursor: pointer; width: 14px; height: 14px;" />
+                <label [for]="'col-' + col.key" style="margin-left: 10px; font-size: 13px; color: #333; cursor: pointer; margin-bottom: 0;">{{ col.label }}</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Filter2 Modal-->
+<div *ngIf="showValueFilterModal" style="position: fixed; inset: 0; z-index: 2000;" (click)="showValueFilterModal = false">
+    <div class="mrum-filter-popup" [ngStyle]="{ position: 'absolute', top: filterModalY + 'px', left: filterModalX + 'px' }" 
+        style="width: 260px; background: white; padding: 20px;" (click)="$event.stopPropagation()">
+        <div style="font-size: 14px; font-weight: 600; color: #2c3e50; margin-bottom: 16px;">Filter by {{ getCurrentFilterLabel() }}</div>
+        
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="form-control mb-3"
+            style="font-size: 13px; padding: 6px 10px; border-radius: 4px; border: 1px solid #ddd;" />
+        
+        <div style="max-height: 200px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
+            <div *ngFor="let val of filteredColumnValues" style="display: flex; align-items: center; margin-bottom: 12px;">
+                <input type="checkbox" [id]="'val-' + val"
+                    [checked]="valueFilterMap[currentFilterColumn!] && valueFilterMap[currentFilterColumn!].includes(val)"
+                    (change)="toggleValueSelection(val)" style="margin: 0; cursor: pointer; width: 14px; height: 14px;" />
+                <label [for]="'val-' + val" style="margin-left: 10px; font-size: 13px; color: #333; cursor: pointer; margin-bottom: 0;">{{ val }}</label>
+            </div>
+            <div *ngIf="filteredColumnValues.length === 0" style="padding: 12px; text-align: center; color: #888; font-size: 12px;">
+                No matching values
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-2">
+            <button class="btn btn-outline-secondary btn-sm"
+                style="font-size: 12px; padding: 4px 12px;"
+                (click)="showValueFilterModal = false">Close</button>
+            <button class="btn btn-primary btn-sm"
+                style="font-size: 12px; padding: 4px 12px; background-color: #0066cc; border: none; color: white;; --card-bg: #0066cc;"
+                (click)="applyValueFilters(); showValueFilterModal = false">Apply</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,285 @@
+<div class="role-management-container">
+    <div class="header-row">
+        <div class="title-section">
+            <h2>Role Management</h2>
+            <p>Manage user roles, permissions, and product access across the platform.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="search-container">
+                <i class="ri-search-line"></i>
+                <input type="text" appSanitizeInput [(ngModel)]="searchText" (ngModelChange)="search()" placeholder="Search roles..." />
+            </div>
+            <button class="create-btn" (click)="navigateToCreate()" [disabled]="!canCreate">
+                <i class="ri-add-line"></i> Create New Role
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="role-table">
+            <thead>
+                <tr>
+                    <th>S.NO</th>
+                    <th (click)="sortBy('roleName')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            ROLE NAME
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'roleName'"></i>
+                        </div>
+                    </th>
+                    <th (click)="sortBy('description')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            DESCRIPTION
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'description'"></i>
+                        </div>
+                    </th>
+                    <th (click)="sortBy('createdBy')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            CREATED BY
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'createdBy'"></i>
+                        </div>
+                    </th>
+                    <th (click)="sortBy('createdOn')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            CREATED ON
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'createdOn'"></i>
+                        </div>
+                    </th>
+                    <th (click)="sortBy('updatedBy')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            UPDATED BY
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'updatedBy'"></i>
+                        </div>
+                    </th>
+                    <th (click)="sortBy('updatedOn')" class="cursor-pointer group">
+                        <div class="flex items-center gap-2">
+                            UPDATED ON
+                            <i class="ri-expand-up-down-line transition-all"
+                                [class.text-blue-600]="sortparam === 'updatedOn'"></i>
+                        </div>
+                    </th>
+
+                    <th>FEATURES</th>
+                    <th>MONITORING PRODUCTS</th>
+                    <th class="text-center">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let role of paginatedRoles; let i = index">
+                    <td class="text-center">{{ (p - 1) * itemsPerPage + i + 1 }}</td>
+                    <td class="fw-bold">{{ role.roleName }}</td>
+                    <td class="description-cell">{{ role.description }}</td>
+                    <td>{{ role.createdBy }}</td>
+                    <td>{{ role.createdOn }}</td>
+                    <td>{{ role.updatedBy }}</td>
+                    <td>{{ role.updatedOn }}</td>
+                    <td><button type="button" class="view-link"
+                            style="background:none;border:none;padding:0;font:inherit;"
+                            (click)="openFeaturesModal(role)">View</button></td>
+                    <td><span class="view-link" (click)="openProductsModal(role)">View</span></td>
+                    <td class="text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button class="action-btn edit-btn" title="Edit" (click)="editRole(role)" [disabled]="!canEdit">
+                                <i class="ri-pencil-line"></i>
+                            </button>
+                            <button class="action-btn delete-btn" title="Delete" (click)="deleteRole(role)" [disabled]="!canDelete">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- No Data Found -->
+                <tr *ngIf="paginatedRoles.length === 0" class="border-b border-slate-200 dark:border-slate-800">
+                    <td colspan="10" class="py-12 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div
+                                class="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-800">
+                                <i class="ri-search-line text-3xl"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm font-bold text-slate-600 dark:text-slate-300">No roles found</p>
+                                <p class="text-xs text-slate-400">We couldn't find any roles matching your search
+                                    criteria.</p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-info">
+        <div class="flex items-center gap-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Showing <span class="text-slate-900 dark:text-slate-200 font-bold">{{(p - 1) * itemsPerPage + 1}}</span>
+                to
+                <span class="text-slate-900 dark:text-slate-200 font-bold">{{Math.min(p * itemsPerPage,
+                    filteredRoles.length
+                    || 0)}}</span> of
+                <span class="text-slate-900 dark:text-slate-200 font-bold">{{filteredRoles.length || 0}}</span> results
+            </div>
+
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-slate-500 font-medium">Rows per page:</label>
+                <input type="number" appSanitizeInput [(ngModel)]="itemsPerPage" (change)="onPageSizeChange(itemsPerPage)" min="1"
+                    class="w-16 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs py-1.5 px-2 outline-none focus:ring-2 focus:ring-primary/20 text-center" />
+            </div>
+        </div>
+
+        <div class="pagination-controls">
+            <button (click)="prevPage()" [disabled]="p === 1"
+                class="page-btn w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                <i class="ri-arrow-left-s-line"></i>
+            </button>
+
+            <ng-container *ngFor="let page of visiblePages">
+                <button (click)="goToPage(page)" [class.active-page]="p === page"
+                    class="page-btn w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:border-primary transition-all">
+                    {{page}}
+                </button>
+            </ng-container>
+
+            <button (click)="nextPage()" [disabled]="p === totalPages"
+                class="page-btn w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                <i class="ri-arrow-right-s-line"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Monitoring Products Modal -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-container">
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <div class="flex items-center gap-3">
+                <div class="header-icon-box">
+                    <i class="ri-bar-chart-grouped-line"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">Monitoring Products - {{ selectedRole?.roleName }}</h3>
+            </div>
+            <button class="close-icon-btn" (click)="closeProductsModal()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <div class="flex items-center justify-between mb-4">
+                <p class="modal-description m-0">
+                    Viewing associated monitoring products and infrastructure details for the selected role.
+                </p>
+                <div class="search-container modal-search">
+                    <i class="ri-search-line"></i>
+                    <input type="text" appSanitizeInput [(ngModel)]="modalSearchText" (ngModelChange)="searchModalProducts()" placeholder="Search in modal..." />
+                </div>
+            </div>
+
+            <div class="modal-table-container">
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>SR. NO.</th>
+                            <th class="text-left">APPLICATION</th>
+                            <th *ngIf="currentTool.toUpperCase() !== 'APM'">Host Name</th>
+                            <th *ngIf="currentTool.toUpperCase() !== 'APM'">Sub Feature</th>
+                            <th *ngIf="currentTool.toUpperCase() === 'APM'">TECHNOLOGY TYPE</th>
+                            <th *ngIf="currentTool.toUpperCase() === 'APM'">IP ADDRESS</th>
+                            <th [class.text-left]="currentTool.toUpperCase() === 'APM'">{{ currentTool.toUpperCase() === 'APM' ? 'APPLICATION TYPE' : 'CATEGORY' }}</th>
+                            <th *ngIf="currentTool.toLowerCase() === 'orc'">Zone</th>
+                            <th *ngIf="currentTool.toLowerCase() === 'orc'">Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let product of filteredProductsData; let i = index">
+                            <td class="text-center text-slate-500">{{ i + 1 < 10 ? '0' + (i + 1) : (i + 1) }}</td>
+                            <td class="font-semibold text-slate-900 text-left">{{ product.displayName }}</td>
+                            
+                            <!-- ORC / Default Columns -->
+                            <td *ngIf="currentTool.toUpperCase() !== 'APM'" class="text-slate-600">
+                                {{ getResolvedHostName(product.appId, product.hostName) }}
+                            </td>
+                            <td *ngIf="currentTool.toUpperCase() !== 'APM'" class="text-slate-600">
+                                {{ product.subFeature || '-' }}
+                            </td>
+
+                            <!-- APM Specific Columns -->
+                            <td *ngIf="currentTool.toUpperCase() === 'APM'" class="text-slate-600">
+                                {{ product.technologyType || product.techType || '-' }}
+                            </td>
+                            <td *ngIf="currentTool.toUpperCase() === 'APM'" class="text-slate-600">
+                                {{ product.ipAddress || product.ipaddress || product.ipRange || '-' }}
+                            </td>
+
+                            <td class="text-slate-600 uppercase text-xs font-semibold">{{ product.category }}</td>
+                            
+                            <td *ngIf="currentTool.toLowerCase() === 'orc'" class="text-slate-600 text-xs text-left">
+                                {{ getZoneName(product.zoneId) }}
+                            </td>
+                            <td *ngIf="currentTool.toLowerCase() === 'orc'" class="text-slate-600 text-xs text-left">
+                                {{ getTeamName(product.zoneId, product.teamId) }}
+                            </td>
+                        </tr>
+                        <!-- Modal No Results Found -->
+                        <tr *ngIf="filteredProductsData.length === 0">
+                            <td [attr.colspan]="currentTool.toLowerCase() === 'orc' ? 7 : (currentTool.toUpperCase() === 'APM' ? 5 : 5)" class="py-10 text-center">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="ri-search-line text-2xl text-slate-300"></i>
+                                    <p class="text-xs text-slate-400 italic">No matching records found in this modal.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+            <button class="footer-close-btn" (click)="closeProductsModal()">
+                Close <i class="ri-close-line"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Features List Modal -->
+<div class="feature-modal-overlay" *ngIf="isFeaturesModalOpen" (click)="closeFeaturesModal()">
+    <div class="feature-modal-card" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="feature-modal-header">
+            <h2 class="feature-modal-title">Feature List</h2>
+            <div class="role-badge">
+                <span class="role-label">ROLE NAME:</span>
+                <span class="role-value">{{ selectedFeatureRole?.roleName | uppercase }}</span>
+            </div>
+        </div>
+
+        <!-- List Header -->
+        <div class="feature-list-header">
+            <div class="col-sr">SR. NO.</div>
+            <div class="col-name">SUB-FEATURE NAME</div>
+        </div>
+
+        <!-- Scrollable List -->
+        <div class="feature-list-body">
+            <div class="feature-row" *ngFor="let feature of featuresList; let i = index">
+                <div class="col-sr-val">0{{ i + 1 }}</div>
+                <div class="col-name-val">
+                    <i [class]="feature.icon" class="feature-icon"></i>
+                    <span class="feature-text">{{ feature.name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="feature-modal-footer">
+            <button class="btn-close-modal" (click)="closeFeaturesModal()">Close</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1619 @@
+<main>
+    <!-- breadcrumb part -->
+
+    <nav aria-label="breadcrumb" class="mx-1 mt-1" style=" font-size: small;">
+        <ol class="breadcrumb" style="padding:2px 0px 4px 8px;margin-bottom: 0px;">
+            <li class="breadcrumb-item"><a routerLink="/service-page">Apmosys Apm</a></li>
+            <li class="breadcrumb-item " aria-current="page"><a
+                    [routerLink]="['/service-page', 'general-service']">{{selectedServiceId}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{selectedServiceInstance}}</li>
+        </ol>
+    </nav>
+    <!-- Body -->
+    <div class="">
+        <div class="row mx-0" style="width: 99.5%; max-height: 87vh; overflow-x: hidden;">
+            <div class="w-100 h-8 ">
+                <ul class="nav nav-tabs" id="instance-nav" style=" margin-left: -1%; width: 1270px; font-size: small;">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                            (click)="loadData('overview')">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#traces"
+                            (click)="loadData('traces')">Traces</a>
+
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#log"
+                            (click)="loadData('log')">Log</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#source"
+                            (click)="loadData('jvm')">Source</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Tab Body -->
+            <div class="main-card-body p-0">
+                <div class="tab-content rounded-3 rounded">
+                    <!-- Overview Tab -->
+
+                    <div class="tab-pane fade in active show" id="overview" style="background: #F8FAFC;">
+
+                        <!-- TOP BAR: Logo + KPI strip -->
+                        <div class="ov2-top-bar">
+                            <div class="ov2-logo-wrap">
+                                <img *ngIf="logoPath" [src]="'assets/images/' + (logoPath)" />
+                            </div>
+                            <div class="ov2-kpi-strip">
+
+                                <div class="ov2-kpi-card" data-testid="success-rate-metric"
+                                    [ngStyle]="{'border': (getThresholdDisplay('service_instance_sla', kpis.Availablity).color === 'red' || getThresholdDisplay('service_instance_sla', kpis.Availablity).color === 'orange') ? '1px solid ' + getThresholdDisplay('service_instance_sla', kpis.Availablity).color : '' }">
+                                    <div class="ov2-kpi-label">
+                                        <div>
+                                            Availability
+                                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                                                matButton="elevated"
+                                                title="<p>The percentage of requests successfully handled within the agreed SLA.</p>"></i>
+                                        </div>
+
+                                        <span class="ov2-threshold-badge"
+                                            *ngIf="getThresholdDisplay('service_instance_sla', kpis.Availablity)?.value"
+                                            [ngStyle]="{'color': getThresholdDisplay('service_instance_sla', kpis.Availablity).color == 'red' ? 'red' : 'orange'}">
+                                            {{ getThresholdDisplay('service_instance_sla', kpis.Availablity).value }}
+                                        </span>
+                                    </div>
+                                    <div class="ov2-kpi-value"
+                                        [ngStyle]="{'color': getThresholdDisplay('service_instance_sla', kpis.Availablity).color}">
+                                        {{ kpis.Availablity }}<span class="ov2-kpi-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <div class="ov2-kpi-card" data-testid="latency-metric"
+                                    [ngStyle]="{'border': (getThresholdDisplay('service_instance_resp_time', kpis.latency).color === 'red' || getThresholdDisplay('service_instance_resp_time', kpis.latency).color === 'orange') ? '1px solid ' + getThresholdDisplay('service_instance_resp_time', kpis.latency).color : '' }">
+                                    <div class="ov2-kpi-label">
+                                        <div>
+                                            Latency
+                                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                                                matButton="elevated"
+                                                title="<p>The time taken for the service instance to respond to requests.</p>"></i>
+
+                                        </div>
+
+                                        <span class="ov2-threshold-badge"
+                                            *ngIf="getThresholdDisplay('service_instance_resp_time', kpis.latency)?.value"
+                                            [ngStyle]="{'color': getThresholdDisplay('service_instance_resp_time', kpis.latency).color == 'red' ? 'red' : 'orange'}">
+                                            {{ getThresholdDisplay('service_instance_resp_time', kpis.latency).value }}
+                                        </span>
+                                    </div>
+                                    <div class="ov2-kpi-value"
+                                        [ngStyle]="{'color': getThresholdDisplay('service_instance_resp_time', kpis.latency).color}">
+                                        {{ kpis.latency }}<span class="ov2-kpi-unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="ov2-kpi-card" data-testid="load-metric"
+                                    [ngStyle]="{'border': (getThresholdDisplay('service_instance_cpm', kpis.load).color === 'red' || getThresholdDisplay('service_instance_cpm', kpis.load).color === 'orange') ? '1px solid ' + getThresholdDisplay('service_instance_cpm', kpis.load).color : '' }">
+                                    <div class="ov2-kpi-label">
+                                        <div>
+                                            Load
+                                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                                                matButton="elevated"
+                                                title="<p>The number of requests or transactions being handled by this service instance per minute.</p>"></i>
+
+                                        </div>
+
+                                        <span class="ov2-threshold-badge"
+                                            *ngIf="getThresholdDisplay('service_instance_cpm', kpis.load)?.value"
+                                            [ngStyle]="{'color': getThresholdDisplay('service_instance_cpm', kpis.load).color == 'red' ? 'red' : 'orange'}">
+                                            {{ getThresholdDisplay('service_instance_cpm', kpis.load).value }}
+                                        </span>
+                                    </div>
+                                    <div class="ov2-kpi-value"
+                                        [ngStyle]="{'color': getThresholdDisplay('service_instance_cpm', kpis.load).color}">
+                                        {{ kpis.load }}<span class="ov2-kpi-unit">call/min</span>
+                                    </div>
+                                </div>
+
+                                <div class="ov2-kpi-card" data-testid="total-hits">
+                                    <div class="ov2-kpi-label">
+                                        <div>
+                                            Total Hits
+                                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                                                matButton="elevated"
+                                                title="<p>The total number of requests received by this service instance.</p>"></i>
+                                        </div>
+                                        <span></span>
+
+                                    </div>
+                                    <div class="ov2-kpi-value" style="color: var(--primary-color);">
+                                        {{ kpis.hits }}<span class="ov2-kpi-unit">reqs</span>
+                                    </div>
+                                </div>
+
+                                <div class="ov2-kpi-card" data-testid="errors"
+                                    [style.border]="(kpis.error === 0 && kpis.ignoredError === 0) ? '' : '1px solid red'" style="cursor:pointer;"
+                                    (click)="navigateToTraces($event)">
+                                    <div class="ov2-kpi-label">
+                                        <div>
+                                            Errors Total
+                                            <i class="fa-solid fa-circle-info ms-1 gradiantIcon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                                                matButton="elevated"
+                                                title="<p>Total number of errors observed for this service instance</p>"></i>
+                                        </div>
+                                        <span></span>
+
+                                    </div>
+                                    <div class="ov2-kpi-value d-flex align-items-center justify-content-center gap-1" style="height: 100%;">
+                                        <span [style.color]="kpis.error === 0 ? '#16a34a' : '#ef4444'"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="HTTP Response failures">
+                                            {{ kpis.error }}
+                                        </span>
+                                        <span class="text-secondary fw-normal">|</span>
+                                        <span [style.color]="kpis.ignoredError === 0 ? '#16a34a' : '#ef4444'"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Internal Processing failures">
+                                            {{ kpis.ignoredError }}
+                                        </span>
+                                        <span class="ov2-kpi-unit">errs</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- PERF SECTION -->
+                        <div class="ov2-section mt-2 ps-2 pe-2">
+                            <h3 class="ov2-section-heading">Performance</h3>
+
+                            <div class="ov2-cards-row">
+
+                                <!-- Availability — full width -->
+                                <div class="ov2-chart-card ov2-full-width">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Availability %</span>
+                                        <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                            title="<p>The percentage of time this service instance was available during the selected period.</p>"></i>
+                                    </div>
+                                    <div class="ov2-avail-body">
+                                        <div class="ov2-avail-col">
+                                            <div class="ov2-avail-meta">
+                                                <h6 class="ov2-avail-period">Last 5 days</h6>
+                                                <span class="ov2-avail-pct">{{ uptimeData['5_day']?.uptime_percentage ||
+                                                    0 }}%</span>
+                                                <p class="ov2-avail-down">Downtime: {{
+                                                    uptimeData['5_day']?.downtime_duration_minutes || 0 }} mins</p>
+                                            </div>
+                                            <highcharts-chart [Highcharts]="Highcharts"
+                                                [options]="AppAvailHighcharts5Day"
+                                                style="width: 100%; display: block;"></highcharts-chart>
+                                        </div>
+                                        <div class="ov2-avail-col">
+                                            <div class="ov2-avail-meta">
+                                                <h6 class="ov2-avail-period">Last 10 days</h6>
+                                                <span class="ov2-avail-pct">{{ uptimeData['10_day']?.uptime_percentage
+                                                    || 0 }}%</span>
+                                                <p class="ov2-avail-down">Downtime: {{
+                                                    uptimeData['10_day']?.downtime_duration_minutes || 0 }} mins</p>
+                                            </div>
+                                            <highcharts-chart [Highcharts]="Highcharts"
+                                                [options]="AppAvailHighcharts10Day"
+                                                style="width: 100%; display: block;"></highcharts-chart>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Instance Load -->
+                                <div class="ov2-chart-card ov2-one-third">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Instance Load (calls/min)</span>
+                                        <div class="ov2-chart-controls">
+                                            <select [(ngModel)]="chart_criteria" class="ov2-select">
+                                                <option value="avg" selected>Average</option>
+                                                <option value="threshold">Threshold</option>
+                                            </select>
+                                            <span *ngIf="chart_criteria=='avg'" class="ov2-badge-avg">{{ kpis.load
+                                                }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-warn">{{
+                                                thresholds?.["service_instance_cpm"]?.warningValue }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-crit">{{
+                                                thresholds?.["service_instance_cpm"]?.criticalValue }}</span>
+                                            <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                                title="<p>Number of requests this service instance handled per minute.</p>"></i>
+                                        </div>
+                                    </div>
+                                    <div id="ServiceInstanceLoadTimevalues" class="ov2-graph-area"></div>
+                                </div>
+
+                                <!-- Instance Success Rate -->
+                                <div class="ov2-chart-card ov2-one-third">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Instance Success Rate (%)</span>
+                                        <div class="ov2-chart-controls">
+                                            <select [(ngModel)]="chart_criteria" class="ov2-select">
+                                                <option value="avg" selected>Average</option>
+                                                <option value="threshold">Threshold</option>
+                                            </select>
+                                            <span *ngIf="chart_criteria=='avg'" class="ov2-badge-avg">{{
+                                                kpis.Availablity }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-warn">{{
+                                                thresholds?.["service_instance_sla"]?.warningValue }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-crit">{{
+                                                thresholds?.["service_instance_sla"]?.criticalValue }}</span>
+                                            <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                                title="<p>Percentage of requests successfully completed by this service instance.</p>"></i>
+                                        </div>
+                                    </div>
+                                    <div id="ServiceInstanceSuccessRateTimevalues" class="ov2-graph-area"></div>
+                                    <app-instance-trace-modal></app-instance-trace-modal>
+                                </div>
+
+                                <!-- Instance Latency -->
+                                <div class="ov2-chart-card ov2-one-third">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Instance Latency (ms)</span>
+                                        <div class="ov2-chart-controls">
+                                            <select [(ngModel)]="chart_criteria" class="ov2-select">
+                                                <option value="avg" selected>Average</option>
+                                                <option value="threshold">Threshold</option>
+                                            </select>
+                                            <span *ngIf="chart_criteria=='avg'" class="ov2-badge-avg">{{ kpis.latency
+                                                }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-warn">{{
+                                                thresholds?.["service_instance_resp_time"]?.warningValue }}</span>
+                                            <span *ngIf="chart_criteria=='threshold'" class="ov2-badge-crit">{{
+                                                thresholds?.["service_instance_resp_time"]?.criticalValue }}</span>
+                                            <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                                title="<p>Time taken by this service instance to respond to requests.</p>"></i>
+                                        </div>
+                                    </div>
+                                    <div id="ServiceInstanceLatencyTimevalues" class="ov2-graph-area"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- DB SECTION -->
+                        <div class="ov2-section mt-2 ps-2 pe-2">
+                            <h3 class="ov2-section-heading">DB</h3>
+
+                            <div class="ov2-cards-row">
+
+                                <!-- Database Connection Pool -->
+                                <div class="ov2-chart-card ov2-half-width">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Database Connection Pool</span>
+                                        <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                            title="<p>The number of active database connections used by this service instance.</p>"></i>
+                                    </div>
+                                    <div id="ServiceInstanceDatabaseConnectionPool" class="ov2-graph-area"></div>
+                                </div>
+
+                                <!-- Thread Pool -->
+                                <div class="ov2-chart-card ov2-half-width">
+                                    <div class="ov2-chart-header">
+                                        <span class="ov2-chart-title">Thread Pool</span>
+                                        <i class="fa-solid fa-circle-info gradiantIcon" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                                            title="<p>Number of threads actively processing requests in this service instance.</p>"></i>
+                                    </div>
+                                    <div id="ServiceInstanceThreadPool" class="ov2-graph-area"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Trace -->
+                    <div class="tab-pane fade px-2 py-3" id="traces">
+                        <div class="m-0">
+
+                            <!-- FILTER BAR -->
+                            <div class="trc-filter-bar">
+
+                                <div class="trc-criteria-wrap" style="position: relative;">
+                                    <div #criteriaCard class="trc-criteria-btn" (click)="toggleDropdown()" tabindex="0"
+                                        [style.pointerEvents]="allCriteriaSelected ? 'none' : 'auto'"
+                                        [style.opacity]="allCriteriaSelected ? '0.5' : '1'">
+                                        <i class="fa-solid fa-plus trc-criteria-btn__icon"></i>
+                                        Criteria
+                                        <i class="fas fa-caret-down trc-criteria-btn__caret"></i>
+                                    </div>
+
+                                    <ul *ngIf="dropdownOpen && !allCriteriaSelected" #criteriaDropdown
+                                        class="trc-dropdown">
+                                        <li *ngFor="let c of availableCriteria" (click)="selectCriteria(c.key)"
+                                            class="trc-dropdown__item">
+                                            {{ c.label }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="trc-filter-divider"></div>
+
+                                <div class="trc-filters-scroll">
+                                    <div class="trc-filter-pill" *ngFor="let c of criteriaList"
+                                        [hidden]="!shownCriteria[c.key]">
+                                        <label class="trc-filter-pill__label">{{ c.label }}</label>
+
+                                        <ng-container [ngSwitch]="c.key">
+
+                                            <div *ngSwitchCase="'endpoint'" style="position:relative;">
+                                                <select *ngIf="endpointTrace !== 'custom'"
+                                                    (ngModelChange)="autoSearch()" class="trc-filter-pill__input"
+                                                    [(ngModel)]="endpointTrace"
+                                                    (change)="endpointTrace === 'custom' ? null : null">
+                                                    <option value="custom" style="background-color:#f4bf69;">Text
+                                                    </option>
+                                                    <option *ngFor="let e of endpoints" [value]="e.value">{{ e.name }}
+                                                    </option>
+                                                </select>
+                                                <div *ngIf="endpointTrace === 'custom'" style="position:relative;">
+                                                    <input type="text" [(ngModel)]="textEndpoint"
+                                                        (ngModelChange)="autoSearch()" class="trc-filter-pill__input"
+                                                        placeholder="Enter custom endpoint"
+                                                        style="padding-right:22px;" />
+                                                    <i class="fas fa-times trc-filter-pill__clear"
+                                                        (click)="cancelCustomEndpoint()"></i>
+                                                </div>
+                                            </div>
+
+                                            <select *ngSwitchCase="'status'" [(ngModel)]="status"
+                                                (ngModelChange)="autoSearch()" class="trc-filter-pill__input"
+                                                style="width:100px;">
+                                                <option value="">All</option>
+                                                <option value="success">Success</option>
+                                                <option value="error">Error</option>
+                                            </select>
+
+                                            <ng-container *ngSwitchCase="'statusCode'">
+                                                <select [(ngModel)]="statusCode" (ngModelChange)="autoSearch()"
+                                                    class="trc-filter-pill__input" style="width:100px;">
+                                                    <option value="All">All</option>
+                                                    <option value="1xx">1xx</option>
+                                                    <option value="2xx">2xx</option>
+                                                    <option value="3xx">3xx</option>
+                                                    <option value="4xx">4xx</option>
+                                                    <option value="5xx">5xx</option>
+                                                    <option value="text">text</option>
+                                                </select>
+                                                <input *ngIf="statusCode === 'text'" type="text" [(ngModel)]="customStatusCodeTrace" (ngModelChange)="autoSearch(true)"
+                                                    class="trc-filter-pill__input" style="width:80px; margin-left: 6px;" placeholder="Code..." autocomplete="off" />
+                                            </ng-container>
+
+                                            <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceID"
+                                                class="trc-filter-pill__input" style="width:150px;"
+                                                (ngModelChange)="autoSearch()" autocomplete="off" />
+
+                                            <input *ngSwitchCase="'minDuration'" type="number" [(ngModel)]="minDuration"
+                                                class="trc-filter-pill__input" style="width:100px;"
+                                                (ngModelChange)="autoSearch()" autocomplete="off" />
+
+                                            <input *ngSwitchCase="'maxDuration'" type="number" [(ngModel)]="maxDuration"
+                                                class="trc-filter-pill__input" style="width:100px;"
+                                                (ngModelChange)="autoSearch()" autocomplete="off" />
+
+                                        </ng-container>
+
+                                        <i class="fas fa-times trc-filter-pill__remove"
+                                            (click)="removeCriteria(c.key)"></i>
+                                    </div>
+
+                                    <!-- Search button -->
+                                    <!-- <div class="trc-filter-divider"></div>
+                                    <i (click)="search()" class="fas fa-search"
+                                        style="cursor:pointer; font-size:12px; color:#64748b;"></i> -->
+                                </div>
+
+                            </div>
+
+
+                            <!-- TRACES TABLE -->
+                            <div class="trc-details">
+
+                                <div class="trc-details__header">
+                                    <span class="trc-details__title">Traces</span>
+                                    <span class="trc-details__count" *ngIf="totalHitsTrace">
+                                        {{ totalHitsTrace }} results
+                                    </span>
+                                </div>
+
+                                <div class="trc-table-scroll">
+                                    <table class="trc-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:5%" (click)="toggleSort('isError')">
+                                                    Status
+                                                    <i class="fa" [ngClass]="sortParameter === 'isError'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                                </th>
+                                                <th style="width:20%">
+                                                    Endpoint <span class="trc-th-count">({{ totalHitsTrace }})</span>
+                                                </th>
+                                                <th style="width:10%">
+                                                    Status Code
+                                                </th>
+                                                <th style="width:12%" (click)="toggleSort('duration')">
+                                                    Duration
+                                                    <i class="fa" [ngClass]="sortParameter === 'duration'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                                </th>
+                                                <th style="width:18%" (click)="toggleSort('start_time')">
+                                                    Start Time
+                                                    <i class="fa" [ngClass]="sortParameter === 'start_time'
+                                    ? (orderParameter === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                                    : 'fa-sort'"></i>
+                                                </th>
+                                                <th style="width:35%">Trace ID</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr class="trc-tr" *ngFor="let item of traceNames"
+                                                (click)="selectItem(item)"
+                                                [ngClass]="{'trc-tr--active': selectedTraceId?.trim() === item.traceId.trim()}"
+                                                style="cursor: pointer;">
+
+                                                <td style="width:5%">
+                                                    <div class="trc-status-bar"
+                                                        [ngClass]="getStatusColorClass(item.isError) === 'bg-danger' ? 'trc-status-bar--err' : 'trc-status-bar--ok'">
+                                                    </div>
+                                                </td>
+
+                                                <td style="width:20%" class="text-ellipsis"
+                                                    [ngClass]="item.isError ? 'trc-td--err' : 'trc-td--link'"
+                                                    [title]="decodeBase64(item.endpointId)">
+                                                    {{ decodeBase64(item.endpointId) }}
+                                                </td>
+
+                                                <td style="width:10%">
+                                                    <span class="trc-sc-badge" 
+                                                        [ngClass]="{
+                                                            'trc-sc-badge--1xx': item.httpStatusCode && item.httpStatusCode.startsWith('1'),
+                                                            'trc-sc-badge--2xx': item.httpStatusCode && item.httpStatusCode.startsWith('2'),
+                                                            'trc-sc-badge--3xx': item.httpStatusCode && item.httpStatusCode.startsWith('3'),
+                                                            'trc-sc-badge--4xx': item.httpStatusCode && item.httpStatusCode.startsWith('4'),
+                                                            'trc-sc-badge--5xx': item.httpStatusCode && item.httpStatusCode.startsWith('5')
+                                                        }">
+                                                        {{ item.httpStatusCode || 'N/A' }}
+                                                    </span>
+                                                </td>
+
+                                                <td style="width:12%">
+                                                    <span class="trc-lat-pill"
+                                                        [class.trc-lat-pill--warn]="item.latency > 200">
+                                                        {{ item.latency }} ms
+                                                    </span>
+                                                </td>
+
+                                                <td style="width:18%" class="trc-td--muted">
+                                                    {{ formatTimeBucket(item.timeBucket) }}
+                                                </td>
+
+                                                <td style="width:35%" class="trc-td--mono trc-td--muted">
+                                                    {{ item.traceId }}
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="trc-empty trc-empty--table" *ngIf="traceNames.length === 0">
+                                        No Data Available
+                                    </div>
+                                </div>
+
+                                <div class="trc-pager" *ngIf="traceNames.length !== 0">
+                                    <span class="trc-pager__info">{{ traceItemRange }}</span>
+                                    <div class="trc-pager__controls">
+                                        <button class="trc-pager__btn" [disabled]="currentPageTrace === 1"
+                                            (click)="previousTracePage()">
+                                            <i class="fa-solid fa-angle-left"></i>
+                                        </button>
+                                        <input type="number" class="trc-pager__input" [value]="currentPageTrace"
+                                            (keydown.enter)="goToTracePage(+inputTracePage.value)" #inputTracePage
+                                            min="1" [max]="totalPagesTrace" />
+                                        <span class="trc-pager__of">of {{ totalPagesTrace }}</span>
+                                        <button class="trc-pager__btn" [disabled]="currentPageTrace === totalPagesTrace"
+                                            (click)="nextTracePage()">
+                                            <i class="fa-solid fa-angle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <!-- TRACE DETAILS -->
+                            <div class="row mt-2" #traceDetailsSection>
+                                <div class="col">
+
+                                    <div class="trc-view-bar">
+                                        <div class="trc-view-bar__left"></div>
+                                        <div class="trc-view-bar__right">
+
+                                            <div class="trc-view-switcher">
+                                                <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="View Table"
+                                                    [class.trc-view-btn--active]="selectedView === 'table'"
+                                                    (click)="changeView('table')" class="fa fa-table trc-view-btn">
+                                                </i>
+
+                                                <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="View List"
+                                                    [class.trc-view-btn--active]="selectedView === 'list'"
+                                                    (click)="changeView('list')" class="fas fa-list trc-view-btn">
+                                                </i>
+
+                                                <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="View Tree"
+                                                    [class.trc-view-btn--active]="selectedView === 'tree'"
+                                                    (click)="changeView('tree')"
+                                                    class="fas fa-network-wired trc-view-btn">
+                                                </i>
+
+                                                <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="View Statistics"
+                                                    [class.trc-view-btn--active]="selectedView === 'stat'"
+                                                    (click)="changeView('stat')" class="fa fa-bar-chart trc-view-btn">
+                                                </i>
+
+                                                <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="View Logs" (click)="openLogTabTraceId(selectedTraceId)"
+                                                    class="fa-solid fa-file-lines trc-view-btn">
+                                                </i>
+                                            </div>
+
+                                            <div class="trc-id-info">
+                                                <i class="fa-solid fa-circle-info trc-id-info__icon"></i>
+                                                <div class="trc-id-info__popup">
+                                                    <span class="trc-id-info__label">Trace ID</span>
+                                                    <span class="trc-id-info__val">{{ selectedTraceId }}</span>
+                                                    <i class="fa-regular fa-copy trc-id-info__copy"
+                                                        title="Copy Trace Id"
+                                                        (click)="copyTraceId(selectedTraceId, $event)">
+                                                    </i>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="trc-details trc-details--inner">
+                                        <div class="trc-details__header">
+                                            <span class="trc-details__title">Trace Details</span>
+                                        </div>
+                                        <div class="trc-details__body">
+                                            <ng-container *ngIf="selectedView === 'table'">
+                                                <app-table-view [traceMetaData]="traceMetaData"
+                                                    (itemSelected)="onTableRowSelected($event)">
+                                                </app-table-view>
+                                            </ng-container>
+                                            <ng-container *ngIf="selectedView === 'list'">
+                                                <app-list-view [hierarchicalList]="hierarchicalList"
+                                                    (itemSelected)="onListItemSelected($event)">
+                                                </app-list-view>
+                                            </ng-container>
+                                            <ng-container *ngIf="selectedView === 'tree'">
+                                                <div style="height:100%; width:100%;">
+                                                    <app-tree-view [traceData]="traceData"
+                                                        (selectedNode)="openModal($event)">
+                                                    </app-tree-view>
+                                                </div>
+                                            </ng-container>
+                                            <ng-container *ngIf="selectedView === 'stat'">
+                                                <app-stat-view [traceMetaData]="traceMetaData">
+                                                </app-stat-view>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <app-trace-details-modal *ngIf="showModal" [modalData]="modalData"
+                                (closeModal)="closeModal()">
+                            </app-trace-details-modal>
+
+                        </div>
+                    </div>
+
+                    <!-- Log -->
+                    <div class="tab-pane fade" id="log">
+                        <div class="log-root">
+
+                            <!-- ══════════════════════════════════
+             FILTER BAR
+             ══════════════════════════════════ -->
+                            <div class="log-filter-bar">
+
+                                <!-- Criteria trigger button -->
+                                <div class="log-criteria-wrap" style="position: relative;">
+                                    <div #criteriaCard class="log-criteria-btn" (click)="toggleDropdownLogs()"
+                                        tabindex="0" [style.pointerEvents]="allCriteriaSelectedLogs ? 'none' : 'auto'"
+                                        [style.opacity]="allCriteriaSelectedLogs ? '0.5' : '1'">
+                                        <i class="fa-solid fa-plus log-criteria-btn__icon"></i>
+                                        Citeria
+                                        <i class="fas fa-caret-down log-criteria-btn__caret"></i>
+                                    </div>
+
+                                    <!-- Dropdown -->
+                                    <ul *ngIf="dropdownOpenLogs && !allCriteriaSelectedLogs" #criteriaDropdown
+                                        class="log-dropdown">
+                                        <li *ngFor="let c of availableCriteriaLogs" (click)="selectCriteriaLogs(c.key)"
+                                            class="log-dropdown__item">
+                                            {{ c.label }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Divider -->
+                                <div class="log-filter-divider"></div>
+
+                                <!-- Scrollable filter pills -->
+                                <div class="log-filters-scroll">
+                                    <div class="log-filter-pill" *ngFor="let c of criteriaListLogs"
+                                        [hidden]="!shownCriteriaLogs[c.key]">
+                                        <label class="log-filter-pill__label">{{ c.label }}:</label>
+
+                                        <ng-container [ngSwitch]="c.key">
+
+                                            <select *ngSwitchCase="'instance'" [(ngModel)]="instNameLogs"
+                                                class="log-filter-pill__input" style="width:129px;">
+                                                <option *ngFor="let e of instancesLogs" [value]="e.value">{{ e.name }}
+                                                </option>
+                                            </select>
+
+                                            <select *ngSwitchCase="'endpoint'" [(ngModel)]="endpointLogs"
+                                                class="log-filter-pill__input" style="width:129px;">
+                                                <option *ngFor="let e of endpoints" [value]="e.value">{{ e.name }}
+                                                </option>
+                                            </select>
+
+                                            <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDLogs"
+                                                class="log-filter-pill__input" style="width:150px;"
+                                                autocomplete="off" />
+
+                                            <select *ngSwitchCase="'tags'" [(ngModel)]="tags"
+                                                class="log-filter-pill__input" style="width:129px;">
+                                                <option *ngFor="let key of getLogKeys()" [value]="key">{{ key }}
+                                                </option>
+                                            </select>
+
+                                            <input *ngSwitchCase="'incContent'" type="text"
+                                                [(ngModel)]="keywordsOfContent" class="log-filter-pill__input"
+                                                style="width:150px;" autocomplete="off" />
+
+                                            <input *ngSwitchCase="'excContent'" type="text"
+                                                [(ngModel)]="excludingKeywordsOfContent" class="log-filter-pill__input"
+                                                style="width:150px;" autocomplete="off" />
+
+                                        </ng-container>
+
+                                        <i class="fas fa-times log-filter-pill__remove"
+                                            (click)="removeCriteriaLogs(c.key)"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Search trigger -->
+                                <div class="log-filter-divider"></div>
+                                <button class="log-search-btn" (click)="searchLogs()">
+                                    <i class="fas fa-search"></i>
+                                    Search
+                                </button>
+
+                            </div>
+                            <!-- end filter bar -->
+
+
+                            <!-- ══════════════════════════════════
+             LOGS COUNT CHART
+             ══════════════════════════════════ -->
+                            <div class="log-card mb-10">
+                                <div class="log-card__header">
+                                    <span class="log-card__title">Logs Count</span>
+                                </div>
+                                <div class="log-card__body" style="height:33vh; padding:0;">
+                                    <div *ngIf="logsTimeSeriesChart" style="height:100%; width:100%;">
+                                        <highcharts-chart [Highcharts]="Highcharts" [options]="logsTimeSeriesChart"
+                                            [oneToOne]="true" style="height:33vh; width:100%; display:block;">
+                                        </highcharts-chart>
+                                    </div>
+                                    <div *ngIf="!logsTimeSeriesChart" class="log-empty log-empty--tall">
+                                        No Data Available
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- ══════════════════════════════════
+             LOGS DETAILS TABLE
+             ══════════════════════════════════ -->
+                            <div class="log-card">
+
+                                <!-- Header -->
+                                <div class="log-card__header">
+                                    <span class="log-card__title">Logs Details ({{ totalHitsLog }})</span>
+
+                                    <!-- Level filter buttons -->
+                                    <div class="log-level-btns" *ngIf="logStats">
+                                        <ng-container *ngFor="let key of getLogKeys()">
+                                            <button class="log-level-btn"
+                                                [ngClass]="[getBtnColor(key), isSelected(key) ? getSelectedBtnColor(key) : '']"
+                                                (click)="toggleSelection(key)">
+                                                {{ key.toLowerCase() }}&nbsp;:&nbsp;{{ logStats[key] }}
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </div>
+
+                                <!-- Table scroll -->
+                                <div class="log-table-scroll">
+                                    <table class="log-table">
+
+                                        <thead>
+                                            <tr>
+                                                <th style="width:2%"></th>
+                                                <th style="width:12%">Date</th>
+                                                <th style="width:5%" (click)="toggleSortLogs()">
+                                                    Status &nbsp;<i class="fa-solid fa-sort"></i>
+                                                </th>
+                                                <th style="width:60%">Content</th>
+                                                <th style="width:8%">HTTP Method</th>
+                                            </tr>
+                                        </thead>
+
+                                        <!-- Skeleton -->
+                                        <tbody *ngIf="loadingLogs" style="max-height: 48vh; min-height: 26vh;">
+                                            <tr class="log-tr" *ngFor="let i of [].constructor(15)">
+                                                <td style="width:5%">
+                                                    <div class="log-skeleton"></div>
+                                                </td>
+                                                <td style="width:9%">
+                                                    <div class="log-skeleton"></div>
+                                                </td>
+                                                <td style="width:5%">
+                                                    <div class="log-skeleton"></div>
+                                                </td>
+                                                <td style="width:60%">
+                                                    <div class="log-skeleton"></div>
+                                                </td>
+                                                <td style="width:8%">
+                                                    <div class="log-skeleton"></div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                        <!-- Data -->
+                                        <tbody *ngIf="!loadingLogs">
+                                            <ng-container *ngFor="let item of logNames; let i = index">
+
+                                                <!-- Main row -->
+                                                <tr class="log-tr"
+                                                    [ngClass]="{'log-tr--active': selectedRowIndex === i}"
+                                                    (click)="toggleRowSelection(i)">
+
+                                                    <!-- Trace link icon -->
+                                                    <td style="width:2%; cursor:pointer;">
+                                                        <i class="fas fa-code-branch log-trace-icon"
+                                                            *ngIf="item.traceId" [attr.title]="'trace-link'"
+                                                            (click)="openTraceTabLogs(item.traceId)"
+                                                            [ngClass]="getLevelColor(item.tags?.level)"></i>
+                                                    </td>
+
+                                                    <!-- Date -->
+                                                    <td style="width:12%">{{ formatDate1(item.timeBucket) }}</td>
+
+                                                    <!-- Status / Level -->
+                                                    <td style="width:5%" [ngClass]="getLevelColor(item.tags?.level)">
+                                                        {{ item.tags.level }}
+                                                    </td>
+
+                                                    <!-- Content -->
+                                                    <td style="width:60%; cursor:pointer;" class="log-td--content"
+                                                        (click)="toggleDetailApp(i)">
+                                                        {{ expandedLogIndex === i ? '▼ ' : '▶ ' }}&nbsp;{{ item.content
+                                                        }}
+                                                    </td>
+
+                                                    <!-- HTTP Method -->
+                                                    <td style="width:8%">{{ formatEndpointId(item.endpointId) }}</td>
+
+                                                </tr>
+
+                                                <!-- Expanded detail row -->
+                                                <tr class="log-tr-detail" *ngIf="expandedLogIndex === i">
+                                                    <td colspan="5" style="padding:0;">
+                                                        <div class="log-detail-panel">
+
+                                                            <div class="log-detail-row" *ngIf="item.traceId">
+                                                                <span class="log-detail-label">Trace ID</span>
+                                                                <input type="text" class="log-detail-input"
+                                                                    [value]="item.traceId" readonly />
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Time</span>
+                                                                <input type="text" class="log-detail-input"
+                                                                    [value]="formatDate1(item.timeBucket)" readonly />
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Service ID</span>
+                                                                <input type="text" class="log-detail-input"
+                                                                    [value]="item.ServiceId" readonly />
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Instance ID</span>
+                                                                <input type="text" class="log-detail-input"
+                                                                    [value]="item.instance" readonly />
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Endpoint ID</span>
+                                                                <input type="text" class="log-detail-input"
+                                                                    [value]="item.endpointId" readonly />
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Tags</span>
+                                                                <div class="log-tags-wrap">
+                                                                    <span *ngFor="let tag of item.tags | keyvalue"
+                                                                        class="log-tag-badge">
+                                                                        <span class="log-tag-key">{{ tag.key }}</span>:
+                                                                        {{ tag.value }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="log-detail-row">
+                                                                <span class="log-detail-label">Content</span>
+                                                                <textarea class="log-detail-textarea"
+                                                                    [(ngModel)]="item.content" rows="4"
+                                                                    style="resize: vertical;" readonly></textarea>
+                                                            </div>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                            </ng-container>
+                                        </tbody>
+
+                                    </table>
+
+                                    <!-- No data -->
+                                    <div *ngIf="logNames.length === 0 && !loadingLogs"
+                                        class="log-empty log-empty--table">
+                                        No Data Available
+                                    </div>
+                                </div>
+
+                                <!-- Pagination -->
+                                <div class="log-pager" *ngIf="logNames.length !== 0">
+                                    <div class="log-pager__controls">
+                                        <button class="log-pager__btn" [disabled]="currentPageLog === 1"
+                                            (click)="previousLogPage()">
+                                            <i class="fa-solid fa-angle-left"></i>
+                                        </button>
+                                        <input type="number" class="log-pager__input" [value]="currentPageLog"
+                                            (keydown.enter)="goToLogPage(+inputLogPage.value)" #inputLogPage min="1"
+                                            [max]="totalPagesLog" aria-label="Page number input" />
+                                        <span class="log-pager__of">of {{ totalPagesLog }}</span>
+                                        <button class="log-pager__btn" [disabled]="currentPageLog === totalPagesLog"
+                                            (click)="nextLogPage()">
+                                            <i class="fa-solid fa-angle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- end logs details -->
+
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="source">
+                        <div class="src-root">
+
+                            <div class="src-layout">
+
+                                <!-- ══════════════════════════════════
+                 SIDEBAR — Language selector
+                 ══════════════════════════════════ -->
+                                <div class="src-sidebar">
+                                    <h6 class="src-sidebar__heading">Language</h6>
+                                    <div *ngFor="let lang of languages" class="src-sidebar__item">
+                                        <input type="radio" class="src-sidebar__radio" name="language" [value]="lang"
+                                            (change)="onLanguageChange(lang)" id="{{ lang.id }}"
+                                            [checked]="selectedLanguage.id == lang.id" />
+                                        <label class="src-sidebar__label" [for]="lang.id">{{ lang.label }}</label>
+                                    </div>
+                                </div>
+
+                                <!-- ══════════════════════════════════
+                 MAIN CONTENT
+                 ══════════════════════════════════ -->
+                                <div class="src-content">
+
+                                    <!-- ── JVM ──────────────────────── -->
+                                    <div *ngIf="selectedLanguage.id === 'jvm'">
+
+                                        <div class="src-charts-row">
+
+                                            <!-- JVM CPU -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM CPU (%)</span>
+                                                    <div class="src-chart-controls">
+                                                        <select [(ngModel)]="chart_criteria" class="src-select">
+                                                            <option value="avg" selected>Average</option>
+                                                            <option value="threshold">Threshold</option>
+                                                        </select>
+                                                        <span *ngIf="chart_criteria=='avg'" class="src-badge-avg">{{
+                                                            kpis.latency }}</span>
+                                                        <span *ngIf="chart_criteria=='threshold'"
+                                                            class="src-badge-warn">{{
+                                                            thresholds?.["instance_jvm_cpu"]?.warningValue }}</span>
+                                                        <span *ngIf="chart_criteria=='threshold'"
+                                                            class="src-badge-crit">{{
+                                                            thresholds?.["instance_jvm_cpu"]?.criticalValue }}</span>
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="<p>CPU usage percentage of this JVM instance.</p>"></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JVM_CPU" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- JVM Memory -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM Mem. (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <select [(ngModel)]="jvm_mem_chart_data"
+                                                            (ngModelChange)="updateJvmMemChart(jvm_mem_chart_data)"
+                                                            class="src-select">
+                                                            <option value="All" selected>All</option>
+                                                            <option value="instance_jvm_memory_noheap_max">noheap_max
+                                                            </option>
+                                                            <option value="instance_jvm_memory_heap">heap</option>
+                                                            <option value="instance_jvm_memory_heap_max">heap_max
+                                                            </option>
+                                                            <option value="instance_jvm_memory_noheap">noheap</option>
+                                                        </select>
+                                                        <select *ngIf="jvm_mem_chart_data !== 'All'"
+                                                            [(ngModel)]="chart_criteria" class="src-select">
+                                                            <option value="avg" selected>Average</option>
+                                                            <option value="threshold">Threshold</option>
+                                                        </select>
+                                                        <span
+                                                            *ngIf="chart_criteria=='avg' && jvm_mem_chart_data !== 'All'"
+                                                            class="src-badge-avg">{{ kpis.latency }}</span>
+                                                        <span
+                                                            *ngIf="chart_criteria=='threshold' && jvm_mem_chart_data !== 'All'"
+                                                            class="src-badge-warn">{{
+                                                            thresholds[jvm_mem_chart_data]?.warningValue }}</span>
+                                                        <span
+                                                            *ngIf="chart_criteria=='threshold' && jvm_mem_chart_data !== 'All'"
+                                                            class="src-badge-crit">{{
+                                                            thresholds[jvm_mem_chart_data]?.criticalValue }}</span>
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Total memory used by this JVM instance in MB."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JVM_Memory" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- JVM Memory Detail -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM Mem. Detail (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <select [(ngModel)]="jvm_mem_detail_chart_data"
+                                                            (ngModelChange)="updateJvmMemDetailChart(jvm_mem_detail_chart_data)"
+                                                            class="src-select">
+                                                            <option value="All" selected>All</option>
+                                                            <option value="instance_jvm_memory_pool_oldgen">oldgen</option>
+                                                            <option value="instance_jvm_memory_pool_metaspace">metaspace</option>
+                                                        </select>
+                                                        <select *ngIf="jvm_mem_detail_chart_data !== 'All'" [(ngModel)]="chart_criteria" class="src-select">
+                                                            <option value="avg" selected>Average</option>
+                                                            <option value="threshold">Threshold</option>
+                                                        </select>
+                                                        <span *ngIf="chart_criteria=='avg' && jvm_mem_detail_chart_data !== 'All'" class="src-badge-avg">{{
+                                                            kpis.latency }}</span>
+                                                        <span *ngIf="chart_criteria=='threshold' && jvm_mem_detail_chart_data !== 'All'"
+                                                            class="src-badge-warn">{{
+                                                            thresholds[jvm_mem_detail_chart_data]?.warningValue }}</span>
+                                                        <span *ngIf="chart_criteria=='threshold' && jvm_mem_detail_chart_data !== 'All'"
+                                                            class="src-badge-crit">{{
+                                                            thresholds[jvm_mem_detail_chart_data]?.criticalValue }}</span>
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Breakdown of JVM memory usage (heap, non-heap) for this instance in MB. Helps identify memory distribution and usage patterns."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JVM_Memory_detail" class="src-graph-area"></div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="src-charts-row">
+
+                                            <!-- JVM GC Time -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM GC Time (ms)</span>
+                                                    <div class="src-chart-controls">
+                                                        <select [(ngModel)]="jvm_gc_time_chart_data"
+                                                            (ngModelChange)="updateJvmGcChart(jvm_gc_time_chart_data)"
+                                                            class="src-select">
+                                                            <option value="All" selected>All</option>
+                                                            <option value="instance_jvm_young_gc_time">young_gc</option>
+                                                            <option value="instance_jvm_old_gc_time">old_gc</option>
+                                                        </select>
+                                                        <select *ngIf="jvm_gc_time_chart_data !== 'All'"
+                                                            [(ngModel)]="chart_criteria" class="src-select">
+                                                            <option value="avg" selected>Average</option>
+                                                            <option value="threshold">Threshold</option>
+                                                        </select>
+                                                        <span
+                                                            *ngIf="chart_criteria=='avg' && jvm_gc_time_chart_data !== 'All'"
+                                                            class="src-badge-avg">{{ kpis.latency }}</span>
+                                                        <span
+                                                            *ngIf="chart_criteria=='threshold' && jvm_gc_time_chart_data !== 'All'"
+                                                            class="src-badge-warn">{{
+                                                            thresholds[jvm_gc_time_chart_data]?.warningValue }}</span>
+                                                        <span
+                                                            *ngIf="chart_criteria=='threshold' && jvm_gc_time_chart_data !== 'All'"
+                                                            class="src-badge-crit">{{
+                                                            thresholds[jvm_gc_time_chart_data]?.criticalValue }}</span>
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Time spent by garbage collection in this JVM instance, measured in milliseconds."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JvmGCTime" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- JVM GC Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM GC Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Number of garbage collection events performed by this JVM instance. Frequent GC may indicate memory pressure."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JvmGCCount" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- JVM Thread Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM Thread Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Total number of threads running in this JVM instance."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JvmThreadCount" class="src-graph-area"></div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="src-charts-row">
+
+                                            <!-- JVM Thread State Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM Thread State Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Number of threads in each state (running, waiting, blocked) for this JVM instance."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JvmThreadStateCount" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- JVM Class Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">JVM Class Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated"
+                                                            title="Total number of loaded classes in this JVM instance."></i>
+                                                    </div>
+                                                </div>
+                                                <div id="JvmClassCount" class="src-graph-area"></div>
+                                            </div>
+
+                                            <!-- Spacer -->
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+
+                                        </div>
+
+                                    </div>
+                                    <!-- end JVM -->
+
+
+                                    <!-- ── PVM ──────────────────────── -->
+                                    <div *ngIf="selectedLanguage.id === 'pvm'">
+
+                                        <div class="src-charts-row">
+
+                                            <!-- Host CPU / PVM CPU -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Host CPU / PVM CPU Utilization
+                                                        (%)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasPvmCpuData; else noPvmCpuData" id="PvmCpuUtilization"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noPvmCpuData>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+
+                                            <!-- PVM Thread Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">PVM Thread Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasPvmThreadCount; else noPvmThreadCount"
+                                                    id="pvmThreadCount" class="src-graph-area"></div>
+                                                <ng-template #noPvmThreadCount>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+
+                                            <!-- PVM GC Count -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">PVM GC Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasPvmGCCount; else noPvmGcCount" id="pvmGcCount"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noPvmGcCount>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="src-charts-row">
+
+                                            <!-- Host Mem / PVM Mem -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Host Mem / PVM Mem Utilization
+                                                        (%)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasPvmMemUtilization; else noPvmMem" id="pvmMem"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noPvmMem>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+
+                                            <!-- PVM GC Time -->
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">PVM GC Time (ms)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasPvmGCTime; else noPvmGcTime" id="PvmGcTime"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noPvmGcTime>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+
+                                            <!-- Spacer -->
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+
+                                        </div>
+
+                                    </div>
+                                    <!-- end PVM -->
+
+
+                                    <!-- ── Golang ─────────────────────── -->
+                                    <div *ngIf="selectedLanguage.id === 'golang'">
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Memory Heap Size (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasMemoryHeapSize; else noMemoryHeapSize"
+                                                    id="MemoryHeapSize" class="src-graph-area"></div>
+                                                <ng-template #noMemoryHeapSize>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Live Threads Num</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasLiveThreadsNum; else noLiveThreadsNum"
+                                                    id="LiveThreadsNum" class="src-graph-area"></div>
+                                                <ng-template #noLiveThreadsNum>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">GoRoutine Schedule Time (ms)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasGoRoutineScheduleTime; else noGoRoutineScheduleTime"
+                                                    id="GoRoutineScheduleTime" class="src-graph-area"></div>
+                                                <ng-template #noGoRoutineScheduleTime>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">GC Count Per Minute</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasGcCountPerMinute; else GcCountPerMinute"
+                                                    id="GcCountPerMinute" class="src-graph-area"></div>
+                                                <ng-template #GcCountPerMinute>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">GC Pause Time Per Minute (ms)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasGcPauseTimePerMinute; else noGcPauseTimePerMinute"
+                                                    id="GcPauseTimePerMinute" class="src-graph-area"></div>
+                                                <ng-template #noGcPauseTimePerMinute>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">GC Goal Size (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasGcGoalSize; else noGcGoalSize" id="GcGoalSize"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noGcGoalSize>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">GC Free Size Per Minute (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasGcFreeSize; else noGcFreeSize" id="GcFreeSize"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noGcFreeSize>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Heap Alloc Size Per Minute (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasHeapAllocSize; else noHeapAllocSize" id="HeapAllocSize"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noHeapAllocSize>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Heap Object Count</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasHeapObjectCount; else noHeapObjectCount"
+                                                    id="HeapObjectCount" class="src-graph-area"></div>
+                                                <ng-template #noHeapObjectCount>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Free Size Per Minute (KB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasFreeSizePerMinute; else noFreeSizePerMinute"
+                                                    id="FreeSizePerMinute" class="src-graph-area"></div>
+                                                <ng-template #noFreeSizePerMinute>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Alloc Size Per Minute (KB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasAllocSizePerMinute; else noAllocSizePerMinute"
+                                                    id="AllocSizePerMinute" class="src-graph-area"></div>
+                                                <ng-template #noAllocSizePerMinute>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Metadata Mspan (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasMetaDataMspan; else noMetaDataMspan" id="MetaDataMspan"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noMetaDataMspan>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">Metadata Mcache (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasMetaDataMcache; else noMetaDataMcache"
+                                                    id="MetaDataMcache" class="src-graph-area"></div>
+                                                <ng-template #noMetaDataMcache>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+                                        </div>
+
+                                    </div>
+                                    <!-- end Golang -->
+
+
+                                    <!-- ── .NET ──────────────────────── -->
+                                    <div *ngIf="selectedLanguage.id === 'dotnet'">
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">CLR CPU (.NET Service)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasCrlCPUData; else noCrlCPUData" id="crlCPU"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noCrlCPUData>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">CLR GC</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasClrGcData; else noClrGcData" id="crlGC"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noClrGcData>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">CLR Heap Memory (MB)</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasClrHeapMemoryData; else noClrHeapMemoryData" id="crlHM"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noClrHeapMemoryData>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+
+                                        <div class="src-charts-row">
+                                            <div class="src-chart-card">
+                                                <div class="src-chart-header">
+                                                    <span class="src-chart-title">CLR Thread</span>
+                                                    <div class="src-chart-controls">
+                                                        <i class="fa-solid fa-circle-info gradiantIcon"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-html="true" matButton="elevated" title="info"></i>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="hasClrThreadData; else noClrThreadData" id="crlTH"
+                                                    class="src-graph-area"></div>
+                                                <ng-template #noClrThreadData>
+                                                    <div class="src-no-data">No Data</div>
+                                                </ng-template>
+                                            </div>
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+                                            <div class="src-chart-card src-chart-card--hidden"></div>
+                                        </div>
+
+                                    </div>
+                                    <!-- end dotnet -->
+
+
+                                    <!-- ── Empty state ──────────────── -->
+                                    <div class="src-empty-state" *ngIf="selectedLanguage.id === ''">
+                                        <p class="src-empty-state__text">Select a language</p>
+                                    </div>
+
+                                </div>
+                                <!-- end main content -->
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal for displaying Pie Chart For Log Tab -->
+<div id="logPieChartModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 103%">
+            <div class="modal-header">
+                <h5 class="modal-title">Log Levels Distribution</h5>
+                <button type="button" style="margin-left: 63%; font-size: 24px; font-weight: 800" class="close"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="pieChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying Bar Graph For Log Tab -->
+<div id="logBarGraphModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Log Levels Distribution</h5>
+                <button type="button" style="margin-left: 60%; font-size: 24px; font-weight: 800" class="close"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="barGraph"></div> <!-- This is where the bar graph will be rendered -->
+            </div>
+        </div>
+    </div>
+</div>

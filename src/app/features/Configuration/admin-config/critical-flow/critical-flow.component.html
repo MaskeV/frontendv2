@@ -1,0 +1,259 @@
+<div class="cf-page">
+
+  <!-- HEADER -->
+  <header class="cf-header">
+    <div class="cf-header-left">
+      <div class="cf-header-icon">
+        <i class="fa-solid fa-route"></i>
+      </div>
+      <div>
+        <h4 class="cf-title">Critical Flow Configuration</h4>
+        <p class="cf-subtitle">Manage critical flow definitions and API endpoints</p>
+      </div>
+    </div>
+    
+    <div class="cf-header-actions">
+      <button *ngIf="showTable" class="cf-action-btn cf-primary-btn" (click)="openCreateForm()" [disabled]="!userTypeCrudMap.create">
+        <i class="fa-solid fa-plus"></i> Add Critical Flow
+      </button>
+      <button *ngIf="isForm" class="cf-action-btn cf-secondary-btn" (click)="showTableList()">
+        <i class="fa-solid fa-table"></i> See All Flows
+      </button>
+    </div>
+  </header>
+
+  <!-- TABLE LIST VIEW -->
+  <div *ngIf="showTable" class="cf-card mt-3">
+    <!-- Search / Filter bar -->
+    <div class="cf-search-bar mb-3">
+      <div class="cf-search-input-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" [(ngModel)]="searchText" (ngModelChange)="page=1; applyFilterAndPagination()" 
+               placeholder="Search critical flows..." class="cf-search-input" />
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="cf-table-wrap">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;"></th>
+            <th class="sortable" (click)="sortBy('featureName')">
+              Critical Flow Name 
+              <i class="fa-solid" [ngClass]="sortColumn === 'featureName' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+            </th>
+            <th class="sortable" (click)="sortBy('description')">
+              Description
+              <i class="fa-solid" [ngClass]="sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+            </th>
+            <th style="width: 150px; text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let flow of pagedCriticalFlows">
+            <!-- Main Row -->
+            <tr [class.expanded-row-parent]="expandedFlows[flow.id]">
+              <td>
+                <button class="cf-toggle-expand-btn" (click)="toggleExpand(flow.id)">
+                  <i class="fa-solid" [ngClass]="expandedFlows[flow.id] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+                </button>
+              </td>
+              <td class="cf-bold-text">{{ flow.featureName }}</td>
+              <td>{{ flow.description }}</td>
+              <td>
+                <div class="cf-row-actions">
+                  <button class="cf-icon-btn edit-btn" (click)="openUpdateForm(flow)" [disabled]="!userTypeCrudMap.edit" title="Edit">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button class="cf-icon-btn delete-btn" (click)="deleteCriticalFlow(flow)" [disabled]="!userTypeCrudMap.delete" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Expanded Steps Row -->
+            <tr *ngIf="expandedFlows[flow.id]" class="cf-steps-details-row">
+              <td colspan="4">
+                <div class="cf-expanded-steps-wrap">
+                  <h6 class="cf-steps-title"><i class="fa-solid fa-list-ol"></i> Step Definitions for {{ flow.featureName }}</h6>
+                  <div *ngIf="!flow.criticalFlowSteps || flow.criticalFlowSteps.length === 0" class="cf-no-steps">
+                    No steps defined for this critical flow.
+                  </div>
+                  <table *ngIf="flow.criticalFlowSteps && flow.criticalFlowSteps.length > 0" class="cf-steps-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 80px;">Order</th>
+                        <th>Step Name</th>
+                        <th>Application</th>
+                        <th>API Endpoint</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let step of flow.criticalFlowSteps">
+                        <td><span class="cf-step-badge">{{ step.stepOrder }}</span></td>
+                        <td class="cf-bold-text">{{ step.stepName }}</td>
+                        <td>{{ getApplicationName(step.applicationId) }}</td>
+                        <td class="cf-code-text">{{ step.endpoint }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="pagedCriticalFlows.length === 0">
+            <td colspan="4" class="cf-empty-state">
+              <i class="fa-solid fa-route-interleaved empty-icon"></i>
+              <p>No critical flows found matching your search.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="cf-pagination" *ngIf="totalPages > 1">
+      <div class="cf-page-info">
+        Showing {{ (page - 1) * pageSize + 1 }} to {{ Math.min(page * pageSize, filteredCriticalFlows.length) }} of {{ filteredCriticalFlows.length }} flows
+      </div>
+      <div class="cf-page-controls">
+        <button class="cf-page-btn" (click)="prevPage()" [disabled]="page === 1">
+          <i class="fa-solid fa-angle-left"></i> Previous
+        </button>
+        <span class="cf-page-num">Page {{ page }} of {{ totalPages }}</span>
+        <button class="cf-page-btn" (click)="nextPage()" [disabled]="page === totalPages">
+          Next <i class="fa-solid fa-angle-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM VIEW -->
+  <div *ngIf="isForm" class="cf-card mt-3">
+    <div class="cf-section-badge">
+      <div class="cf-badge-num">{{ isUpdation ? 'Edit' : 'New' }}</div>
+      <div>
+        <h5 class="cf-section-title">{{ isUpdation ? 'Update Critical Flow' : 'Create Critical Flow' }}</h5>
+        <p class="cf-section-sub">Configure basic details and steps execution flow</p>
+      </div>
+    </div>
+
+    <form [formGroup]="criticalFlowForm" (ngSubmit)="saveCriticalFlow()">
+      <!-- Basic Info -->
+      <div class="cf-form-grid">
+        <div class="cf-form-group">
+          <label class="cf-form-label">Critical Flow Name <span class="text-danger">*</span></label>
+          <input type="text" formControlName="featureName" class="cf-form-control" placeholder="Critical flow name" appSanitizeInput />
+          <div *ngIf="criticalFlowForm.get('featureName')?.touched && criticalFlowForm.get('featureName')?.invalid" class="cf-validation-err">
+            Critical Flow Name is required.
+          </div>
+        </div>
+
+        <div class="cf-form-group">
+          <label class="cf-form-label">Description</label>
+          <input type="text" formControlName="description" class="cf-form-control" placeholder="Description (optional)" appSanitizeInput />
+        </div>
+      </div>
+
+      <!-- Steps Header -->
+      <div class="cf-steps-header mt-4 mb-2">
+        <h5 class="cf-steps-title"><i class="fa-solid fa-route"></i> Define Execution Steps</h5>
+        <button type="button" class="cf-action-btn cf-accent-btn btn-sm" (click)="addStep()">
+          <i class="fa-solid fa-plus"></i> Add Step
+        </button>
+      </div>
+
+      <!-- Steps List -->
+      <div formArrayName="steps" class="cf-steps-list">
+        <div *ngFor="let step of steps.controls; let i = index" 
+             [formGroupName]="i" 
+             class="cf-step-row-card"
+             [class.cf-drag-hover]="dragOverIndex === i"
+             (dragover)="onDragOver(i, $event)"
+             (dragenter)="onDragEnter(i, $event)"
+             (dragleave)="onDragLeave(i, $event)"
+             (drop)="onDrop(i, $event)">
+
+          <!-- Drag Grip Handle -->
+          <div class="cf-drag-handle" draggable="true" 
+               (dragstart)="onDragStart(i, $event)"
+               (dragend)="onDragEnd()"
+               title="Drag to reorder step">
+            <i class="fa-solid fa-grip-vertical"></i>
+          </div>
+
+          <!-- Step Number badge -->
+          <div class="cf-step-row-num">
+            <span>{{ i + 1 }}</span>
+          </div>
+
+          <div class="cf-step-fields-grid">
+            <div class="cf-form-group">
+              <label class="cf-form-label">Step Name <span class="text-danger">*</span></label>
+              <input type="text" formControlName="stepName" class="cf-form-control" placeholder="Step name" appSanitizeInput />
+              <div *ngIf="step.get('stepName')?.touched && step.get('stepName')?.invalid" class="cf-validation-err">
+                Step name is required.
+              </div>
+            </div>
+
+            <div class="cf-form-group">
+              <label class="cf-form-label">Application <span class="text-danger">*</span></label>
+              <select formControlName="applicationId" class="cf-form-control select-control" (change)="onApplicationChange(i)">
+                <option value="" disabled selected>Select Application</option>
+                <option *ngFor="let app of availableApplications" [value]="app.applicationId">
+                  {{ app.applicationName }}
+                </option>
+              </select>
+              <div *ngIf="step.get('applicationId')?.touched && step.get('applicationId')?.invalid" class="cf-validation-err">
+                Application is required.
+              </div>
+            </div>
+
+            <div class="cf-form-group">
+              <label class="cf-form-label">API Endpoint <span class="text-danger">*</span></label>
+              <select formControlName="endpoint" class="cf-form-control select-control">
+                <option value="" disabled selected>Select Endpoint</option>
+                <!-- Include current endpoint value if not yet loaded in options -->
+                <option *ngIf="step.get('endpoint')?.value && (!stepEndpoints[i] || !stepEndpoints[i].includes(step.get('endpoint')?.value))" [value]="step.get('endpoint')?.value">
+                  {{ step.get('endpoint')?.value }}
+                </option>
+                <option *ngFor="let ep of stepEndpoints[i]" [value]="ep">
+                  {{ ep }}
+                </option>
+              </select>
+              <div *ngIf="stepEndpointsLoading[i]" class="cf-loading-text">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading endpoints...
+              </div>
+              <div *ngIf="step.get('endpoint')?.touched && step.get('endpoint')?.invalid" class="cf-validation-err">
+                Endpoint path is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="cf-step-row-actions">
+            <button type="button" class="cf-step-delete-btn" (click)="removeStep(i)" [disabled]="steps.length <= 1" title="Remove Step">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="cf-form-actions mt-4 pt-3">
+        <button type="submit" class="cf-action-btn cf-primary-btn" [disabled]="criticalFlowForm.invalid">
+          <i class="fa-solid fa-save"></i> {{ isUpdation ? 'Update Flow' : 'Save Flow' }}
+        </button>
+        <button type="button" class="cf-action-btn cf-secondary-btn ms-2" (click)="resetForm()">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+        <button type="button" class="cf-action-btn cf-danger-btn ms-2" (click)="showTableList()">
+          <i class="fa-solid fa-xmark"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,432 @@
+<div class="container-fluid" style="background-color: #f8fafc; padding: 24px; font-family: 'Inter', sans-serif;">
+  <!-- Top KPI Row -->
+  <div class="row g-4 mb-4">
+    <!-- Total App Versions -->
+    <div class="col-auto">
+      <div class="card shadow-sm border-0 rounded-4" style="width: 160px;">
+        <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center text-center">
+          <div style="font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 2px;">Total App Versions</div>
+          <h2 class="fw-bold mb-1 text-dark" style="font-size: 24px;">8</h2>
+          <!-- Little green line sparkline mock -->
+          <svg width="80" height="15" class="mt-2">
+            <path d="M0 10 L16 5 L32 12 L48 4 L64 8 L80 2" stroke="#10b981" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    <!-- Users by App Version Donut -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-body p-4 position-relative">
+          <h6 class="fw-bold mb-3" style="font-size: 13px; color: #334155;">Users by App Version</h6>
+          <div class="d-flex align-items-center">
+            <div style="width: 50%; position: relative;">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="usersByVersionOptions" style="width: 100%; height: 200px; display: block;"></highcharts-chart>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <div style="font-size: 16px; font-weight: bold; color: #0f172a;">1,24,865</div>
+                <div style="font-size: 10px; color: #64748b; font-weight: 600;">Total Users</div>
+              </div>
+            </div>
+            <div style="width: 50%; padding-left: 15px;">
+              <div class="d-flex align-items-center justify-content-between mb-3" style="font-size: 12px; font-weight: 600;">
+                <div class="d-flex align-items-center gap-2"><div style="width:8px;height:8px;border-radius:50%;background:#10b981;"></div><span style="color: #334155;">v5.2.0</span></div>
+                <span class="text-dark">42.5% <span class="text-muted fw-normal">(53.1K)</span></span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mb-3" style="font-size: 12px; font-weight: 600;">
+                <div class="d-flex align-items-center gap-2"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;"></div><span style="color: #334155;">v5.1.0</span></div>
+                <span class="text-dark">28.4% <span class="text-muted fw-normal">(35.5K)</span></span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mb-3" style="font-size: 12px; font-weight: 600;">
+                <div class="d-flex align-items-center gap-2"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></div><span style="color: #334155;">v5.0.5</span></div>
+                <span class="text-dark">14.2% <span class="text-muted fw-normal">(17.7K)</span></span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between" style="font-size: 12px; font-weight: 600;">
+                <div class="d-flex align-items-center gap-2"><div style="width:8px;height:8px;border-radius:50%;background:#94a3b8;"></div><span style="color: #334155;">Others</span></div>
+                <span class="text-dark">14.9% <span class="text-muted fw-normal">(18.5K)</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users by OS Version -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-4" style="font-size: 13px; color: #334155;">Users by OS Version</h6>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Android 14</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 38.6%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">38.6%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Android 13</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 26.4%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">26.4%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Android 12</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 18.7%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">18.7%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Android 11</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 9.5%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">9.5%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Android 10 & below</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #94a3b8; width: 6.8%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">6.8%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Devices by Brand -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-4" style="font-size: 13px; color: #334155;">Devices by Brand</h6>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Samsung</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 32.4%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">32.4%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Xiaomi</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 18.6%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">18.6%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">OnePlus</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 12.8%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">12.8%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Realme</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #10b981; width: 10.2%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">10.2%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">Others</span>
+            <div style="flex-grow: 1; margin: 0 10px; height: 6px; background-color: #f1f5f9; border-radius: 3px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background-color: #94a3b8; width: 26.0%;"></div></div>
+            <span style="font-size: 11px; font-weight: 600; color: #334155; width: 35px; text-align: right;">26.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-body p-4 position-relative">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0" style="font-size: 13px; color: #334155;">Crash & Error Trend by Version</h6>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light bg-white border dropdown-toggle" type="button" style="font-size: 11px; font-weight: 600; color: #334155; border-radius: 6px;">
+                Last 7 Days
+              </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center gap-4 mb-2">
+            <div class="d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600; color: #334155;"><div style="width:6px;height:6px;border-radius:50%;background:#ef4444;"></div>Crash Rate</div>
+            <div class="d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600; color: #334155;"><div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;"></div>Error Rate</div>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="crashErrorTrendOptions" style="width: 100%; height: 170px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version Details Navigation & Filters -->
+  <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+    <ul class="nav nav-tabs border-0" style="gap: 20px;">
+      <li class="nav-item" style="cursor: pointer;">
+        <a class="nav-link px-0" (click)="activeTab = 'version-details'" 
+           [ngClass]="activeTab === 'version-details' ? 'active fw-bold text-dark border-bottom border-2 border-success' : 'text-muted fw-semibold'" 
+           style="border: none; font-size: 13px; background: transparent;">Version Details</a>
+      </li>
+      <li class="nav-item" style="cursor: pointer;">
+        <a class="nav-link px-0" (click)="activeTab = 'os-version'" 
+           [ngClass]="activeTab === 'os-version' ? 'active fw-bold text-dark border-bottom border-2 border-success' : 'text-muted fw-semibold'" 
+           style="border: none; font-size: 13px; background: transparent;">OS Version</a>
+      </li>
+    </ul>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="position-relative">
+        <i class="bi bi-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
+        <input type="text" class="form-control form-control-sm" [placeholder]="activeTab === 'os-version' ? 'Search OS version...' : 'Search version...'" style="padding-left: 32px; font-size: 12px; border-radius: 6px; width: 220px; border-color: #e2e8f0;">
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light bg-white border dropdown-toggle d-flex align-items-center gap-2" type="button" style="font-size: 12px; font-weight: 600; color: #334155; border-radius: 6px;">
+          <i class="bi bi-android2 text-success"></i> Platform: Android
+        </button>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light bg-white border dropdown-toggle d-flex align-items-center gap-2" type="button" style="font-size: 12px; font-weight: 600; color: #334155; border-radius: 6px;">
+          <i class="bi bi-calendar3 text-muted"></i> Last 7 Days
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Area -->
+  <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        
+        <!-- Version Details Table -->
+        <table *ngIf="activeTab === 'version-details'" class="table table-hover table-borderless align-middle mb-0" style="font-size: 12px;">
+          <thead style="border-bottom: 1px solid #e2e8f0;">
+            <tr>
+              <th class="fw-bold text-dark py-3 px-4">Version</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Active Users <i class="bi bi-arrow-down ms-1"></i></th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Sessions</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Sessions / User</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Crash Rate</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Error Rate</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Apdex</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Avg. Session Duration</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Release Date</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Status</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of versionDetails; let last = last" [class.border-bottom]="!last">
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-stack text-muted" style="font-size: 14px;"></i>
+                  <a href="#" class="text-decoration-none fw-semibold" style="color: #334155;">{{ row.version }}</a>
+                  <span *ngIf="row.isCurrent" class="badge" style="background-color: #ecfdf5; color: #10b981; font-weight: 600; font-size: 10px;">Current</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-center fw-bold text-dark">{{ row.activeUsers | number }} <span style="font-size: 10px; color: #10b981; font-weight: 600;" class="ms-1">{{ row.usersPct }}</span></td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.sessions | number }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.sessionsPerUser }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">
+                {{ row.crashRate }}% 
+                <span [style.color]="row.crashRateTrend === 'down' ? '#10b981' : '#ef4444'" style="font-size: 10px; font-weight: 700; margin-left: 4px;">
+                  <i class="bi" [ngClass]="row.crashRateTrend === 'down' ? 'bi-caret-down-fill' : 'bi-caret-up-fill'"></i> {{ row.crashRateTrendVal }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">
+                {{ row.errorRate }}% 
+                <span [style.color]="row.errorRateTrend === 'down' ? '#10b981' : '#ef4444'" style="font-size: 10px; font-weight: 700; margin-left: 4px;">
+                  <i class="bi" [ngClass]="row.errorRateTrend === 'down' ? 'bi-caret-down-fill' : 'bi-caret-up-fill'"></i> {{ row.errorRateTrendVal }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="badge px-2 py-1" [style.background-color]="getApdexBgColor(row.apdex)" [style.color]="getApdexColor(row.apdex)" style="font-size: 11px; font-weight: 700; border-radius: 4px;">
+                  {{ row.apdex }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.avgSessionDuration }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.releaseDate }}</td>
+              <td class="px-4 py-3 text-center">
+                <span *ngIf="row.status === 'Live'" class="badge" style="background-color: #ecfdf5; color: #10b981; border: 1px solid #10b981; font-weight: 600;">Live</span>
+                <span *ngIf="row.status === 'Deprecated'" class="badge" style="background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; font-weight: 600;">Deprecated</span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <i class="bi bi-three-dots-vertical text-muted" style="cursor: pointer;"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- OS Version Table -->
+        <table *ngIf="activeTab === 'os-version'" class="table table-hover table-borderless align-middle mb-0" style="font-size: 12px;">
+          <thead style="border-bottom: 1px solid #e2e8f0;">
+            <tr>
+              <th class="fw-bold text-dark py-3 px-4">OS Version</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Active Users <i class="bi bi-arrow-down ms-1"></i></th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Users %</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Sessions</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Sessions / User</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Crash Rate</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Error Rate</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Apdex</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Avg. Session Duration</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Adoption Trend</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Status</th>
+              <th class="fw-bold text-dark py-3 px-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of osVersionDetails; let last = last" [class.border-bottom]="!last">
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i *ngIf="row.isAndroid" class="bi bi-android2" style="font-size: 16px; color: #10b981;"></i>
+                  <i *ngIf="!row.isAndroid" class="bi bi-apple" style="font-size: 16px; color: #334155;"></i>
+                  <span class="fw-bold" style="color: #334155;">{{ row.os }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-center fw-bold text-dark">{{ row.activeUsers | number }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.usersPct }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.sessions | number }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.sessionsPerUser }}</td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">
+                {{ row.crashRate }}% 
+                <span [style.color]="row.crashRateTrend === 'down' ? '#10b981' : '#ef4444'" style="font-size: 10px; font-weight: 700; margin-left: 4px;">
+                  <i class="bi" [ngClass]="row.crashRateTrend === 'down' ? 'bi-caret-down-fill' : 'bi-caret-up-fill'"></i> {{ row.crashRateTrendVal }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">
+                {{ row.errorRate }}% 
+                <span [style.color]="row.errorRateTrend === 'down' ? '#10b981' : '#ef4444'" style="font-size: 10px; font-weight: 700; margin-left: 4px;">
+                  <i class="bi" [ngClass]="row.errorRateTrend === 'down' ? 'bi-caret-down-fill' : 'bi-caret-up-fill'"></i> {{ row.errorRateTrendVal }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="badge px-2 py-1" [style.background-color]="getApdexBgColor(row.apdex)" [style.color]="getApdexColor(row.apdex)" style="font-size: 11px; font-weight: 700; border-radius: 4px;">
+                  {{ row.apdex }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center fw-semibold text-dark">{{ row.avgSessionDuration }}</td>
+              <td class="px-4 py-3 text-center">
+                <svg width="60" height="15">
+                  <path [attr.d]="getSparklinePath(row.sparklineData)" [attr.stroke]="row.sparklineColor" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+                  <circle *ngFor="let val of row.sparklineData; let i = index" 
+                          [attr.cx]="i * (60 / (row.sparklineData.length - 1))" 
+                          [attr.cy]="15 - ((val - 2) / 3) * 11 - 2" 
+                          r="1.5" [attr.fill]="row.sparklineColor" />
+                </svg>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span *ngIf="row.status === 'Active'" class="badge" style="background-color: #ecfdf5; color: #10b981; border: 1px solid #10b981; font-weight: 600;">Active</span>
+                <span *ngIf="row.status === 'Deprecated'" class="badge" style="background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; font-weight: 600;">Deprecated</span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <i class="bi bi-three-dots-vertical text-muted" style="cursor: pointer;"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Tables Row -->
+  <div class="row g-4">
+    <!-- Top Crashes -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">Top Crashes by Version</h6>
+          <a [routerLink]="['/mrum/mrum-errors-list']" [queryParams]="{ type: 'Crash' }" class="text-decoration-none" style="font-size: 12px; font-weight: 600; color: #10b981;">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless align-middle mb-0" style="font-size: 11px;">
+              <thead class="text-muted" style="border-bottom: 1px solid #f1f5f9;">
+                <tr>
+                  <th class="fw-semibold px-4 py-3">Version</th>
+                  <th class="fw-semibold px-4 py-3">Crash Type</th>
+                  <th class="fw-semibold px-4 py-3 text-center">Count</th>
+                  <th class="fw-semibold px-4 py-3 text-center">Crash Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let crash of topCrashes; let last = last" [class.border-bottom]="!last">
+                  <td class="px-4 py-3 fw-semibold text-dark">{{ crash.version }}</td>
+                  <td class="px-4 py-3 fw-semibold text-dark">{{ crash.crashType }}</td>
+                  <td class="px-4 py-3 text-center fw-semibold text-dark">{{ crash.count }}</td>
+                  <td class="px-4 py-3 text-center fw-semibold text-dark">{{ crash.crashRate }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Errors -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">Top Errors by Version</h6>
+          <a [routerLink]="['/mrum/mrum-errors-list']" [queryParams]="{ type: 'Error' }" class="text-decoration-none" style="font-size: 12px; font-weight: 600; color: #10b981;">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless align-middle mb-0" style="font-size: 11px;">
+              <thead class="text-muted" style="border-bottom: 1px solid #f1f5f9;">
+                <tr>
+                  <th class="fw-semibold px-4 py-3">Version</th>
+                  <th class="fw-semibold px-4 py-3">Error Message</th>
+                  <th class="fw-semibold px-4 py-3 text-center">Count</th>
+                  <th class="fw-semibold px-4 py-3 text-center">Error Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let err of topErrors; let last = last" [class.border-bottom]="!last">
+                  <td class="px-4 py-3 fw-semibold text-dark">{{ err.version }}</td>
+                  <td class="px-4 py-3 fw-semibold text-dark">{{ err.errorMsg }}</td>
+                  <td class="px-4 py-3 text-center fw-semibold text-dark">{{ err.count | number }}</td>
+                  <td class="px-4 py-3 text-center fw-semibold text-dark">{{ err.errorRate }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load Time Distribution -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-bold text-dark" style="font-size: 13px;">Load Time Distribution by Version</h6>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-light bg-white border dropdown-toggle" type="button" style="font-size: 11px; font-weight: 600; color: #334155; border-radius: 6px;">
+              v5.2.0
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-4 pt-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">&gt; 5 s</span>
+            <div style="flex-grow: 1; margin: 0 15px; height: 12px; background-color: #f1f5f9; border-radius: 6px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; background-color: #6ee7b7; width: 1.8%;"></div></div>
+            <span style="font-size: 11px; font-weight: 700; color: #334155; width: 35px; text-align: right;">1.8%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">2 - 5 s</span>
+            <div style="flex-grow: 1; margin: 0 15px; height: 12px; background-color: #f1f5f9; border-radius: 6px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; background-color: #6ee7b7; width: 6.4%;"></div></div>
+            <span style="font-size: 11px; font-weight: 700; color: #334155; width: 35px; text-align: right;">6.4%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">1 - 2 s</span>
+            <div style="flex-grow: 1; margin: 0 15px; height: 12px; background-color: #f1f5f9; border-radius: 6px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; background-color: #6ee7b7; width: 34.6%;"></div></div>
+            <span style="font-size: 11px; font-weight: 700; color: #334155; width: 35px; text-align: right;">34.6%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">500 ms - 1 s</span>
+            <div style="flex-grow: 1; margin: 0 15px; height: 12px; background-color: #f1f5f9; border-radius: 6px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; background-color: #10b981; width: 38.2%;"></div></div>
+            <span style="font-size: 11px; font-weight: 700; color: #334155; width: 35px; text-align: right;">38.2%</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span style="font-size: 11px; color: #64748b; font-weight: 600; width: 60px;">0 - 500 ms</span>
+            <div style="flex-grow: 1; margin: 0 15px; height: 12px; background-color: #f1f5f9; border-radius: 6px; position: relative;"><div style="position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px; background-color: #6ee7b7; width: 19.0%;"></div></div>
+            <span style="font-size: 11px; font-weight: 700; color: #334155; width: 35px; text-align: right;">19.0%</span>
+          </div>
+          <!-- x-axis labels -->
+          <div class="d-flex justify-content-between ms-auto me-4 position-relative" style="width: calc(100% - 110px); font-size: 10px; color: #64748b; font-weight: 600;">
+            <span style="position: absolute; left: 0%;">0%</span>
+            <span style="position: absolute; left: 25%; transform: translateX(-50%);">10%</span>
+            <span style="position: absolute; left: 50%; transform: translateX(-50%);">20%</span>
+            <span style="position: absolute; left: 75%; transform: translateX(-50%);">30%</span>
+            <span style="position: absolute; left: 100%; transform: translateX(-100%);">40%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

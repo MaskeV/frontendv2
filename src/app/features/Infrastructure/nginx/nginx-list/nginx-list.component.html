@@ -1,0 +1,135 @@
+<div class="root">
+    <!-- Header and search bar -->
+    <div class="card-header">
+        <div class="pe-3 py-2 col-md-12 d-flex justify-content-between" style="padding-left: 0.8%;">
+            <span class="main-header">NGINX Monitoring</span>
+            <div style="width: 15%; position: relative;">
+                <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                    [(ngModel)]="searchText" (input)="resetCurrentPage(metricsData, searchText, ['name'])"
+                    placeholder="Search Application..." />
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- NGINX Table Section -->
+    <div class="flex-grow-1 p-2 overflow-hidden">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden h-100">
+            <div class="table-container h-100 overflow-auto">
+                <table class="table w-full mb-0">
+                    <thead>
+                        <tr>
+                            <th (click)="sortData('name')" style="cursor: pointer;">
+                                APPLICATION NAME
+                                <i class="fa fa-sort ms-1 small opacity-50"></i>
+                            </th>
+                            <th (click)="sortData('http_requests_total')" style="cursor: pointer;">
+                                HTTP REQUESTS
+                                <i class="fa fa-sort ms-1 small opacity-50"></i>
+                            </th>
+                            <th (click)="sortData('http_bandwidth_total_kb')" style="cursor: pointer;">
+                                BANDWIDTH (KB)
+                                <i class="fa fa-sort ms-1 small opacity-50"></i>
+                            </th>
+                            <th (click)="sortData('http_connections_avg')" style="cursor: pointer;">
+                                ACTIVE CONNECTIONS
+                                <i class="fa fa-sort ms-1 small opacity-50"></i>
+                            </th>
+                            <th (click)="sortData('success_rate')" style="cursor: pointer;">
+                                SUCCESS RATE (%)
+                                <i class="fa fa-sort ms-1 small opacity-50"></i>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody *ngIf="!isLoading && totalItems > 0; else noDataOrLoading">
+                        <tr *ngFor="let n of metricsData | sort:sortColumn:sortDirection | objectFilter:searchText:['name'] | paginate:currentPage:pageSize">
+                            <td class="fw-medium">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img [src]="getImagePath(n.applicationTechnology, n.applicationType)" class="icons" alt="logo" (error)="onImageError($event)" />
+                                    <span style="cursor: pointer;" (click)="gotoNginxDetails(n.name)">
+                                        {{ n.name ?? 'No Data' }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-chart-line text-primary" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total HTTP Requests"></i>
+                                    {{ n.http_requests_total | shortNumber }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-regular fa-hourglass text-warning" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Total Bandwidth (KB)"></i>
+                                    {{ n.http_bandwidth_total_kb | shortNumber }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-gauge-high text-success" data-bs-toggle="tooltip" data-bs-placement="top" matButton="elevated" title="Average Active Connections"></i>
+                                    {{ n.http_connections_avg | shortNumber }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="sv-success-pill">
+                                        <i class="fa-regular fa-circle-check sv-metric-icon"></i>
+                                        {{ getSuccessRate(n) }}%
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody *ngIf="isLoading">
+                        <tr class="skeleton-row" *ngFor="let skeleton of skeletonRows">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="skeleton skeleton-icon"></div>
+                                    <div class="skeleton skeleton-text" style="width: 100px;"></div>
+                                </div>
+                            </td>
+                            <td><div class="skeleton skeleton-text" style="width: 60px;"></div></td>
+                            <td><div class="skeleton skeleton-text" style="width: 60px;"></div></td>
+                            <td><div class="skeleton skeleton-text" style="width: 60px;"></div></td>
+                            <td><div class="skeleton skeleton-text" style="width: 60px;"></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer with Pagination -->
+    <div class="px-3 py-2 border-top bg-white d-flex justify-content-between align-items-center">
+        <div class="small text-muted">
+            Showing {{((currentPage*pageSize) < totalItems) ? (currentPage*pageSize) : totalItems}} of {{totalItems}} applications
+        </div>
+        <div class="pagination-container d-flex align-items-center gap-2 mb-0" style="font-size: small; margin-top: 0 !important;">
+            <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn" (click)="previousPage()" [disabled]="currentPage <= 1">
+                <i class="fa-solid fa-angle-left text-primary"></i>
+            </button>
+            <span class="page-number small text-muted">
+                Page
+                <input type="number" [(ngModel)]="inputPage" (keydown.enter)="goToPage()" class="page-input" />
+                of {{ totalPages }}
+            </span>
+            <button type="button" class="btn btn-sm border-0 py-0 px-2 page-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">
+                <i class="fa-solid fa-angle-right text-primary"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<ng-template #noDataOrLoading>
+    <tbody *ngIf="!isLoading">
+        <tr>
+            <td colspan="5">
+                <div class="d-flex justify-content-center align-items-center p-5">
+                    <img src="assets/images/NoSearch.png" style="height: 5vw; padding-right: 10px;" alt="no data" />
+                    <div class="text-center fs-5">No Data Available</div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</ng-template>

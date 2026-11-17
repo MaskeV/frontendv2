@@ -1,0 +1,220 @@
+<main>
+    <div class="p-2 d-flex">
+        <div class="d-flex fileIcon">
+            <i class="fa-solid fa-file"></i>
+        </div>
+        <div class="px-3">
+            <span
+                style="font-size: large; font-weight: 500; font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', serif;">Report
+                Generator</span> <br>
+            <span style="font-size: small; color: gray;">Configure and generate comprehensive application reports</span>
+        </div>
+    </div>
+    <div class="custom-bg center-align" style="height: 84vh; overflow: auto;">
+        <div class="p-3 reportForm shadow shadow-3 rounded rounded-3">
+            <div class="mb-3">
+                <span class="px-1 icons rounded rounded-2"><i class="fa-regular fa-rectangle-list"></i></span>
+                <span class="ms-2" style="font-weight: 500;">Configuration</span>
+            </div>
+            <div class="mb-3">
+                <label for="applicationType" class="form-label">Application Type</label>
+                <select class="form-select" [ngClass]="{ 'placeholder-selected': selectedAppType === '' }"
+                    [(ngModel)]="selectedAppType" (change)="onAppTypeChange()">
+                    <option value="" disabled>Select Application Type</option>
+
+                    <option *ngFor="let product of productList" class="real-option" [value]="product">
+                        {{ product }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3" *ngIf="technologyList.length > 0">
+                <div class="form-label">Technology Type</div>
+
+                        <select class="form-select"  [(ngModel)]="technology" name="technology" (ngModelChange)="onTechChange($event)">
+                    <option value="">Select Technology</option>
+
+                    <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                        {{ tech.technologyType }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="applicationName" class="form-label">Application Name</label>
+                <select class="form-select" [ngClass]="{ 'placeholder-selected': selectedAppId === '' }"
+                    [(ngModel)]="selectedAppId" (change)="onAppNameSelect()">
+                    <option value="" disabled>Select Application Name</option>
+                    <option *ngFor="let app of applicationNames" [ngValue]="app.applicationId" class="real-option">{{ app.applicationName }}</option>
+                </select>
+            </div>
+            <div *ngIf="selectedAppType.toUpperCase() === 'HOST'" class="mb-3">
+                <label for="applicationName" class="form-label">Application IP</label>
+                <select class="form-select" [ngClass]="{ 'placeholder-selected': selectedIp === '' }"
+                    [(ngModel)]="selectedIp" (change)="onInfraIpSelect()">
+                    <option value="" disabled>Select Application Ip</option>
+                    <option *ngFor="let app of ipAddresses" [ngValue]="app.ipAddrID" class="real-option">{{ app.ipAddress }}</option>
+                </select>
+            </div>
+
+            <div class="mb-3" *ngIf="selectedAppType && showTimeSelector">
+                <div class="mb-3" *ngIf="selectedApps.length > 0">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span *ngFor="let app of selectedApps" class="p-2 d-flex align-items-center">
+                            <div class="hive-card">
+                                <div class="card-header">
+                                    <span class="ip-chip">{{ selectedAppType.toUpperCase() === 'HOST'? app.ipAddress : app.applicationName }}</span>
+                                    <button class="delete-btn" title="Delete">
+                                        <i class="fas fa-trash" (click)="removeApp(app)"></i>
+                                    </button>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="field">
+                                        <label>Start Time</label>
+                                        <div class="date-input">
+                                            <input type="datetime-local" placeholder="DD/MM/YYYY, --:--" [(ngModel)]="startTime" />
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label>End Time</label>
+                                        <div class="date-input">
+                                            <input type="datetime-local" placeholder="DD/MM/YYYY, --:--" [(ngModel)]="endTime" [min]="startTime" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3" *ngIf="selectedApps.length === 0">
+                    <div class="noDataAvailable" style="height: 18vh;">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span style="font-weight: 500;">No Application Selected</span>
+                        <span style="font-size: small;">Use the dropdown above to add Application</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+
+                <div class="d-flex justify-content-end" style="width: 84%;">
+
+                    <!-- Step 1: Check Status -->
+                    <!-- <button *ngIf="reportStatus === null" class="btn btn-gradient" (click)="checkReportStatus()">
+                        <i class="fa-solid fa-file-circle-check me-2"></i>
+                        Check Report Status
+                    </button> -->
+
+                    <!-- Case 1: Report EXISTS -->
+                    <ng-container *ngIf="reportStatus === true && !showTimeSelector">
+
+                        <button class="btn btn-gradient ms-2" (click)="previewReport()">
+                            <i class="fa-solid fa-file me-2"></i>
+                            Preview Report
+                        </button>
+
+                        <button class="btn btn-gradient ms-2" (click)="onClickRegenerate()">
+                            <i class="fa-solid fa-rotate me-2"></i>
+                            Regenerate
+                        </button>
+
+                    </ng-container>
+
+                    <!-- Case 2: Time Selector Visible -->
+                    <ng-container *ngIf="showTimeSelector">
+
+                        <button class="btn btn-gradient ms-2" [disabled]="!startTime || !endTime || selectedApps.length === 0" (click)="generateReport()">
+                            <i class="fa-solid fa-file-pen me-2"></i>
+                            Generate
+                        </button>
+
+                        <button class="btn btn-gradient ms-2" [disabled]="disablePreviewButton"
+                            (click)="previewReport()">
+                            <i class="fa-solid fa-file me-2"></i>
+                            Preview Report
+                        </button>
+
+                        <button *ngIf="reportStatus === true" class="btn btn-reset ms-2" (click)="onCancelRegenerate()">
+                            Cancel
+                        </button>
+
+                    </ng-container>
+
+                </div>
+
+                <button class="btn btn-reset" [disabled]="isResetDisabled()" (click)="onReset()">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div class="p-3 reportGenerated shadow shadow-3 rounded rounded-3">
+            <div class="d-flex justify-content-between">
+                <span>
+                    <span class="px-1 icons2 rounded rounded-2"><i class="fa-regular fa-file-lines"></i></span>
+                    <span class="ms-2" style="font-weight: 500;">Generated Report</span>
+                </span>
+            </div>
+            <div>
+                <div *ngIf="generatedReportHtml">
+                    <div class="mt-3" style="height: 55vh;">
+                        <iframe *ngIf="safeReportUrl" [src]="safeReportUrl" width="100%" height="100%"
+                            style="border: none; border-radius: 8px;">
+                        </iframe>
+
+                        <div *ngIf="!safeReportUrl" class="text-center text-muted mt-5">
+                            No report generated yet
+                        </div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-end">
+                        <button class="btn btn-gradient" [disabled]="!generatedReportHtml" style="width: 36%;" data-bs-toggle="modal"
+                            data-bs-target="#confirmModal">
+                            <i class="fa-solid fa-circle-down me-2"></i>
+                            Download Report
+                        </button>
+                        <button class="btn btn-reset ms-3" style="width: 20%;" (click)="this.generatedReportHtml = ''">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="!generatedReportHtml" class="noDataAvailable mt-3" style="height: 58vh;">
+                    <span class="px-1 icons3 rounded rounded-2"><i class="fa-regular fa-file-lines"
+                            style="font-size: xx-large;"></i></span>
+                    <span style="font-weight: 500;">No Report Generated</span>
+                    <span style="font-size: small;">Configure your application settings and click "Generate Report" to
+                        preview the results</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal fade" id="confirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content"
+                style=" margin-top: 19%; max-height: 40vh;">
+                <div class="modal-body">
+                    <div>
+                        <span class="modal-title" id="confirmModalLabel" style="font-size: large; font-weight: 500;">Download Report
+                        </span>
+
+                    </div>
+                    <div class="mt-3">
+                        <span>Are you sure you want to download the generated report?</span>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-end">
+                        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal" aria-label="Close">
+                            Cancle
+                        </button>
+                        <button type="button" class="btn btn-download ms-3" data-bs-dismiss="modal" aria-label="Close" (click)="downloadHtmlReport()">
+                            Download
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

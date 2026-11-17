@@ -1,0 +1,127 @@
+<!-- sv = stats-view prefix -->
+
+<div *ngIf="aggregatedData.length > 0; else noData">
+
+  <!-- Search bar -->
+  <div class="sv-search-bar">
+    <div class="sv-search-wrap">
+      <input type="text" class="sv-search-input" [(ngModel)]="searchText" placeholder="Search method…"
+        autocomplete="off" />
+      <i class="fas fa-search sv-search-icon"></i>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="sv-table-scroll">
+    <table class="sv-table">
+
+      <thead>
+        <tr>
+          <th style="width:5%" (click)="sortData('isError')">
+            Status
+            <i class="fa" [ngClass]="sortColumn==='isError'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+          <th style="width:26%">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span (click)="sortData('endpointName')" style="cursor:pointer;">
+                Endpoint Name
+                <i class="fa" [ngClass]="sortColumn==='endpointName'
+                     ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                     : 'fa-sort'"></i>
+              </span>
+            </div>
+          </th>
+          <th style="width:13%" (click)="sortData('maxTime')">
+            Max Time (ms)
+            <i class="fa" [ngClass]="sortColumn==='maxTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+          <th style="width:13%" (click)="sortData('minTime')">
+            Min Time (ms)
+            <i class="fa" [ngClass]="sortColumn==='minTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+          <th style="width:13%" (click)="sortData('avgTime')">
+            Avg Time (ms)
+            <i class="fa" [ngClass]="sortColumn==='avgTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+          <th style="width:13%" (click)="sortData('sumTime')">
+            Sum Time (ms)
+            <i class="fa" [ngClass]="sortColumn==='sumTime'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+          <th style="width:9%" (click)="sortData('hits')">
+            Hits
+            <i class="fa" [ngClass]="sortColumn==='hits'
+                 ? (sortOrder==='asc' ? 'fa-arrow-up' : 'fa-arrow-down')
+                 : 'fa-sort'"></i>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr class="sv-tr" *ngFor="let trace of aggregatedData | searchTable:searchText:['endpointName']"
+          [class.sv-tr--err]="trace.isError">
+
+          <!-- Status -->
+          <td style="width:5%">
+            <div class="sv-status-bar" [ngClass]="trace.isError ? 'sv-status-bar--err' : 'sv-status-bar--ok'">
+            </div>
+          </td>
+
+          <!-- Endpoint Name -->
+          <td style="width:26%" [ngClass]="trace.isError ? 'sv-td--err' : 'sv-td--link'" [title]="trace.endpointName">
+            {{ trace.endpointName }}
+          </td>
+
+          <!-- Max Time -->
+          <td style="width:13%">
+            <span class="sv-lat-pill" [class.sv-lat-pill--warn]="trace.maxTime > 200">
+              {{ trace.maxTime }} ms
+            </span>
+          </td>
+
+          <!-- Min Time -->
+          <td style="width:13%">
+            <span class="sv-lat-pill" [class.sv-lat-pill--warn]="trace.minTime > 200">
+              {{ trace.minTime }} ms
+            </span>
+          </td>
+
+          <!-- Avg Time -->
+          <td style="width:13%">
+            <span class="sv-lat-pill" [class.sv-lat-pill--warn]="trace.avgTime > 200">
+              {{ trace.avgTime }} ms
+            </span>
+          </td>
+
+          <!-- Sum Time -->
+          <td style="width:13%" class="sv-td--muted">
+            {{ trace.sumTime }} ms
+          </td>
+
+          <!-- Hits -->
+          <td style="width:9%" class="sv-td--muted">
+            {{ trace.hits }}
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
+
+<ng-template #noData>
+  <div class="sv-empty">
+    No Data Available
+  </div>
+</ng-template>

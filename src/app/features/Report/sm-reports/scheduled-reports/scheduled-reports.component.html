@@ -1,0 +1,518 @@
+<main class="py-0 my-0 mx-0">
+    <div class="scrollbar mb-2">
+        <div class=" py-1 px-2">
+            <header class="pb-0 mb-0 ">
+                <ul class="nav nav-tabs border-bottom">
+                    <li class="nav-item ">
+                        <a class="nav-link active  sm-font" aria-current="page">Scheduled Reports</a>
+                    </li>
+                </ul>
+            </header>
+        </div>
+        <div class="custom-card mb-2 px-0 pb-3 pt-0 mt-0 mx-0">
+            <div class="card rounded-0 ">
+                <div class="custom-bg px-3 py-3">
+                    <div class="table-responsive small p-1 mt-1 pb-3 card-shadow">
+                        <div class="d-flex smm-font justify-content-end align-items-center gap-1 ">
+                            <div class=" py-0 ">Total: {{ totalItems }} | <i class="fa-solid fa-download me-1"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <table class="table striped table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 19%;" scope="col">Report Name</th>
+                                        <th style="width: 8%;" scope="col">Zone</th>
+                                        <th style="width: 8%;" scope="col">Team</th>
+                                        <th style="width: 10%;" scope="col">To Emails</th>
+                                        <th style="width: 10%;" scope="col">CC Emails</th>
+                                        <th style="width: 10%;" scope="col">Scheduled Time</th>
+                                        <th style="width: 10%;" scope="col">Scheduled On</th>
+                                        <th style="width: 10%;" scope="col">Frequency</th>
+                                        <th style="width: 10%;" scope="col">Created On</th>
+                                        <th style="width: 10%;" scope="col">Created By</th>
+                                        <th style="width: 5%;" scope="col">Enabled</th>
+                                        <th style="width: 5%;" scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="allData">
+                                    <tr *ngFor="let item of allData | paginate: currentPage: pageSize">
+                                        <td style="width: 19%;">{{ item.reportName }}</td>
+                                        <td style="width: 8%;">{{ item.meteringMappings[0]?.zoneName || 'Unknown Zone'
+                                            }}</td>
+                                        <td style="width: 8%;">{{ item.meteringMappings[0]?.teamName || 'Unknown Team'
+                                            }}</td>
+                                        <td style="width: 10%;">{{ item.toEmails || 'N/A'}}</td>
+                                        <td style="width: 10%;">{{ item.ccEmails || 'N/A'}}</td>
+                                        <td style="width: 10%;">{{ item.scheduledTime }}</td>
+                                        <td style="width: 10%;">
+                                            {{ item.scheduledDOW ? formatScheduledDOW(item.scheduledDOW) :
+                                            item.scheduledDOM || 'N/A' }}
+                                        </td>
+                                        <td style="width: 10%;">{{ item.frequency }}</td>
+                                        <td style="width: 10%;">{{ item.createdAt | date:'yyyy-MM-dd HH:mm'}}</td>
+                                        <td style="width: 10%;">{{ item.createdByName }}</td>
+                                        <td style="width: 5%;">
+                                            <span [ngClass]="item.status ? 'text-success' : 'text-danger'">
+                                                {{ item.status ? 'Yes' : 'No' }}
+                                            </span>
+                                        </td>
+                                        <td style="width: 5%;">
+                                            <!-- <i class="fa-solid fa-pen-to-square text-primary" (click)="getReportMeteringSchedule(item.id)"></i> &nbsp; -->
+                                            <i class="fa-solid fa-trash text-danger" (click)="deleteReportMeteringSchedule(item.id)"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <div *ngIf="!allData || allData.length === 0" class="noData" style="height: 40vh;">
+                                    <h4>No Data Available</h4>
+                                </div>
+                            </table>
+
+                            <div class="d-flex justify-content-end my-1">
+                                <div class="d-flex me-2 ">
+                                    <div class="d-flex justify-content-end  my-1">
+                                        <div class="d-flex me-2 ">
+                                            <div class="pagination-container my-0">
+                                                <button class="py-0 px-2"
+                                                    (click)="currentPage = currentPage - 1;this.inputPage=this.currentPage"
+                                                    [disabled]="currentPage <= 1">
+                                                    <i class="fa-solid fa-angle-left icon-color"></i>
+                                                </button>
+                                                <span class="page-number">
+                                                    Page
+                                                    <input type="number" [(ngModel)]="inputPage"
+                                                        (keydown.enter)="goToPage()" class="page-input" />
+                                                    of {{ totalPages }}
+                                                </span>
+
+                                                <button class="py-0 px-2"
+                                                    (click)="currentPage = currentPage + 1;this.inputPage=this.currentPage"
+                                                    [disabled]="currentPage >= totalPages">
+                                                    <i class="fa-solid fa-angle-right icon-color"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-3" *ngIf="isUpdate">
+            <div class="row mb-3">
+                <div class="col-2 themed-grid-col ">
+                    <label for="staticEmail" class="form-label smm-font">Select Sub Module </label>
+                </div>
+                <div class="col-3 themed-grid-col ">
+                    <div class="d-flex align-items-center">
+            
+                        <span class="me-3">:</span>
+                        <div class="container py-0 d-flex justify-content-between  align-items-center">
+            
+                            <div class="form-check fs-6">
+                                <input class="form-check-input" type="radio" name="SubModule" id="Hardware" checked>
+                                <label class="form-check-label smm-font" for="Hardware">
+                                    Hardware
+                                </label>
+                            </div>
+                            <div class="form-check fs-6">
+                                <input class="form-check-input" type="radio" name="SubModule" id="Software" checked>
+                                <label class="form-check-label smm-font" for="Software">
+                                    Software
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 ">
+                <div class="col-2 themed-grid-col ">
+                    <label for="staticEmail" class="form-label smm-font">Report Name <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-4 themed-grid-col ">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3">:</span>
+                        <input class="form-control form-control-sm smm-font" type="text" value="Report Name" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 mb-1 custom-bg" *ngIf="isUpdate">
+            <div class="card rounded-0">
+                <h5 class="sm-font fw-bold start-0 sub-headers mt-2 mb-1 ml-3">
+                    Schedule
+                </h5>
+                <div class="py-1 px-2">
+                    <header class="pb-0 mb-0 d-flex justify-content-center">
+                        <ul class="nav nav-tabs border-bottom">
+                            <li class="nav-item ">
+                                <a class="nav-link active sm-font" aria-current="page" data-bs-toggle="tab" href="#daily">Daily</a>
+                            </li>
+                            <li class="nav-item ">
+                                <a class="nav-link sm-font" aria-current="page" data-bs-toggle="tab" href="#weekly">Weekly</a>
+                            </li>
+                            <li class="nav-item ">
+                                <a class="nav-link sm-font" aria-current="page" data-bs-toggle="tab" href="#monthly">Monthly</a>
+                            </li>
+                        </ul>
+                    </header>
+                    <div class="tab-content p-0">
+                        <div class="tab-pane fade show active" id="daily">
+                            <div class="m-3 p-2 custom-bg shadow shadow-3 scheduleCard">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="reportsStorageOptions">Reports Storage Options:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="smm-font text-primary">File Path</h6>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="exportFormat">Export Format:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-select form-select-sm smm-font" id="exportFormat"
+                                            style="width: auto;" name="exportFormat">
+                                            <option value="" selected>-- Select --</option>
+                                            <option value="PDF">PDF</option>
+                                            <option value="Excel">Excel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="time">Time:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="time" style="width: auto;" class="form-control form-select-sm smm-font" id="time">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="status">Status:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="checkbox" class="form-check-input" id="status"> 
+                                        <label class="form-check-label ms-1 smm-font" for="status " name="status">
+                                            Email this scheduled report
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 justify-content-center">
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="email" (change)="toggleEmail($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="email " name="email">
+                                            Email
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="sms" (change)="toggleSMS($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="sms " name="sms">
+                                            SMS
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6"> 
+                                        <label class="form-label smm-font">To Email(s):</label>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <label class="form-label smm-font">CC Email(s):</label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of toEmails; let i = index; trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center ">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="toEmails[i]"
+                                                    name="toEmail{{i}}" placeholder="Enter email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addToEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeToEmail(i)"
+                                                    *ngIf="toEmails.length > 1"></i>
+                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="ccEmails[i]"
+                                                    name="ccEmail{{i}}" placeholder="Enter  email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addCcEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeCcEmail(i)"
+                                                    *ngIf="ccEmails.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-2" *ngIf="showSMS">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="mb-2">
+                                            <label class="form-label smm-font">Phone Number(s):</label>
+                                            <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="number" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="phoneNumbers[i]"
+                                                    name="number" placeholder="Enter phone number">
+                                                <i class="fa fa-plus sm-font text-secondary mx-1" (click)="addPhoneNumber()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removePhoneNumber(i)" *ngIf="phoneNumbers.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="weekly">
+                            <div class="m-3 p-2 custom-bg shadow shadow-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="reportsStorageOptions">Reports Storage Options:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="smm-font text-primary">File Path</h6>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="exportFormat">Export Format:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-select form-select-sm smm-font" id="exportFormat"
+                                            style="width: auto;" name="exportFormat">
+                                            <option value="" selected>-- Select --</option>
+                                            <option value="PDF">PDF</option>
+                                            <option value="Excel">Excel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="status">Status:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="checkbox" class="form-check-input" id="status"> 
+                                        <label class="form-check-label ms-1 smm-font" for="status " name="status">
+                                            Email this scheduled report
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="days">Select Days:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div ngbDropdown class="d-inline-block">
+                                            <button class="btn btn-sm selectDaysbtn dropdown-toggle smm-font" id="exportFormatDropdown"
+                                                ngbDropdownToggle>
+                                                {{ selectedDays.length > 0 ? selectedDays.join(', ') : '-- Select --' }}
+                                            </button>
+                                        
+                                            <div ngbDropdownMenu aria-labelledby="exportFormatDropdown" class="dropdown-menu p-2"
+                                                style="max-height: 250px; overflow-y: auto; width: fit-content">
+                                                <div *ngFor="let day of days" class="form-check">
+                                                    <input class="form-check-input" type="checkbox" [id]="day" #checkbox
+                                                        (change)="onDayToggle(day, checkbox.checked)" [checked]="selectedDays.includes(day)">
+                                                    <label class="form-check-label ms-2" [for]="day">
+                                                        {{ day }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="time">Time:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="time" style="width: auto;" class="form-control form-select-sm smm-font" id="time">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-2 justify-content-center">
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="email" (change)="toggleEmail($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="email " name="email">
+                                            Email
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="sms" (change)="toggleSMS($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="sms " name="sms">
+                                            SMS
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6"> 
+                                        <label class="form-label smm-font">To Email(s):</label>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <label class="form-label smm-font">CC Email(s):</label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of toEmails; let i = index; trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center ">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="toEmails[i]"
+                                                    name="toEmail{{i}}" placeholder="Enter email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addToEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeToEmail(i)"
+                                                    *ngIf="toEmails.length > 1"></i>
+                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="ccEmails[i]"
+                                                    name="ccEmail{{i}}" placeholder="Enter  email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addCcEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeCcEmail(i)"
+                                                    *ngIf="ccEmails.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-2" *ngIf="showSMS">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="mb-2">
+                                            <label class="form-label smm-font">Phone Number(s):</label>
+                                            <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="number" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="phoneNumbers[i]"
+                                                    name="number" placeholder="Enter phone number">
+                                                <i class="fa fa-plus sm-font text-secondary mx-1" (click)="addPhoneNumber()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removePhoneNumber(i)" *ngIf="phoneNumbers.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="monthly">
+                            <div class="m-3 p-2 custom-bg shadow shadow-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="reportsStorageOptions">Reports Storage Options:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="smm-font text-primary">File Path</h6>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="exportFormat">Export Format:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-select form-select-sm smm-font" id="exportFormat"
+                                            style="width: auto;" name="exportFormat">
+                                            <option value="" selected>-- Select --</option>
+                                            <option value="PDF">PDF</option>
+                                            <option value="Excel">Excel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="time">Date and Time:</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="datetime-local" style="width: auto;" class="form-control form-select-sm smm-font" id="dateTime">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-4">
+                                        <label class="smm-font" for="status">Status:</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="checkbox" class="form-check-input" id="status"> 
+                                        <label class="form-check-label ms-1 smm-font" for="status " name="status">
+                                            Email this scheduled report
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 justify-content-center">
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="email" (change)="toggleEmail($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="email " name="email">
+                                            Email
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3 align-self-center">
+                                        <input type="checkbox" class="form-check-input" id="sms" (change)="toggleSMS($event)"> 
+                                        <label class="form-check-label ms-1 smm-font" for="sms " name="sms">
+                                            SMS
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6"> 
+                                        <label class="form-label smm-font">To Email(s):</label>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <label class="form-label smm-font">CC Email(s):</label>
+                                    </div>
+                                </div>
+                                <div class="row g-3 " *ngIf="showEmail">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of toEmails; let i = index; trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center ">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="toEmails[i]"
+                                                    name="toEmail{{i}}" placeholder="Enter email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addToEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeToEmail(i)"
+                                                    *ngIf="toEmails.length > 1"></i>
+                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="">
+                                            <div *ngFor="let email of ccEmails; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="email" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="ccEmails[i]"
+                                                    name="ccEmail{{i}}" placeholder="Enter  email address" autocomplete="off">
+                                                <i class="fa fa-plus mx-1 sm-font text-secondary" (click)="addCcEmail()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removeCcEmail(i)"
+                                                    *ngIf="ccEmails.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-2" *ngIf="showSMS">
+                                    <div class="col-sm-6 align-self-center">
+                                        <div class="mb-2">
+                                            <label class="form-label smm-font">Phone Number(s):</label>
+                                            <div *ngFor="let phone of phoneNumbers; let i = index;trackBy: trackByIndex"
+                                                class="input-group mb-2 align-items-center">
+                                                <input type="number" class="form-control smm-font py-1 rounded-0 " [(ngModel)]="phoneNumbers[i]"
+                                                    name="number" placeholder="Enter phone number">
+                                                <i class="fa fa-plus sm-font text-secondary mx-1" (click)="addPhoneNumber()"></i>
+                                                <i class="fa fa-minus sm-font text-secondary" (click)="removePhoneNumber(i)" *ngIf="phoneNumbers.length > 1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 d-flex align-items-center justify-content-end">
+                <button class="btn btn-sm save-btn rounded-1 smm-font fw-bold py-1 me-2">Save</button>
+                <button class="btn btn-sm cancel-btn rounded-1 smm-font fw-bold" (click)="cancleUpdateReport()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</main>

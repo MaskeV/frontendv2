@@ -1,0 +1,194 @@
+<main>
+    <nav aria-label="breadcrumb" class="cd-breadcrumb">
+        <ol class="cd-breadcrumb__list">
+            <li class="cd-breadcrumb__item">
+                <a routerLink="/infra">
+                    <i class="fa-brands fa-linux cd-breadcrumb__icon"></i>
+                    {{ selectedServiceId }}
+                </a>
+            </li>
+            <li class="cd-breadcrumb__item">
+                <a routerLink="/infra/linux-service">{{ selectedService }}</a>
+            </li>
+            <!-- <li class="cd-breadcrumb__item"><a routerLink="/infra/linux-service">{{selectedServiceName}}</a></li> -->
+            <li class="cd-breadcrumb__item cd-breadcrumb__item--active" aria-current="page">
+                {{ selectedServiceName }}
+            </li>
+        </ol>
+    </nav>
+
+    <div class="cd-root">
+
+        <!-- ══════════════════════════════════
+             TOOLBAR — container selector
+             ══════════════════════════════════ -->
+        <div class="cd-toolbar">
+            <div class="cd-select-wrap">
+                <i class="fa-solid fa-box cd-select-wrap__icon" matButton="elevated" data-bs-toggle="tooltip"
+                    data-bs-placement="top" title="container"></i>
+                <select class="cd-select" [(ngModel)]="selectedServiceName" (change)="setContainerName()">
+                    <option *ngFor="let items of containerDetailsText" [value]="items">{{ items }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             PERF SECTION
+             ══════════════════════════════════ -->
+        <div class="cd-section">
+
+            <!-- Horizontal heading (mirrors db tab Performance label) -->
+            <div class="cd-section__heading">
+                <span class="cd-section__title">Performance</span>
+            </div>
+
+            <!-- Chart grid -->
+            <div class="cd-chart-grid">
+
+                <!-- Container Details -->
+                <div class="cd-chart-card">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Container Details</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                            title="<p>container status- active/inactive</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerDetailsChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- CPU Usage -->
+                <div class="cd-chart-card">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Containers CPU Usage (%)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                            title="<p>container cpu usage</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerCpuUsageChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- Memory Usage -->
+                <div class="cd-chart-card">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Containers Memory Usage (%)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" matButton="elevated"
+                            title="<p>container memory usage</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerMemoryUsageChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- ── commented-out cards preserved exactly ── -->
+                <!-- <div class="cd-chart-card cd-chart-card--mt">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Container Network Recieved Rate (Byte)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           data-bs-html="true" matButton="elevated"
+                           title="<p>container network recieved</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerNetworkReceivedChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div> -->
+
+                <!-- <div class="cd-chart-card cd-chart-card--mt">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Container Network Transmit Rate (Byte)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           data-bs-html="true" matButton="elevated"
+                           title="<p>container network transmit</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerNetworkTransmitChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div> -->
+
+                <!-- Network Combined -->
+                <div class="cd-chart-card cd-chart-card--mt">
+                    <div class="cd-chart-card__header">
+                        <span class="cd-chart-card__title">Container Network Rates (Byte)</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon cd-info-icon" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            title="<p>Combined Container Network Received &amp; Transmit Rates with Consolidated Area Spline</p>"></i>
+                    </div>
+                    <div class="cd-chart-card__body">
+                        <div id="containerNetworkCombinedChartsContainer" style="width:100%; height:26vh;"></div>
+                    </div>
+                </div>
+
+                <!-- spacer placeholders (preserve original layout rhythm) -->
+                <div class="cd-chart-card--spacer cd-chart-card--mt"></div>
+                <div class="cd-chart-card--spacer cd-chart-card--mt"></div>
+
+            </div>
+            <!-- end chart grid -->
+
+        </div>
+        <!-- end perf section -->
+
+    </div>
+</main>
+<!-- <ng-template #propertiesModal let-modal>
+    <div class="modal-content">
+        <div class="modal-header py-1 d-flex justify-content-between">
+            <h6 class="modal-title" style="font-weight: 500; margin-bottom: 0%;">PROPERTIES</h6>
+            <i class="fa-solid fa-xmark" (click)="modal.dismiss()" style="cursor: pointer;"></i>
+        </div>
+        <div class="modal-body py-3">
+            <div *ngIf="properties" class="px-2">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>Name:</span>
+                            <span>{{ properties.name }}</span>
+                        </div>
+                    </li>
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>ID:</span>
+                            <span>{{ properties.id }}</span>
+                        </div>
+                    </li>
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>Size:</span>
+                            <span>{{ properties.size }}</span>
+                        </div>
+                    </li>
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>Created:</span>
+                            <span>{{ properties.created }}</span>
+                        </div>
+                    </li>
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>Repo Tags:</span>
+                            <span>{{ properties.repoTags }}</span>
+                        </div>
+                    </li>
+                    <li class="mb-2">
+                        <div class="d-flex justify-content-between pb-1">
+                            <span>CPU Limit:</span>
+                            <span>{{ properties.cpu_limit }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between">
+                            <span>Memory Limit:</span>
+                            <span>{{ properties.memory_limit }}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

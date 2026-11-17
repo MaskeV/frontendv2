@@ -1,0 +1,760 @@
+<main>
+    <!-- breadcrumb part -->
+    <app-mrum-breadcrumb 
+        [breadcrumbs]="breadcrumbData">
+    </app-mrum-breadcrumb>
+    
+    <div class="container-fluid px-3 pb-4" style="background-color: #ffffff; padding-top: 15px; height: 85vh; overflow-y: auto; overflow-x: hidden;">
+        
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="bi bi-phone" style="color: #6366f1;"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0 fw-bold text-dark" style="letter-spacing: -0.5px;">Session Details <span *ngIf="isLive" class="badge rounded-pill shadow-sm ms-2" style="background-color: #6ee7b7; color: #064e3b; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; padding: 4px 10px; vertical-align: middle;"><i class="bi bi-circle-fill me-2" style="font-size: 8px; vertical-align: middle; color: #047857;"></i>LIVE</span></h4>
+                    <div style="color: #64748b; font-size: 13px;">ID: {{ (filters.sessionId ) | slice:0:16 }}...</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" 
+                    style="background-color: #f3e8ff; color: #7e22ce; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; transition: all 0.2s;"
+                    (click)="navigateToUserDetails()">
+                    <i class="bi bi-person-circle" style="font-size: 14px;"></i>
+                    View in User Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrics Section -->
+        <div class="p-4 rounded-4 mb-4" style="background-color: #faf5ff; border: 1px solid #f3e8ff;">
+            <!-- 5 Metric Cards -->
+            <div class="row g-3 mb-4">
+            <!-- User Profile -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #eef2ff; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #e0e7ff; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);">
+                                    <i class="bi bi-person-badge fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end" style="overflow: visible;">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px;">User Profile</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #818cf8; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip align-left" style="background-color: #eef2ff; border-color: #818cf8; color: #3730a3; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Details about the user who generated this session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-truncate" style="color: #312e81; font-size: 15px; letter-spacing: -0.5px;" title="{{ sessionDetails?.userName || 'Anonymous User' }}">{{ sessionDetails?.userName || 'Anonymous User' }}</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 w-100" style="font-size: 11px; color: #4338ca; font-weight: 600; line-height: 1.5; overflow: hidden;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="text-truncate"><i class="bi bi-at" style="opacity: 0.7;"></i> {{ sessionDetails?.userHandle || 'N/A' }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-truncate"><i class="bi bi-envelope" style="opacity: 0.7;"></i> {{ sessionDetails?.userEmail || 'N/A' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Duration -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f0f9ff; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(2, 132, 199, 0.1);">
+                                    <i class="bi bi-clock fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Session Duration</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #60a5fa; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #eff6ff; border-color: #60a5fa; color: #1e3a8a; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Total time elapsed during this session<br><b>Formula:</b> End Time - Start Time of the session.</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #1e3a8a; font-size: 17px; letter-spacing: -0.5px;">{{ sessionDetails?.sessionDuration || '0s' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #0369a1; font-weight: 600; line-height: 1.4;">
+                                <span style="color: #0c4a6e; font-weight: 700;">{{ (sessionDetails?.startTime | date:'MMM d, yyyy') || 'N/A' }}</span><br>
+                                {{ (sessionDetails?.startTime | date:'h:mm a') || 'N/A' }} <span style="color: #7dd3fc; margin: 0 2px;">to</span> {{ (sessionDetails?.endTime | date:'h:mm a') || 'N/A' }}
+                            </div>
+                            <div style="position: relative; width: 70px; height: 24px;">
+                                <svg width="70" height="24" viewBox="0 0 70 24" style="overflow: visible; position: absolute; top: 0; left: 0; pointer-events: none;">
+                                    <path d="M0 20 Q 15 5, 30 15 T 50 5 T 70 0" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+                                    <circle cx="15" cy="12.5" r="3" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"></circle>
+                                    <circle cx="50" cy="5" r="3" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"></circle>
+                                    <circle cx="70" cy="0" r="3" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"></circle>
+                                </svg>
+                                
+                                <div class="tooltip-wrap" style="position: absolute; left: 15px; top: 12.5px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f0f9ff; border-color: #7dd3fc; color: #0c4a6e; font-family: inherit;">
+                                        <strong style="color: #0369a1;">11:15 AM</strong><br>
+                                        <span style="opacity: 0.85;">High Interaction (12 actions)</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 50px; top: 5px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f0f9ff; border-color: #7dd3fc; color: #0c4a6e; font-family: inherit;">
+                                        <strong style="color: #0369a1;">11:32 AM</strong><br>
+                                        <span style="opacity: 0.85;">Peak Activity (28 actions)</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 70px; top: 0px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f0f9ff; border-color: #7dd3fc; color: #0c4a6e; font-family: inherit;">
+                                        <strong style="color: #0369a1;">11:40 AM</strong><br>
+                                        <span style="opacity: 0.85;">Session End (5 actions)</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions with Errors -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #fff1f2; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #ffe4e6; color: #e11d48; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(225, 29, 72, 0.1);">
+                                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.5px;">Actions w/ Errors</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #fb7185; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #fff1f2; border-color: #fb7185; color: #9f1239; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Count of actions that encountered an error<br><b>Formula:</b> Total failed UI Actions + Failed API Calls.</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #9f1239; font-size: 17px; letter-spacing: -0.5px;">{{ sessionDetails?.actionsWithErrors || 0 }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #be123c; font-weight: 600; line-height: 1.4;">
+                                {{ sessionDetails?.errorPercentage || 0 }}% of total<br><span style="opacity: 0.8;">actions</span>
+                            </div>
+                            <div style="position: relative; width: 70px; height: 24px;">
+                                <svg width="70" height="24" viewBox="0 0 70 24" style="overflow: visible; position: absolute; top: 0; left: 0; pointer-events: none;">
+                                    <path d="M0 20 L 15 8 L 25 18 L 40 5 L 55 12 L 70 0" fill="none" stroke="#e11d48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="#ffffff" stroke="#e11d48" stroke-width="1.5"></circle>
+                                    <circle cx="40" cy="5" r="2.5" fill="#ffffff" stroke="#e11d48" stroke-width="1.5"></circle>
+                                    <circle cx="70" cy="0" r="2.5" fill="#ffffff" stroke="#e11d48" stroke-width="1.5"></circle>
+                                </svg>
+                                
+                                <div class="tooltip-wrap" style="position: absolute; left: 15px; top: 8px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #fff1f2; border-color: #fda4af; color: #881337; font-family: inherit;">
+                                        <strong style="color: #be123c;">11:12 AM</strong><br>
+                                        <span style="opacity: 0.85;">Network Timeout</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 40px; top: 5px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #fff1f2; border-color: #fda4af; color: #881337; font-family: inherit;">
+                                        <strong style="color: #be123c;">11:24 AM</strong><br>
+                                        <span style="opacity: 0.85;">JS Exception</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 70px; top: 0px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #fff1f2; border-color: #fda4af; color: #881337; font-family: inherit;">
+                                        <strong style="color: #be123c;">11:39 AM</strong><br>
+                                        <span style="opacity: 0.85;">API 500 Response</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #ecfdf5; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #d1fae5; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.1);">
+                                    <i class="bi bi-phone fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.5px;">Device</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #34d399; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #ecfdf5; border-color: #34d399; color: #064e3b; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Device and OS used for this session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #064e3b; font-size: 13px; line-height: 1.2; letter-spacing: -0.2px;">{{ sessionDetails?.device || 'Unknown' }}</div>
+                            </div>
+                        </div>
+                        <div class="text-end mt-2" style="font-size: 12px; color: #047857; font-weight: 700; display: flex; justify-content: flex-end; align-items: center; gap: 6px;">
+                            <i class="bi bi-android2 fs-5" style="color: #10b981;"></i> {{ sessionDetails?.os || 'Unknown' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apdex Score -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" [ngStyle]="{'background-color': getApdexTheme(apdexScore).bg}" style="border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div [ngStyle]="{'background-color': getApdexTheme(apdexScore).iconBg, 'color': getApdexTheme(apdexScore).iconColor}" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                    <i class="bi bi-bar-chart-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div [ngStyle]="{'color': getApdexTheme(apdexScore).iconColor}" style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Apdex Score</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" [ngStyle]="{'color': getApdexTheme(apdexScore).iconColor}" style="font-size: 10px; opacity: 0.6;"></i>
+                                        <span class="custom-tooltip" [ngStyle]="{'background-color': getApdexTheme(apdexScore).bg, 'border-color': getApdexTheme(apdexScore).iconColor, 'color': getApdexTheme(apdexScore).textDark}" style="z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">User satisfaction score based on response times<br><b>Formula:</b> (Satisfied + (Tolerating / 2)) / Total Samples.</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" [ngStyle]="{'color': getApdexTheme(apdexScore).textDark}" style="font-size: 17px; letter-spacing: -0.5px;">{{ apdexScore ?? 'N/A' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div [ngStyle]="{'color': getApdexTheme(apdexScore).textLight, 'background-color': getApdexTheme(apdexScore).iconBg}" style="font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-star-fill me-1" [ngStyle]="{'color': getApdexTheme(apdexScore).iconColor}" style="font-size: 9px;"></i> {{ getApdexTheme(apdexScore).label }}
+                            </div>
+                            <div style="position: relative; width: 60px; height: 20px;">
+                                <svg width="60" height="20" viewBox="0 0 60 20" style="overflow: visible; position: absolute; top: 0; left: 0; pointer-events: none;">
+                                    <path d="M0 15 Q 30 20, 60 0" fill="none" [attr.stroke]="getApdexTheme(apdexScore).iconColor" stroke-width="2" stroke-linecap="round"/>
+                                    <circle cx="30" cy="17.5" r="2.5" fill="#ffffff" [attr.stroke]="getApdexTheme(apdexScore).iconColor" stroke-width="1.5"></circle>
+                                    <circle cx="60" cy="0" r="2.5" fill="#ffffff" [attr.stroke]="getApdexTheme(apdexScore).iconColor" stroke-width="1.5"></circle>
+                                </svg>
+                                
+                                <div class="tooltip-wrap" style="position: absolute; left: 30px; top: 17.5px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; font-family: inherit;" [ngStyle]="{'background-color': getApdexTheme(apdexScore).bg, 'border-color': getApdexTheme(apdexScore).iconBg, 'color': getApdexTheme(apdexScore).textDark}">
+                                        <strong [ngStyle]="{'color': getApdexTheme(apdexScore).iconColor}">Mid Session</strong><br>
+                                        <span style="opacity: 0.85;">Score: Good</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 60px; top: 0px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; font-family: inherit;" [ngStyle]="{'background-color': getApdexTheme(apdexScore).bg, 'border-color': getApdexTheme(apdexScore).iconBg, 'color': getApdexTheme(apdexScore).textDark}">
+                                        <strong [ngStyle]="{'color': getApdexTheme(apdexScore).iconColor}">Session End</strong><br>
+                                        <span style="opacity: 0.85;">Current: {{ getApdexTheme(apdexScore).label }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Actions -->
+            <div class="col-12 col-md mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f5f3ff; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #ede9fe; color: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(139, 92, 246, 0.1);">
+                                    <i class="bi bi-activity fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #8b5cf6; text-transform: uppercase; letter-spacing: 0.5px;">Total Actions</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #a78bfa; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip align-right" style="background-color: #f5f3ff; border-color: #a78bfa; color: #4c1d95; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Total number of discrete user interactions<br><b>Formula:</b> Sum of all tracked user events and interactions.</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #4c1d95; font-size: 17px; letter-spacing: -0.5px;">{{ sessionDetails?.totalActions || 0 }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #6d28d9; font-weight: 600; line-height: 1.4;">
+                                {{ sessionDetails?.uiActions || 0 }} UI Actions<br><span style="opacity: 0.8;">{{ sessionDetails?.actionsWithErrors || 0 }} API Calls</span>
+                            </div>
+                            <div style="position: relative; width: 70px; height: 24px;">
+                                <svg width="70" height="24" viewBox="0 0 70 24" style="overflow: visible; position: absolute; top: 0; left: 0; pointer-events: none;">
+                                    <path d="M0 20 L 10 10 L 25 15 L 45 5 L 70 2" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="10" cy="10" r="2.5" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"></circle>
+                                    <circle cx="25" cy="15" r="2.5" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"></circle>
+                                    <circle cx="45" cy="5" r="2.5" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"></circle>
+                                    <circle cx="70" cy="2" r="2.5" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"></circle>
+                                </svg>
+                                
+                                <div class="tooltip-wrap" style="position: absolute; left: 10px; top: 10px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f5f3ff; border-color: #ddd6fe; color: #4c1d95; font-family: inherit;">
+                                        <strong style="color: #6d28d9;">Navigations</strong><br>
+                                        <span style="opacity: 0.85;">12 Actions</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 25px; top: 15px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f5f3ff; border-color: #ddd6fe; color: #4c1d95; font-family: inherit;">
+                                        <strong style="color: #6d28d9;">Form Submits</strong><br>
+                                        <span style="opacity: 0.85;">8 Actions</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 45px; top: 5px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f5f3ff; border-color: #ddd6fe; color: #4c1d95; font-family: inherit;">
+                                        <strong style="color: #6d28d9;">API Fetches</strong><br>
+                                        <span style="opacity: 0.85;">20 Calls</span>
+                                    </span>
+                                </div>
+                                <div class="tooltip-wrap" style="position: absolute; left: 70px; top: 2px; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; z-index: 50;">
+                                    <span class="custom-tooltip" style="width: max-content; left: 50%; bottom: 125%; text-align: left; z-index: 1050; background-color: #f5f3ff; border-color: #ddd6fe; color: #4c1d95; font-family: inherit;">
+                                        <strong style="color: #6d28d9;">Background Sync</strong><br>
+                                        <span style="opacity: 0.85;">2 Calls</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 Metrics -->
+        <div class="row g-1 mb-4">
+            <!-- Application -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f0fdf4; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.1);">
+                                    <i class="bi bi-grid-3x3-gap-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">Application</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #4ade80; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #f0fdf4; border-color: #4ade80; color: #14532d; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Application context for this session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-truncate" style="color: #14532d; font-size: 13px; letter-spacing: -0.3px;">{{ filters.appName || 'ecom-app' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #15803d; font-weight: 600; line-height: 1.4;">
+                                {{ sessionDetails?.appVersion || 'Unknown' }}<br><span style="opacity: 0.8;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #eff6ff; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #dbeafe; color: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);">
+                                    <i class="bi bi-wifi fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px;">Network</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #60a5fa; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #eff6ff; border-color: #60a5fa; color: #1e3a8a; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Network connection type</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #1e3a8a; font-size: 14px; letter-spacing: -0.5px;">{{ sessionDetails?.network || 'Unknown' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #1d4ed8; font-weight: 600; line-height: 1.4;">
+                                <br><span style="opacity: 0.8;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #fff7ed; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #ffedd5; color: #ea580c; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.1);">
+                                    <i class="bi bi-geo-alt-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">Location</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #fb923c; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #fff7ed; border-color: #fb923c; color: #7c2d12; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Geographic location of the session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #7c2d12; font-size: 14px; letter-spacing: -0.5px;">{{ sessionDetails?.location || 'Unknown' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #c2410c; font-weight: 600; line-height: 1.4;">
+                                <br><span style="opacity: 0.8;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f0f9ff; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(2, 132, 199, 0.1);">
+                                    <i class="bi bi-phone fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px;">Display</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #38bdf8; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #f0f9ff; border-color: #38bdf8; color: #0c4a6e; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Screen resolution and density</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #0c4a6e; font-size: 13px; letter-spacing: -0.5px; white-space: nowrap;">{{ sessionDetails?.display || 'Unknown' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #0369a1; font-weight: 600; line-height: 1.4;">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session -->
+            <div class="col-12 col-xl mb-2" style="flex: 0 0 17%; max-width: 17%;">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f4f4f5; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2 gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #e4e4e7; color: #52525b; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(82, 82, 91, 0.1);">
+                                    <i class="bi bi-fingerprint fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end" style="min-width: 0;">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Session ID</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #a1a1aa; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #f4f4f5; border-color: #a1a1aa; color: #3f3f46; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Unique identifier for this session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-truncate" style="color: #4b5563; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11.5px; letter-spacing: -0.3px;" title="{{filters.sessionId }}">{{filters.sessionId }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <button class="btn btn-sm d-flex align-items-center gap-1" 
+                                    style="font-size: 10px; font-weight: 700; border-radius: 6px; padding: 4px 10px; border: none; transition: all 0.3s ease;"
+                                    (click)="copySessionId()"
+                                    [ngStyle]="{'background-color': isSessionIdCopied ? '#dcfce7' : '#e4e4e7', 'color': isSessionIdCopied ? '#16a34a' : '#52525b'}">
+                                <i class="bi" [ngClass]="isSessionIdCopied ? 'bi-check2-all' : 'bi-files'" style="transition: transform 0.2s;" [ngStyle]="{'transform': isSessionIdCopied ? 'scale(1.2)' : 'scale(1)'}"></i> 
+                                {{ isSessionIdCopied ? 'Copied!' : 'Copy' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Screen Visits -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100" style="background-color: #f0fdfa; border-radius: 16px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 44px; height: 44px; background-color: #ccfbf1; color: #0d9488; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(13, 148, 136, 0.1);">
+                                    <i class="bi bi-stickies fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div style="font-size: 10px; font-weight: 800; color: #0d9488; text-transform: uppercase; letter-spacing: 0.5px;">Screen Visits</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="color: #2dd4bf; font-size: 10px; opacity: 0.8;"></i>
+                                        <span class="custom-tooltip" style="background-color: #f0fdfa; border-color: #2dd4bf; color: #115e59; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Number of screens visited during this session</span>
+                                    </div>
+                                </div>
+                                <div class="fw-bold" style="color: #115e59; font-size: 17px; letter-spacing: -0.5px;">{{ sessionDetails?.totalScreens || 0 }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div style="font-size: 11px; color: #0f766e; font-weight: 600; line-height: 1.4;">
+                                {{ sessionDetails?.uniqueScreens || 0 }} Unique Screens<br><span style="opacity: 0.8; font-size: 10px;">Useful for navigation analysis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battery Level -->
+            <div class="col-12 col-xl mb-2">
+                <div class="card shadow-sm border-0 h-100 battery-card" style="border-radius: 16px;" [ngClass]="isDischarging ? 'discharging' : 'charging'" (click)="isDischarging = !isDischarging">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="b-icon-bg" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s;">
+                                    <i class="bi fs-4" [ngClass]="isDischarging ? 'bi-battery-half' : 'bi-battery-charging'"></i>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                    <div class="b-label" style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.3s;">Battery</div>
+                                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                                        <i class="bi bi-info-circle-fill" style="font-size: 10px; opacity: 0.5;"></i>
+                                        <span class="custom-tooltip align-right" style="background-color: #f8fafc; border-color: #94a3b8; color: #334155; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Battery level at start of session</span>
+                                    </div>
+                                </div>
+                                <div class="b-value fw-bold" style="font-size: 17px; letter-spacing: -0.5px; transition: color 0.3s;">{{ sessionDetails?.batteryLevel || 'N/A' }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div class="b-status" style="font-size: 11px; font-weight: 600; line-height: 1.4; transition: color 0.3s;">
+                                {{ sessionDetails?.isCharging ? 'Charging' : 'On Battery' }}
+                            </div>
+                            <div style="font-size: 10px; color: #94a3b8; opacity: 0.6; padding-bottom: 2px;">(Click to toggle)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Session Timeline -->
+        <div #timelineContainer class="card shadow-sm border-0 rounded-4 mb-4" style="background-color: #f0f9ff; border: 1px solid #e0f2fe !important;" [class.fullscreen-mode]="isFullscreen">
+            <div class="card-body p-4" style="background-color: transparent; border-radius: 16px;" [style.height]="isFullscreen ? '100vh' : 'auto'">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <h6 class="mb-0 fw-bold" style="color: #0c4a6e; font-family: 'Inter', sans-serif; letter-spacing: -0.3px;">Session Timeline</h6>
+                        <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                            <i class="bi bi-info-circle-fill" style="color: #38bdf8; font-size: 12px;"></i>
+                            <span class="custom-tooltip" style="background-color: #f0f9ff; border-color: #38bdf8; color: #0c4a6e; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Interactive timeline of session events</span>
+                        </div>
+                    </div>
+                    <button (click)="toggleFullscreen()" class="btn btn-light fw-bold d-flex align-items-center gap-2 shadow-sm" style="background-color: #ffffff; border: 1px solid #bae6fd; color: #0c4a6e; border-radius: 10px; padding: 8px 16px; font-size: 12px;">
+                        <i class="bi text-primary" [ngClass]="isFullscreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'"></i> {{ isFullscreen ? 'Exit Full Screen' : 'View in Full Screen' }}
+                    </button>
+                </div>
+
+                <div class="d-flex gap-4 mb-4" style="font-size: 12px; font-weight: 600; color: #0369a1;">
+                    <div class="d-flex align-items-center gap-2"><i class="bi bi-circle-fill" style="color: #4f46e5; font-size: 10px;"></i> User Action</div>
+                    <div class="d-flex align-items-center gap-2"><i class="bi bi-circle-fill" style="color: #e11d48; font-size: 10px;"></i> Error / Annoyance</div>
+                    <div class="d-flex align-items-center gap-2"><i class="bi bi-square-fill" style="color: #c7d2fe; font-size: 11px; border-radius: 3px;"></i> Screen View</div>
+                </div>
+
+                <!-- Timeline Graph Placeholder -->
+                <div class="position-relative mt-2" [style.height]="isFullscreen ? 'calc(100vh - 200px)' : '280px'" style="border-bottom: 2px solid #e2e8f0; transition: height 0.3s ease;">
+                    <!-- Grid Lines Layer -->
+                    <div style="position: absolute; left: 160px; right: 20px; top: 0; bottom: 0; z-index: 0; pointer-events: none;">
+                        <!-- Horizontal lines -->
+                        <div style="position: absolute; left: 0; right: 0; top: 30%; border-top: 1px dashed #cbd5e1;"></div>
+                        <div style="position: absolute; left: 0; right: 0; top: 55%; border-top: 1px dashed #cbd5e1;"></div>
+                        <div style="position: absolute; left: 0; right: 0; top: 80%; border-top: 1px dashed #cbd5e1;"></div>
+                        
+                        <!-- Vertical lines -->
+                        <div *ngFor="let marker of timelineMarkers" style="position: absolute; top: 0; bottom: 0; border-left: 1px solid #f1f5f9;" [style.left.%]="marker.leftPercent"></div>
+                    </div>
+
+                    <!-- Axis Labels -->
+                    <div style="position: absolute; left: 0; top: 25%; font-size: 10px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; z-index: 1;">ERRORS &<br>ANNOYANCES</div>
+                    <div style="position: absolute; left: 0; top: 52%; font-size: 10px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; z-index: 1;">USER ACTIONS</div>
+                    <div style="position: absolute; left: 0; top: 77%; font-size: 10px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; z-index: 1;">SCREENS</div>
+
+                    <!-- Plotted Data -->
+                    <div style="position: absolute; left: 160px; right: 20px; height: 100%; z-index: 2;">
+                        <!-- Errors -->
+                        <div *ngFor="let err of errors; let i = index" class="timeline-action-point d-flex align-items-center justify-content-center" [class.active]="activeTooltipIndex === err.id" (click)="toggleTooltip(err.id, $event)" [style.left.%]="err.leftPercent" style="position: absolute; top: calc(29% - 5px); width: 18px; height: 18px; background-color: #e11d48; border-radius: 50%; color: white; font-size: 10px; font-weight: bold; border: 2px solid #fda4af;">
+                            <div class="timeline-tooltip tooltip-error" (click)="$event.stopPropagation()" style="min-width: 320px;">
+                                <div class="tt-header" (click)="err.expanded = !err.expanded" style="cursor: pointer;">
+                                    <i class="bi" [class.bi-chevron-down]="err.expanded" [class.bi-chevron-right]="!err.expanded" style="color: #e11d48;"></i> {{ err.time }} <strong style="color: #be123c;">{{ err.name }}</strong>
+                                </div>
+                                <div [class.d-none]="!err.expanded">
+                                    <div class="tt-body">
+                                        <div class="tt-row"><span class="label">Error type</span><span class="dotted-leader"></span><span class="value" style="color: #e11d48;">{{ err.name }}</span></div>
+                                        <div class="tt-row"><span class="label">Component</span><span class="dotted-leader"></span><span class="value text-truncate" style="max-width: 180px;" [title]="err.component">{{ err.component }}</span></div>
+                                        <div class="tt-row" *ngIf="err.url"><span class="label">URL</span><span class="dotted-leader"></span><span class="value text-truncate" style="max-width: 180px;" [title]="err.url">{{ err.url }}</span></div>
+                                    </div>
+                                    <div class="tt-footer">
+                                        <button class="tt-btn" style="border-color: #e11d48; color: #e11d48;" (click)="showEventDetails(err)">View more details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div *ngFor="let act of actions; let i = index" class="timeline-action-point" [class.active]="activeTooltipIndex === act.id" (click)="toggleTooltip(act.id, $event)" [style.left.%]="act.leftPercent" [style.width.%]="act.widthPercent" style="position: absolute; top: 54.5%; height: 8px; background-color: #4f46e5; border-radius: 2px; cursor: pointer; min-width: 6px;">
+                            <div class="timeline-tooltip tooltip-action" (click)="$event.stopPropagation()" style="min-width: 320px;">
+                                <div class="tt-header" (click)="act.expanded = !act.expanded" style="cursor: pointer;">
+                                    <i class="bi" [class.bi-chevron-down]="act.expanded" [class.bi-chevron-right]="!act.expanded" style="color: #00b4d8;"></i> {{ act.time }} <strong>{{ act.name }}</strong>
+                                </div>
+                                <div [class.d-none]="!act.expanded">
+                                    <div class="tt-body">
+                                        <div class="tt-row"><span class="label">Action type</span><span class="dotted-leader"></span><span class="value">Mobile Action</span></div>
+                                        <div class="tt-row" *ngIf="act.apdex"><span class="label">Apdex rating</span><span class="dotted-leader"></span><span class="value">{{ getApdexLabel(act.apdex) }}</span></div>
+                                        <div class="tt-row"><span class="label">Action duration</span><span class="dotted-leader"></span><span class="value">{{ act.duration }}</span></div>
+                                    </div>
+                                    <div class="tt-footer">
+                                        <button class="tt-btn" (click)="showEventDetails(act)">View more details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Screens -->
+                        <div *ngFor="let screen of screens" class="timeline-action-point d-flex align-items-center justify-content-center fw-bold px-1" [class.active]="activeTooltipIndex === screen.id" (click)="toggleTooltip(screen.id, $event)" [style.left.%]="screen.leftPercent" [style.width.%]="screen.width" style="position: absolute; top: 78%; height: 16px; background-color: #e0e7ff; border: 1.5px solid #a5b4fc; border-radius: 4px; font-size: 10px; color: #4338ca; overflow: visible; letter-spacing: 0.5px; cursor: pointer;">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; text-align: center;" *ngIf="screen.width >= 3">{{ screen.name }}</span>
+                            
+                            <div class="timeline-tooltip tooltip-action" (click)="$event.stopPropagation()" style="min-width: 250px; bottom: 25px; top: auto; left: 50%; transform: translateX(-50%);">
+                                <div class="tt-header" style="cursor: default;">
+                                    <span class="d-inline-block text-truncate" style="max-width: 200px;" [title]="screen.name">
+                                        <i class="bi bi-phone" style="color: #4338ca;"></i> {{ screen.startTime }} <strong style="color: #4338ca;">{{ screen.name }}</strong>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="tt-body">
+                                        <div class="tt-row"><span class="label">Screen</span><span class="dotted-leader"></span><span class="value">{{ screen.name }}</span></div>
+                                        <div class="tt-row"><span class="label">Duration</span><span class="dotted-leader"></span><span class="value">{{ screen.durationStr }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Time Scale -->
+                <div class="position-relative mt-2" style="height: 30px; margin-left: 160px; margin-right: 20px;">
+                    <div *ngFor="let marker of timelineMarkers" style="position: absolute; top: 4px; font-size: 10px; font-weight: 600; color: #94a3b8;" [style.left.%]="marker.leftPercent">
+                        {{ marker.label }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events & Actions Table -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden" style="background-color: #f0fdf4; border: 1px solid #dcfce7 !important;">
+            <div class="card-header border-0 bg-transparent py-4 px-4 d-flex align-items-center gap-3">
+                <div style="width: 8px; height: 24px; background-color: #059669; border-radius: 4px;"></div>
+                <div class="d-flex align-items-center gap-2">
+                    <h6 class="mb-0 fw-bold" style="color: #064e3b; font-family: 'Inter', sans-serif; letter-spacing: -0.3px;">Events & Actions</h6>
+                    <div class="tooltip-wrap position-relative d-inline-flex ms-1" style="cursor: help;">
+                        <i class="bi bi-info-circle-fill" style="color: #34d399; font-size: 12px; margin-top: 1px;"></i>
+                        <span class="custom-tooltip" style="background-color: #f0fdf4; border-color: #34d399; color: #064e3b; z-index: 1050; width: max-content; font-family: inherit; font-size: 11px; padding: 6px 10px; font-weight: 500;">Detailed log of all actions in this session</span>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size: 12px; color: #334155;">
+                    <thead style="background-color: #ecfdf5; border-top: 1px solid #d1fae5; border-bottom: 2px solid #d1fae5;">
+                        <tr>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Time <i class="bi bi-chevron-expand ms-1 opacity-50"></i></th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Type</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Event / Action</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Screen</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Duration</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Apdex</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none;">Errors</th>
+                            <th style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; padding: 16px 20px; border: none; text-align: center;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let ev of paginatedEvents">
+                        <tr (click)="ev.expanded = !ev.expanded" [style.border-bottom]="'1px solid ' + getEventBorderColor(ev.type)" style="cursor: pointer; transition: background-color 0.2s;">
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 600;" [style.color]="getEventTimeColor(ev.type)">{{ ev.time }}</td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px;"><span class="badge shadow-sm" [style.backgroundColor]="getEventBadgeStyle(ev.type).bg" [style.color]="getEventBadgeStyle(ev.type).color" style="border-radius: 6px; padding: 6px 10px; font-weight: 700; font-size: 10px; letter-spacing: 0.5px;">{{ ev.type }}</span></td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 700; font-size: 13px;" [style.color]="getEventNameColor(ev.type)">{{ ev.name }}</td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 500;" [style.color]="getEventComponentColor(ev.type)">{{ ev.component }}</td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 600;" [class.text-danger]="ev.type === 'ERROR'">{{ ev.duration }}</td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 700; color: #1e293b;">
+                                <ng-container *ngIf="ev.apdex !== null">
+                                    <span [style.color]="getApdexTheme(ev.apdex).iconColor">
+                                        <i class="bi bi-circle-fill me-2" style="font-size: 10px;"></i>{{ getApdexTheme(ev.apdex).label | titlecase }}
+                                    </span>
+                                </ng-container>
+                                <ng-container *ngIf="ev.apdex === null">
+                                    <span style="color: #cbd5e1;">—</span>
+                                </ng-container>
+                            </td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; font-weight: 800;" [style.color]="ev.errorCount ? '#e11d48' : '#cbd5e1'">{{ ev.errorCount ? ev.errorCount : '—' }}</td>
+                            <td [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 18px 20px; text-align: center;"><i class="bi fw-bold fs-6" [ngClass]="ev.expanded ? 'bi-chevron-up' : 'bi-chevron-down'" [style.color]="getEventChevronColor(ev.type)"></i></td>
+                        </tr>
+                        <tr *ngIf="ev.expanded" style="border-bottom: 2px solid #e2e8f0;">
+                            <td colspan="8" [style.backgroundColor]="getEventBgColor(ev.type)" [style.boxShadow]="'none'" style="padding: 24px 40px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-5 flex-wrap">
+                                        <div class="d-flex flex-column gap-3" style="font-size: 12px;">
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">Action Type</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span style="color: #334155; font-weight: 600;">{{ ev.type === 'ERROR' ? 'API Request' : (ev.type === 'SCREEN' ? 'Screen Load' : 'Mobile Action') }}</span></div>
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">Start time</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span style="color: #334155; font-weight: 600;">{{ ev.time }}</span></div>
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">API Called</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span [style.color]="ev.type === 'ERROR' ? '#e11d48' : (ev.type === 'SCREEN' ? '#4f46e5' : '#64748b')" [style.font-weight]="ev.type !== 'APP' && ev.type !== 'ACTION' ? '600' : 'normal'" [style.font-style]="ev.type === 'APP' || ev.type === 'ACTION' ? 'italic' : 'normal'">{{ ev.type === 'ERROR' ? 'POST /search/journey' : (ev.type === 'SCREEN' ? 'GET /api/v1/' + ev.component.toLowerCase().split(' ')[0] : 'None (UI Action Only)') }}</span></div>
+                                        </div>
+                                        <div class="d-flex flex-column gap-3" style="font-size: 12px;">
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">Application</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span style="color: #0ea5e9; font-weight: 600;">ecom-app Mobile</span></div>
+                                            <ng-container *ngIf="ev.type === 'SCREEN' || ev.type === 'ERROR'">
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">Target Service</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span style="color: #10b981; font-weight: 600;">{{ ev.component.toLowerCase().split(' ')[0] }}-service</span></div>
+                                            </ng-container>
+                                            <ng-container *ngIf="ev.type === 'ERROR'">
+                                            <div class="d-flex align-items-center" style="width: 380px;"><span style="color: #94a3b8; min-width: 100px;">Reported errors</span> <div style="flex-grow: 1; border-bottom: 1px dashed #cbd5e1; margin: 0 12px; transform: translateY(-4px);"></div> <span style="color: #e11d48; font-weight: 700;">{{ ev.errorCount }}</span></div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                    <div class="align-self-end">
+                                        <button [routerLink]="['/mrum/action-waterfall']" [queryParams]="{ serviceId: filters.appName, actionName: ev.component, st: startTime, et: endTime, user: filters.user, sessionId: filters.sessionId }" class="btn btn-sm shadow-sm d-flex align-items-center gap-2" [style.background-color]="getEventComponentColor(ev.type)" style="color: white; font-weight: 600; font-size: 12px; padding: 8px 18px; border-radius: 6px; border: none; letter-spacing: 0.3px;">
+                                            <i class="bi bi-bar-chart-steps"></i> Waterfall Analysis
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-transparent border-0 py-4 px-4 d-flex justify-content-between align-items-center" style="background-color: #f8fafc !important; border-top: 1px solid #e2e8f0 !important;">
+                <div style="font-size: 12px; font-weight: 600; color: #64748b;">Showing {{ eventPaginationStart }} to {{ eventPaginationEnd }} of {{ totalEvents }} events</div>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" min="1" class="form-control form-control-sm" style="width: 70px; text-align: center; font-weight: 600;" [(ngModel)]="eventPageSize" (ngModelChange)="updateEventPagination()">
+                        <span style="font-size: 12px; font-weight: 700; color: #334155;">per page</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0 shadow-sm" style="border-radius: 8px; overflow: hidden; font-weight: 600;">
+                            <li class="page-item" [class.disabled]="currentEventPage === 1">
+                                <a class="page-link border-0 py-2 px-3" href="#" (click)="changeEventPage(currentEventPage - 1, $event)" [style.background-color]="currentEventPage === 1 ? '#f8fafc' : '#ffffff'" [style.color]="currentEventPage === 1 ? '#cbd5e1' : '#64748b'"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            
+                            <li class="page-item" *ngFor="let page of eventPaginationPages" [class.active]="currentEventPage === page">
+                                <a class="page-link border-0 py-2 px-3" href="#" (click)="changeEventPage(page, $event)" 
+                                   [style.background-color]="currentEventPage === page ? '#4f46e5' : '#ffffff'" 
+                                   [style.color]="currentEventPage === page ? '#ffffff' : '#64748b'">{{ page }}</a>
+                            </li>
+                            
+                            <li class="page-item" [class.disabled]="currentEventPage === totalEventPages">
+                                <a class="page-link border-0 py-2 px-3" href="#" (click)="changeEventPage(currentEventPage + 1, $event)" [style.background-color]="currentEventPage === totalEventPages ? '#f8fafc' : '#ffffff'" [style.color]="currentEventPage === totalEventPages ? '#cbd5e1' : '#64748b'"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

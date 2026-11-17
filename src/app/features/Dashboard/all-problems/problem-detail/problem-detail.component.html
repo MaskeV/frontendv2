@@ -1,0 +1,138 @@
+<div class="detail-page container-fluid p-0">
+
+  <div class="detail-header px-4 py-3 d-flex align-items-center gap-3">
+    <button class="btn-back" (click)="goBack()">
+      <i class="fa fa-arrow-left"></i>
+    </button>
+    <div>
+      <h4 class="m-0 fw-bold text-dark">Problem Detail</h4>
+      <small class="text-muted">Trigger breakdown for <strong>PID-{{pid}}</strong></small>
+    </div>
+  </div>
+
+  <div class="px-4 py-3 flex-grow-1" style="overflow-y: auto;">
+
+    <div *ngIf="loading" class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && error" class="alert alert-danger rounded-3">{{error}}</div>
+
+    <div *ngIf="!loading && !error && triggerRows.length === 0"
+      class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+      <i class="fa fa-inbox fa-3x text-muted mb-3"></i>
+      <p class="text-muted">No trigger details found for PID-{{pid}}</p>
+    </div>
+
+    <div *ngIf="!loading && triggerRows.length > 0">
+
+      <!-- Summary Card -->
+      <div class="summary-card mb-4">
+        <div class="summary-card-header">
+          <div class="d-flex align-items-center gap-3">
+            <div class="pid-badge">PID-{{triggerRows[0].pid}}</div>
+            <div>
+              <div class="fw-bold text-dark" style="font-size: 15px;">{{triggerRows[0].applicationName}}</div>
+              <div class="text-muted" style="font-size: 12px;">{{triggerRows[0].applicationType}}</div>
+            </div>
+          </div>
+          <span class="state-badge" [ngClass]="getStateClass(lastRow.alertState)">
+            {{lastRow.alertState}}
+          </span>
+        </div>
+        <div class="summary-grid mt-3">
+          <div class="summary-item">
+            <span class="summary-label">Health Rule</span>
+            <span class="summary-value">{{triggerRows[0].healthRuleName || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Module Threshold</span>
+            <span class="summary-value">{{triggerRows[0].moduleThresholdName || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Application Type</span>
+            <span class="summary-value">{{triggerRows[0].applicationType || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Technology Type</span>
+            <span class="summary-value">{{triggerRows[0].technologyType || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">IP Address</span>
+            <span class="summary-value">{{triggerRows[0].ipAddress || '-'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Events Header -->
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="section-title">
+          <i class="fa fa-bolt text-warning me-2"></i>Trigger Events
+          <span class="trigger-count ms-2">{{triggerRows.length}} record{{triggerRows.length > 1 ? 's' : ''}}</span>
+        </div>
+        <button class="sort-btn" (click)="toggleSort()">
+          <i class="fa" [ngClass]="sortDirection === 'desc' ? 'fa-sort-amount-desc' : 'fa-sort-amount-asc'"></i>
+          Initiated {{ sortDirection === 'desc' ? 'Newest First' : 'Oldest First' }}
+        </button>
+      </div>
+
+      <!-- Scrollable Trigger Timeline -->
+      <div class="trigger-timeline-scroll" style="overflow: visible;">
+        <div class="trigger-timeline">
+          <div *ngFor="let row of sortedRows; let i = index; let last = last" class="trigger-card">
+
+            <!-- Index + connector -->
+            <div class="trigger-connector">
+              <div class="trigger-index" [ngClass]="getThresholdClass(row.thresholdType)">{{i + 1}}</div>
+              <div class="connector-line" *ngIf="!last"></div>
+            </div>
+
+            <!-- Card body -->
+            <div class="trigger-body" [ngClass]="'border-' + row.thresholdType?.toLowerCase()">
+
+              <!-- Row header -->
+              <div class="trigger-row-header">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <span class="threshold-badge" [ngClass]="getThresholdClass(row.thresholdType)">
+                    {{row.thresholdType || 'Normal'}}
+                  </span>
+                  <span class="state-badge" [ngClass]="getStateClass(row.alertState)">
+                    {{row.alertState}}
+                  </span>
+                </div>
+                <span class="time-chip">
+                  <i class="fa fa-clock-o me-1"></i>{{row.createdOn | date:'yyyy-MM-dd HH:mm:ss'}}
+                </span>
+              </div>
+
+              <!-- Mail escalation — above the table -->
+              <div class="mail-escalation mb-3" *ngIf="getMailsForRow(row).length > 0">
+                <div class="mail-escalation-title">
+                  <i class="fa fa-paper-plane-o me-1"></i> Escalation Path
+                </div>
+                <div class="mail-escalation-list">
+                  <div *ngFor="let m of getMailsForRow(row)" class="mail-item">
+                    <div class="mail-level-block">
+                      <span class="mail-level-label">Escalation Level {{m.levelNum}}</span>
+                      <div class="mail-level-row">
+                        <span class="mail-level" [ngClass]="m.cls">{{m.level}}</span>
+                        <span class="mail-value">{{m.email}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rendered HTML threshold table -->
+              <div class="threshold-html-wrapper">
+                <div class="threshold-html-render" [innerHTML]="sanitize(row.currentThresholdValue)"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

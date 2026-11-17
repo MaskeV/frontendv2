@@ -1,0 +1,1038 @@
+<div class="main">
+  <div class=" p-1 rounded">
+    <header class="pb-0 mb-0 ">
+      <ul class="nav nav-tabs">
+        <li class="nav-item ">
+          <a class="nav-link active sm-font" aria-current="page" style="color: black;">MS SQL</a>
+        </li>
+      </ul>
+    </header>
+
+
+    <nav aria-label="breadcrumb" class="mx-1" style="height: 7.5vh; font-size: small;margin-bottom: -20px;">
+      <ol class="breadcrumb" style="padding: 0px 5px;margin-top: -8px;">
+        <li class="breadcrumb-item"><a routerLink="/database">{{serviceName}}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Database-Service</li>
+      </ol>
+    </nav>
+
+    <div class="p-1 rounded" style="margin-bottom: -14px;">
+      <header class="pb-0 mb-0">
+        <ul class="nav nav-tabs" id="database-nav" style="font-weight: bold;font-size: small;">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#inspections"
+              (click)="loadData('inspections')">Inspections</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instances"
+              (click)="loadData('instances')">Instances</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#slow_statements"
+              (click)="loadData('slow_statements')">Queries</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#ddl_statements"
+              (click)="loadData('ddl_statements')">DDL Statements</a>
+          </li> -->
+        </ul>
+      </header>
+    </div>
+
+    <!-- Scrollable Inspections Content -->
+    <div class="tab-content custom-bg p-1">
+      <!-- Inspections Tab -->
+      <div class="tab-pane fade in show active" id="inspections">
+        <div class="row mr-1 gap-2 align-items-center" style="width: 95%;">
+          <!-- Logo container -->
+          <div class="w-8">
+            <img class="appImg" src="assets/images/mssql.png" alt="MsSQL">
+          </div>
+
+          <div class="metric-box w-14" [ngStyle]="{
+                      'border': getThresholdDisplay('meter_mysql_qps', avgqps).color === 'orange' 
+                                ? '2px solid orange' 
+                                : getThresholdDisplay('meter_mysql_qps', avgqps).color === 'red' 
+                                  ? '2px solid red' 
+                                  : 'none'
+                    }">
+            <div class="small d-flex justify-content-between align-items-center">
+              <span class="d-flex align-items-center">
+                QPS
+                <i class="fa-solid fa-circle-info gradiantIcon ms-1" matButton="elevated" matTooltip="QPS"></i>
+              </span>
+
+              <span class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold"
+                *ngIf="getThresholdDisplay('meter_mssql_qps', avgqps)?.value"
+                [ngStyle]="{'color': getThresholdDisplay('meter_mssql_qps', avgqps).color == 'red' ? 'red' : 'orange'}">
+                {{ getThresholdDisplay('meter_mssql_qps', avgqps).value }}
+              </span>
+            </div>
+
+            <div class="fw-bold" [ngStyle]="{'color': getThresholdDisplay('meter_mssql_qps', avgqps).color}">
+              {{ avgqps }}
+            </div>
+          </div>
+
+          <!-- <div class="metric-box w-14">
+            <div class="small">TPS<i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                matTooltip="Average TPS"></i></div>
+            <div class="fw-bold">{{avgtps}}</div>
+          </div> -->
+
+          <!-- <div class="metric-box w-14">
+            <div class="small">Connections<i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                matTooltip="Maximum Connected Connections"></i></div>
+            <div class="fw-bold">{{maxconnected}}</div>
+          </div> -->
+
+          <div class="metric-box w-14" [ngStyle]="{
+                    'border': getThresholdDisplay('meter_mssql_threads_connected', maxconnected).color === 'orange' 
+                              ? '2px solid orange' 
+                              : getThresholdDisplay('meter_mssql_threads_connected', maxconnected).color === 'red' 
+                                ? '2px solid red' 
+                                : 'none'
+                  }">
+
+            <div class="small d-flex justify-content-between align-items-center">
+              <span class="d-flex align-items-center">
+                Connections
+                <i class="fa-solid fa-circle-info gradiantIcon ms-1" matButton="elevated"
+                  matTooltip="Maximum Connected Connections"></i>
+              </span>
+
+              <span class="badge border me-1 rounded-0 py-0 px-1 m-0 threshold"
+                *ngIf="getThresholdDisplay('meter_mssql_threads_connected', maxconnected)?.value"
+                [ngStyle]="{'color': getThresholdDisplay('meter_mssql_threads_connected', maxconnected).color== 'red' ? 'red' : 'orange'}">
+                {{ getThresholdDisplay('meter_mssql_threads_connected', maxconnected).value }}
+              </span>
+            </div>
+
+            <div class="fw-bold"
+              [ngStyle]="{'color': getThresholdDisplay('meter_mssql_threads_connected', maxconnected).color}">
+              {{ maxconnected }}
+            </div>
+          </div>
+
+
+
+
+          <!-- Group: Query Volume -->
+          <div class="d-flex align-items-stretch my-3 ps-2 pe-3" style="margin-right: -3%;">
+            <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+              <h5 class="fw-bold ms-3 mb-0" matTooltip="Query Volume">Query Vol..</h5>
+              <div class="pointers"></div>
+            </div>
+
+            <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 93%;">
+
+              <div class="w-33 px-0 custom-border border div-elem">
+                <div class="p-1 border-bottom custom-border"
+                  style=" background-color: var(--card-header-bg); font-weight: 599;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span style="font-size: small;font-weight:500">
+                     Batch Requests (req/sec)
+                    </span>
+                    <div class=" d-flex align-items-center justify-content-between">
+                      <select [(ngModel)]="chart_criteria_qps" style="line-height: 1.2;"
+                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                        aria-label="Small select example">
+
+                        <option value="avg" selected>Average</option>
+                        <option value="threshold">Threshold</option>
+
+                      </select>
+                      <div *ngIf="chart_criteria_qps=='avg'"
+                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold" style="color:#0e38f1">
+                        {{thresholds?.["meter_mssql_qps"]?.avgBaseline}}
+                      </div>
+                      <div *ngIf="chart_criteria_qps=='threshold'"
+                        class="bg-white rounded-2  px-1 chart-threshold fw-bold" style="color:#e07e23">
+                        {{thresholds?.["meter_mssql_qps"]?.warningValue}}
+                      </div>
+                      <div *ngIf="chart_criteria_qps=='threshold'"
+                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                        {{thresholds?.["meter_mssql_qps"]?.criticalValue}}</div>
+                      <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                          matTooltip="{{ qpsInfo }}"></i>
+                      </div>
+
+                    </div>
+
+                  </div>
+                </div>
+                <div id="current_qps_graph" class="card-body h-33 p-0">
+                  <div *ngIf="!currentQPSdata.length" class="text-center"
+                    style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="card w-33">
+              <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                <span>TPS</span>
+                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tpsInfo }}"></i>
+              </div>
+              <div id="current_tps_graph" class="card-body h-33 p-0">
+                <div *ngIf="!currentTPSdata.length" class="text-center"
+                  style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                  <p>No Data</p>
+                </div>
+              </div>
+            </div> -->
+
+              <div class="w-33 px-0 custom-border border div-elem">
+                <div class="p-1 border-bottom custom-border"
+                  style=" background-color: var(--card-header-bg); font-weight: 599;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span style="font-size: small;font-weight:500">
+                        Slow Queries (queries/sec)
+                    </span>
+                    <div class=" d-flex align-items-center justify-content-between">
+                      <select [(ngModel)]="chart_criteria_slowQueries" style="line-height: 1.2;"
+                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                        aria-label="Small select example">
+
+                        <option value="avg" selected>Average</option>
+                        <option value="threshold">Threshold</option>
+
+                      </select>
+                      <div *ngIf="chart_criteria_slowQueries=='avg'"
+                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold" style="color:#0e38f1">
+                        {{thresholds?.["meter_mssql_slow_queries_rate"]?.avgBaseline}}
+                      </div>
+                      <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                        class="bg-white rounded-2  px-1 chart-threshold fw-bold" style="color:#e07e23">
+                        {{thresholds?.["meter_mssql_slow_queries_rate"]?.warningValue}}
+                      </div>
+                      <div *ngIf="chart_criteria_slowQueries=='threshold'"
+                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                        {{thresholds?.["meter_mssql_slow_queries_rate"]?.criticalValue}}</div>
+                      <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                          matTooltip="{{ slowQueriesInfo }}"></i>
+                      </div>
+
+                    </div>
+
+                  </div>
+                </div>
+                <div id="slow_queries_trend" class="card-body h-33 p-0">
+                  <div *ngIf="!slowQueriesTrendData.length" class="text-center"
+                    style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-33 px-0 custom-border border div-elem">
+                <div class="p-1 border-bottom custom-border"
+                  style=" background-color: var(--card-header-bg); font-weight: 599;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span style="font-size: small;font-weight:500">
+                      Index Access Operations (ops/sec)
+                    </span>
+                    <div class=" d-flex align-items-center justify-content-between">
+                      <select [(ngModel)]="chart_criteria_readQuery" style="line-height: 1.2;"
+                        class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                        aria-label="Small select example">
+
+                        <option value="avg" selected>Average</option>
+                        <option value="threshold">Threshold</option>
+
+                      </select>
+                      <div *ngIf="chart_criteria_readQuery=='avg'"
+                        class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold" style="color:#0e38f1">
+                        {{thresholds?.["meter_mssql_commands_select_rate"]?.avgBaseline}}
+                      </div>
+                      <div *ngIf="chart_criteria_readQuery=='threshold'"
+                        class="bg-white rounded-2  px-1 chart-threshold fw-bold" style="color:#e07e23">
+                        {{thresholds?.["meter_mssql_commands_select_rate"]?.warningValue}}
+                      </div>
+                      <div *ngIf="chart_criteria_readQuery=='threshold'"
+                        class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                        {{thresholds?.["meter_mssql_commands_select_rate"]?.criticalValue}}</div>
+                      <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                          matTooltip="{{ commandsReadInfo}}"></i>
+                      </div>
+
+                    </div>
+
+                  </div>
+                </div>
+                <div id="commands_trend" class="card-body h-33 p-0">
+                  <div *ngIf="!commandTrendData.length" class="text-center"
+                    style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card w-33 mt-2">
+                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                  <span>Index Write Operations (ops/sec)
+                  </span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                    matTooltip="{{ commandsWriteInfo }}"></i>
+                </div>
+                <div id="commands_trend_write" class="card-body h-33 p-0">
+                  <div *ngIf="!commandTrendWriteData.length" class="text-center"
+                    style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+              </div>
+              <div style="width: 66%;"></div>
+            </div>
+          </div>
+
+
+          <!-- Group: Connections -->
+          <div class="d-flex align-items-stretch my-3 ps-2 pe-3" style="margin-right: -3%;">
+            <div class="section-header d-flex align-items-center justify-content-center" style="width: 4%;">
+              <h5 class="fw-bold mb-0" matTooltip="Connections">Conns..</h5>
+            </div>
+
+
+            <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 93%;">
+
+              <div class="card w-33">
+                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                  <span>Threads</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                    matTooltip="{{ threadsInfo }}"></i>
+                </div>
+                <div id="trends" class="graph pe-1">
+                  <div *ngIf="!trendsData.length" class="card-body h-33 p-0"
+                    style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+
+              </div>
+              <div class="card w-33">
+                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                  <span>Connects</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                    matTooltip="{{ connectionsInfo }}"></i>
+                </div>
+                <div id="connects" class="card-body h-33 p-0"></div>
+                <div *ngIf="!connectsData.length" class="text-center"
+                  style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+                  <p>No Data</p>
+                </div>
+
+              </div>
+              <div class="card w-33">
+                <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                  <span>Connection Errors</span>
+                  <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                    matTooltip="{{ connectionsErrorsInfo }}"></i>
+                </div>
+                <div id="connection_errors" class="card-body h-33 p-0">
+                  <div *ngIf="!connectionErrorsData.length" class="text-center"
+                    style="color: rgb(137, 137, 137); font-weight: bold;">
+                    <p>No Data</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instances Tab -->
+      <div class="tab-pane fade" id="instances">
+        <div style="height: 73vh !important;">
+          <div class="card-body custom-border border rounded h-100">
+            <!-- Search bar -->
+            <div class="card-header d-flex justify-content-between align-items-center" style="margin-bottom: -2%;">
+              <h5 class="mb-0">MsSql Instances</h5>
+              <div class="searchbar d-flex align-items-center">
+                <input type="text" class="form-control form-control-sm mr-2 custom-border" [(ngModel)]="searchText"
+                  style="background-color: transparent;" placeholder="Search Instances..."
+                  style="width: 200px;font-size: x-small;margin-left: -5%;">
+                <a class="search_icon" style="margin-left:-2rem ;">
+                  <i class="fas fa-lg fw-bold fa-search"></i>
+                </a>
+              </div>
+            </div>
+
+            <br>
+            <div class="border-secondary custom-border my-2" style="height: 80%; overflow-y: auto;">
+              <table class="table table-md" style="table-layout: auto !important;">
+                <thead class="thead-light">
+                  <tr class="headings" style="font-size: x-small; height: 25px; text-transform: uppercase;">
+                    <th class="pointer" (click)="sortBy('instanceName')">
+                      Instance
+                      <span class="sort-icon">
+                        <i *ngIf="sortparam !== 'instanceName'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'instanceName' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'instanceName' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                      </span>
+                    </th>
+                    <th class="pointer" (click)="sortBy('upTime')">
+                      Uptime (Days)
+                      <span class="sort-icon">
+                        <i *ngIf="sortparam !== 'upTime'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'upTime' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'upTime' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                      </span>
+                    </th>
+                    <!-- <th class="pointer" (click)="sortBy('memory')">
+                      Memory
+                      <span class="sort-icon">
+                        <i *ngIf="sortparam !== 'memory'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'memory' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'memory' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                      </span>
+                    </th>
+                    <th class="pointer" (click)="sortBy('ram')">
+                      RAM
+                      <span class="sort-icon">
+                        <i *ngIf="sortparam !== 'ram'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'ram' && sortDirection === 'asc'" class="fas fa-sort"></i>
+                        <i *ngIf="sortparam === 'ram' && sortDirection === 'desc'" class="fas fa-sort"></i>
+                      </span>
+                    </th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let instance of instanceList | searchItem:searchText:'instanceName' | sort:sortparam:sortDirection">
+                    <!-- Instance Name -->
+                    <td class="service-cell"
+                      [ngClass]="{'no-data': !instance.instanceName, 'has-data': instance.instanceName}"
+                      (click)="setServiceInstance(instance.instanceName)">
+                      <img src="assets/images/mssql.png" alt="icon" class="icon" />
+                      <span class="service-name">
+                        {{ instance.instanceName ? instance.instanceName : 'No Data' }}
+                      </span>
+                    </td>
+
+                    <!-- Uptime -->
+                    <td class="started-cell" [ngClass]="{'no-data': !instance.upTime, 'has-data': instance.upTime}">
+                      <i class="fa-regular fa-hourglass me-2" style="color: blue;"></i>
+                      {{ instance.upTime ? instance.upTime : 'No Data' }}
+                    </td>
+
+                    <!-- Memory -->
+                    <!-- <td [ngClass]="{'no-data': !instance.memory, 'has-data': instance.memory}">
+                      <div class="memory-bar-wrapper">
+                        <div class="memory-bar-bg">
+                          <div *ngIf="instance.memoryUsage !== null && instance.memoryUsage !== undefined"
+                            class="memory-bar-fill" [style.width.%]="instance.memoryUsage">
+                          </div>
+                        </div>
+                        <span class="memory-label">
+                          {{ instance.memory ? instance.memory : 'No Data' }}
+                        </span>
+                      </div>
+                    </td> -->
+
+
+                    <!-- RAM -->
+                    <!-- <td [ngClass]="{'no-data': !instance.ram, 'has-data': instance.ram}">
+                      <div class="ram-bar-wrapper">
+                        <div class="ram-bar-bg">
+                          <div *ngIf="instance.ramUsage !== null && instance.ramUsage !== undefined"
+                            class="ram-bar-fill" [style.width.%]="instance.ramUsage">
+                          </div>
+                        </div>
+                        <span class="ram-label">
+                          {{ instance.ram ? instance.ram : 'No Data' }}
+                        </span>
+                      </div>
+                    </td> -->
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- No Data Message -->
+              <div *ngIf="!instanceList || instanceList.length === 0" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                            text-align: center; color: rgb(137, 137, 137); font-size: large; margin-top: 40px;">
+                <strong>No Data</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slow Statements Tab -->
+      <div class="tab-pane fade" id="slow_statements">
+        <div style="width: 99.5%;">
+          <div class="card-body border custom-border rounded" style="min-height: 55vh !important;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Slow Statements (ms)</h5>
+              <div style="position: relative; width: 20%;">
+                <input type="text" class="form-control form-control-sm mr-2" [(ngModel)]="searchQuery"
+                  (input)="onSearchSlowStatements()" style="width: 90%;font-size: x-small;"
+                  placeholder="Search slow statements..." />
+                <i class="fas fa-search"
+                  style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+              </div>
+            </div>
+
+            <div class="scrollables mx-1 my-1" *ngIf="filteredSlowStatements.length; else noDataTemplate">
+              <table class="table table-md" style="table-layout: fixed !important;">
+                <thead class="thead-light">
+
+                  <tr class="headings" style="font-size: x-small; height: 25px; text-transform: uppercase;">
+                    <!-- Sr. No (not sortable) -->
+                    <th scope="col" class="pointer resizable" style="width: 60px;" (click)="sortBy('originalIndex')">
+                      <strong>
+                        Sr. No
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'sr_no' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                              <i *ngIf="sortparam === 'sr_no' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'originalIndex'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'originalIndex'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 0)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- Host -->
+                    <th scope="col" class="pointer resizable" style="width: 125px;" (click)="sortBy('clientHost')">
+                      <strong>
+                        Host
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'host' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'host' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'clientHost'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'clientHost'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 1)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- User -->
+                    <th scope="col" class="pointer resizable" style="width: 55px;" (click)="sortBy('user')">
+                      <strong>
+                        User
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'user' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'user' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'user'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'user'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 2)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- Database -->
+                    <th scope="col" class="pointer resizable" style="width: 85px;" (click)="sortBy('database')">
+                      <strong>
+                        Database
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'state' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'state' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'database'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'database'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 3)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- clientApp -->
+                    <th scope="col" class="pointer resizable" style="width: 85px;" (click)="sortBy('clientApp')">
+                      <strong>
+                        Client App
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'state' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'state' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'clientApp'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'clientApp'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 4)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- execution time -->
+                    <th scope="col" class="pointer resizable" style="width: 210px;" (click)="sortBy('executionTime')">
+                      <strong>
+                        Execution time
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'state' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'state' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'executionTime'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'executionTime'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 5)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- Query -->
+                    <th scope="col" class="pointer resizable" (click)="sortBy('query')">
+                      <strong>
+                        Query
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'query' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'query' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'query'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'query'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 6)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+
+                    <!-- latency -->
+                    <th scope="col" class="pointer resizable" style="width: 80px;" (click)="sortBy('latency')">
+                      <strong>
+                        Duration (ms)
+                        <span class="sort-icon">
+                          <!-- <i *ngIf="sortparam === 'duration' && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
+                            <i *ngIf="sortparam === 'duration' && sortDirection === 'desc'" class="fas fa-arrow-down"></i> -->
+                          <i *ngIf="sortparam !== 'latency'" class="fas fa-sort"></i>
+                          <i *ngIf="sortparam == 'latency'" class="fas fa-sort"></i>
+                        </span>
+                      </strong>
+                      <div class="resize-handle" (mousedown)="initResize($event, 7)" (click)="$event.stopPropagation()">
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="infra-group-table"
+                    *ngFor="let slowStatement of pagedSlowStatements | sort:sortparam:sortDirection; let i = index;"
+                    style="font-size: small; cursor: pointer;"
+                    (click)="slowStatement.showFull = !slowStatement.showFull">
+                    <td>
+                      <div [ngClass]="{
+                              'line-clamp-1': !slowStatement.showFull,
+                              'line-clamp-none': slowStatement.showFull
+                            }" class="overflow-hidden">
+                        {{ slowStatement.originalIndex }}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{ slowStatement.clientHost }}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{slowStatement.user}}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{slowStatement.database}}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{slowStatement.clientApp}}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{slowStatement.executionTime}}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                              'line-clamp-1': !slowStatement.showFull,
+                              'line-clamp-none': slowStatement.showFull
+                            }" class="overflow-hidden">
+                        {{ slowStatement.query }}
+                      </div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{
+                            'line-clamp-1': !slowStatement.showFull,
+                            'line-clamp-none': slowStatement.showFull
+                          }" class="overflow-hidden">
+                        {{slowStatement.latency}}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+
+              </table>
+              <!-- <pagination-controls (pageChange)="pageChange($event)"></pagination-controls> -->
+              <!-- Pagination -->
+              <div class="col-12 d-flex justify-content-end" style="margin-top:-2.5%;">
+                <nav class="mb-1 mr-1">
+                  <ul class="pagination justify-content-center align-items-center"
+                    style="font-size: small; gap: 0.5rem;">
+
+                    <!-- Previous -->
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage()"
+                        [disabled]="currentPage === 1">
+                        &laquo; Previous
+                      </button>
+                    </li>
+
+                    <!-- Page input -->
+                    <li class="page-item d-flex align-items-center">
+                      <span class="me-2" style="color: var(--text-color);">Page</span>
+                      <input type="number" class="form-control form-control-sm text-center"
+                        style="width:60px; font-size: x-small;" [(ngModel)]="pageInput"
+                        (keydown.enter)="goToPage(pageInput)" min="1" [max]="totalPages"
+                        aria-label="Page number input" />
+                      <span class="ms-2" style="color: var(--text-color);">of {{ totalPages }}</span>
+                    </li>
+
+                    <!-- Next -->
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage()"
+                        [disabled]="currentPage === totalPages">
+                        Next &raquo;
+                      </button>
+                    </li>
+
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MsSql SP Errors Table -->
+        <div style="width: 99.5%; margin-top: 20px;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">MsSql SP Errors</h5>
+                <div style="position: relative; width: 250px;">
+                    <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                        placeholder="Search SP Errors..." [(ngModel)]="searchTextMssqlSpErrors"
+                        (input)="onSearchMssqlSpErrors()">
+                    <i class="fas fa-search"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: gray;"></i>
+                </div>
+            </div>
+            <div class="card-body p-0 border custom-border rounded" style="height: 53vh; display: flex; flex-direction: column;">
+                <div class="mt-1" style="overflow-x: auto; flex-grow: 1;">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 15%;" class="pointer" (click)="sortByMssqlSpErrors('objectName')">
+                                    Stored Procedure
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'objectName'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'objectName' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'objectName' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 25%;" class="pointer" (click)="sortByMssqlSpErrors('errorMessage')">
+                                    Error Message
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'errorMessage'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'errorMessage' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'errorMessage' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('errorCode')">
+                                    Error Code
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'errorCode'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'errorCode' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'errorCode' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('severity')">
+                                    Severity
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'severity'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'severity' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'severity' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('database')">
+                                    Database
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'database'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'database' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'database' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('user')">
+                                    User
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'user'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'user' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'user' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('clientHost')">
+                                    Host
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'clientHost'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'clientHost' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'clientHost' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 10%;" class="pointer" (click)="sortByMssqlSpErrors('executionTime')">
+                                    Execution Time
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlSpErrors !== 'executionTime'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'executionTime' && sortDirectionMssqlSpErrors === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlSpErrors === 'executionTime' && sortDirectionMssqlSpErrors === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="isMssqlSpErrorsLoading">
+                            <tr *ngFor="let i of [].constructor(8)">
+                                <td *ngFor="let j of [].constructor(8)">
+                                    <div class="skeleton h-4 w-100"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody *ngIf="!isMssqlSpErrorsLoading && pagedMssqlSpErrors.length !== 0">
+                            <tr *ngFor="let item of pagedMssqlSpErrors">
+                                <td style="width: 25%; font-size: x-small;" (click)="item.expanded = !item.expanded" class="pointer">
+                                    <span *ngIf="!item.expanded">
+                                        {{ item.errorMessage | slice:0:100 }}<span *ngIf="item.errorMessage && item.errorMessage.length > 100">...</span>
+                                    </span>
+                                    <span *ngIf="item.expanded">{{ item.errorMessage }}</span>
+                                </td>
+                                <td style="width: 15%; font-size: x-small;">{{ item.objectName }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.errorCode }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.severity }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.database }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.user }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.clientHost }}</td>
+                                <td style="width: 10%; font-size: x-small;">{{ item.executionTime }}</td>
+                            </tr>
+                        </tbody>
+                        <tbody *ngIf="!isMssqlSpErrorsLoading && pagedMssqlSpErrors.length === 0">
+                            <tr>
+                                <td colspan="8" class="text-center" style="height: 40vh; vertical-align: middle;">
+                                    <div class="noData"><span>No Data Available</span></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="col-12 d-flex justify-content-between p-2"
+                    style="background-color: var(--card-bg-color, white); border-top: 1px solid #dee2e6;">
+                    <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                        {{ (currentPageMssqlSpErrors - 1) * itemsPerPageMssqlSpErrors + 1 }} - {{
+                        (currentPageMssqlSpErrors * itemsPerPageMssqlSpErrors) > filteredMssqlSpErrorsList.length ?
+                        filteredMssqlSpErrorsList.length : (currentPageMssqlSpErrors * itemsPerPageMssqlSpErrors) }}
+                        of {{ filteredMssqlSpErrorsList.length }}
+                    </span>
+                    <nav class="mb-1 mr-1">
+                        <ul class="pagination justify-content-center align-items-center mb-0"
+                            style="font-size: small; gap: 0.5rem;">
+                            <li class="page-item" [class.disabled]="currentPageMssqlSpErrors === 1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    (click)="previousPageMssqlSpErrors()"
+                                    [disabled]="currentPageMssqlSpErrors === 1" tabindex="0">
+                                    &laquo; Previous
+                                </button>
+                            </li>
+
+                            <li class="page-item d-flex align-items-center">
+                                <input type="number" class="form-control form-control-sm text-center"
+                                    style="width:60px" [value]="currentPageMssqlSpErrors"
+                                    (keydown.enter)="goToPageMssqlSpErrors(inputPageMssqlSpErrors.value)"
+                                    #inputPageMssqlSpErrors min="1" [max]="totalPagesMssqlSpErrors"
+                                    aria-label="Page number input" />
+                                <span class="ms-2"> of {{ totalPagesMssqlSpErrors }}</span>
+                            </li>
+
+                            <li class="page-item"
+                                [class.disabled]="currentPageMssqlSpErrors === totalPagesMssqlSpErrors">
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    (click)="nextPageMssqlSpErrors()"
+                                    [disabled]="currentPageMssqlSpErrors === totalPagesMssqlSpErrors" tabindex="0">
+                                    Next &raquo;
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- MsSql Deadlocks Table -->
+        <div style="width: 99.5%; margin-top: 20px;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">MSSql Deadlocks</h5>
+                <div style="position: relative; width: 250px;">
+                    <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                        placeholder="Search Deadlocks..." [(ngModel)]="searchTextMssqlDeadlocks"
+                        (input)="onSearchMssqlDeadlocks()">
+                    <i class="fas fa-search"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: gray;"></i>
+                </div>
+            </div>
+            <div class="card-body p-0 border custom-border rounded" style="height: 53vh; display: flex; flex-direction: column;">
+                <div class="mt-1" style="overflow-x: auto; flex-grow: 1;">
+                    <table class="table table-sm table-bordered table-hover"
+                        style="min-width: 1500px; table-layout: fixed; word-wrap: break-word;">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 250px;" class="pointer" (click)="sortByMssqlDeadlocks('query1')">
+                                    Blocked Query
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'query1'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'query1' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'query1' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 100px;" class="pointer" (click)="sortByMssqlDeadlocks('user1')">
+                                    User 1
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'user1'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'user1' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'user1' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 120px;" class="pointer" (click)="sortByMssqlDeadlocks('host1')">
+                                    Host 1
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'host1'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'host1' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'host1' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 250px;" class="pointer" (click)="sortByMssqlDeadlocks('query2')">
+                                    Blocking Query
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'query2'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'query2' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'query2' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 100px;" class="pointer" (click)="sortByMssqlDeadlocks('user2')">
+                                    User 2
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'user2'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'user2' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'user2' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 120px;" class="pointer" (click)="sortByMssqlDeadlocks('host2')">
+                                    Host 2
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'host2'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'host2' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'host2' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                                <th style="width: 150px;" class="pointer" (click)="sortByMssqlDeadlocks('executionTime')">
+                                    Execution Time
+                                    <span class="sort-icon">
+                                        <i *ngIf="sortParamMssqlDeadlocks !== 'executionTime'" class="fas fa-sort"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'executionTime' && sortDirectionMssqlDeadlocks === 'asc'" class="fas fa-arrow-up"></i>
+                                        <i *ngIf="sortParamMssqlDeadlocks === 'executionTime' && sortDirectionMssqlDeadlocks === 'desc'" class="fas fa-arrow-down"></i>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="isMssqlDeadlocksLoading">
+                            <tr *ngFor="let i of [].constructor(8)">
+                                <td *ngFor="let j of [].constructor(7)">
+                                    <div class="skeleton h-4 w-100"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody *ngIf="!isMssqlDeadlocksLoading && pagedMssqlDeadlocks.length !== 0">
+                            <tr *ngFor="let item of pagedMssqlDeadlocks" (click)="item.expanded = !item.expanded" class="pointer">
+                                <td style="width: 250px; font-size: x-small;">
+                                    <span *ngIf="!item.expanded">
+                                        {{ item.query1 | slice:0:100 }}<span *ngIf="item.query1 && item.query1.length > 100">...</span>
+                                    </span>
+                                    <span *ngIf="item.expanded" style="white-space: pre-wrap;">{{ item.query1 }}</span>
+                                </td>
+                                <td style="width: 100px; font-size: x-small;">{{ item.user1 }}</td>
+                                <td style="width: 120px; font-size: x-small;">{{ item.host1 }}</td>
+                                <td style="width: 250px; font-size: x-small;">
+                                    <span *ngIf="!item.expanded">
+                                        {{ item.query2 | slice:0:100 }}<span *ngIf="item.query2 && item.query2.length > 100">...</span>
+                                    </span>
+                                    <span *ngIf="item.expanded" style="white-space: pre-wrap;">{{ item.query2 }}</span>
+                                </td>
+                                <td style="width: 100px; font-size: x-small;">{{ item.user2 }}</td>
+                                <td style="width: 120px; font-size: x-small;">{{ item.host2 }}</td>
+                                <td style="width: 150px; font-size: x-small;">{{ item.executionTime }}</td>
+                            </tr>
+                        </tbody>
+                        <tbody *ngIf="!isMssqlDeadlocksLoading && pagedMssqlDeadlocks.length === 0">
+                            <tr>
+                                <td colspan="7" class="text-center" style="height: 40vh; vertical-align: middle;">
+                                    <div class="noData"><span>No Data Available</span></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="col-12 d-flex justify-content-between p-2"
+                    style="background-color: var(--card-bg-color, white); border-top: 1px solid #dee2e6;">
+                    <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                        {{ (currentPageMssqlDeadlocks - 1) * itemsPerPageMssqlDeadlocks + 1 }} - {{
+                        (currentPageMssqlDeadlocks * itemsPerPageMssqlDeadlocks) > filteredMssqlDeadlocksList.length ?
+                        filteredMssqlDeadlocksList.length : (currentPageMssqlDeadlocks * itemsPerPageMssqlDeadlocks) }}
+                        of {{ filteredMssqlDeadlocksList.length }}
+                    </span>
+                    <nav class="mb-1 mr-1">
+                        <ul class="pagination justify-content-center align-items-center mb-0"
+                            style="font-size: small; gap: 0.5rem;">
+                            <li class="page-item" [class.disabled]="currentPageMssqlDeadlocks === 1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    (click)="previousPageMssqlDeadlocks()"
+                                    [disabled]="currentPageMssqlDeadlocks === 1" tabindex="0">
+                                    &laquo; Previous
+                                </button>
+                            </li>
+
+                            <li class="page-item d-flex align-items-center">
+                                <input type="number" class="form-control form-control-sm text-center"
+                                    style="width:60px" [value]="currentPageMssqlDeadlocks"
+                                    (keydown.enter)="goToPageMssqlDeadlocks(inputPageMssqlDeadlocks.value)"
+                                    #inputPageMssqlDeadlocks min="1" [max]="totalPagesMssqlDeadlocks"
+                                    aria-label="Page number input" />
+                                <span class="ms-2"> of {{ totalPagesMssqlDeadlocks }}</span>
+                            </li>
+
+                            <li class="page-item"
+                                [class.disabled]="currentPageMssqlDeadlocks === totalPagesMssqlDeadlocks">
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    (click)="nextPageMssqlDeadlocks()"
+                                    [disabled]="currentPageMssqlDeadlocks === totalPagesMssqlDeadlocks" tabindex="0">
+                                    Next &raquo;
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noDataTemplate>
+      <div class="text-center" style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+        <p>No Data</p>
+      </div>
+    </ng-template>

@@ -1,0 +1,750 @@
+<ng-template #template>
+  <div class="modal-body text-center">
+    <p>Are you sure you want to delete the user?</p>
+    <button type="button" class="btn btn-success" (click)="deleteUser()">Yes, proceed</button>&nbsp;
+    <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+  </div>
+</ng-template>
+
+<ng-template #toggleLockTemplate>
+  <div class="modal-body text-center">
+    <p>Are you sure you want to {{ (userObj?.count ?? 0) >= (userObj?.actualLockCount ?? 5) ? 'unlock' : 'lock' }} this
+      user?</p>
+    <button type="button" class="btn btn-success" (click)="toggleLockUser()">Yes, proceed</button>&nbsp;
+    <button type="button" class="btn btn-danger" (click)="cancelRequest()">No, Cancel</button>&nbsp;
+  </div>
+</ng-template>
+
+
+
+<div
+  class="bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-xl shadow-sm overflow-hidden mt-2"
+  *ngIf="isForm && isCreation && userTypeCrudMap.create=== true">
+  <div class="p-6 border-b border-border-light dark:border-border-dark flex items-center gap-3">
+    <i class="ri-user-add-line text-primary text-2xl"></i>
+    <h2 class="text-lg font-semibold flex-1">User Creation & Role Assignment</h2>
+    <!-- See All Button -->
+    <button class="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+      (click)="showTable()">
+      See All <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+  <div class="p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Username<span
+            class="text-danger">*</span></label>
+        <input
+          class="w-full bg-slate-50 dark:bg-slate-900 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+          placeholder="Enter Username" type="text" maxlength="25" [(ngModel)]="userObj.userId"
+          (ngModelChange)="validateUserId($event)" (keypress)="omit_special_char($event)" (paste)="onPaste($event)" appSanitizeInput />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Full Name<span
+            class="text-danger">*</span></label>
+        <input
+          class="w-full bg-slate-50 dark:bg-slate-900 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+          placeholder="Enter Full Name" type="text" maxlength="25" [(ngModel)]="userObj.fullName" appSanitizeInput />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address<span
+            class="text-danger">*</span></label>
+        <input
+          class="w-full bg-slate-50 dark:bg-slate-900 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+          placeholder="Enter Email Address" type="email" maxlength="50" [(ngModel)]="userObj.mailId"
+          (change)="validateEmail(userObj.mailId)" (keypress)="omit_special_char($event)" (paste)="onPaste($event)" appSanitizeInput />
+        <small *ngIf="!validateEmail(userObj.mailId)" class="text-danger block mt-1">Kindly provide valid Email ID
+          !!</small>
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mobile Number<span
+            class="text-danger">*</span></label>
+        <input
+          class="w-full bg-slate-50 dark:bg-slate-900 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+          placeholder="Enter Mobile Number" type="tel" minlength="10" maxlength="10" [(ngModel)]="userObj.mobileNo"
+          (change)="validateMobileNum(userObj.mobileNo)" appSanitizeInput />
+        <small *ngIf="!validateMobileNum(userObj.mobileNo)" class="text-danger block mt-1">Mobile Number should be 10
+          digits !!</small>
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Auth Type<span
+            class="text-danger">*</span></label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none no-native-arrow cursor-pointer shadow-sm"
+            [(ngModel)]="userObj.authentication">
+            <option selected="selected" value="Select" disabled>Select</option>
+            <option value="RUAMBOT">Netraa User</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">User Type<span
+            class="text-danger">*</span></label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none no-native-arrow cursor-pointer shadow-sm"
+            [(ngModel)]="userObj.userType" (change)="getApproversByUserType()" [disabled]="userStatus">
+            <option selected="selected" value="Select" disabled>Select</option>
+            <option [disabled]="userType" value="Super Admin">Super Admin</option>
+            <option [disabled]="userType1" value="Admin">Admin</option>
+            <option [disabled]="userType2" value="User">User</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Client Selection (Super Admin only can change, Admin sees as read-only if desired, or hidden) -->
+      <div class="space-y-1.5" *ngIf="currentUser?.userType === 'Super Admin'">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Client<span
+            class="text-danger">*</span></label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none no-native-arrow cursor-pointer shadow-sm"
+            [(ngModel)]="userObj.clientId">
+            <option [ngValue]="undefined" disabled selected>Select Client</option>
+            <option *ngFor="let client of allClientList" [ngValue]="client.client_id">{{client.client_name}}</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Read-only Client ID for Admin (optional, hidden as per "dont show id in admin view") -->
+      <div class="space-y-1.5" *ngIf="currentUser?.userType === 'Admin' && false">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Client ID</label>
+        <input
+          class="w-full bg-slate-100 dark:bg-slate-800 border-border-light dark:border-border-dark rounded-md px-4 py-2 outline-none"
+          [value]="userObj.clientId" readonly />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Session Logout
+          Timer</label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none no-native-arrow cursor-pointer shadow-sm"
+            [(ngModel)]="userObj.sessionLogout">
+            <option selected="selected" value="15">15 Minutes</option>
+            <option value="30">30 Minutes</option>
+            <option value="45">45 Minutes</option>
+            <option value="60">60 Minutes</option>
+            <option value="0">Never</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-1.5" *ngIf="userObj.userType != 'Super Admin'">
+        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role<span
+            class="text-danger">*</span></label>
+        <div class="relative">
+          <select
+            class="w-full bg-white dark:bg-slate-950 border-border-light dark:border-border-dark rounded-md px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none no-native-arrow cursor-pointer shadow-sm"
+            [(ngModel)]="userObj.role">
+            <option selected="selected" value="Select" disabled>Select Role</option>
+            <option *ngFor="let data of allRolesList" [value]="data.id">{{data.roleName}}</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 rounded-lg"
+      *ngIf="isCreation && currentUser?.userType !== 'Super Admin' && userObj.userType === 'Admin'">
+      <div class="flex flex-col md:flex-row md:items-center gap-6">
+        <div class="flex-1 space-y-1.5">
+          <label class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Assigned
+            Approver<span class="text-danger">*</span></label>
+          <div class="relative">
+            <select
+              class="w-full bg-white dark:bg-slate-950 border-blue-200 dark:border-blue-800 rounded-md px-4 py-2 focus:ring-2 focus:ring-primary outline-none appearance-none no-native-arrow cursor-pointer shadow-sm"
+              [(ngModel)]="userObj.approver" [disabled]="approverValue">
+              <option selected="selected" value="Select" disabled>Select Super Admin...</option>
+              <option *ngFor="let data of approverList" [value]="data.id">{{data.userId}}</option>
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+              <i class="ri-arrow-down-s-line text-slate-400"></i>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-blue-600 dark:text-blue-300 italic">
+            <i class="ri-information-line text-lg align-middle mr-1"></i>
+            Admin-level accounts require approval from a designated Super Admin before activation.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 rounded-lg"
+      *ngIf="isUpdation">
+      <div class="flex flex-col md:flex-row md:items-center gap-6">
+        <div class="flex-1 space-y-1.5">
+          <label class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Assigned
+            Approver<span class="text-danger">*</span></label>
+          <div class="relative">
+            <select
+              class="w-full bg-white dark:bg-slate-950 border-blue-200 dark:border-blue-800 rounded-md px-4 py-2 focus:ring-2 focus:ring-primary outline-none appearance-none no-native-arrow cursor-pointer shadow-sm"
+              [(ngModel)]="userObj.approver" [disabled]="approverValue">
+              <option selected="selected" value="Select" disabled>Select</option>
+              <option *ngFor="let data of allApproverList" value={{data.id}}>{{data.userId}}</option>
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+              <i class="ri-arrow-down-s-line text-slate-400"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <!-- Footer Actions -->
+    <div
+      class="bg-white dark:bg-slate-900 border-t border-border-light dark:border-border-dark py-4 px-8 z-50 rounded-b-xl mt-8">
+      <div class="flex items-center justify-between">
+        <button
+          class="px-6 py-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/30 text-[11px] font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 animate-hover"
+          (click)="discardChanges()">
+          Discard Changes <i class="ri-close-line text-base"></i>
+        </button>
+        <div class="flex items-center gap-3">
+          <button
+            class="px-6 py-2 bg-[#f26321] text-white rounded-lg text-sm font-semibold hover:bg-[#d9581b] transition-all"
+            *ngIf="!isCreation" (click)="updateUser()">
+            Update User
+          </button>
+          <button
+            class="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
+            *ngIf="isCreation" (click)="createUser()">
+            Create User <i class="ri-save-line text-sm"></i>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update User Form -->
+<div *ngIf="isUpdation && userTypeCrudMap.edit=== true" class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
+  <!-- Header -->
+  <div class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+    <div class="w-full flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <button (click)="showTable()"
+          class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors group">
+          <i class="ri-arrow-left-line text-slate-500 group-hover:text-primary text-xl"></i>
+        </button>
+        <h1 class="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Update User Profile</h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/40 rounded-full"
+          *ngIf="currentUser?.userType === 'Super Admin'">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Super
+            Admin Mode</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="w-full px-6 py-8 pb-32">
+    <div class="grid grid-cols-12 gap-8 max-w-[1400px] mx-auto">
+      <!-- Left Column: Primary Information -->
+      <div class="col-span-12 lg:col-span-8 space-y-6">
+        <!-- User Information Card -->
+        <div
+          class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div
+            class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+            <i class="ri-user-3-line text-primary text-xl"></i>
+            <h2 class="font-bold text-slate-700 dark:text-slate-200">User Information</h2>
+          </div>
+          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Username</label>
+              <input
+                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                type="text" [(ngModel)]="userObj.userId" (ngModelChange)="validateUserId($event)"
+                (keypress)="omit_special_char($event)" (paste)="onPaste($event)" appSanitizeInput />
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
+              <input
+                class="w-full bg-slate-50 dark:bg-slate-955 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                type="text" maxlength="40" [(ngModel)]="userObj.fullName" appSanitizeInput />
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email ID</label>
+              <input
+                class="w-full bg-slate-50 dark:bg-slate-955 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                type="email" maxlength="50" [(ngModel)]="userObj.mailId" (change)="validateEmail(userObj.mailId)"
+                (keypress)="omit_special_char($event)" (paste)="onPaste($event)" appSanitizeInput />
+              <small *ngIf="!validateEmail(userObj.mailId)"
+                class="text-danger flex items-center gap-1 mt-1 text-[10px]">
+                <i class="ri-error-warning-line"></i> Kindly provide valid Email ID
+              </small>
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mobile Number</label>
+              <input
+                class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                type="tel" minlength="10" maxlength="10" [(ngModel)]="userObj.mobileNo"
+                (change)="validateMobileNum(userObj.mobileNo)" appSanitizeInput />
+              <small *ngIf="!validateMobileNum(userObj.mobileNo)"
+                class="text-danger flex items-center gap-1 mt-1 text-[10px]">
+                <i class="ri-error-warning-line"></i> Mobile Number should be 10 digits
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Access & Permissions Card -->
+        <div
+          class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div
+            class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+            <i class="ri-shield-user-line text-primary text-xl"></i>
+            <h2 class="font-bold text-slate-700 dark:text-slate-200">Access & Permissions</h2>
+          </div>
+          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">User Type <span
+                  class="text-danger">*</span></label>
+              <div class="relative group">
+                <select
+                  class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer outline-none"
+                  [(ngModel)]="userObj.userType" (change)="getApproversByUserType()" [disabled]="userStatus">
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                </select>
+                <i
+                  class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform group-hover:scale-110"></i>
+              </div>
+            </div>
+            <div class="space-y-2" *ngIf="currentUser?.userType === 'Super Admin'">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Client Selection <span
+                  class="text-danger">*</span></label>
+              <div class="relative group">
+                <select
+                  class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer outline-none"
+                  [(ngModel)]="userObj.clientId" name="updateClientId">
+                  <option [ngValue]="undefined" disabled selected>Select Client</option>
+                  <option *ngFor="let client of allClientList" [ngValue]="client.client_id">{{client.client_name}}
+                  </option>
+                </select>
+                <i
+                  class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform group-hover:scale-110"></i>
+              </div>
+            </div>
+            <!-- Role Selection: hidden for Super Admin -->
+            <div class="space-y-2" *ngIf="userObj.userType !== 'Super Admin'">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Role Selection <span
+                  class="text-danger">*</span></label>
+              <div class="relative group">
+                <i class="ri-search-2-line absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
+                <select
+                  class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer outline-none"
+                  [(ngModel)]="userObj.role" [disabled]="!isRoleEditable">
+                  <option selected="selected" value="Select" disabled>Select Role</option>
+                  <option *ngFor="let data of allRolesList" [value]="data.id">{{data.roleName}}</option>
+                </select>
+                <i
+                  class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform group-hover:scale-110"></i>
+              </div>
+            </div>
+
+            <!-- Session Logout Timer -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Session Logout Timer
+              </label>
+              <div class="relative group">
+                <select
+                  class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer outline-none"
+                  [(ngModel)]="userObj.sessionLogout">
+                  <option value="15">15 Minutes</option>
+                  <option value="30">30 Minutes</option>
+                  <option value="45">45 Minutes</option>
+                  <option value="60">60 Minutes</option>
+                  <option value="0">Never</option>
+                </select>
+                <i
+                  class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform group-hover:scale-110"></i>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Right Column: Metadata & Status -->
+      <div class="col-span-12 lg:col-span-4 space-y-6">
+        <!-- System Metadata Card -->
+        <div
+          class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 overflow-hidden relative">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-800/20 rounded-full -mr-16 -mt-16 -z-0">
+          </div>
+
+          <h2 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 relative z-10">System
+            Metadata</h2>
+
+          <div class="space-y-8 relative z-10">
+            <!-- Created On -->
+            <div class="flex items-start gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-900/10">
+                <i class="ri-add-line text-blue-600 dark:text-blue-400 text-lg"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Created On</p>
+                <p class="text-sm font-bold text-slate-700 dark:text-slate-200">{{userObj['createdOn'] |
+                  date:'dd-MMM-yyyy'}}</p>
+                <div class="mt-1 flex flex-col">
+                  <span class="text-[10px] font-bold text-slate-500">CREATED BY</span>
+                  <span
+                    class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">{{userObj['createdByUsername']
+                    || '-'}}</span>
+                  <span class="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">ID: {{userObj.createdBy
+                    || '-'}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="flex items-start gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-900/10">
+                <i class="ri-history-line text-amber-600 dark:text-amber-400 text-lg"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Last Updated</p>
+                <p class="text-sm font-bold text-slate-700 dark:text-slate-200">{{userObj.updatedOn ? (userObj.updatedOn
+                  | date:'dd-MMM-yyyy') : '-'}}</p>
+                <div class="mt-1 flex flex-col">
+                  <span class="text-[10px] font-bold text-slate-500">UPDATED BY</span>
+                  <span
+                    class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">{{userObj['updatedByUsername']
+                    || '-'}}</span>
+                  <span class="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">ID: {{userObj.updatedBy
+                    ||
+                    '-'}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approved By -->
+            <div class="flex items-start gap-4" *ngIf="userObj.approverName">
+              <div
+                class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/10">
+                <i class="ri-checkbox-circle-line text-emerald-600 dark:text-emerald-400 text-lg"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Approved By</p>
+                <div class="mt-0.5 flex flex-col">
+                  <span
+                    class="text-[11px] font-semibold text-slate-700 dark:text-slate-200">{{userObj.approverName}}</span>
+                  <span class="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">ID: {{userObj.approver ||
+                    '-'}}</span>
+                </div>
+                <div class="mt-3">
+                  <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Approval Date</p>
+                  <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{userObj['approvalDate'] ?
+                    (userObj['approvalDate'] | date:'dd-MMM-yyyy') : (userObj.createdDate | date:'dd-MMM-yyyy')}}</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Footer -->
+  <div
+    class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 z-40">
+    <div class="max-w-[1400px] mx-auto flex items-center justify-between px-2">
+      <div class="hidden md:flex items-center gap-2 text-slate-500 text-xs italic">
+        <i class="ri-information-line text-slate-400"></i>
+        Changes will be logged in the system audit trail.
+      </div>
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <button (click)="showTable()"
+          class="flex-1 md:flex-none px-8 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-all active:scale-95">
+          Cancel
+        </button>
+        <button (click)="updateUser()"
+          class="flex-1 md:flex-none px-10 py-2.5 text-sm font-bold text-white bg-[#f26321] hover:bg-[#d9581b] shadow-lg shadow-[#f26321]/20 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+          <i class="ri-save-3-line text-lg"></i>
+          Update User
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Table View -->
+<div *ngIf="isTable"
+  class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mt-4">
+  <!-- Search and Header -->
+  <div
+    class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Heading -->
+    <div class="flex items-center gap-3">
+      <button (click)="showForm()"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+        <i class="ri-arrow-left-line text-lg"></i>
+      </button>
+      <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">User Management</h2>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Search -->
+      <div class="relative">
+        <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input type="text" [(ngModel)]="searchText" (keyup)="search()"
+          class="pl-9 pr-4 py-2 w-full md:w-64 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400"
+          placeholder="Search users..." appSanitizeInput />
+      </div>
+
+
+      <button (click)="showForm()"
+        class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-semibold shadow-lg shadow-primary/20 transition-all active:scale-95">
+        <i class="ri-user-add-line"></i> Add User
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left border-collapse min-w-[1200px]">
+      <thead>
+        <tr
+          class="bg-slate-50/80 dark:bg-slate-800/50 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-12 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            SR</th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('userId')">
+            User Name <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('fullName')">
+            Full Name <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('mailId')">
+            Email <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('mobileNo')">
+            Mobile <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('approver')">
+            Approver <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('userType')">
+            Type <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('roleName')">
+            Role <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('createdOn')">
+            Created On <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('createdByUsername')">
+            Created By <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('updatedOn')">
+            Updated On <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('updatedByUsername')">
+            Updated By <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0"
+            (click)="sortBy('clientName')">
+            Client Name <i class="ri-arrow-up-down-line ml-1 text-[9px]"></i>
+          </th>
+          <th
+            class="px-3 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center px-4 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+        <tr *ngFor="let user of users; let i = index"
+          class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <td
+            class="px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{ (p - 1) * itemsPerPage + i + 1 }}
+          </td>
+
+          <td
+            class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            <div class="flex items-center gap-2">
+              <div
+                class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">
+                {{user.userId?.charAt(0) | uppercase}}
+              </div>
+              {{user.userId}}
+            </div>
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user.fullName}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user.mailId}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 font-mono text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user.mobileNo}}
+          </td>
+          <td class="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            <span
+              class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+              {{user.approverName || user.approver || '-'}}
+            </span>
+          </td>
+          <td class="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            <span
+              [class]="'px-2 py-0.5 rounded-full text-[10px] font-medium border ' + getUserTypeClass(user.userType)">
+              {{user.userType}}
+            </span>
+          </td>
+          <td class="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-medium border ' + getRoleClass(user.roleName)">
+              {{user.roleName || '-'}}
+            </span>
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user['createdOn'] | date:'dd-MMM-yy'}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user['createdByUsername'] || '-'}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user.updatedOn ? (user.updatedOn | date:'dd-MMM-yy') : '-'}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user['updatedByUsername'] || '-'}}
+          </td>
+          <td
+            class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            {{user['clientName'] || '-'}}
+          </td>
+          <td class="px-3 py-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
+            <div class="flex items-center justify-center gap-2 transition-opacity">
+              <!-- Single Toggle Lock/Unlock Button -->
+              <button *ngIf="canLockUnlockUser(user)" (click)="openToggleLockUser(toggleLockTemplate, user)"
+                [class]="(user['count'] ?? 0) >= (user['actualLockCount'] ?? 5)
+                  ? 'w-7 h-7 flex items-center justify-center rounded bg-amber-50 hover:bg-amber-100 text-amber-600 transition-colors'
+                  : 'w-7 h-7 flex items-center justify-center rounded bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors'"
+                [title]="(user['count'] ?? 0) >= (user['actualLockCount'] ?? 5) ? 'Unlock User' : 'Lock User'">
+                <i
+                  [class]="(user['count'] ?? 0) >= (user['actualLockCount'] ?? 5) ? 'ri-lock-unlock-line text-sm' : 'ri-lock-line text-sm'"></i>
+              </button>
+              <button *ngIf="canEditUser(user) && userTypeCrudMap.edit" (click)="openUpdateUser(user)"
+                class="w-7 h-7 flex items-center justify-center rounded bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                title="Edit User">
+                <i class="ri-edit-line text-sm"></i>
+              </button>
+              <button *ngIf="canDeleteUser(user)" (click)="openDeleteUser(template, user)"
+                class="w-7 h-7 flex items-center justify-center rounded bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+                title="Delete User">
+                <i class="ri-delete-bin-line text-sm"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0" class="border-b border-slate-200 dark:border-slate-800">
+          <td colspan="13" class="py-8 text-center text-slate-500 dark:text-slate-400">
+            <i class="ri-inbox-line text-4xl mb-2 block text-slate-300"></i>
+            No users found
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    class="px-4 py-3 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        Showing <span class="text-slate-900 dark:text-slate-200 font-bold">{{(p - 1) * itemsPerPage + 1}}</span> to
+        <span class="text-slate-900 dark:text-slate-200 font-bold">{{Math.min(p * itemsPerPage, filteredUsers.length
+          || 0)}}</span> of
+        <span class="text-slate-900 dark:text-slate-200 font-bold">{{filteredUsers.length || 0}}</span> results
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-slate-500 font-medium">Rows per page:</label>
+        <input type="number" [(ngModel)]="itemsPerPage" (change)="onPageSizeChange(itemsPerPage)" min="1"
+          class="w-16 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs py-1.5 px-2 outline-none focus:ring-2 focus:ring-primary/20 text-center" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1">
+      <button (click)="prevPage()" [disabled]="p === 1"
+        class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+
+      <ng-container *ngFor="let page of visiblePages">
+        <button (click)="goToPage(page)" [class.bg-primary]="p === page" [class.text-white]="p === page"
+          [class.border-primary]="p === page" [class.bg-white]="p !== page" [class.text-slate-600]="p !== page"
+          class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:border-primary transition-all">
+          {{page}}
+        </button>
+      </ng-container>
+
+      <button (click)="nextPage()" [disabled]="p === totalPages"
+        class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+  </div>
+</div>

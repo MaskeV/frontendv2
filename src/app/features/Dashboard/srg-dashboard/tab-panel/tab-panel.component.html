@@ -1,0 +1,29 @@
+<main>
+    <div class="p-1 rounded" style="margin-bottom: -4px;">
+        <header class="pb-0 mb-0">
+            <ul #nav="ngbNav" ngbNav [(activeId)]="activeTabId" class="mb-0 nav nav-tabs border-bottom" role="tablist">
+                <li [ngbNavItem]="'1'" class="nav-item">
+                    <a ngbNavLink class="nav-link" style="cursor: pointer;">SRG Dashboard</a>
+                    <ng-template ngbNavContent>
+                        <app-apmosys-srg></app-apmosys-srg>
+                    </ng-template>
+                </li>
+                <li [ngbNavItem]="'2'" class="nav-item">
+                    <a ngbNavLink class="nav-link" style="cursor: pointer;">Logs</a>
+                    <ng-template ngbNavContent>
+                        <app-srg-logs></app-srg-logs>
+                    </ng-template>
+                </li>
+                <li *ngIf="showAPIMonitoringTab" [ngbNavItem]="'3'" class="nav-item">
+                    <a ngbNavLink class="nav-link" style="cursor: pointer;">API Monitoring</a>
+                    <ng-template ngbNavContent>
+                        <app-api-monitoring></app-api-monitoring>
+                    </ng-template>
+                </li>
+            </ul>
+        </header>
+    </div>
+    <div class="tab-content custom-bg">
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+    </div>
+</main>

@@ -1,0 +1,186 @@
+<main>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb custom-breadcrumb mb-0">
+      <li class="breadcrumb-item d-flex align-items-center gap-1">
+        <img src="assets/images/eks.png" class="icons" alt="EKS Logo" />
+        <a routerLink="/eks">EKS Applications</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{selectedService}}</li>
+    </ol>
+  </nav>
+
+  <div class="tab-content custom-bg p-2">
+
+
+    <div class="bs-cards-row ps-2 pe-3 mt-3">
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Node Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="nodeCountChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Failed Node Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="failedNodeCountChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Pod Count (namespace dimension)</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Amount of memory swapped to disk due to insufficient RAM."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="nameSpaceCountChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-cards-row ps-2 pe-3 mt-2">
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Pod Count (service dimension)</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Number of active client connections to the database."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="serviceCountChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network RX Dropped Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Percentage of CPU capacity currently used by the RDS instance."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="netRXDroppedChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network RX Error Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Available RAM that can be allocated to processes or cache."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="netRXErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-cards-row ps-2 pe-3 mt-2">
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network TX Dropped Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Amount of memory swapped to disk due to insufficient RAM."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="netTXDroppedChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="bs-card w-33">
+        <div class="bs-card__header">
+          <span>Network TX Error Count</span>
+          <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Number of active client connections to the database."></i>
+        </div>
+        <div class="bs-card__body h-26 p-0">
+          <div id="netTXErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+        </div>
+      </div>
+
+      <div class="w-33"></div>
+    </div>
+
+    <div class="ps-2 pe-3 mt-3">
+      <div class="bs-details">
+        <div class="bs-details__header">
+          <span class="bs-details__title">Node List</span>
+          <div class="bs-search-wrap">
+            <i class="fas fa-search bs-search-wrap__icon"></i>
+            <input type="text" class="bs-search-input" placeholder="Search..." [(ngModel)]="instanceSearch"
+              (input)="onInstanceSearch()" />
+          </div>
+        </div>
+        <div class="bs-table-scroll" style="max-height: 50vh; min-height: 30vh; overflow: auto;">
+          <table class="bs-table">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Service Instances</th>
+                <th style="width: 30%;">CPU Usage (%)</th>
+                <th style="width: 30%;">Memory Usage (%)</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="pagedInstanceName.length !== 0">
+              <tr class="bs-tr" *ngFor="let item of pagedInstanceName">
+                <td style="width: 40%;"><a class="bs-link" (click)="setInstanceId($event)">{{item}}</a></td>
+                <td style="width: 30%;"></td>
+                <td style="width: 30%;"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="pagedInstanceName.length === 0" class="bs-empty bs-empty--table">
+            No Data Available
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps-2 pe-3 mt-3">
+      <div class="bs-details">
+        <div class="bs-details__header">
+          <span class="bs-details__title">Server List</span>
+          <div class="bs-search-wrap">
+            <i class="fas fa-search bs-search-wrap__icon"></i>
+            <input type="text" class="bs-search-input" placeholder="Search..." [(ngModel)]="endpointSearch"
+              (input)="onEndpointSearch()" />
+          </div>
+        </div>
+        <div class="bs-table-scroll" style="max-height: 50vh; min-height: 30vh; overflow: auto;">
+          <table class="bs-table">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Endpoint</th>
+                <th style="width: 15%;">CPU Usage (%)</th>
+                <th style="width: 15%;">Memory Usage (%)</th>
+                <th style="width: 15%;">Network TX Errors (count/s)</th>
+                <th style="width: 15%;">Network RX Errors (count/s)</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="pagedEndpointName.length !== 0">
+              <tr class="bs-tr" *ngFor="let item of pagedEndpointName">
+                <td style="width: 40%;"><a class="bs-link" (click)="setEndpointId($event)">{{item}}</a></td>
+                <td style="width: 15%;"></td>
+                <td style="width: 15%;"></td>
+                <td style="width: 15%;"></td>
+                <td style="width: 15%;"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="pagedEndpointName.length === 0" class="bs-empty bs-empty--table">
+            No Data Available
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

@@ -1,0 +1,370 @@
+<main>
+    <div  style="width: 99%; height: 89vh; overflow-x: hidden;">
+        <div class="p-3" id="customAlert" role="tabpanel">
+            <div class="card" *ngIf="isAlertsForm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-link" style="border: none;" (click)="goToAlert()"> <i class="fa-solid fa-arrow-left"></i> Go Back</button>
+                    <h5 style="letter-spacing: 0.5px;" class="mb-0 ml-1">Set Custom Alert</h5>
+                    <i class="fa-solid fa-eye" [attr.title]="'See All Alerts'" (click)="showAlertTable()"></i>
+                    <!-- <button type="button" class="btn btn-outline-secondary" style="padding: 2px 6px;" (click)="showAlertTable()">See All</button> -->
+                </div>
+
+                <div class="card-body">
+                    <form (ngSubmit)="saveCustomAlerts()">
+
+                        <div class="row mb-3">
+                            <div class="form-group col-md-4">
+                                <label>Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="alertForm.name"
+                                    name="name" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-sm" [(ngModel)]="alertForm.email"
+                                    name="email" required email #emailRef="ngModel" />
+                                <div *ngIf="emailRef.invalid && emailRef.touched" class="text-danger mt-1">
+                                    <div *ngIf="emailRef.errors?.['email']">Enter a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label>Time <span class="text-danger">*</span></label>
+                                <input id="timePicker" class="form-control form-control-sm" type="time"
+                                    [(ngModel)]="alertForm.time" step="60" name="time" placeholder="HH:mm" />
+                            </div>
+
+                            <div class="form-group col-md-1 d-flex justify-content-end align-items-end">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="enable"
+                                        [(ngModel)]="alertForm.enabled" name="enable" />
+                                    <label class="form-check-label" for="enable">Enable</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="m-1 mb-3" />
+
+                        <div *ngFor="let alert of customAlerts; let i = index" class="row mb-3 pb-2">
+
+                            <div class="form-group col-md-4">
+                                <label>Application Type <span class="text-danger">*</span></label>
+                                <select class="form-control form-control-sm" [(ngModel)]="alert.applicationType"
+                                    name="appType{{i}}" (change)="setAppType($event, alert)">
+                                    <option value="">Select</option>
+                                    <option value="APM">ApMoSys APM</option>
+                                    <option value="Infra">Infra</option>
+                                    <option value="Network">Network</option>
+                                    <option value="Database">Database</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Application Name <span class="text-danger">*</span></label>
+
+                                <select *ngIf="alert.applicationType === 'APM'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_APM{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of serviceList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Infra'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_Infra{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of infraList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Network'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_Network{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of networkList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Database'"
+                                    class="form-control form-control-sm" [(ngModel)]="alert.applicationID"
+                                    name="appID_DB{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of databaseList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <small class="text-danger"
+                                    *ngIf="isDuplicateCombination(alert.applicationType, alert.applicationID, i)">
+                                    Duplicate Application Type + Name not allowed.
+                                </small>
+                            </div>
+
+                            <div class="form-group col-md-3" ngbDropdown>
+                                <label>Metrics <span class="text-danger">*</span></label>
+                                <button class="form-control form-control-sm text-left" ngbDropdownToggle type="button"
+                                    style="overflow: auto;">
+                                    {{ alert.module.length ? getMetricNames(alert.module).join(', ') : 'Select metrics'
+                                    }}
+                                </button>
+
+                                <div ngbDropdownMenu class="w-100 p-2 custom-dropdown-bg"
+                                    style="max-height: 250px; overflow-y: auto; font-size: small;">
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <button class="btn btn-sm btn-success" (click)="selectAllMetrics(alert, i)"
+                                            type="button">Select All</button>
+                                        &nbsp;
+                                        <button class="btn btn-sm btn-danger" (click)="clearAllMetrics(alert)"
+                                            type="button">Clear All</button>
+                                    </div>
+                                    <hr class="my-1" />
+                                    <!-- Use availableMetricsMap[i] instead of alert.metrics -->
+                                    <div *ngFor="let item of availableMetricsMap[i]" class="form-check">
+                                        <input type="checkbox" class="form-check-input" [id]="item.metricName + i"
+                                            [checked]="isMetricSelected(item, alert)"
+                                            (change)="toggleMetricSelection(item, alert)" />
+                                        <label class="form-check-label" [for]="item.metricName + i">{{
+                                            item.metricLabel || item.metricName }}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1 d-flex align-items-end" style="justify-content: space-around;">
+                                <button *ngIf="i === customAlerts.length - 1" type="button"
+                                    class="btn btn-sm btn-outline-primary" [disabled]="!isLastRowValid()"
+                                    (click)="addRow()" title="Add another alert row">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeRow(i)"
+                                    [disabled]="customAlerts.length === 1" title="Remove this row">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary">Save Alerts</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card" *ngIf="isAlertsTable">
+                <div class="col-md-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-link" (click)="showAlertForm()"> <i
+                            class="fa-solid fa-arrow-left"></i> Go Back</button>
+                    <div class="d-flex align-items-center">
+                        <input type="text" class="form-control form-control-sm mr-2" style="width: 300px;"
+                            [(ngModel)]="searchQuery" (input)="onSearch()" />
+                        <i class="fas fa-search mr-3" style="cursor: pointer;"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th (click)="onSort('name')" style="cursor: pointer;">Name &nbsp;<i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th (click)="onSort('email')" style="cursor: pointer;">Email &nbsp;<i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th (click)="onSort('time')" style="cursor: pointer;">Time &nbsp;<i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th (click)="onSort('enabled')" style="cursor: pointer;">Enabled &nbsp;<i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="pagedAlertTable.length !== 0">
+                            <tr *ngFor="let item of pagedAlertTable; let i = index">
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>{{ item.time }}</td>
+                                <td>{{ item.enabled === true ? 'Yes' : 'No' }}</td>
+                                <td class="action">
+                                    <i class="fa-solid fa-pen-to-square text-primary"
+                                        (click)="showAlertUpdateForm(item.id)"></i> &nbsp;&nbsp;
+                                    <i class="fa-solid fa-trash text-danger" (click)="deleteAlert(item.id)"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <div class="noData d-flex justify-content-center align-items-center"
+                            *ngIf="pagedAlertTable.length === 0">
+                            <h4>No Data to Display</h4>
+                        </div>
+                    </table>
+                    <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                        <nav class="mb-1 mr-1">
+                            <ul class="pagination justify-content-center align-items-center"
+                                style="font-size: small; gap: 0.5rem;">
+                                <li class="page-item" [class.disabled]="currentPage === 1">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        (click)="previousPage()" [disabled]="currentPage === 1" tabindex="0">
+                                        &laquo; Previous
+                                    </button>
+                                </li>
+
+                                <li class="page-item d-flex align-items-center">
+                                    <input type="number" class="form-control form-control-sm text-center"
+                                        style="width:60px" [value]="currentPage"
+                                        (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1"
+                                        [max]="totalPages" aria-label="Page number input" />
+                                    <span class="ms-2"> of {{ totalPages }}</span>
+                                </li>
+
+                                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage()"
+                                        [disabled]="currentPage === totalPages" tabindex="0">
+                                        Next &raquo;
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="card" *ngIf="isAlertsUpdateForm">
+                <div class="col-md-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-link" (click)="showAlertTable()"> <i
+                            class="fa-solid fa-arrow-left"></i> Go Back</button>
+                </div>
+                <div class="card-body">
+                    <form (ngSubmit)="updateCustomAlert()">
+
+                        <div class="row mb-3">
+                            <div class="form-group col-md-4">
+                                <label>Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="alertForm.name"
+                                    name="name" />
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-sm" [(ngModel)]="alertForm.email"
+                                    name="email" />
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label>Time <span class="text-danger">*</span></label>
+                                <input id="timePicker" class="form-control form-control-sm" type="time"
+                                    [(ngModel)]="alertForm.time" step="60" name="time" placeholder="HH:mm" />
+                            </div>
+
+                            <div class="form-group col-md-1 d-flex justify-content-end align-items-end">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="enable"
+                                        [(ngModel)]="alertForm.enabled" name="enable" />
+                                    <label class="form-check-label" for="enable">Enable</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="m-1 mb-3" />
+
+                        <div *ngFor="let alert of customAlerts; let i = index" class="row mb-3 pb-2">
+
+                            <div class="form-group col-md-4">
+                                <label>Application Type <span class="text-danger">*</span></label>
+                                <select class="form-control form-control-sm" [(ngModel)]="alert.applicationType"
+                                    name="appType{{i}}" (change)="setAppType($event, alert)">
+                                    <option value="">Select</option>
+                                    <option value="APM">ApMoSys APM</option>
+                                    <option value="Infra">Infra</option>
+                                    <option value="Network">Network</option>
+                                    <option value="Database">Database</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label>Application Name <span class="text-danger">*</span></label>
+
+                                <select *ngIf="alert.applicationType === 'APM'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_APM{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of serviceList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Infra'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_Infra{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of infraList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Network'" class="form-control form-control-sm"
+                                    [(ngModel)]="alert.applicationID" name="appID_Network{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of networkList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <select *ngIf="alert.applicationType === 'Database'"
+                                    class="form-control form-control-sm" [(ngModel)]="alert.applicationID"
+                                    name="appID_DB{{i}}"
+                                    (change)="onApplicationChange(alert.applicationType, alert, i)">
+                                    <option *ngFor="let item of databaseList" [value]="item.appID">{{
+                                        item.applicationName }}</option>
+                                </select>
+
+                                <small class="text-danger"
+                                    *ngIf="isDuplicateCombination(alert.applicationType, alert.applicationID, i)">
+                                    Duplicate Application Type + Name not allowed.
+                                </small>
+                            </div>
+
+                            <div class="form-group col-md-3" ngbDropdown container="body">
+                                <label>Metrics <span class="text-danger">*</span></label>
+                                <button class="form-control form-control-sm text-left" ngbDropdownToggle type="button"
+                                    style="overflow: auto;">
+                                    {{ alert.module.length ? getMetricNames(alert.module).join(', ') : 'Select metrics'
+                                    }}
+                                </button>
+
+                                <div ngbDropdownMenu class="w-100 p-2 custom-dropdown-bg"
+                                    style="max-height: 250px; overflow-y: auto; font-size: small;">
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <button class="btn btn-sm btn-success" (click)="selectAllMetrics(alert, i)"
+                                            type="button">Select All</button>
+                                        &nbsp;
+                                        <button class="btn btn-sm btn-danger" (click)="clearAllMetrics(alert)"
+                                            type="button">Clear
+                                            All</button>
+                                    </div>
+                                    <hr class="my-1" />
+                                    <!-- Use availableMetricsMap[i] instead of alert.metrics -->
+                                    <div *ngFor="let item of availableMetricsMap[i]" class="form-check">
+                                        <input type="checkbox" class="form-check-input" [id]="item.metricName + i"
+                                            [checked]="isMetricSelected(item, alert)"
+                                            (change)="toggleMetricSelection(item, alert)" />
+                                        <label class="form-check-label" [for]="item.metricName + i">{{
+                                            item.metricName }}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1 d-flex align-items-end" style="justify-content: space-around;">
+                                <button *ngIf="i === customAlerts.length - 1" type="button"
+                                    class="btn btn-sm btn-outline-primary" [disabled]="!isLastRowValid()"
+                                    (click)="addRow()" title="Add another alert row">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeRow(i)"
+                                    [disabled]="customAlerts.length === 1" title="Remove this row">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary">Update Alerts</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div *ngIf="toast.visible" class="toast-box" [ngClass]="toast.type">
+    {{ toast.message }}
+</div>

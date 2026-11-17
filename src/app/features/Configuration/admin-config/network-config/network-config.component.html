@@ -1,0 +1,516 @@
+<div class="top-error-bar" *ngIf="showError">
+    <span class="error-icon">!</span>
+    <span>{{ errorMessage }}</span>
+</div>
+
+<div class="top-success-bar" *ngIf="showSuccess">
+    <span class="success-icon">✓</span>
+    <span>{{ successMessage }}</span>
+</div>
+
+<div class="top-update-bar" *ngIf="showUpdateSuccess">
+    <span class="update-icon">↻</span>
+    <span>{{ updateMessage }}</span>
+</div>
+
+<div class="top-delete-bar" *ngIf="showDelete">
+    <span class="delete-icon1">✖</span>
+    <span>{{ deleteMessage }}</span>
+</div>
+
+<div class="page-wrapper">
+    <div class="card">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <div class="icon interface-icon" data-bs-toggle="tooltip" data-bs-placement="right"
+                    (click)="openCreateNetwork()" title="Configure Network">
+                </div>
+
+                <div>
+                    <h2>Network Configuration</h2>
+                    <p>Configure your network</p>
+                </div>
+            </div>
+
+            <button class="table-toggle-btn" title="View Interfaces" (click)="toggleTableView()">
+                ☰
+            </button>
+        </div>
+        <!-- ======================
+         FORM
+    ====================== -->
+        <form *ngIf="isForm" autocomplete="off">
+            <section>
+                <div class="d-flex container fluid justify-content-between mt-3">
+
+                    <h4 class="my-0">Network Details</h4>
+                    <button class="import-btn flex items-center gap-2 px-2 py-2 bg-primary text-white rounded-lg text-[10px] font-bold  tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-primary/20" (click)="openImportModal()">
+                        ⬆ Import Template
+                    </button>
+                </div>
+                <div class="grid-2">
+                    <!-- Network Type -->
+                    <div *ngIf="!isEditMode">
+                        <label>Network Type *</label>
+                        <select [(ngModel)]="selectedApplication" name="selectedApplication">
+                            <option value="Select" disabled>-- Select --</option>
+                            <option *ngFor="let app of networkList" [ngValue]="app.appID">
+                                {{ app.applicationName }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Host Name -->
+                    <div>
+                        <label>Host Name *</label>
+                        <input type="text" name="hostName" [(ngModel)]="hostName" autocomplete="off"
+                            (input)="onHostNameChange()" />
+                    </div>
+                    <!-- Visible Name -->
+                    <div>
+                        <label>Visible Name *</label>
+                        <input type="text" name="visibleName" [(ngModel)]="visibleName" autocomplete="off"
+                            (input)="onHostNameChange()" (input)="onVisibleNameChange()" />
+                    </div>
+                    <!-- Select Template -->
+                    <div class="form-field host-dropdown">
+                        <label>Select Template <span class="text-danger">*</span></label>
+
+                        <div class="dropdown-box" (click)="toggleTempDropdown($event)">
+                            <span *ngIf="selectedTemplateIds.length === 0" class="placeholder">
+                                -- Select --
+                            </span>
+
+                            <span *ngIf="selectedTemplateIds.length > 0">
+                                {{ getSelectedTemplateNames().join(', ') }}
+                            </span>
+
+                            <span class="arrow">▾</span>
+                        </div>
+
+                        <div class="dropdown-panel" *ngIf="showTempDropdown" (click)="$event.stopPropagation()">
+                            <div class="dropdown-item" *ngFor="let template of templates"
+                                (click)="$event.stopPropagation()">
+                                <span>{{ template.name }}</span>
+
+                                <input type="checkbox" [checked]="selectedTemplateIds.includes(template.id)"
+                                    (change)="toggleTemplateSelection(template.id)" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- select Host Group -->
+                    <div class="form-field host-dropdown">
+                        <label>Host Group *</label>
+                        <!-- DROPDOWN BOX -->
+                        <div class="dropdown-box" (click)="toggleHostDropdown($event)">
+                            <span *ngIf="selectedHostGroups.length === 0" class="placeholder">
+                                -- Select --
+                            </span>
+                            <span *ngIf="selectedHostGroups.length > 0">
+                                {{ getSelectedHostGroupNames().join(', ') }}
+                            </span>
+                            <span class="arrow">▾</span>
+                        </div>
+
+                        <!-- DROPDOWN PANEL -->
+                        <div class="dropdown-panel" *ngIf="showHostDropdown">
+                            <!-- ADD BUTTON -->
+                            <div class="dropdown-item" style="font-weight: 600; color: #7c00ff;"
+                                (click)="openAddHostGroup($event)">
+                                <i class="fa-solid fa-plus"></i>
+                                &nbsp; Add Host Group
+                            </div>
+                            <!-- INLINE CREATE FORM -->
+                            <div *ngIf="showAddHostGroupForm" style="padding: 12px" (click)="$event.stopPropagation()">
+                                <label style="font-size: 12px;">New Host Group</label>
+                                <input type="text" [(ngModel)]="newHostGroupName"
+                                    [ngModelOptions]="{ standalone: true }" placeholder="Enter host group name" />
+                                <div style="display:flex; gap:8px; margin-top:8px;">
+                                    <button class="table-toggle-btn" (click)="submitHostGroupInline($event)">
+                                        Create
+                                    </button>
+                                    <button class="table-toggle-btn" (click)="closeAddHostGroup($event)">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- HOST GROUP LIST -->
+                            <div class="dropdown-item" *ngFor="let host of hostGroups"
+                                (click)="$event.stopPropagation()">
+                                <span>{{ host.name }}</span>
+                                <input type="checkbox" [checked]="selectedHostGroups.includes(host.id)"
+                                    (change)="toggleHostGroup(host.id)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="mt-4">
+            <section>
+                <h4>Interface</h4>
+
+                <div class="grid-2">
+
+                    <div>
+                        <label>IP Address *</label>
+                        <input type="text" [(ngModel)]="interfaces[0].ipAddr" name="ipAddr" placeholder="127.0.0.1" />
+                    </div>
+
+                    <div>
+                        <label>DNS Name</label>
+                        <input type="text" [(ngModel)]="interfaces[0].dnsName" name="dnsName" />
+                    </div>
+
+                    <div>
+                        <label>Port</label>
+                        <input type="text" [(ngModel)]="interfaces[0].port" name="port" />
+                    </div>
+
+                    <div>
+                        <label>Connect To</label>
+
+                        <label style="margin-left: 2%;
+    margin-top: 5%;
+    margin-bottom: -0.7%;" class="toggle-switch" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Connect using IP or DNS">
+
+                            <input type="checkbox" [checked]="interfaces[0].connectTo === 'DNS'"
+                                (change)="toggleConnectTo($event)" />
+
+                            <span class="toggle-track">
+                                <span class="toggle-text on">DNS</span>
+                                <span class="toggle-text off">IP</span>
+                            </span>
+
+                        </label>
+                    </div>
+
+
+                </div>
+            </section>
+            <hr class="mt-4">
+            <section>
+                <h4>SNMP</h4>
+
+                <div class="grid-2">
+
+                    <div>
+                        <label>SNMP Version *</label>
+                        <select [(ngModel)]="snmpVersion" name="snmpVersion">
+                            <option value="1">SNMPv1</option>
+                            <option value="2">SNMPv2</option>
+                            <option value="3">SNMPv3</option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="snmpVersion !== '3'">
+                        <label>Community *</label>
+                        <input type="text" [(ngModel)]="snmpCommunity" name="snmpCommunity"
+                            placeholder="{$SNMP_COMMUNITY}" />
+                    </div>
+
+                </div>
+
+                <!-- SNMP v3 -->
+                <div *ngIf="snmpVersion === '3'" class="grid-2">
+
+                    <div>
+                        <label>Context Name</label>
+                        <input [(ngModel)]="contextName" name="contextName" />
+                    </div>
+
+                    <div>
+                        <label>Security Name</label>
+                        <input [(ngModel)]="securityName" name="securityName" />
+                    </div>
+
+                    <div>
+                        <label>Security Level</label>
+                        <select [(ngModel)]="securityLevel" name="securityLevel">
+                            <option value="0">noAuthNoPriv</option>
+                            <option value="1">authNoPriv</option>
+                            <option value="2">authPriv</option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="securityLevel !== '0'">
+                        <label>Auth Protocol</label>
+                        <select [(ngModel)]="authProtocol" name="authProtocol">
+                            <option [value]="0">MD5</option>
+                            <option [value]="1">SHA1</option>
+                            <option [value]="2">SHA224</option>
+                            <option [value]="3">SHA256</option>
+                            <option [value]="4">SHA384</option>
+                            <option [value]="5">SHA512</option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="securityLevel === '2'">
+                        <label>Priv Protocol</label>
+                        <select [(ngModel)]="privProtocol" name="privProtocol">
+                            <option value="0">DES</option>
+                            <option value="1">AES128</option>
+                            <option value="2">AES192</option>
+                            <option value="3">AES256</option>
+                            <option value="4">AES192C</option>
+                            <option value="5">AES256C</option>
+                        </select>
+                    </div>
+
+                    <div *ngIf="securityLevel !== '0'">
+                        <label>Auth Passphrase</label>
+                        <input [(ngModel)]="authPassphrase" name="authPassphrase" />
+                    </div>
+
+                    <div *ngIf="securityLevel === '2'">
+                        <label>Priv Passphrase</label>
+                        <input [(ngModel)]="privPassphrase" name="privPassphrase" />
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <label style="display:flex; align-items:center; gap:12px;">
+
+                        <span style="font-size:13px; font-weight:500;">
+                            Use combined requests
+                        </span>
+
+                        <label class="toggle-switch" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Enable combined SNMP requests">
+
+                            <input type="checkbox" [(ngModel)]="useCombinedRequests" name="useCombinedRequests" />
+
+                            <span class="toggle-track">
+                                <span class="toggle-text on">YES</span>
+                                <span class="toggle-text off">NO</span>
+                            </span>
+
+                        </label>
+                    </label>
+                </div>
+
+            </section>
+            <hr class="mt-4">
+            <section class="mt-4">
+                <div class="grid-2">
+                    <div class="form-field">
+                        <label>Discription *</label>
+                        <textarea [(ngModel)]="description" placeholder="Write here" name="infraGroupDescription">
+                                  </textarea>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display:flex; align-items:center; gap:12px;">
+
+                            <span style="font-size:13px; font-weight:500;">
+                                Enabled
+                            </span>
+
+                            <label class="toggle-switch">
+
+                                <input type="checkbox" [(ngModel)]="statusBoolean" name="statusBoolean" />
+
+                                <span class="toggle-track">
+                                    <span class="toggle-text on">YES</span>
+                                    <span class="toggle-text off">NO</span>
+                                </span>
+
+                            </label>
+                        </label>
+                    </div>
+                </div>
+            </section>
+            <div class="action-bar">
+                <button class="submit" type="button" *ngIf="!isUpdation" (click)="createNetworkConfig()">
+                    Create Network Configuration
+                </button>
+
+                <button class="submit" type="button" *ngIf="isUpdation" (click)="updateNetworkConfig()">
+                    Update Network Configuration
+                </button>
+            </div>
+        </form>
+        <div class="card mt-4" style="width:96%; margin-left:2%;" *ngIf="showInfraTable">
+
+            <h4 style="margin-left:2%; margin-top:1%;">
+                Network Configuration Details
+            </h4>
+
+            <div class="table-glass" style="overflow-x:auto;">
+
+                <!-- SEARCH -->
+                <div class="table-toolbar">
+                    <div class="table-search">
+                        <input type="text" [(ngModel)]="searchText" (ngModelChange)="page=1; applyFilterAndPagination()"
+                            placeholder="Search infra groups..." />
+                    </div>
+                </div>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th (click)="sortBy('hostName')">Host Name</th>
+                            <th (click)="sortBy('ipDNS')">IP Address / DNS Name</th>
+                            <th (click)="sortBy('port')">Port</th>
+                            <th (click)="sortBy('status')">Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let g of pagedNetwork">
+
+                            <td>{{ g.name || 'No Data' }}</td>
+                            <td>{{ g.ipAddress || g.dnsName || 'No Data' }}</td>
+                            <td>{{ g.portNumber || 'No Data' }}</td>
+                            <td>{{ g.status === '1' ? 'Disabled' : 'Enabled' }}</td>
+                            <td>
+                                <button class="icon-btn" title="Edit" (click)="openUpdateNetwork(g)">
+                                    ✏️
+                                </button>
+
+                                <button class="icon-btn" title="Delete"
+                                    (click)="openDeleteModal(deleteConfirmTemplate, g)">
+                                    🗑️
+                                </button>
+                            </td>
+
+                        </tr>
+                        <tr *ngIf="pagedNetwork.length === 0">
+                            <td colspan="6" style="text-align:center; padding:30px; font-weight:600;">
+                                No data found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- PAGINATION -->
+                <div class="pagination minimal-pagination" *ngIf="totalPages > 1">
+
+                    <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                        ‹ Previous
+                    </button>
+
+                    <span class="page-indicator">
+                        <strong>{{ page }}</strong> / {{ totalPages }}
+                    </span>
+
+                    <button class="page-btn" (click)="nextPage()" [disabled]="page === totalPages">
+                        Next ›
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #deleteConfirmTemplate let-modal>
+    <div class="delete-modal-wrapper">
+
+        <!-- HEADER -->
+        <div class="delete-header">
+            <div class="delete-icon-circle">
+                !
+            </div>
+            <div class="delete-header-text">
+                <h3>Confirm Deletion</h3>
+                <p>
+                    You are about to delete this Network Configuration
+                    This will remove all associated data.
+                </p>
+            </div>
+        </div>
+
+        <!-- CAUTION -->
+        <div class="delete-warning">
+            <span class="warn-icon">⚠</span>
+            <span><strong>Caution:</strong> This action cannot be undone.</span>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="delete-actions">
+            <button class="btn btn-outline-secondary" (click)="modal.dismiss()">
+                No, Keep It
+            </button>
+
+            <button class="btn btn-danger" [disabled]="isDeleting" (click)="deleteNetworkConfig()">
+                {{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}
+            </button>
+        </div>
+
+    </div>
+</ng-template>
+
+
+<div class="modal-backdrop" *ngIf="showImportModal">
+
+  <div class="modal-card">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3 class="" style="font-weight: 600;">Import</h3>
+      <button class="close-btn" (click)="closeImport()">✖</button>
+    </div>
+
+    <!-- FORM -->
+    <form (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+
+ 
+
+      <!-- File -->
+      <label>Import file:</label>
+    <input 
+  class="import-file"
+  type="file"
+  accept=".yaml,.yml"
+  (change)="onFileChange($event)" 
+  required 
+/>
+
+      <!-- Rules -->
+      <h4>Rules</h4>
+
+      <table class="rules-table ">
+        <tr>
+          <th></th>
+          <th>Update existing</th>
+          <th>Create new</th>
+          <th>Delete missing</th>
+        </tr>
+        <tr>
+          <td>All</td>
+
+          <td>
+            <input style="width: auto;" type="checkbox" 
+                   [(ngModel)]="form.updateExisting"
+                   name="updateExisting">
+          </td>
+
+          <td>
+            <input style="width: auto;" type="checkbox"
+                   [(ngModel)]="form.createMissing"
+                   name="createMissing">
+          </td>
+
+          <td>
+            <input style="width: auto;" type="checkbox"
+                   [(ngModel)]="form.deleteMissing"
+                   name="deleteMissing">
+          </td>
+        </tr>
+      </table>
+
+      <br>
+
+      <!-- ACTIONS -->
+      <div class="modal-actions">
+        <button type="submit" class="import-btn flex items-center gap-2 px-2 py-2 bg-primary text-white rounded-lg text-[10px] font-bold  tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-primary/20">Import</button>
+        <button type="button" class="cancel-btn flex items-center gap-2 px-2 py-2  text-primary rounded-lg text-[10px] font-bold  tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-primary/20" (click)="reset()">Reset</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

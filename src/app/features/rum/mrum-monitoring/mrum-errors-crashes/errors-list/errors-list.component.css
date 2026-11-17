@@ -1,0 +1,4 @@
+.custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #94a3b8;
+}

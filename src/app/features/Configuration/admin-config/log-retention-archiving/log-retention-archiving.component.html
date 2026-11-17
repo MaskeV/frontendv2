@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-slate-50 pb-6 font-sans">
+    <div class="w-full flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Log Retention & Archiving</h1>
+            <p class="text-sm text-slate-500 mt-1">Configure automated backups and lifecycle policies for your Elasticsearch data.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-300 transition-all flex items-center gap-2 cursor-pointer" 
+                (click)="toggleView()">
+                <i [class]="showTable ? 'ri-add-line' : 'ri-list-check'"></i>
+                {{ showTable ? 'Add Configuration' : 'See All' }}
+            </button>
+        </div>
+    </div>
+
+    <main class="w-full space-y-6" *ngIf="!showTable">
+
+        <!-- Section 1: Storage Configuration -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-lg bg-blue-50 text-blue-600">
+                    <i class="ri-hard-drive-2-line text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Storage Configuration</h2>
+                    <p class="text-sm text-slate-500">Define the storage method and location for data archiving.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Storage Type<span class="text-danger">*</span></label>
+                    <select [(ngModel)]="storageType" class="w-full h-10 px-3 py-2 text-sm bg-slate-100 border border-slate-200 rounded-md focus:outline-none cursor-not-allowed text-slate-600 font-medium" disabled>
+                        <option value="Local/Shared Network Drive">Local / Shared Network Drive</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Directory Path<span class="text-danger">*</span></label>
+                    <input type="text" [(ngModel)]="directoryPath" placeholder="e.g. /mount/backups/elasticsearch"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                    <p class="text-xs text-slate-500 mt-1 italic"><i class="ri-information-line text-blue-500"></i> Note: This path must be whitelisted in elasticsearch.yml (path.repo).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Backup Schedule -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-lg bg-blue-50 text-blue-600">
+                    <i class="ri-calendar-event-line text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Backup Schedule (SLM - The Archiver)</h2>
+                    <p class="text-sm text-slate-500">Configure how often data is compressed and pushed to the storage location.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Target Index Pattern<span class="text-danger">*</span></label>
+                    <input type="text" [(ngModel)]="targetIndexPattern" placeholder="e.g. app-logs-* or ruambot_log-*"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Archive Frequency<span class="text-danger">*</span></label>
+                    <select [(ngModel)]="archiveFrequency" class="w-full h-10 px-3 py-2 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                        <option value="Daily at Midnight">Daily at Midnight</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Custom">Custom (Cron Expression)</option>
+                    </select>
+                </div>
+
+                <div *ngIf="archiveFrequency === 'Custom'" class="md:col-span-2">
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Custom Cron Expression<span class="text-danger">*</span></label>
+                    <input type="text" [(ngModel)]="customCron" placeholder="e.g. 0 30 1 * * ?"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Archive Retention Limit (Days)</label>
+                    <div class="flex items-center gap-4">
+                        <input type="number" [(ngModel)]="archiveRetentionLimit" [disabled]="keepArchivesForever" placeholder="e.g. 365"
+                            class="w-48 h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500 disabled:bg-slate-100 disabled:text-slate-400">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="keepArchivesForever" (change)="onKeepForeverChange()" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
+                            <span class="text-sm font-medium text-slate-700">Keep archives forever</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Active Data Policy -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-lg bg-red-50 text-red-600">
+                    <i class="ri-delete-bin-line text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Active Data Policy (ILM - The Deletion)</h2>
+                    <p class="text-sm text-slate-500">Control the data actively sitting in the fast, searchable Elasticsearch database.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Active Data Retention (Days)<span class="text-danger">*</span></label>
+                    <input type="number" [(ngModel)]="activeDataRetention" placeholder="e.g. 30"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                    <p class="text-xs text-slate-500 mt-1 italic">Days before data is deleted from the active database.</p>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Rollover Size Limit (GB)<span class="text-danger">*</span></label>
+                    <input type="number" [(ngModel)]="rolloverSizeLimit" placeholder="e.g. 50"
+                        class="w-full h-10 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-blue-500">
+                    <p class="text-xs text-slate-500 mt-1 italic">Size at which the system closes an active index and starts a new one.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm mt-6 flex items-center justify-between">
+            <div>
+                <button *ngIf="isUpdation" (click)="toggleView()" class="px-6 py-2.5 bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-300 transition-all cursor-pointer">
+                    Cancel
+                </button>
+            </div>
+            <button (click)="saveConfiguration()"
+                class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+                {{ isUpdation ? 'Update Configuration' : 'Save Configuration' }} <i class="ri-save-line text-sm"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Table View -->
+    <main class="w-full space-y-6" *ngIf="showTable">
+        <div class="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+                            <th class="px-6 py-4 font-semibold">Target Index Pattern</th>
+                            <th class="px-6 py-4 font-semibold">Storage Type</th>
+                            <th class="px-6 py-4 font-semibold">Archive Frequency</th>
+                            <th class="px-6 py-4 font-semibold">Archive Retention</th>
+                            <th class="px-6 py-4 font-semibold">Active Retention</th>
+                            <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr *ngFor="let config of configurations" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 text-sm font-medium text-slate-900">{{ config.targetIndexPattern || 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-600">{{ config.storageType }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-600">
+                                {{ config.archiveFrequency === 'Custom' ? config.customCron : config.archiveFrequency }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600">
+                                {{ config.keepArchivesForever ? 'Forever' : config.archiveRetentionLimit + ' Days' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600">{{ config.activeDataRetention }} Days</td>
+                            <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                <button (click)="editConfiguration(config)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors inline-block" title="Edit">
+                                    <i class="ri-edit-line text-lg"></i>
+                                </button>
+                                <button (click)="deleteConfiguration(config.id)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-block ml-2" title="Delete">
+                                    <i class="ri-delete-bin-line text-lg"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="configurations.length === 0">
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 text-sm">
+                                No configurations found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>

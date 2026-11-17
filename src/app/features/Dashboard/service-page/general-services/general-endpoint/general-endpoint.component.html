@@ -1,0 +1,738 @@
+<main>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb custom-breadcrumb" style="padding:6px 0px 6px 10px; font-size: small;">
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/service-page']">ApMoSys APM</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/service-page', 'general-service']">{{selectedServiceId}}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{selectedServiceEndpoint}}
+            </li>
+        </ol>
+    </nav>
+    <div class="p-1 rounded" style="margin-bottom: -14px; margin-top: -22px;">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom" id="endpoint-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#traces"
+                        (click)="loadData('traces')">Trace</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#log" (click)="loadData('log')">Log</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+    <div class="tab-content custom-bg p-1">
+        <!-- OVERVIEW -->
+        <div class="tab-pane fade in active show" id="overview">
+            <div class="ep-root">
+
+                <!-- ══════════════════════════════════
+             TOP BAR: Logo + KPI strip
+             ══════════════════════════════════ -->
+                <div class="ep-top-bar">
+
+                    <div class="ep-logo-wrap">
+                        <img *ngIf="logoPath" [src]="'assets/images/' + (logoPath)" />
+                    </div>
+
+                    <div class="ep-kpi-strip">
+
+                        <!-- Success Rate -->
+                        <div class="ep-kpi-card">
+                            <div class="ep-kpi-label">
+                                <div>
+                                    Success Rate
+                                </div>
+                                <span class="ep-threshold-badge"
+                                    *ngIf="getThresholdDisplay('endpoint_sla', successRate)?.value"
+                                    [ngStyle]="{'color': getThresholdDisplay('endpoint_sla', successRate).color == 'red' ? 'red' : 'orange'}">
+                                    {{ getThresholdDisplay('endpoint_sla', successRate).value }}
+                                </span>
+                            </div>
+                            <div class="ep-kpi-value"
+                                [ngStyle]="{'color': getThresholdDisplay('endpoint_sla', successRate).color}">
+                                {{ successRate != null ? successRate : 'N/A' }}<span class="ep-kpi-unit"
+                                    *ngIf="successRate">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Load -->
+                        <div class="ep-kpi-card">
+                            <div class="ep-kpi-label">
+                                <div>
+                                    Load
+                                </div>
+                                <span class="ep-threshold-badge"
+                                    *ngIf="getThresholdDisplay('endpoint_cpm', successRate)?.value"
+                                    [ngStyle]="{'color': getThresholdDisplay('endpoint_cpm', successRate).color == 'red' ? 'red' : 'orange'}">
+                                    {{ getThresholdDisplay('endpoint_cpm', loadValue).value }}
+                                </span>
+                            </div>
+                            <div class="ep-kpi-value"
+                                [ngStyle]="{'color': getThresholdDisplay('endpoint_cpm', loadValue).color}">
+                                {{ loadValue != null ? loadValue : 'N/A' }}<span class="ep-kpi-unit"
+                                    *ngIf="loadValue">call/min</span>
+                            </div>
+                        </div>
+
+                        <!-- Latency -->
+                        <div class="ep-kpi-card">
+                            <div class="ep-kpi-label">
+                                <div>
+                                    Latency
+                                </div>
+                                <span class="ep-threshold-badge"
+                                    *ngIf="getThresholdDisplay('endpoint_resp_time', successRate)?.value"
+                                    [ngStyle]="{'color': getThresholdDisplay('endpoint_resp_time', successRate).color == 'red' ? 'red' : 'orange'}">
+                                    {{ getThresholdDisplay('endpoint_resp_time', latencyValue).value }}
+                                </span>
+                            </div>
+                            <div class="ep-kpi-value"
+                                [ngStyle]="{'color': getThresholdDisplay('endpoint_resp_time', latencyValue).color}">
+                                {{ latencyValue != null ? latencyValue : 'N/A' }}<span class="ep-kpi-unit"
+                                    *ngIf="latencyValue">ms</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════
+             PERF SECTION
+             ══════════════════════════════════ -->
+                <div class="ep-section">
+                    <h3 class="ep-section-heading">Performance</h3>
+
+                    <div class="ep-cards-row">
+
+                        <!-- Success Rate chart -->
+                        <div class="ep-chart-card ep-one-third">
+                            <div class="ep-chart-header">
+                                <span class="ep-chart-title">Success Rate (%)</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ successRateInfo }}"></i>
+                            </div>
+                            <div class="ep-graph-area">
+                                <div style="width: 100%; height: 26vh;" id="EndpointSuccessRate"></div>
+                            </div>
+                        </div>
+
+                        <!-- Load chart -->
+                        <div class="ep-chart-card ep-one-third">
+                            <div class="ep-chart-header">
+                                <span class="ep-chart-title">Load (calls / min)</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ loadInfo }}"></i>
+                            </div>
+                            <div class="ep-graph-area">
+                                <div style="width: 100%; height: 26vh;" id="EndpointLoad"></div>
+                            </div>
+                        </div>
+
+                        <!-- Avg Response Time chart -->
+                        <div class="ep-chart-card ep-one-third">
+                            <div class="ep-chart-header">
+                                <span class="ep-chart-title">Avg Response Time (ms)</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ latencyInfo }}"></i>
+                            </div>
+                            <div class="ep-graph-area">
+                                <div style="width: 100%; height: 26vh;" id="EndpointAvgResponseTime"></div>
+                            </div>
+                        </div>
+
+                        <!-- Response Time Percentile chart -->
+                        <div class="ep-chart-card ep-one-third">
+                            <div class="ep-chart-header">
+                                <span class="ep-chart-title">Endpoint Response Time Percentile (ms)</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="{{ latencyPercentileInfo }}"></i>
+                            </div>
+                            <div class="ep-graph-area">
+                                <div style="width: 100%; height: 26vh;" id="EndpointResponseTimePercentile"></div>
+                            </div>
+                        </div>
+
+                        <!-- Two spacers to maintain 3-col grid -->
+                        <div class="ep-chart-card ep-one-third ep-chart-card--hidden"></div>
+                        <div class="ep-chart-card ep-one-third ep-chart-card--hidden"></div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TRACE -->
+        <div class="tab-pane fade p-2" id="traces">
+            <div class="m-0">
+
+                <!-- ══════════════════════════════════
+             FILTER BAR
+             ══════════════════════════════════ -->
+                <div class="trc-filter-bar">
+
+                    <div class="trc-criteria-wrap" style="position: relative;">
+                        <div #criteriaCard class="trc-criteria-btn" (click)="toggleDropdown()" tabindex="0"
+                            [style.pointerEvents]="allCriteriaSelected ? 'none' : 'auto'"
+                            [style.opacity]="allCriteriaSelected ? '0.5' : '1'">
+                            <i class="fa-solid fa-plus trc-criteria-btn__icon"></i>
+                            Citeria
+                            <i class="fas fa-caret-down trc-criteria-btn__caret"></i>
+                        </div>
+
+                        <ul *ngIf="dropdownOpen && !allCriteriaSelected" #criteriaDropdown class="trc-dropdown">
+                            <li *ngFor="let c of availableCriteria" (click)="selectCriteria(c.key)"
+                                class="trc-dropdown__item">
+                                {{ c.label }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="trc-filter-divider"></div>
+
+                    <div class="trc-filters-scroll">
+                        <div class="trc-filter-pill" *ngFor="let c of criteriaList" [hidden]="!shownCriteria[c.key]">
+                            <label class="trc-filter-pill__label">{{ c.label }}:</label>
+
+                            <ng-container [ngSwitch]="c.key">
+
+                                <select *ngSwitchCase="'instance'" [(ngModel)]="instNameTrace"
+                                    class="trc-filter-pill__input" style="width:129px;">
+                                    <option *ngFor="let e of instancesTraces" [value]="e.value">{{ e.name }}</option>
+                                </select>
+
+                                <select *ngSwitchCase="'status'" [(ngModel)]="traceState" class="trc-filter-pill__input"
+                                    style="width:100px;">
+                                    <option value="">All</option>
+                                    <option value="success">Success</option>
+                                    <option value="error">Error</option>
+                                </select>
+
+                                <ng-container *ngSwitchCase="'statusCode'">
+                                    <select [(ngModel)]="statusCodeTrace" class="trc-filter-pill__input"
+                                        style="width:100px;">
+                                        <option value="All">All</option>
+                                        <option value="1xx">1xx</option>
+                                        <option value="2xx">2xx</option>
+                                        <option value="3xx">3xx</option>
+                                        <option value="4xx">4xx</option>
+                                        <option value="5xx">5xx</option>
+                                        <option value="text">text</option>
+                                    </select>
+                                    <input *ngIf="statusCodeTrace === 'text'" type="text" [(ngModel)]="customStatusCodeTrace"
+                                        class="trc-filter-pill__input" style="width:80px; margin-left: 6px;" placeholder="Code..." autocomplete="off" />
+                                </ng-container>
+
+                                <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDTrace"
+                                    class="trc-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                                <input *ngSwitchCase="'minDuration'" type="number" [(ngModel)]="minDuration"
+                                    class="trc-filter-pill__input" style="width:100px;" autocomplete="off" />
+
+                                <input *ngSwitchCase="'maxDuration'" type="number" [(ngModel)]="maxDuration"
+                                    class="trc-filter-pill__input" style="width:100px;" autocomplete="off" />
+
+                            </ng-container>
+
+                            <i class="fas fa-times trc-filter-pill__remove" (click)="removeCriteria(c.key)"></i>
+                        </div>
+
+                        <div class="trc-filter-divider"></div>
+                        <i class="fas fa-search" style="cursor:pointer; font-size:12px; color:#64748b;"
+                            (click)="searchTrace()"></i>
+                    </div>
+
+                </div>
+
+
+                <!-- ══════════════════════════════════
+             TRACES TABLE
+             ══════════════════════════════════ -->
+                <div class="trc-details">
+
+                    <div class="trc-details__header">
+                        <span class="trc-details__title">Traces</span>
+                        <span class="trc-details__count" *ngIf="totalHitsTrace">{{ totalHitsTrace }} results</span>
+                    </div>
+
+                    <div class="trc-table-scroll">
+                        <table class="trc-table">
+
+                            <thead>
+                                <tr>
+                                    <th style="width:5%" (click)="toggleSort('isError')">
+                                        Status &nbsp;<i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="width:20%">Endpoint</th>
+                                    <th style="width:10%">Status Code</th>
+                                    <th style="width:12%" (click)="toggleSort('duration')">
+                                        Duration &nbsp;<i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="width:18%" (click)="toggleSort('start_time')">
+                                        Start Time &nbsp;<i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="width:35%">Trace ID</th>
+                                </tr>
+                            </thead>
+
+                            <!-- Skeleton -->
+                            <tbody *ngIf="loadingTrace">
+                                <tr *ngFor="let i of [].constructor(8)">
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                    <td>
+                                        <div class="skeleton h-4 w-100"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Data -->
+                            <tbody *ngIf="!loadingTrace">
+                                <tr class="trc-tr" *ngFor="let item of traceNames;" (click)="selectItem(item)"
+                                    [ngClass]="{'trc-tr--active': selectedTraceId?.trim() === item.traceId?.trim()}">
+
+                                    <td style="width:5%">
+                                        <div [ngClass]="item.isError ? 'bg-danger' : 'bg-success'"
+                                            [ngStyle]="{'width': '5px', 'height': '20px', 'margin-right': '8px', 'border-radius': '1px'}">
+                                        </div>
+                                    </td>
+
+                                    <td style="width:20%" class="text-ellipsis trc-td--link"
+                                        [ngClass]="item.isError ? 'trc-td--err' : 'trc-td--link'"
+                                        [title]="decodeBase64(item.endpointId)">
+                                        {{ decodeBase64(item.endpointId) }}
+                                    </td>
+
+                                    <td style="width:10%">
+                                        <span class="trc-sc-badge" 
+                                            [ngClass]="{
+                                                'trc-sc-badge--1xx': item.httpStatusCode && item.httpStatusCode.startsWith('1'),
+                                                'trc-sc-badge--2xx': item.httpStatusCode && item.httpStatusCode.startsWith('2'),
+                                                'trc-sc-badge--3xx': item.httpStatusCode && item.httpStatusCode.startsWith('3'),
+                                                'trc-sc-badge--4xx': item.httpStatusCode && item.httpStatusCode.startsWith('4'),
+                                                'trc-sc-badge--5xx': item.httpStatusCode && item.httpStatusCode.startsWith('5')
+                                            }">
+                                            {{ item.httpStatusCode || 'N/A' }}
+                                        </span>
+                                    </td>
+
+                                    <td style="width:12%">{{ item.latency }} ms</td>
+
+                                    <td style="width:18%">{{ item.startTime | date: 'dd-MM-yyyy HH:mm:ss' }}</td>
+
+                                    <td style="width:35%">{{ item.traceId }}</td>
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                        <div *ngIf="!loadingTrace && traceNames?.length === 0" class="trc-empty trc-empty--table">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <div *ngIf="traceNames?.length !== 0" class="trc-pager">
+                        <span class="trc-pager__info">{{ traceItemRange }}</span>
+                        <div class="trc-pager__controls">
+                            <button class="trc-pager__btn" [disabled]="currentPageTrace === 1"
+                                (click)="previousTracePage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="trc-pager__input" [value]="currentPageTrace"
+                                (keydown.enter)="goToTracePage(+inputTracePage.value)" #inputTracePage min="1"
+                                [max]="totalPagesTrace" aria-label="Page number input" />
+                            <span class="trc-pager__of">of {{ totalPagesTrace }}</span>
+                            <button class="trc-pager__btn" [disabled]="currentPageTrace === totalPagesTrace"
+                                (click)="nextTracePage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- ══════════════════════════════════
+             TRACE DETAILS
+             ══════════════════════════════════ -->
+                <div class="row mt-2" #traceDetailsSection>
+                    <div class="col">
+
+                        <div class="mb-2">
+
+                            <div class="trc-view-bar">
+                                <div class="trc-view-bar__left"></div>
+                                <div class="trc-view-bar__right">
+
+                                    <div class="trc-view-switcher">
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Table" [class.trc-view-btn--active]="selectedView === 'table'"
+                                            (click)="changeView('table')" class="fa fa-table trc-view-btn"></i>
+
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View List" [class.trc-view-btn--active]="selectedView === 'list'"
+                                            (click)="changeView('list')" class="fas fa-list trc-view-btn"></i>
+
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Tree" [class.trc-view-btn--active]="selectedView === 'tree'"
+                                            (click)="changeView('tree')" class="fas fa-network-wired trc-view-btn"></i>
+
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Statistics"
+                                            [class.trc-view-btn--active]="selectedView === 'stat'"
+                                            (click)="changeView('stat')" class="fa fa-bar-chart trc-view-btn"></i>
+
+                                        <i matButton="elevated" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="View Logs" (click)="openLogTabTraceId(selectedTraceId)"
+                                            class="fa-solid fa-file-lines trc-view-btn">
+                                        </i>
+                                    </div>
+
+                                    <div class="trc-id-info">
+                                        <i class="fa-solid fa-circle-info trc-id-info__icon"></i>
+                                        <div class="trc-id-info__popup">
+                                            <span class="trc-id-info__label">Trace ID</span>
+                                            <span class="trc-id-info__val">{{ selectedTraceId }}</span>
+                                            <i class="fa-regular fa-copy trc-id-info__copy" title="Copy Trace Id"
+                                                (click)="copyTraceId(selectedTraceId, $event)"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="trc-details trc-details--inner">
+                                <div class="trc-details__header">
+                                    <span class="trc-details__title">Trace Details</span>
+                                </div>
+                                <div class="trc-details__body">
+                                    <ng-container *ngIf="selectedView === 'table'">
+                                        <app-table-view [traceMetaData]="traceMetaData"
+                                            (itemSelected)="onTableRowSelected($event)"></app-table-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'list'">
+                                        <app-list-view [hierarchicalList]="hierarchicalList"
+                                            (itemSelected)="onListItemSelected($event)"></app-list-view>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'tree'">
+                                        <div style="height: 100%; width: 100%;">
+                                            <app-tree-view [traceData]="traceData"
+                                                (selectedNode)="openModal($event)"></app-tree-view>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedView === 'stat'">
+                                        <app-stat-view [traceMetaData]="traceMetaData"></app-stat-view>
+                                    </ng-container>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <app-trace-details-modal *ngIf="showModal" [modalData]="modalData" (closeModal)="closeModal()">
+                </app-trace-details-modal>
+
+            </div>
+        </div>
+
+
+        <!-- LOG -->
+        <div class="tab-pane fade" id="log">
+            <div class="log-root">
+
+                <!-- ══════════════════════════════════
+             FILTER BAR
+             ══════════════════════════════════ -->
+                <div class="log-filter-bar">
+
+                    <!-- Criteria trigger button -->
+                    <div class="log-criteria-wrap" style="position: relative;">
+                        <div #criteriaCard class="log-criteria-btn" (click)="toggleDropdownLogs()" tabindex="0"
+                            [style.pointerEvents]="allCriteriaSelectedLogs ? 'none' : 'auto'"
+                            [style.opacity]="allCriteriaSelectedLogs ? '0.5' : '1'">
+                            <i class="fa-solid fa-plus log-criteria-btn__icon"></i>
+                            Citeria
+                            <i class="fas fa-caret-down log-criteria-btn__caret"></i>
+                        </div>
+
+                        <!-- Dropdown -->
+                        <ul *ngIf="dropdownOpenLogs && !allCriteriaSelectedLogs" #criteriaDropdown class="log-dropdown">
+                            <li *ngFor="let c of availableCriteriaLogs" (click)="selectCriteriaLogs(c.key)"
+                                class="log-dropdown__item">
+                                {{ c.label }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="log-filter-divider"></div>
+
+                    <!-- Scrollable filter pills -->
+                    <div class="log-filters-scroll">
+                        <div class="log-filter-pill" *ngFor="let c of criteriaListLogs"
+                            [hidden]="!shownCriteriaLogs[c.key]">
+                            <label class="log-filter-pill__label">{{ c.label }}:</label>
+
+                            <ng-container [ngSwitch]="c.key">
+
+                                <select *ngSwitchCase="'instance'" [(ngModel)]="instNameLogs"
+                                    class="log-filter-pill__input" style="width:129px;">
+                                    <option *ngFor="let e of instancesLogs" [value]="e.value">{{ e.name }}</option>
+                                </select>
+
+                                <input *ngSwitchCase="'traceID'" type="text" [(ngModel)]="traceIDLogs"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                                <select *ngSwitchCase="'tags'" [(ngModel)]="tags" class="log-filter-pill__input"
+                                    style="width:129px;">
+                                    <option *ngFor="let key of getLogKeys()" [value]="key">{{ key }}</option>
+                                </select>
+
+                                <input *ngSwitchCase="'incContent'" type="text" [(ngModel)]="keywordsOfContent"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                                <input *ngSwitchCase="'excContent'" type="text" [(ngModel)]="excludingKeywordsOfContent"
+                                    class="log-filter-pill__input" style="width:150px;" autocomplete="off" />
+
+                            </ng-container>
+
+                            <i class="fas fa-times log-filter-pill__remove" (click)="removeCriteriaLogs(c.key)"></i>
+                        </div>
+                    </div>
+
+                    <!-- Search trigger -->
+                    <div class="log-filter-divider"></div>
+                    <button class="log-search-btn" (click)="searchLogs()">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+
+                </div>
+                <!-- end filter bar -->
+
+
+                <!-- ══════════════════════════════════
+             LOGS COUNT CHART
+             ══════════════════════════════════ -->
+                <div class="log-card mb-10">
+                    <div class="log-card__header">
+                        <span class="log-card__title">Logs Count</span>
+                    </div>
+                    <div class="log-card__body" style="height:33vh; padding:0;">
+                        <div *ngIf="logsTimeSeriesChart" style="height:100%; width:100%;">
+                            <highcharts-chart [Highcharts]="Highcharts" [options]="logsTimeSeriesChart"
+                                [oneToOne]="true" style="height:33vh; width:100%; display:block;">
+                            </highcharts-chart>
+                        </div>
+                        <div *ngIf="!logsTimeSeriesChart" class="log-empty log-empty--tall">
+                            No Data Available
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ══════════════════════════════════
+             LOGS DETAILS TABLE
+             ══════════════════════════════════ -->
+                <div class="log-card">
+
+                    <!-- Header -->
+                    <div class="log-card__header">
+                        <span class="log-card__title">Logs Details ({{ totalHitsLog }})</span>
+
+                        <!-- Level filter buttons -->
+                        <div class="log-level-btns" *ngIf="logStats">
+                            <ng-container *ngFor="let key of getLogKeys()">
+                                <button class="log-level-btn"
+                                    [ngClass]="[getBtnColor(key), isSelected(key) ? getSelectedBtnColor(key) : '']"
+                                    (click)="toggleSelection(key)">
+                                    {{ key.toLowerCase() }} : {{ logStats[key] }}
+                                </button>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Table scroll -->
+                    <div class="log-table-scroll">
+                        <table class="log-table">
+
+                            <thead>
+                                <tr>
+                                    <th style="width:2%"></th>
+                                    <th style="width:12%">Date</th>
+                                    <th style="width:5%" (click)="toggleSortLogs()">
+                                        Status &nbsp;<i class="fa-solid fa-sort"></i>
+                                    </th>
+                                    <th style="width:60%">Content</th>
+                                    <th style="width:8%">HTTP Method</th>
+                                </tr>
+                            </thead>
+
+                            <!-- Skeleton -->
+                            <tbody *ngIf="loadingLogs" style="max-height: 48vh; min-height: 26vh;">
+                                <tr *ngFor="let i of [].constructor(15)">
+                                    <td style="width:5%">
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td style="width:9%">
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td style="width:5%">
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td style="width:60%">
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                    <td style="width:8%">
+                                        <div class="log-skeleton"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- Data -->
+                            <tbody *ngIf="!loadingLogs">
+                                <ng-container *ngFor="let item of logNames; let i = index">
+
+                                    <!-- Main row -->
+                                    <tr class="log-tr" [ngClass]="{'log-tr--active': selectedRowIndex === i}"
+                                        (click)="toggleRowSelection(i)">
+
+                                        <td style="width:2%; cursor:pointer;">
+                                            <i class="fas fa-code-branch log-trace-icon" *ngIf="item.traceId"
+                                                [attr.title]="'trace-link'" (click)="openTraceTabLogs(item.traceId)"
+                                                [ngClass]="getLevelColor(item.tags?.level)"></i>
+                                        </td>
+
+                                        <td style="width:12%">{{ formatDate1(item.timeBucket) }}</td>
+
+                                        <td style="width:5%" [ngClass]="getLevelColor(item.tags?.level)">
+                                            {{ item.tags.level }}
+                                        </td>
+
+                                        <td style="width:60%; cursor:pointer;" class="log-td--content"
+                                            (click)="toggleDetailApp(i)">
+                                            {{ expandedLogIndex === i ? '▼' : '▶' }}&nbsp;{{ item.content }}
+                                        </td>
+
+                                        <td style="width:8%">{{ formatEndpointId(item.endpointId) }}</td>
+
+                                    </tr>
+
+                                    <!-- Expanded detail row -->
+                                    <tr class="log-tr-detail p-1" *ngIf="expandedLogIndex === i">
+                                        <td colspan="5" style="padding:0;">
+                                            <div class="log-detail-panel">
+
+                                                <div class="log-detail-row" *ngIf="item.traceId">
+                                                    <span class="log-detail-label">Trace ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.traceId"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Time</span>
+                                                    <input type="text" class="log-detail-input"
+                                                        [value]="formatDate1(item.timeBucket)" readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Service ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.ServiceId"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Instance ID</span>
+                                                    <input type="text" class="log-detail-input" [value]="item.instance"
+                                                        readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Endpoint ID</span>
+                                                    <input type="text" class="log-detail-input"
+                                                        [value]="item.endpointId" readonly />
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Tags</span>
+                                                    <div class="log-tags-wrap">
+                                                        <span *ngFor="let tag of item.tags | keyvalue"
+                                                            class="log-tag-badge">
+                                                            <span class="log-tag-key">{{ tag.key }}</span>: {{ tag.value
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="log-detail-row">
+                                                    <span class="log-detail-label">Content</span>
+                                                    <textarea class="log-detail-textarea" [(ngModel)]="item.content"
+                                                        rows="4" style="resize: vertical;" readonly></textarea>
+                                                </div>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </ng-container>
+                            </tbody>
+
+                        </table>
+
+                        <!-- No data -->
+                        <div *ngIf="logNames?.length === 0 && !loadingLogs" class="log-empty log-empty--table">
+                            No Data Available
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="log-pager" *ngIf="logNames?.length !== 0">
+                        <span class="log-pager__info">{{ logItemRange }}</span>
+                        <div class="log-pager__controls">
+                            <button class="log-pager__btn" [disabled]="currentPageLog === 1"
+                                (click)="previousLogPage()">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
+                            <input type="number" class="log-pager__input" [value]="currentPageLog"
+                                (keydown.enter)="goToLogPage(+inputLogPage.value)" #inputLogPage min="1"
+                                [max]="totalPagesLog" aria-label="Page number input" />
+                            <span class="log-pager__of">of {{ totalPagesLog }}</span>
+                            <button class="log-pager__btn" [disabled]="currentPageLog === totalPagesLog"
+                                (click)="nextLogPage()">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end logs details -->
+
+            </div>
+        </div>
+    </div>
+</main>

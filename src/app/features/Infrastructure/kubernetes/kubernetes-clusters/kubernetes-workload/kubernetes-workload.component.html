@@ -1,0 +1,597 @@
+<div class="app-shell">
+    <div class="body-wrap">
+        <div class="content">
+            <!-- Tabs and Breadcrumb Header -->
+            <app-kubernetes-tab-header activeTab="workload"
+                [selectedCluster]="selectedCluster"></app-kubernetes-tab-header>
+
+            <div class="kw-body">
+
+                <!-- KPI cards (Matching Cluster Overview) -->
+                <div class="summary-grid">
+
+                    <!-- 1. Total Workloads -->
+                    <div class="summary-card donut-card">
+                        <div class="tile-main-content">
+                            <div class="tile-left">
+                                <div class="tile-icon-box bg-blue">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                                        <path d="m3.3 7 8.7 5 8.7-5"></path>
+                                        <path d="M12 22V12"></path>
+                                    </svg>
+                                </div>
+                                <div class="tile-info">
+                                    <span class="tile-title">Workloads</span>
+                                    <span class="tile-value">178</span>
+                                    <span class="tile-sub">Total Workloads</span>
+                                </div>
+                            </div>
+                            <div class="tile-bottom-left">
+                                <div class="tile-dots">
+                                    <span class="dot-item"><span class="dot green"></span>152 Healthy</span>
+                                    <span class="dot-item"><span class="dot red"></span>18 Issues</span>
+                                </div>
+                                <div class="tile-bar-track">
+                                    <div class="tile-bar-fill blue" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-donut-wrap">
+                            <div class="tile-donut">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                    <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="100 100"></circle>
+                                </svg>
+                                <span class="donut-text">100%</span>
+                            </div>
+                            <span class="donut-sub">Active</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Healthy Workloads -->
+                    <div class="summary-card donut-card">
+                        <div class="tile-main-content">
+                            <div class="tile-left">
+                                <div class="tile-icon-box bg-green">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="9.5"></circle>
+                                        <polyline points="8.5 12 11 14.5 15.5 9.5"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="tile-info">
+                                    <span class="tile-title">Healthy</span>
+                                    <span class="tile-value">152</span>
+                                    <span class="tile-sub">Healthy Workloads</span>
+                                </div>
+                            </div>
+                            <div class="tile-bottom-left">
+                                <div class="tile-dots">
+                                    <span class="dot-item"><span class="dot green"></span>152 Passing</span>
+                                    <span class="dot-item"><span class="dot gray"></span>26 Other</span>
+                                </div>
+                                <div class="tile-bar-track">
+                                    <div class="tile-bar-fill green" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-donut-wrap">
+                            <div class="tile-donut">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                    <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="85.4 100"></circle>
+                                </svg>
+                                <span class="donut-text">85%</span>
+                            </div>
+                            <span class="donut-sub">Healthy</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Workloads with Issues -->
+                    <div class="summary-card donut-card">
+                        <div class="tile-main-content">
+                            <div class="tile-left">
+                                <div class="tile-icon-box bg-orange">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                        <circle cx="12" cy="17" r="0.8" fill="#ea580c"></circle>
+                                    </svg>
+                                </div>
+                                <div class="tile-info">
+                                    <span class="tile-title">Issues</span>
+                                    <span class="tile-value" style="color: #ef4444">18</span>
+                                    <span class="tile-sub">With Issues</span>
+                                </div>
+                            </div>
+                            <div class="tile-bottom-left">
+                                <div class="tile-dots">
+                                    <span class="dot-item"><span class="dot orange"></span>12 Pending</span>
+                                    <span class="dot-item"><span class="dot red"></span>6 Failed</span>
+                                </div>
+                                <div class="tile-bar-track">
+                                    <div class="tile-bar-fill orange" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-donut-wrap">
+                            <div class="tile-donut">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                    <circle class="donut-fill orange" cx="18" cy="18" r="15.9155" stroke-dasharray="10.1 100"></circle>
+                                </svg>
+                                <span class="donut-text">10%</span>
+                            </div>
+                            <span class="donut-sub">Warning</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Updating Workloads -->
+                    <div class="summary-card donut-card">
+                        <div class="tile-main-content">
+                            <div class="tile-left">
+                                <div class="tile-icon-box bg-purple">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                        <path d="M21 3v5h-5"></path>
+                                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                        <path d="M8 16H3v5"></path>
+                                    </svg>
+                                </div>
+                                <div class="tile-info">
+                                    <span class="tile-title">Updating</span>
+                                    <span class="tile-value">8</span>
+                                    <span class="tile-sub">In Progress</span>
+                                </div>
+                            </div>
+                            <div class="tile-bottom-left">
+                                <div class="tile-dots">
+                                    <span class="dot-item"><span class="dot purple"></span>8 Updating</span>
+                                    <span class="dot-item"><span class="dot gray"></span>0 Paused</span>
+                                </div>
+                                <div class="tile-bar-track">
+                                    <div class="tile-bar-fill purple" style="width: 5%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-donut-wrap">
+                            <div class="tile-donut">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                    <circle class="donut-fill purple" cx="18" cy="18" r="15.9155" stroke-dasharray="4.5 100"></circle>
+                                </svg>
+                                <span class="donut-text">5%</span>
+                            </div>
+                            <span class="donut-sub">Updating</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Total Pods -->
+                    <div class="summary-card donut-card">
+                        <div class="tile-main-content">
+                            <div class="tile-left">
+                                <div class="tile-icon-box bg-blue">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                        <path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+                                        <path d="M3 12a9 3 0 0 0 18 0"></path>
+                                    </svg>
+                                </div>
+                                <div class="tile-info">
+                                    <span class="tile-title">Total Pods</span>
+                                    <span class="tile-value">1448</span>
+                                    <span class="tile-sub">Across Workloads</span>
+                                </div>
+                            </div>
+                            <div class="tile-bottom-left">
+                                <div class="tile-dots">
+                                    <span class="dot-item"><span class="dot green"></span>1381 Running</span>
+                                    <span class="dot-item"><span class="dot red"></span>8 Failed</span>
+                                </div>
+                                <div class="tile-bar-track">
+                                    <div class="tile-bar-fill green" style="width: 95%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-donut-wrap">
+                            <div class="tile-donut">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                    <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="95.4 100"></circle>
+                                </svg>
+                                <span class="donut-text">95%</span>
+                            </div>
+                            <span class="donut-sub">Running</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Insights row -->
+                <section class="kw-insights">
+
+                    <!-- Workloads by type -->
+                    <article class="kw-card kw-panel">
+                        <h3 class="kw-panel-title">
+                            <svg class="ic-blue" viewBox="0 0 24 24" width="15" height="15" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="M3 3v18h18" />
+                                <path d="m7 15 4-5 3 3 5-6" />
+                            </svg>
+                            Workloads by Type
+                        </h3>
+                        <div class="kw-type-body">
+                            <div class="kw-donut">
+                                <svg viewBox="0 0 124 124" width="124" height="124" class="kw-donut-svg"
+                                    aria-hidden="true">
+                                    <defs>
+                                        <mask id="kwWorkloadDonutMask">
+                                            <circle class="kw-mask-circle" cx="62" cy="62" r="51" fill="none"
+                                                stroke="#ffffff" stroke-width="26" stroke-linecap="round"
+                                                transform="rotate(-90 62 62)" />
+                                        </mask>
+                                    </defs>
+                                    <!-- Background track ring -->
+                                    <circle class="kw-donut-bg-circle" cx="62" cy="62" r="51" fill="none"
+                                        stroke="#f1f5f9" stroke-width="20" />
+                                    <!-- Animated multi-segment ring -->
+                                    <g class="kw-donut-segments-group" mask="url(#kwWorkloadDonutMask)">
+                                        <circle *ngFor="let seg of donutSegments" class="kw-donut-segment" cx="62"
+                                            cy="62" r="51" fill="none" stroke-width="20" transform="rotate(-90 62 62)"
+                                            [attr.stroke]="seg.color" [attr.stroke-dasharray]="seg.dash"
+                                            [attr.stroke-dashoffset]="seg.offset"
+                                            [class.dimmed]="hoveredType && hoveredType !== seg.type"
+                                            [class.highlighted]="hoveredType === seg.type"
+                                            (mouseenter)="onSegmentHover(seg.type)" (mouseleave)="onSegmentLeave()"
+                                            (click)="selectType(seg.type)" />
+                                    </g>
+                                </svg>
+                                <div class="kw-donut-center">
+                                    <strong>{{ displayedCount }}</strong>
+                                    <span>{{ displayedLabel }}</span>
+                                </div>
+                            </div>
+                            <ul class="kw-legend">
+                                <li *ngFor="let t of typeStats"
+                                    [class.active-item]="hoveredType === t.type || activeType === t.type"
+                                    [class.dimmed-item]="hoveredType && hoveredType !== t.type"
+                                    (mouseenter)="onSegmentHover(t.type)" (mouseleave)="onSegmentLeave()"
+                                    (click)="selectType(t.type)" style="cursor: pointer;">
+                                    <span class="kw-dot" [style.background]="t.color"></span>
+                                    <span class="kw-legend-name">{{ t.label }}</span>
+                                    <span class="kw-legend-count">{{ t.count }}</span>
+                                    <span class="kw-legend-pct">{{ t.count / totalWorkloads * 100 | number: '1.0-0'
+                                        }}%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <!-- Workload status -->
+                    <article class="kw-card kw-panel">
+                        <h3 class="kw-panel-title">
+                            <svg class="ic-green" viewBox="0 0 24 24" width="15" height="15" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                            Workload Status
+                        </h3>
+                        <ul class="kw-status-list">
+                            <li *ngFor="let s of statusStats">
+                                <span class="kw-dot" [style.background]="s.color"></span>
+                                <span class="kw-status-label">{{ s.label }}</span>
+                                <span class="kw-status-count">{{ s.count }}</span>
+                                <div class="kw-track">
+                                    <span [style.width.%]="s.count / totalWorkloads * 100"
+                                        [style.background]="s.color"></span>
+                                </div>
+                                <span class="kw-status-pct">{{ s.count / totalWorkloads * 100 | number: '1.1-1'
+                                    }}%</span>
+                            </li>
+                        </ul>
+                    </article>
+
+                    <!-- Top namespaces -->
+                    <article class="kw-card kw-panel">
+                        <div class="kw-panel-head">
+                            <h3 class="kw-panel-title">
+                                <svg class="ic-blue" viewBox="0 0 24 24" width="15" height="15" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <path d="M12 7v5l3 2" />
+                                </svg>
+                                Top Namespaces by Workload Count
+                            </h3>
+                            <button type="button" class="kw-link kw-view-all">View all</button>
+                        </div>
+                        <div class="kw-ns">
+                            <div class="kw-ns-row kw-ns-head">
+                                <span>Namespace</span>
+                                <span>Workloads</span>
+                                <span>% of Total</span>
+                            </div>
+                            <div class="kw-ns-row" *ngFor="let n of namespaces">
+                                <span class="kw-ns-name">
+                                    <span class="kw-dot" [style.background]="n.color"></span>
+                                    <button type="button" class="kw-link" (click)="goToNamespace(n.name)">{{ n.name
+                                        }}</button>
+                                </span>
+                                <span>{{ n.workloads }}</span>
+                                <span>{{ n.workloads / totalWorkloads * 100 | number: '1.0-0' }}%</span>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- Type tabs -->
+                <nav class="kw-tabs" aria-label="Filter by workload type">
+                    <button type="button" class="kw-tab" *ngFor="let t of tabs" [class.active]="t.type === activeType"
+                        [attr.aria-pressed]="t.type === activeType" (click)="selectType(t.type)">
+                        {{ t.label }}
+                        <span class="kw-tab-count">{{ t.count }}</span>
+                    </button>
+                </nav>
+
+                <!-- Workloads table -->
+                <section class="kw-card kw-table-card">
+                    <div class="kw-table-header">
+                        <h3 class="kw-table-title">Workloads ({{ total }})</h3>
+                        <div class="kw-table-actions" style="display: flex; align-items: center; gap: 8px;">
+                            <div class="k8s-table-search">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="7" />
+                                    <path d="M21 21l-4.35-4.35" />
+                                </svg>
+                                <input type="text" placeholder="Search workloads..." [(ngModel)]="searchTerm"
+                                    (ngModelChange)="onSearch(searchTerm)" />
+                            </div>
+
+                            <!-- Export Dropdown -->
+                            <div class="k8s-export-wrap">
+                                <button type="button" class="k8s-export-btn" (click)="toggleExportMenu(); $event.stopPropagation()" title="Download workloads table">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                                    <span>Export</span>
+                                </button>
+                                <div class="k8s-export-menu" *ngIf="exportMenuOpen" (click)="$event.stopPropagation()">
+                                    <button type="button" class="k8s-export-item" (click)="exportWorkloads('xlsx')">
+                                        <span class="k8s-export-badge xlsx">XLSX</span>
+                                        <span>Download Excel</span>
+                                    </button>
+                                    <button type="button" class="k8s-export-item" (click)="exportWorkloads('csv')">
+                                        <span class="k8s-export-badge csv">CSV</span>
+                                        <span>Download CSV</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kw-table-scroll">
+                        <table class="kw-table">
+                            <colgroup>
+                                <col style="width: 14%" />
+                                <col style="width: 11%" />
+                                <col style="width: 10%" />
+                                <col style="width: 11%" />
+                                <col style="width: 8%" />
+                                <col style="width: 15%" />
+                                <col style="width: 15%" />
+                                <col style="width: 8%" />
+                                <col style="width: 8%" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <button type="button" class="kw-th-btn" (click)="toggleSort()"
+                                            aria-label="Sort by name">
+                                            Name
+                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none"
+                                                stroke="currentColor" stroke-width="2.6" stroke-linecap="round"
+                                                stroke-linejoin="round" [class.desc]="sortDir === 'desc'"
+                                                aria-hidden="true">
+                                                <path d="M12 19V5M5 12l7-7 7 7" />
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th class="th-filter-col">
+                                        <div class="th-filter-wrap type-filter-wrap">
+                                            <span>Type</span>
+                                            <button type="button" class="th-filter-trigger"
+                                                [class.active]="activeType !== null"
+                                                (click)="toggleTypeMenu(); $event.stopPropagation()"
+                                                title="Filter by type">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                                </svg>
+                                            </button>
+
+                                            <div class="th-filter-popup" *ngIf="typeMenuOpen"
+                                                (click)="$event.stopPropagation()">
+                                                <div class="th-filter-option" *ngFor="let opt of typeOptions"
+                                                    [class.selected]="(activeType === null && opt === 'All') || activeType === opt"
+                                                    (click)="setTypeFilter(opt)">
+                                                    <span class="th-filter-check">
+                                                        <svg *ngIf="(activeType === null && opt === 'All') || activeType === opt" viewBox="0 0 24 24" width="12"
+                                                            height="12" fill="none" stroke="currentColor"
+                                                            stroke-width="3">
+                                                            <path d="M20 6L9 17l-5-5" />
+                                                        </svg>
+                                                    </span>
+                                                    <span class="th-filter-label">{{ opt }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>Namespace</th>
+                                    <th class="th-filter-col">
+                                        <div class="th-filter-wrap status-filter-wrap">
+                                            <span>Status</span>
+                                            <button type="button" class="th-filter-trigger"
+                                                [class.active]="statusFilter !== 'All'"
+                                                (click)="toggleStatusMenu(); $event.stopPropagation()"
+                                                title="Filter by status">
+                                                <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                                </svg>
+                                            </button>
+
+                                            <div class="th-filter-popup" *ngIf="statusMenuOpen"
+                                                (click)="$event.stopPropagation()">
+                                                <div class="th-filter-option" *ngFor="let opt of statusOptions"
+                                                    [class.selected]="statusFilter === opt"
+                                                    (click)="setStatusFilter(opt)">
+                                                    <span class="th-filter-check">
+                                                        <svg *ngIf="statusFilter === opt" viewBox="0 0 24 24" width="12"
+                                                            height="12" fill="none" stroke="currentColor"
+                                                            stroke-width="3">
+                                                            <path d="M20 6L9 17l-5-5" />
+                                                        </svg>
+                                                    </span>
+                                                    <span class="th-filter-label">{{ opt }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>Pods</th>
+                                    <th>CPU Usage</th>
+                                    <th>Memory Usage</th>
+                                    <th>Age</th>
+                                    <th>Version</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let w of rows; trackBy: trackByName">
+                                    <td>
+                                        <div class="kw-name-cell">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" aria-hidden="true">
+                                                <path
+                                                    d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                                                <path d="m3.3 7 8.7 5 8.7-5" />
+                                                <path d="M12 22V12" />
+                                            </svg>
+                                            <button type="button" class="kw-link" (click)="onViewDetails(w)">{{ w.name
+                                                }}</button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="kw-type-cell">
+                                            <span class="kw-type-icon" [ngClass]="'t-' + w.type.toLowerCase()"
+                                                [ngSwitch]="w.type">
+                                                <svg *ngSwitchCase="'StatefulSet'" viewBox="0 0 24 24" width="15"
+                                                    height="15" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <rect x="3" y="3" width="18" height="18" rx="4" />
+                                                    <rect x="8" y="8" width="8" height="8" rx="2" />
+                                                </svg>
+                                                <svg *ngSwitchCase="'Job'" viewBox="0 0 24 24" width="15" height="15"
+                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <rect x="3" y="3" width="18" height="18" rx="4" />
+                                                    <circle cx="12" cy="12" r="3" />
+                                                </svg>
+                                                <svg *ngSwitchCase="'CronJob'" viewBox="0 0 24 24" width="15"
+                                                    height="15" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                                                    <path d="M21 4v5h-5" />
+                                                    <circle cx="12" cy="12" r="1.5" />
+                                                </svg>
+                                                <svg *ngSwitchCase="'ReplicaSet'" viewBox="0 0 24 24" width="15"
+                                                    height="15" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <rect x="8" y="8" width="13" height="13" rx="3" />
+                                                    <path d="M16 8V6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h2" />
+                                                </svg>
+                                                <svg *ngSwitchDefault viewBox="0 0 24 24" width="15" height="15"
+                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path
+                                                        d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                                                    <path d="m3.3 7 8.7 5 8.7-5" />
+                                                    <path d="M12 22V12" />
+                                                </svg>
+                                            </span>
+                                            <span>{{ w.type }}</span>
+                                        </div>
+                                    </td>
+                                    <td><button type="button" class="kw-link" (click)="goToNamespace(w.namespace)">{{
+                                            w.namespace }}</button></td>
+                                    <td>
+                                        <span class="kw-chip" [ngClass]="'chip-' + w.status.toLowerCase()">
+                                            <span class="kw-chip-dot"></span>{{ w.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ w.pods }}</td>
+                                    <td>
+                                        <div class="kw-usage">
+                                            <div class="kw-track kw-track-sm">
+                                                <span [ngClass]="usageClass(w.cpu, 'cpu')"
+                                                    [style.width.%]="w.cpu"></span>
+                                            </div>
+                                            <span class="kw-usage-val">{{ w.cpu }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="kw-usage">
+                                            <div class="kw-track kw-track-sm">
+                                                <span [ngClass]="usageClass(w.memory, 'memory')"
+                                                    [style.width.%]="w.memory"></span>
+                                            </div>
+                                            <span class="kw-usage-val">{{ w.memory }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ w.age }}</td>
+                                    <td>{{ w.version }}</td>
+                                </tr>
+                                <tr *ngIf="!rows.length">
+                                    <td colspan="9" class="kw-empty">No workloads found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mrum-pagination-container">
+                        <div class="mrum-showing-text">
+                            Showing {{ rangeStart }} to {{ rangeEnd }} of {{ total }} workloads
+                        </div>
+                        <div class="mrum-pagination-controls">
+                            <div class="mrum-per-page">
+                                <input type="number" min="1" [(ngModel)]="pageSize"
+                                    (ngModelChange)="onItemsPerPageChange()" />
+                                <span>per page</span>
+                            </div>
+                            <div class="mrum-pager">
+                                <button class="mrum-pager-btn" (click)="previousPage()" [disabled]="page === 1">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <button class="mrum-pager-btn" *ngFor="let p of totalPagesArray"
+                                    [class.active]="page === p" (click)="p !== '...' && goToPage(p)"
+                                    [disabled]="p === '...'">
+                                    {{ p }}
+                                </button>
+                                <button class="mrum-pager-btn" (click)="nextPage()" [disabled]="page === totalPages">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

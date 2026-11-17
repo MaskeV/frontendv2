@@ -1,0 +1,66 @@
+<main class="ht-root">
+    <div class="ht-header">
+        <h3 class="ht-header__title raleway-font semi-text">Non-Relational Database</h3>
+        <div class="ht-search-wrap">
+            <input type="text" class="ht-search-input" placeholder="Search Instance..." (input)="onSearch($event)"
+                autocomplete="off" />
+            <i class="fas fa-search ht-search-wrap__icon"></i>
+        </div>
+    </div>
+
+    <div class="ht-table-wrap">
+        <table class="ht-table">
+            <colgroup>
+                <col style="width: 40%"> <!-- Name -->
+                <col style="width: 30%"> <!-- Status -->
+                <col style="width: 30%"> <!-- Uptime -->
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="pointer">Name</th>
+                    <th class="pointer text-center">Status</th>
+                    <th class="pointer text-center">Uptime (Days)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="ht-tr" *ngFor="let db of filteredDatabases">
+                    <!-- Database Name & Logo -->
+                    <td class="ht-td--ip" (click)="goToDb(db.applicationName, db.applicationTechnology)">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="icon-wrapper">
+                                <img [src]="getImagePath(db.applicationTechnology, db.applicationType, db.applicationName)" 
+                                     class="icon" 
+                                     [ngClass]="{
+                                       'mongo-logo': db.applicationTechnology === 'mongodb' || db.applicationTechnology === 'MongoDB', 
+                                       'elastic-logo': db.applicationTechnology === 'elasticsearch' || db.applicationTechnology === 'Elasticsearch'
+                                     }" />
+                            </div>
+                            <span class="ht-ip-text pointer"> {{ db.applicationName }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="text-center">
+                        <span class="ht-health-pill"
+                            [ngClass]="{'ht-health-pill--good': db.health?.status === 'UP', 'ht-health-pill--bad': db.health?.status === 'DOWN'}">
+                            {{ db.health?.status }}
+                        </span>
+                    </td>
+
+                    <!-- Uptime -->
+                    <td class="text-center">
+                        <span class="ht-metric-val">
+                            <i class="fa-regular fa-clock ht-metric-icon"></i>
+                            {{ convertSeconds(db.health?.uptimeSeconds) }}
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div *ngIf="filteredDatabases.length === 0" class="ht-empty">
+            No Data Available
+        </div>
+    </div>
+</main>

@@ -1,0 +1,647 @@
+<div class="mrum-page-container p-4" style="background-color: #f8fafc; height: calc(100vh - 65px); overflow-y: auto;">
+  <!-- Breadcrumbs -->
+  <app-mrum-breadcrumb 
+    [breadcrumbs]="breadcrumbData" 
+    (backClicked)="goBack()">
+  </app-mrum-breadcrumb>
+
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-1">
+    <div class="d-flex align-items-center gap-3">
+      <div class="d-flex justify-content-center align-items-center rounded-circle" style="width: 48px; height: 48px; background-color: #ede9fe; color: #8b5cf6;">
+        <i class="bi bi-phone fs-4"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <h1 class="page-title m-0 fw-bold text-dark" style="font-size: 24px; letter-spacing: -0.5px;">{{ screenName }}</h1>
+          <span class="badge rounded-pill" style="background-color: #f5f3ff; color: #8b5cf6; border: 1px solid #ddd6fe; font-size: 11px; padding: 4px 10px;">
+            <i class="bi bi-phone me-1"></i> Screen
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-4">
+      <div class="text-end">
+        <span style="font-size: 12px; font-weight: 600; color: #64748b;">
+          <i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 8px;"></i> Last seen: 1 min ago
+        </span>
+      </div>
+      <button class="btn btn-sm" style="background-color: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; font-weight: 600; font-size: 12px; padding: 6px 16px;">
+        View Screen Overview
+      </button>
+    </div>
+  </div>
+  <p class="text-muted mb-4 ms-2" style="font-size: 13px; font-weight: 500;">Detailed analysis of this screen performance, errors, crashes and user behavior</p>
+
+  <!-- KPI Cards Row 1 -->
+  <div class="row g-3 mb-3">
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #f5f3ff; color: #4c1d95;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-phone me-2" style="color: #8b5cf6;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Screen Views</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ screenViews }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,20 20,10 40,25 60,5 80,15 100,2" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #eff6ff; color: #1e3a8a;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-hourglass-split me-2" style="color: #3b82f6;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Avg. Load Time</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ avgLoadTime }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,25 20,20 40,30 60,10 80,15 100,5" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #f0fdf4; color: #14532d;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-bar-chart-fill me-2" style="color: #10b981;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">P50 Load Time</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ p50LoadTime }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,5 20,15 40,10 60,25 80,15 100,20" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fffbeb; color: #78350f;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-bar-chart-fill me-2" style="color: #f59e0b;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">P90 Load Time</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ p90LoadTime }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,25 20,20 40,15 60,10 80,5 100,2" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fff7ed; color: #9a3412;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-bar-chart-fill me-2" style="color: #f97316;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">P95 Load Time</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ p95LoadTime }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,28 20,20 40,25 60,15 80,10 100,5" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fef2f2; color: #7f1d1d;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-bar-chart-fill me-2" style="color: #ef4444;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">P99 Load Time</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ p99LoadTime }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,30 20,25 40,20 60,10 80,5 100,2" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row 2 -->
+  <div class="row g-3 mb-4">
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #f0fdf4; color: #14532d;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-speedometer2 me-2" style="color: #10b981;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Apdex Score</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ apdex }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,20 20,25 40,15 60,20 80,10 100,5" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fef2f2; color: #7f1d1d;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-x-circle me-2" style="color: #ef4444;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Error Rate</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ errorRate }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,25 20,20 40,25 60,15 80,20 100,5" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fff7ed; color: #9a3412;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-shield-x me-2" style="color: #f97316;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Crash Rate</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ crashRate }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,5 20,15 40,10 60,20 80,15 100,25" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #faf5ff; color: #581c87;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-arrow-return-left me-2" style="color: #a855f7;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Bounce Rate</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ bounceRate }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,5 20,15 40,20 60,10 80,25 100,20" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #fffbeb; color: #78350f;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-person-exclamation me-2" style="color: #f59e0b;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Apdex Impacted</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ apdexImpacted }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,25 20,20 40,15 60,10 80,5 100,5" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="dash-card p-3 d-flex flex-column justify-content-between h-100" style="background-color: #eff6ff; color: #1e3a8a;">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-people me-2" style="color: #3b82f6;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;">Sessions Impacted</span>
+          </div>
+          <div class="fs-3 fw-bold text-dark mb-1">{{ sessionsImpacted }}</div>
+        </div>
+        <div class="mt-2" style="height: 30px;">
+          <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+            <polyline points="0,20 20,15 40,10 60,15 80,5 100,2" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    
+    <!-- Charts Row 1 -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="dash-card p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold m-0" style="font-size: 13px;">Load Time Over Time <i class="bi bi-info-circle opacity-50"></i></h6>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">2m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">5m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">15m</button>
+              <button class="btn btn-outline-secondary fw-bold text-primary" style="font-size: 10px; background: #e0e7ff;">30m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">1h</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">3h</button>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-2" style="font-size: 11px; font-weight: 600;">
+            <span><i class="bi bi-circle-fill me-1" style="color: #6366f1; font-size: 8px;"></i> Avg. Load Time</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 8px;"></i> P50</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 8px;"></i> P90</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #f97316; font-size: 8px;"></i> P95</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 8px;"></i> P99</span>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="loadTimeOverTimeOptions" style="width: 100%; height: 220px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="dash-card p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold m-0" style="font-size: 13px;">Load Time Distribution <i class="bi bi-info-circle opacity-50"></i></h6>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">2m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">5m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">15m</button>
+              <button class="btn btn-outline-secondary fw-bold text-primary" style="font-size: 10px; background: #e0e7ff;">30m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">1h</button>
+              <button class="btn btn-outline-secondary" style="font-size: 10px;">3h</button>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-2" style="font-size: 11px; font-weight: 600;">
+            <span><i class="bi bi-circle-fill me-1" style="color: #a855f7; font-size: 8px;"></i> Sessions</span>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="loadTimeDistributionOptions" style="width: 100%; height: 220px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Apdex Over Time <i class="bi bi-info-circle opacity-50"></i></h6>
+          <div class="d-flex gap-2 mb-2" style="font-size: 10px; font-weight: 600;">
+            <span><i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 8px;"></i> Excellent</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 8px;"></i> Good</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 8px;"></i> Fair</span>
+            <span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 8px;"></i> Poor</span>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="apdexOverTimeOptions" style="width: 100%; height: 180px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Apdex Breakdown <i class="bi bi-info-circle opacity-50"></i></h6>
+          <div class="row align-items-center">
+            <div class="col-6">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="apdexBreakdownOptions" style="width: 100%; height: 180px; display: block;"></highcharts-chart>
+            </div>
+            <div class="col-6">
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;">
+                <span><i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 8px;"></i> Excellent (0.94 - 1.00)</span>
+                <span class="fw-bold">58.3%</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;">
+                <span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 8px;"></i> Good (0.85 - 0.93)</span>
+                <span class="fw-bold">24.6%</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;">
+                <span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 8px;"></i> Fair (0.70 - 0.84)</span>
+                <span class="fw-bold">12.5%</span>
+              </div>
+              <div class="d-flex justify-content-between" style="font-size: 11px;">
+                <span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 8px;"></i> Poor (0.00 - 0.69)</span>
+                <span class="fw-bold">4.6%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2">
+        <div class="dash-card p-3 h-100 d-flex flex-column">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Screen Availability <i class="bi bi-info-circle opacity-50"></i></h6>
+          <div class="text-center flex-grow-1 d-flex flex-column justify-content-center">
+            <div class="fs-2 fw-bold mb-1" style="color: #111827;">99.21%</div>
+            <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 16px;">Availability</div>
+            
+            <div style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Total Downtime</div>
+            <div class="fw-bold mb-2" style="color: #ef4444; font-size: 14px;">18s</div>
+            
+            <div style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Total Outages</div>
+            <div class="fw-bold" style="color: #3b82f6; font-size: 14px;">2</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2">
+        <div class="dash-card p-3 h-100 d-flex flex-column">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Time to First Byte (TTFB) <i class="bi bi-info-circle opacity-50"></i></h6>
+          <div class="text-center">
+            <div class="fs-2 fw-bold mb-1" style="color: #111827;">320 ms</div>
+            <div style="font-size: 12px; font-weight: 500; color: #6b7280;">Average</div>
+          </div>
+          <div class="mt-auto">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="ttfbOptions" style="width: 100%; height: 100px; display: block;"></highcharts-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 3 -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold m-0" style="font-size: 13px;">Error Rate Over Time <i class="bi bi-info-circle opacity-50"></i></h6>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">2m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">5m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">15m</button>
+              <button class="btn btn-outline-secondary fw-bold text-primary" style="font-size: 9px; padding: 2px 6px; background: #e0e7ff;">30m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">1h</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">3h</button>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mb-2" style="font-size: 10px; font-weight: 600;">
+            <span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 8px;"></i> Error Rate (%)</span>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="errorRateOverTimeOptions" style="width: 100%; height: 180px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold m-0" style="font-size: 13px;">Crash Rate Over Time <i class="bi bi-info-circle opacity-50"></i></h6>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">2m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">5m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">15m</button>
+              <button class="btn btn-outline-secondary fw-bold text-primary" style="font-size: 9px; padding: 2px 6px; background: #e0e7ff;">30m</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">1h</button>
+              <button class="btn btn-outline-secondary" style="font-size: 9px; padding: 2px 6px;">3h</button>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mb-2" style="font-size: 10px; font-weight: 600;">
+            <span><i class="bi bi-circle-fill me-1" style="color: #f97316; font-size: 8px;"></i> Crash Rate (%)</span>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="crashRateOverTimeOptions" style="width: 100%; height: 180px; display: block;"></highcharts-chart>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-4" style="font-size: 13px;">Screen Health Summary</h6>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Error Free Sessions</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">98.20%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-down"></i> 0.56 pp</span>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Crash Free Sessions</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">99.70%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-down"></i> 0.45 pp</span>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Successful Actions</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">96.40%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-down"></i> 0.30 pp</span>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Failed Actions</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">3.60%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-up"></i> 0.30 pp</span>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Client Errors (4xx)</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">0.72%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-up"></i> 0.06 pp</span>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <span style="font-size: 12px; font-weight: 500; color: #374151;">Server Errors (5xx)</span>
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold" style="font-size: 12px;">0.46%</span>
+              <span style="font-size: 11px; font-weight: 600; color: #ef4444; width: 50px; text-align: right;"><i class="bi bi-arrow-up"></i> 0.07 pp</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 4 -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Top Errors <i class="bi bi-info-circle opacity-50"></i></h6>
+          <table class="table table-borderless table-sm m-0" style="font-size: 11px;">
+            <thead>
+              <tr style="border-bottom: 1px solid #f1f5f9; color: #64748b;">
+                <th class="py-2 fw-semibold">Error</th>
+                <th class="py-2 fw-semibold text-end">Count</th>
+                <th class="py-2 fw-semibold text-end">Error Rate</th>
+                <th class="py-2 fw-semibold text-end">Affected Sessions</th>
+                <th class="py-2 fw-semibold text-end">Last Seen</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="py-2 fw-medium text-primary">HTTP 500 Internal Server Error</td><td class="py-2 text-end">312</td><td class="py-2 text-end">0.82%</td><td class="py-2 text-end">286</td><td class="py-2 text-end">1 min ago</td></tr>
+              <tr><td class="py-2 fw-medium text-primary">Network Timeout</td><td class="py-2 text-end">128</td><td class="py-2 text-end">0.34%</td><td class="py-2 text-end">115</td><td class="py-2 text-end">1 min ago</td></tr>
+              <tr><td class="py-2 fw-medium text-primary">JSON Parse Exception</td><td class="py-2 text-end">96</td><td class="py-2 text-end">0.25%</td><td class="py-2 text-end">88</td><td class="py-2 text-end">2 mins ago</td></tr>
+              <tr><td class="py-2 fw-medium text-primary">HTTP 403 Forbidden</td><td class="py-2 text-end">64</td><td class="py-2 text-end">0.17%</td><td class="py-2 text-end">60</td><td class="py-2 text-end">2 mins ago</td></tr>
+              <tr><td class="py-2 fw-medium text-primary">Connection Reset</td><td class="py-2 text-end">52</td><td class="py-2 text-end">0.14%</td><td class="py-2 text-end">49</td><td class="py-2 text-end">3 mins ago</td></tr>
+            </tbody>
+          </table>
+          <div class="mt-3 text-end">
+            <a href="javascript:void(0)" (click)="viewAllErrors($event)" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View all errors <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Errors by Type <i class="bi bi-info-circle opacity-50"></i></h6>
+          <div class="row align-items-center">
+            <div class="col-5">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="errorsByTypeOptions" style="width: 100%; height: 160px; display: block;"></highcharts-chart>
+            </div>
+            <div class="col-7">
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;"><span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 8px;"></i> HTTP Errors</span><span class="fw-bold">55.4%</span></div>
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;"><span><i class="bi bi-circle-fill me-1" style="color: #f97316; font-size: 8px;"></i> Network Errors</span><span class="fw-bold">18.6%</span></div>
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;"><span><i class="bi bi-circle-fill me-1" style="color: #facc15; font-size: 8px;"></i> Client Errors</span><span class="fw-bold">15.3%</span></div>
+              <div class="d-flex justify-content-between mb-2" style="font-size: 11px;"><span><i class="bi bi-circle-fill me-1" style="color: #8b5cf6; font-size: 8px;"></i> Parse Errors</span><span class="fw-bold">9.7%</span></div>
+              <div class="d-flex justify-content-between" style="font-size: 11px;"><span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 8px;"></i> Other Errors</span><span class="fw-bold">1.0%</span></div>
+            </div>
+          </div>
+          <div class="mt-3 text-center">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View error analytics <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Top Crashes <i class="bi bi-info-circle opacity-50"></i></h6>
+          <table class="table table-borderless table-sm m-0" style="font-size: 11px;">
+            <thead>
+              <tr style="border-bottom: 1px solid #f1f5f9; color: #64748b;">
+                <th class="py-2 fw-semibold">Crash Type</th>
+                <th class="py-2 fw-semibold text-end">Count</th>
+                <th class="py-2 fw-semibold text-end">Crash Rate</th>
+                <th class="py-2 fw-semibold text-end">Affected Sessions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="py-2 fw-medium text-dark">NullPointerException</td><td class="py-2 text-end">42</td><td class="py-2 text-end">0.11%</td><td class="py-2 text-end">40</td></tr>
+              <tr><td class="py-2 fw-medium text-dark">ANR (Application Not Responding)</td><td class="py-2 text-end">31</td><td class="py-2 text-end">0.08%</td><td class="py-2 text-end">30</td></tr>
+              <tr><td class="py-2 fw-medium text-dark">OutOfMemoryError</td><td class="py-2 text-end">20</td><td class="py-2 text-end">0.05%</td><td class="py-2 text-end">18</td></tr>
+              <tr><td class="py-2 fw-medium text-dark">IllegalStateException</td><td class="py-2 text-end">14</td><td class="py-2 text-end">0.03%</td><td class="py-2 text-end">14</td></tr>
+              <tr><td class="py-2 fw-medium text-dark">SIGABRT</td><td class="py-2 text-end">9</td><td class="py-2 text-end">0.02%</td><td class="py-2 text-end">9</td></tr>
+            </tbody>
+          </table>
+          <div class="mt-3 text-end">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View crash analytics <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 5 -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-3">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Crashes by Device</h6>
+          <div class="row align-items-center">
+            <div class="col-5">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="crashesByDeviceOptions" style="width: 100%; height: 140px; display: block;"></highcharts-chart>
+            </div>
+            <div class="col-7">
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 6px;"></i> Samsung Galaxy</span><span class="fw-bold">32.1%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 6px;"></i> Google Pixel</span><span class="fw-bold">25.0%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 6px;"></i> OnePlus</span><span class="fw-bold">17.3%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #8b5cf6; font-size: 6px;"></i> iPhone</span><span class="fw-bold">11.0%</span></div>
+              <div class="d-flex justify-content-between" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #6366f1; font-size: 6px;"></i> Other</span><span class="fw-bold">14.6%</span></div>
+            </div>
+          </div>
+          <div class="mt-2 text-center">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View crash details <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Crashes by OS</h6>
+          <div class="row align-items-center">
+            <div class="col-5">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="crashesByOSOptions" style="width: 100%; height: 140px; display: block;"></highcharts-chart>
+            </div>
+            <div class="col-7">
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #3b82f6; font-size: 6px;"></i> Android 14</span><span class="fw-bold">64.2%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #6366f1; font-size: 6px;"></i> Android 13</span><span class="fw-bold">23.5%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 6px;"></i> iOS 17</span><span class="fw-bold">10.5%</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 6px;"></i> iOS 16</span><span class="fw-bold">1.8%</span></div>
+            </div>
+          </div>
+          <div class="mt-2 text-center">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View OS analytics <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Crashes by App Version</h6>
+          <div class="d-flex flex-column gap-2 mt-3">
+            <div class="d-flex align-items-center gap-2" style="font-size: 10px;">
+              <span style="width: 30px; font-weight: 600;">2.3.1</span>
+              <div class="flex-grow-1" style="height: 6px; background-color: #f1f5f9; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: 46%; background-color: #6366f1;"></div>
+              </div>
+              <span class="text-muted" style="width: 50px; text-align: right;">38 (46.9%)</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 10px;">
+              <span style="width: 30px; font-weight: 600;">2.3.0</span>
+              <div class="flex-grow-1" style="height: 6px; background-color: #f1f5f9; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: 28%; background-color: #6366f1;"></div>
+              </div>
+              <span class="text-muted" style="width: 50px; text-align: right;">23 (28.4%)</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 10px;">
+              <span style="width: 30px; font-weight: 600;">2.2.9</span>
+              <div class="flex-grow-1" style="height: 6px; background-color: #f1f5f9; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: 14%; background-color: #6366f1;"></div>
+              </div>
+              <span class="text-muted" style="width: 50px; text-align: right;">12 (14.8%)</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 10px;">
+              <span style="width: 30px; font-weight: 600;">2.2.8</span>
+              <div class="flex-grow-1" style="height: 6px; background-color: #f1f5f9; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: 7%; background-color: #6366f1;"></div>
+              </div>
+              <span class="text-muted" style="width: 50px; text-align: right;">6 (7.4%)</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 10px;">
+              <span style="width: 30px; font-weight: 600;">Others</span>
+              <div class="flex-grow-1" style="height: 6px; background-color: #f1f5f9; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: 2%; background-color: #6366f1;"></div>
+              </div>
+              <span class="text-muted" style="width: 50px; text-align: right;">2 (2.5%)</span>
+            </div>
+          </div>
+          <div class="mt-3 text-end">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View version analytics <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="dash-card p-3 h-100">
+          <h6 class="fw-bold mb-3" style="font-size: 13px;">Crash Free Users</h6>
+          <div class="row align-items-center">
+            <div class="col-5">
+              <highcharts-chart [Highcharts]="Highcharts" [options]="crashFreeUsersOptions" style="width: 100%; height: 140px; display: block;"></highcharts-chart>
+              <div class="text-center mt-1" style="font-size: 10px; font-weight: 600;">
+                <span class="text-muted">Total Users</span><br>
+                <span class="fw-bold" style="font-size: 12px; color: #1f2937;">1,842</span>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #10b981; font-size: 6px;"></i> Total</span><span class="fw-bold">1842 (99.1%)</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #6366f1; font-size: 6px;"></i> United States</span><span class="fw-bold">28 (25.2%)</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #f59e0b; font-size: 6px;"></i> United Kingdom</span><span class="fw-bold">16 (14.2%)</span></div>
+              <div class="d-flex justify-content-between mb-1" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #ef4444; font-size: 6px;"></i> Singapore</span><span class="fw-bold">10 (9.2%)</span></div>
+              <div class="d-flex justify-content-between" style="font-size: 9px;"><span><i class="bi bi-circle-fill me-1" style="color: #8b5cf6; font-size: 6px;"></i> Germany</span><span class="fw-bold">6 (5.1%)</span></div>
+            </div>
+          </div>
+          <div class="mt-1 text-end">
+            <a href="#" class="text-primary text-decoration-none" style="font-size: 11px; font-weight: 600;">View all map <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

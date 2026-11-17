@@ -1,0 +1,195 @@
+<main class="pt-1">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img [src]="getImagePath()" class="Mongoicon" alt="mongo logo" />
+                <a (click)="goToNonRelational()" class="prevPage">{{decodedSelectedMongoService}}</a>
+            </li>
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <i class="fa-solid fa-leaf text-success mt-1 mx-1"></i>
+                <a (click)="goToMongoCluster()" class="prevPage">{{decodedSelectedMongoInstance}}</a>
+            </li>
+            <li class="breadcrumb-item active">MongoDB Node</li>
+        </ol>
+    </nav>
+
+    <div class="content-container">
+        <!-- KPI Section -->
+        <section class="mb-4">
+            <div class="flex align-items-center mb-2 px-1">
+                <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Node Critical Indicators</h3>
+            </div>
+            <div class="row g-3">
+                <!-- Uptime -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card shadow-sm border p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="small fw-semibold text-secondary">Uptime</span>
+                            <span class="text-success fs-6"><i class="fa-regular fa-clock"></i></span>
+                        </div>
+                        <div>
+                            <span class="fs-lg fw-bold text-dark">{{displayMain}}</span>
+                            <p class="small mt-1 fw-medium text-muted">{{displayRest}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QPS -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card shadow-sm border p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="small fw-semibold text-secondary">QPS</span>
+                            <span class="text-primary fs-6"><i class="fa-solid fa-bolt"></i></span>
+                        </div>
+                        <div>
+                            <span class="fs-lg fw-bold text-dark">{{nodeQPS | numericData}}</span>
+                            <p class="small text-muted mt-1 fw-medium">Queries per second</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latency -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card shadow-sm border p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="small fw-semibold text-secondary">Avg Latency</span>
+                            <span class="text-warning fs-6"><i class="fa-solid fa-gauge-high"></i></span>
+                        </div>
+                        <div>
+                            <span class="fs-lg fw-bold text-dark">{{nodeAvgLatency | numericData}}</span>
+                            <p class="small text-muted mt-1 fw-medium">µs (microseconds)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Usage -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card shadow-sm border p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="small fw-semibold text-secondary">Memory Usage</span>
+                            <span class="text-purple fs-6"><i class="fa-solid fa-microchip"></i></span>
+                        </div>
+                        <div>
+                            <span class="fs-lg fw-bold text-dark">{{nodeMemoryUsage | numericData}}%</span>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-purple" [style.width.%]="nodeMemoryUsage"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Graphs Section -->
+        <section>
+            <div class="flex align-items-center mb-2 px-1">
+                <h3 class="small fw-bold text-secondary text-uppercase ls-wider">System & Resource Metrics</h3>
+            </div>
+
+            <!-- Row 1 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">CPU Usage (%)</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="cpuUsageChart" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Network (KB/s)</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="networkBytes" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Memory Free (GB)</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="memoryFree" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Disk (GB)</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="diskGb" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Connections</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="nodeConnections" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Active Clients</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="activeConnections" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Transactions</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="transactions" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Document QPS</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="documentQps" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Operation QPS</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="operationQps" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Repl Operation QPS</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="replOperationQps" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-soft p-3">
+                        <h4 class="fw-bold text-dark small mb-3">Operation Latency (µs)</h4>
+                        <div class="chart-wrapper-sm">
+                            <div id="latencyOpRate" class="h-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>

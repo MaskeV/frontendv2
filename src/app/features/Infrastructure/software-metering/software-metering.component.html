@@ -1,0 +1,1241 @@
+<main>
+    <div>
+        <div class="row custom-row mx-2" style="width: 99%; height: 89vh; max-height: 100vh; overflow-x: hidden;">
+            <!-- Flex Container for Tabs + Dropdowns -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap" style="padding: 0%; gap: 1rem;">
+
+                <!-- Left: Tabs -->
+                <ul class="nav nav-tabs mb-0" id="service-nav" style="font-size: small;">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#dashboard"
+                            (click)="changeTab('dashboard')">
+                            Dashboard
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#libraries" (click)="changeTab('libraries')">
+                            Libraries
+                        </a>
+                        </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#query" (click)="changeTab('query')">
+                            Query
+                        </a>
+                    </li>
+                </ul>
+                <!-- Right: Dropdowns (Zone + Group) -->
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size: smaller;">
+
+                    <!-- Zone Dropdown -->
+                    <!-- Dropdowns Section -->
+                    <div class="d-flex align-items-center gap-3" style="font-size: x-small;">
+                        <!-- Zone Dropdown -->
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="fw-medium text-muted">Zone:</span>
+                            <select class="form-select form-select-sm border-secondary" [(ngModel)]="selectedZoneId"
+                                name="selectedZone" (change)="handleZoneChange()"
+                                style="width: auto; min-width: 100px;">
+                                <option *ngFor="let zone of zoneList" [ngValue]="zone.id">{{ zone.name }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Group Dropdown -->
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="fw-medium text-muted">Group:</span>
+                            <select class="form-select form-select-sm border-secondary" [(ngModel)]="selectedGroupId"
+                                name="selectedGroup" (change)="handleGroupChange()"
+                                style="width: auto; min-width: 100px;">
+                                <option *ngFor="let group of groupList" [ngValue]="group.id">{{ group.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Tab Section -->
+            <div class="tab-content w-100 custom-border border rounded-2"
+                style="max-height: 85vh; max-width: 200vh; overflow-y: auto; overflow-x: hidden;">
+                <div class="tab-pane fade show active" id="dashboard" style="width: 197vh;">
+                    <!-- Summary Section -->
+                    <div class="d-flex pb-4 justify-content-start align-items-center w-100"
+                        style="gap: 10px; flex-wrap: wrap;padding-right: 1.5%;">
+                        <!-- Logo container -->
+                        <div class="logo-inline" style="display: flex; flex-direction: column; align-items: center;">
+                            <img src="assets/images/software-metering.png" alt="Application Metering">
+                            <p class="logo-caption" style="margin-top: 5px;">Process</p>
+                            <p class="logo-caption" style="margin-top: -5px;">Metering</p>
+                        </div>
+                        <!-- Metric boxes -->
+                        <div class="metric-box flex-fill mx-2 my-2 position-relative" style="height: 100px;">
+                            <div class="small text-center border-bottom">Hosts Monitored</div>
+
+                            <div class="fw-bold text-success metric-value d-flex justify-content-center align-items-center"
+                                style="font-size: 3rem; height: 100%;">
+                                {{ totalHostMonitored }}
+                            </div>
+                            <div class="mini-box position-absolute  d-flex flex-column text-end" style="
+                                                              
+                                                                bottom: -1px;
+                                                                right: -5px;
+                                                                font-size: 0.6rem;
+                                                                color: var(--text-color);
+                                                                background-color: var(--card-bg-color);
+                                                                padding: 0px 1px;
+                                                                border-radius: 4px;
+                                                                line-height: 1.2;
+                                                             ">
+                                <span>Zones: {{ totalZones }}</span>
+                                <span>Groups: {{ totalGroups }}</span>
+                                <!-- <span>Unassigned: {{ dnddCardData?.unassigned }}</span> -->
+
+                            </div>
+                        </div>
+                        <div class="metric-box flex-fill mx-2 my-2 position-relative" style="height: 100px;">
+                            <div class="small text-center border-bottom">Processes Monitored</div>
+                            <div class="fw-bold text-success metric-value d-flex justify-content-center align-items-center"
+                                style="font-size: 3rem; height: 100%;">
+                                {{totalProcessMonitored}}
+                            </div>
+                            <span class="mini-box position-absolute custom-border border rounded-2"
+                                style="
+                                                                                                                                                                                                                                                              bottom: 5px;
+                                                                                                                                                                                                                                                              right: 5px;
+                                                                                                                                                                                                                                                              font-size: 0.8rem;
+                                                                                                                                                                                                                                                              color: var(--text-color);
+                                                                                                                                                                                                                                                              background-color: var(--card-bg-color);
+                                                                                                                                                                                                                                                              padding: 2px 6px;
+                                                                                                                                                                                                                                                              border-radius: 4px;
+                                                                                                                                                                                                                                                            ">
+                                7
+                            </span>
+                        </div>
+                        <div class="metric-box flex-fill mx-2 my-2 position-relative"
+                            style="height: 100px; cursor: pointer;" (click)="scrollToProcessTable()">
+                            <div class="small text-center border-bottom">Unused Processes</div>
+                            <div class="fw-bold metric-value d-flex justify-content-center align-items-center"
+                                style="font-size: 3rem; height: 100%;"
+                                [ngStyle]="{ 'color': totalUnusedApps > kpiThreshold ? 'red' : 'green' }">
+                                {{ totalUnusedApps }}
+                            </div>
+                            <span class="mini-box position-absolute custom-border border rounded-2"
+                                style="
+                                                                                                                                                                                                                                      bottom: 5px;
+                                                                                                                                                                                                                                      right: 5px;
+                                                                                                                                                                                                                                      font-size: 0.8rem;
+                                                                                                                                                                                                                                      color: var(--text-color);
+                                                                                                                                                                                                                                      background-color: var(--card-bg-color);
+                                                                                                                                                                                                                                      padding: 2px 6px;
+                                                                                                                                                                                                                                      border-radius: 4px;
+                                                                                                                                                                                                                                    ">
+                                {{kpiThreshold}}
+                            </span>
+                        </div>
+                        <div class="metric-box flex-fill mx-2 my-2 position-relative" style="height: 100px;"
+                            (click)="scrollToNewDevicesTable()">
+                            <div class="small text-center border-bottom">Newly Added devices</div>
+                            <div class="fw-bold text-success metric-value d-flex justify-content-center align-items-center"
+                                style="font-size: 3rem; height: 100%;">{{dnddCardData?.assigned}}</div>
+                            <div class="mini-box position-absolute  d-flex flex-column text-end" style="
+                                                      
+                                                    bottom: -1px;
+                                                    right: -5px;
+                                                    font-size: 0.6rem;
+                                                    color: var(--text-color);
+                                                    background-color: var(--card-bg-color);
+                                                    padding: 0px 1px;
+                                                    border-radius: 4px;
+                                                    line-height: 1.2;
+                                                 ">
+                            </div>
+                        </div>
+                        <div class="metric-box flex-fill mx-2 my-2 position-relative"
+                            style="height: 100px; cursor: pointer;" (click)="scrollToDormantTable()">
+                            <div class="small text-center border-bottom">Dormant Devices</div>
+                            <div class="fw-bold metric-value d-flex justify-content-center align-items-center"
+                                style="font-size: 3rem; height: 100%;"
+                                [ngStyle]="{ 'color': totalDormantDevices > kpiThreshold ? 'red' : 'green' }">
+                                {{ totalDormantDevices }}
+                            </div>
+                            <span class="mini-box position-absolute custom-border border rounded-2" style="
+                                                        bottom: 5px;
+                                                        right: 5px;
+                                                        font-size: 0.8rem;
+                                                        color: var(--text-color);
+                                                        background-color: var(--card-bg-color);
+                                                        padding: 2px 6px;
+                                                        border-radius: 4px;
+                                                      ">
+                                {{kpiThreshold}}
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Group: Application -->
+                    <div class="row custom-row align-items-stretch custom-border" style="margin-top: -6px;">
+                        <div class="col-2 section-title-box d-flex justify-content-center align-items-center"
+                            style="background: var(--custom-card-color)">
+                            <h5 class="fw-bold mb-0">Process</h5>
+                        </div>
+                        <div class="col-10 d-flex flex-wrap gap-2" style="padding-left: 4px;">
+                            <div class="w-24 custom-border border div-elem">
+                                <div class="p-1 border-bottom custom-border"
+                                    style="background-color: var(--card-bg-color);font-weight: 599;">
+                                    Process Usage Trend Over Time(hrs)
+                                </div>
+                                <div style="margin-left: 88%; margin-top: -18px; font-size: xx-small;">
+                                    <button (click)="toggleAllSeries()" style="font-size: xx-small;"
+                                        [style.color]="allSeriesVisible ? '#fb8500' : '#6a994e'">
+                                        {{ allSeriesVisible ? 'Deselect' : 'Select' }}
+                                    </button>
+                                </div>
+                                <highcharts-chart [Highcharts]="Highcharts" [options]="usageTrendChartOptions"
+                                    (chartInstance)="chartRef = $event" [oneToOne]="true"
+                                    style="width: 100%; height: 182px; display: block;margin-top: 10px;">
+                                </highcharts-chart>
+                            </div>
+                            <div class="w-30 custom-border border div-elem">
+                                <div class="p-1 border-bottom custom-border"
+                                    style="background-color: var(--card-bg-color); font-weight: 599;">
+                                    Top 10 Used Processes
+                                </div>
+                                <!-- <div class="p-1 bg-transparent"
+                                                                                                                                                                                                                                                                                                                                                                    style="font-size: small; margin-left: 57.5%; font-weight:lighter; letter-spacing: 0.5px; margin-top: -8%; width: 100%;">
+                                                                                                                                                                                                                                                                                                                                                                   
+                                                                                                </div> -->
+                                <highcharts-chart [Highcharts]="Highcharts"
+                                    [options]="topUsedSoftwareHeatMapChartOptions" [oneToOne]="true"
+                                    style="width: 100%; height: 210px; display: block;margin-top: -15px;">
+                                </highcharts-chart>
+                            </div>
+                            <div class="w-30 custom-border border div-elem">
+                                <div class="p-1 border-bottom custom-border"
+                                    style="background-color: var(--card-bg-color); font-weight: 599;">
+                                    Least 10 Used Processes
+                                </div>
+                                <highcharts-chart [Highcharts]="Highcharts"
+                                    [options]="leastUsedSoftwareHeatMapChartOptions" [oneToOne]="true"
+                                    style="width: 100%; height: 210px; display: block;margin-top: -15px;">
+                                </highcharts-chart>
+                            </div>
+                            <div class="w-30 custom-border border div-elem" style="width: 31.5%;">
+                                <div class="row custom-row">
+                                    <div class="col-6" style="width: 100%;">
+                                        <div class="p-1 border-bottom custom-border"
+                                            style="background-color: var(--card-bg-color); font-weight: 599;width: 88%;">
+                                            Least Used Process (min)
+                                        </div>
+                                        <div class="row custom-row">
+                                            <div class="col-5">
+                                                <div class="p-1 bg-transparent"
+                                                    style="font-size: small; margin-left: 162.5%; font-weight:lighter; letter-spacing: 0.5px; margin-top: -22%; width: 100%;">
+                                                </div>
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="p-1 bg-transparent"
+                                                    style="font-size: small; margin-left: 122.5%; font-weight:lighter; letter-spacing: 0.5px; margin-top: -14.1%; width: 100%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <highcharts-chart [Highcharts]="Highcharts"
+                                            [options]="unusedSoftwareChartOptions" [oneToOne]="true"
+                                            style="width: 90%;height: 185px;display: block;overflow: hidden;margin-top: 1%;">
+                                        </highcharts-chart>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-24 custom-border border div-elem" style="width: 31.5%;">
+                                <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                    style="background-color: var(--card-bg-color); font-weight: 599;">
+                                    <span>Process Usage Trend Over Time</span>
+                                    <div class="d-flex align-items-center" style="gap: 5px;">
+                                        <input type="text" class="form-control form-control-sm"
+                                            style="background-color: transparent; width: 80px; font-size: xx-small;"
+                                            [ngClass]="{ 'search-input-hidden': !showSearchSUOT }"
+                                            [(ngModel)]="searchQuerySUOT" (input)="onSearchSUOT()"
+                                            placeholder="Search..." />
+                                        <i class="fas fa-search" (click)="toggleSearchSUOT()"
+                                            style="cursor: pointer; font-size: xx-small;"></i>
+                                        <i class="fas fa-download" (click)="downloadSoftwareUsageOverTime()"
+                                            style="cursor: pointer; font-size: xx-small;"></i>
+                                    </div>
+                                </div>
+
+                                <div class="table-container custom-border" style="height: calc(100% - 38px);">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-header-bg">
+                                                <tr>
+                                                    <th (click)="onSort4('srNo')" class="table-header clickable"
+                                                        style="font-size: x-small;">
+                                                        Sr No <i class="fa-solid fa-sort"></i>
+                                                    </th>
+                                                    <th (click)="onSort4('name')" class="table-header clickable"
+                                                        style="font-size: x-small;">
+                                                        Process <i class="fa-solid fa-sort"></i>
+                                                    </th>
+                                                    <th (click)="onSort4('usedFor')" class="table-header clickable"
+                                                        style="font-size: x-small;">
+                                                        Usage<i class="fa-solid fa-sort"></i>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container *ngIf="filteredMostUsedProcessesTable?.length !== 0">
+                                                    <tr *ngFor="let item of filteredMostUsedProcessesTable; let i = index"
+                                                        class="table-row">
+                                                        <td>{{ i + 1 }}</td> <!-- Sr No -->
+                                                        <td class="Application-name"
+                                                            (click)="openModal(loginModal, item.name)">
+                                                            {{ item.name }}
+                                                        </td>
+                                                        <td class="usage-time">
+                                                            {{ item.usedFor | timeConversion: 'mins' }}
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <tr *ngIf="filteredMostUsedProcessesTable?.length === 0">
+                                                    <td colspan="3" class="text-center py-4 text-muted no-data">
+                                                        No Data to Display
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="not-monitored-processes-table" class="w-30 custom-border border shadow div-elem"
+                                [class.table-highlighted]="isTableHighlighted">
+                                <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                    style="background-color: var(--card-bg-color);">
+                                    <span style="font-weight: 599;">Unused Processes</span>
+                                    <span class="badge bg-secondary"
+                                        style="font-size: xx-small;font-weight: 500;">{{totalUnusedApps}}
+                                        processes</span>
+                                </div>
+                                <div class="process-list-container p-2" style="max-height: 180px; overflow-y: auto;">
+                                    <div *ngIf="notMonitoredProcesses.length === 0"
+                                        class="d-flex justify-content-center align-items-center text-muted"
+                                        style="height: 150px;">
+                                        No processes to display
+                                    </div>
+                                    <div *ngIf="notMonitoredProcesses.length > 0">
+                                        <!-- Search box -->
+                                        <div class="mb-2">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [(ngModel)]="processSearchTerm" (input)="filterProcesses()"
+                                                placeholder="Search processes...">
+                                        </div>
+                                        <!-- Process list with virtual scrolling for better performance -->
+                                        <cdk-virtual-scroll-viewport itemSize="30" style="height: 130px;">
+                                            <div *cdkVirtualFor="let process of filteredProcesses"
+                                                class="process-item d-flex align-items-center p-1 border-bottom">
+                                                <span class="text-truncate">{{process}}</span>
+                                            </div>
+                                        </cdk-virtual-scroll-viewport>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group: Hardware -->
+                    <div class="row custom-row pt-4 mt-4 align-items-stretch custom-border">
+                        <!-- Section Title -->
+                        <div class="col-2 section-title-box d-flex justify-content-center align-items-center"
+                            style="background: var(--custom-card-color)">
+                            <h5 class="fw-bold mb-0">Hardware</h5>
+                        </div>
+
+                        <!-- Right Content Section -->
+                        <div class="col-10 d-flex flex-column gap-2" style="padding-left: 4px;">
+
+                            <!-- Top Row: System Details & OS Pie Chart -->
+                            <div class="row d-flex flex-wrap gap-2" style="padding-left: 13px;">
+                                <!-- System Details Table -->
+                                <div class="w-30 custom-border border shadow div-elem"
+                                    style="width: 64.5%; height: 100%;">
+                                    <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                        style="background-color:var(--card-bg-color); font-weight: 500;">
+                                        <span>System Details</span>
+                                        <div class="d-flex align-items-center" style="gap: 5px;">
+                                            <input type="text" class="form-control form-control-sm"
+                                                style="width: 100px; background-color: transparent;"
+                                                [ngClass]="{ 'search-input-hidden': !showSearch2 }"
+                                                [(ngModel)]="searchQuery2" (input)="onSearch2()" />
+                                            <i class="fas fa-search mr-3" (click)="toggleSearch2()"
+                                                style="cursor: pointer;"></i>
+                                            <i class="fas fa-download" (click)="downloadReport2()"
+                                                style="cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th (click)="onSort2('hostname')" class="table-header">System
+                                                            Name <i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort2('publicIp')" class="table-header">System IP
+                                                            <i class="fa-solid fa-sort"></i>
+                                                        </th>
+                                                        <th (click)="onSort2('username')" class="table-header">User Name
+                                                            <i class="fa-solid fa-sort"></i>
+                                                        </th>
+                                                        <th (click)="onSort2('primaryMac')" class="table-header">System
+                                                            MAC
+                                                            <i class="fa-solid fa-sort"></i>
+                                                        </th>
+                                                        <th (click)="onSort2('platform')" class="table-header">System
+                                                            Type <i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort2('hardwareVendor')" class="table-header">
+                                                            System Vendor <i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort2('hardwareModel')" class="table-header">
+                                                            System Model <i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort2('complainceScore')" class="table-header">
+                                                            Compliance Score <i class="fa-solid fa-sort"></i></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="pagedReports2.length !== 0">
+                                                    <tr *ngFor="let report of pagedReports2">
+                                                        <td class="align-middle">{{ report.hostname }}</td>
+                                                        <td class="align-middle">{{ report.publicIp }}</td>
+                                                        <td class="align-middle">{{
+                                                            hostUsernames[report.id]?hostUsernames[report.id]:"-" }}
+                                                        </td>
+                                                        <td class="align-middle text-truncate"
+                                                            style="max-width: 150px;">{{ report.primaryMac }}</td>
+                                                        <td class="align-middle">{{ report.platform }}</td>
+                                                        <td class="align-middle">{{ report.hardwareVendor }}</td>
+                                                        <td class="align-middle text-truncate" style="max-width: 150px;"
+                                                            title="{{ report.hardwareModel }}">{{
+                                                            report.hardwareModel
+                                                            }}</td>
+                                                        <td class="align-middle"></td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody *ngIf="pagedReports2.length === 0">
+                                                    <tr>
+                                                        <td colspan="7" class="text-center py-4 text-muted">No Data to
+                                                            Display</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Pagination -->
+                                        <div *ngIf="pagedReports2.length !== 0"
+                                            class="d-flex justify-content-between align-items-center border-top">
+                                            <div class="pagination-info text-muted small">
+                                                Showing {{ startIndex2 + 1 }}-{{ endIndex2 }} of {{
+                                                applicationReports2.length }}
+                                            </div>
+                                            <nav>
+                                                <ul class="pagination pagination-sm mb-0">
+                                                    <li class="page-item" [class.disabled]="currentPage2 === 1">
+                                                        <a class="page-link" (click)="previousPage2()">&laquo;</a>
+                                                    </li>
+                                                    <li class="page-item" *ngFor="let page of totalPagesArray2"
+                                                        [class.active]="page === currentPage2"
+                                                        [class.disabled]="page === '...'">
+                                                        <a class="page-link" *ngIf="page !== '...'"
+                                                            (click)="goToPage2(page)">{{ page }}</a>
+                                                        <span class="page-link" *ngIf="page === '...'">{{ page }}</span>
+                                                    </li>
+                                                    <li class="page-item"
+                                                        [class.disabled]="currentPage2 === totalPages2">
+                                                        <a class="page-link" (click)="nextPage2()">&raquo;</a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- OS Pie Chart -->
+                                <div class="w-30 custom-border border shadow div-elem" style="height: 100%;">
+                                    <div class="p-1 border-bottom custom-border"
+                                        style="background-color: var(--card-bg-color); font-weight: 599;">
+                                        OS Distribution
+                                    </div>
+                                    <div *ngIf="hasOsData && hasOsData.length !== 0">
+                                        <highcharts-chart [Highcharts]="Highcharts" [options]="osUsagePieChartOptions"
+                                            [oneToOne]="true" style="width: 100%; height: 215px; display: block;">
+                                        </highcharts-chart>
+                                    </div>
+                                    <div *ngIf="hasOsData && hasOsData.length === 0">
+                                        <div class="noDataDisplay d-flex justify-content-center align-items-center"
+                                            style="height: 21vh;">
+                                            <h4 style="font-size: small;">No Data to Display</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lower Charts & Tables -->
+                            <div class="d-flex flex-wrap gap-2">
+
+
+
+                                <!-- Daily New Device Chart -->
+                                <div class="w-24 custom-border border div-elem" style="width: 32%;">
+                                    <div class="p-1 border-bottom custom-border"
+                                        style="background-color: var(--card-bg-color);font-weight: 599;">
+                                        <span>Top 10 Active Hosts</span>
+                                    </div>
+                                    <highcharts-chart [Highcharts]="Highcharts"
+                                        [options]="hostActiveDetailsChartOptions" [oneToOne]="true"
+                                        style="width: 90%;height: 185px;display: block;overflow: hidden;margin-top: 1%;">
+                                    </highcharts-chart>
+                                </div>
+
+                                <!-- Daily New Device Table -->
+                                <div id="daily-new-devices-table" class="w-24 custom-border border div-elem"
+                                    style="width: 31.2%;">
+                                    <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                        style="background-color: var(--card-bg-color); font-weight: 599;">
+                                        <span>Newly Added Devices
+                                        </span>
+                                        <div class="d-flex align-items-center" style="gap: 5px;">
+                                            <input type="text" class="form-control form-control-sm"
+                                                style="background-color: transparent; width: 80px; font-size: xx-small;"
+                                                [ngClass]="{ 'search-input-hidden': !showSearchDNDD }"
+                                                [(ngModel)]="searchQueryDNDD" (input)="onSearchDNDD()"
+                                                placeholder="Search..." />
+                                            <i class="fas fa-search" (click)="toggleSearchDNDD()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                            <i class="fas fa-download" (click)="downloadDailyNewDeviceDiscovery()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="table-container custom-border" style="height: calc(100% - 38px);">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-header-bg">
+                                                    <thead>
+                                                        <tr>
+                                                            <th (click)="onSort5('enrolledOn')"
+                                                                class="table-header clickable"
+                                                                style="font-size: x-small;">
+                                                                Date <i class="fa-solid fa-sort"></i></th>
+                                                            <th (click)="onSort5('count')"
+                                                                class="table-header clickable"
+                                                                style="font-size: x-small;">
+
+                                                                Device count <i class="fa-solid fa-sort"></i></th>
+                                                        </tr>
+                                                    </thead>
+                                                <tbody *ngIf="filtereDnddTableData?.length !== 0"
+                                                    style="line-height: 1.5;">
+                                                    <tr *ngFor="let item of filtereDnddTableData; let i = index"
+                                                        (click)="openDeviceDetailsModal(item.enrolledOn)"
+                                                        style="cursor: pointer;">
+                                                        <td style="letter-spacing: 0.5px;">{{ item.enrolledOn }}</td>
+                                                        <td style="letter-spacing: 0.5px;">{{ item.count || '0' }}</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody *ngIf="filtereDnddTableData?.length === 0">
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted py-4">No Data to
+                                                            Display</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- OS Distribution Table -->
+                                <div class="w-24 custom-border border div-elem" style="width: 31.2%;">
+                                    <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                        style="background-color: var(--card-bg-color); font-weight: 599;">
+                                        <span>Device By Operating System
+                                        </span>
+                                        <div class="d-flex align-items-center" style="gap: 5px;">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [ngClass]="{ 'search-input-hidden': !showSearchDOS }"
+                                                [(ngModel)]="searchQueryDOS" (input)="onSearchDOS()"
+                                                placeholder="Search..." />
+                                            <i class="fas fa-search" (click)="toggleSearchDOS()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                            <i class="fas fa-download" (click)="downloadDeviceByOperatingSystem()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="table-container custom-border" style="height: calc(100% - 38px);">
+                                        <div class="table-responsive">
+                                            <table class="table w-full text-sm mb-0">
+                                                <thead class="table-header-bg">
+                                                    <tr>
+                                                        <th (click)="onSort7('name')" class="table-header clickable"
+                                                            style="font-size: x-small;">
+                                                            OS System <i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort7('count')" class="table-header clickable"
+                                                            style="font-size: x-small;">
+                                                            Host Count<i class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort7('distribution')"
+                                                            class="table-header clickable" style="font-size: x-small;">
+                                                            Distribution (%) <i class="fa-solid fa-sort"></i></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="filteredOsUsageTableData?.length !== 0"
+                                                    style="line-height: 1.5;">
+                                                    <tr *ngFor="let item of filteredOsUsageTableData; let i = index">
+                                                        <td style="letter-spacing: 0.5px;">{{item.name}}</td>
+                                                        <td style="letter-spacing: 0.5px;">{{item.count}}</td>
+                                                        <td style="letter-spacing: 0.5px;">{{item.distribution}}</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody *ngIf="filteredOsUsageTableData?.length === 0">
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted py-4">No Data
+                                                            to Display</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Dormant Device Table -->
+                                <div id="dormant-devices-table" class="w-24 custom-border border div-elem"
+                                    style="width: 32%;">
+                                    <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                        style="background-color: var(--card-bg-color); font-weight: 599;">
+                                        <span>All Dormant Devices</span>
+                                        <div class="d-flex align-items-center" style="gap: 5px;">
+                                            <input type="text" class="form-control form-control-sm"
+                                                [ngClass]="{ 'search-input-hidden': !showSearchDD }"
+                                                [(ngModel)]="searchQueryDD" (input)="onSearchDD()"
+                                                placeholder="Search..." />
+                                            <i class="fas fa-search" (click)="toggleSearchDD()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                            <i class="fas fa-download" (click)="downloadDormantDevices()"
+                                                style="cursor: pointer; font-size: xx-small;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="table-container custom-border" style="height: 100%">
+                                        <div class="table-responsive">
+                                            <table class="table w-full text-sm mb-0">
+                                                <thead class="table-header-bg">
+                                                    <tr>
+                                                        <th style="font-size: x-small;">Sr No</th>
+                                                        <th (click)="onSort8('hostName')" class="table-header clickable"
+                                                            style="font-size: x-small;">
+                                                            Host Name <i class="fa-solid fa-sort"></i>
+                                                        </th>
+                                                        <th (click)="onSort8('count')" class="table-header clickable"
+                                                            style="font-size: x-small;">
+                                                            Count <i class="fa-solid fa-sort"></i>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="filteredDormantDevices?.length !== 0"
+                                                    style="line-height: 1.5;">
+                                                    <tr *ngFor="let item of filteredDormantDevices; let i = index"
+                                                        (click)="openDormantDatesModal(item.hostId)"
+                                                        style="cursor: pointer;">
+                                                        <td>{{ i + 1 }}</td>
+                                                        <td style="letter-spacing: 0.5px;">{{ item.hostName }}</td>
+                                                        <td style="letter-spacing: 0.5px;">{{ item.count }}</td>
+                                                    </tr>
+
+                                                </tbody>
+                                                <tbody *ngIf="filtereDnddTableData?.length === 0">
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted py-4">No Data to
+                                                            Display</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Dormant Devices Chart + Host Info Table -->
+                                <div class="w-30 custom-border border shadow div-elem" style="width: 63%;">
+                                    <div class="row custom-row">
+                                        <div class="col-6" style="width: 50%;">
+                                            <div class="p-1 border-bottom custom-border"
+                                                style="background-color: var(--card-bg-color); font-weight: 599; width: 88%;">
+                                                Dormant Devices By Date
+                                            </div>
+                                            <highcharts-chart [Highcharts]="Highcharts"
+                                                [options]="dormantDevicesChartOptions" [oneToOne]="true"
+                                                style="width: 100%; height: 182px; display: block;">
+                                            </highcharts-chart>
+                                        </div>
+                                        <div class="col-6"
+                                            style="background-color: transparent; height: 170px; width: 35%;">
+                                            <div class="table-container">
+                                                <table class="table w-full text-sm mb-0">
+                                                    <thead class="table-header-bg">
+                                                        <tr>
+                                                            <th (click)="onSort6('hostname')"
+                                                                class="table-header clickable"
+                                                                style="font-size: x-small;">
+                                                                Device Hostname <i class="fa-solid fa-sort"></i>
+                                                            </th>
+                                                            <th (click)="onSort6('seen_time')"
+                                                                class="table-header clickable"
+                                                                style="font-size: x-small;">
+                                                                Last Seen Date <i class="fa-solid fa-sort"></i></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody *ngIf="hostLastSeenData?.length !== 0">
+                                                        <tr *ngFor="let item of hostLastSeenData; let i = index">
+                                                            <td style="letter-spacing: 0.5px;">{{item.hostname}}
+                                                            </td>
+                                                            <td style="letter-spacing: 0.5px;">{{item.seen_time}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tbody *ngIf="hostLastSeenData?.length === 0">
+                                                        <tr>
+                                                            <td colspan="2" class="text-center text-muted py-4">No
+                                                                Data
+                                                                to Display</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group: Network -->
+                    <div class="row custom-row pt-4 mt-4 align-items-stretch custom-border">
+                        <div class="col-2 section-title-box d-flex justify-content-center align-items-center"
+                            style="background: var(--custom-card-color)">
+                            <h5 class="fw-bold mb-0">Network</h5>
+                        </div>
+                        <div class="col-10 d-flex flex-wrap gap-2" style="padding-left: 4px;">
+                            <div class="w-49 custom-border border div-elem2">
+                                <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                    style="background-color: var(--card-bg-color); font-weight: 599;">
+                                    <span>Network I/O</span>
+                                    <div class="d-flex align-items-center" style="gap: 8px;">
+                                        <div class="d-flex align-items-center">
+                                            <input type="number" class="form-control form-control-sm me-2"
+                                                style="width: 60px;font-size: 0.7rem;" placeholder="Value"
+                                                [(ngModel)]="inputValueNetwork"
+                                                (keyup.enter)="updateThresholdNetwork()">
+                                            <select class="form-select form-select-sm me-1 custom-border"
+                                                [(ngModel)]="thresholdUnitNetwork" style="font-size: small;"
+                                                (change)="updateThresholdNetwork()">
+                                                <option value="KBps">KBps</option>
+                                                <option value="MBps">MBps</option>
+                                            </select>
+                                            <span class="me-1 filter-icon"
+                                                [class.active-filter]="showAboveThresholdNetwork"
+                                                (click)="setFilterDirectionNetwork(true)"
+                                                title="Show values above or equal to threshold">
+                                                &#9650; </span>
+                                            <span class="me-2 filter-icon"
+                                                [class.active-filter]="!showAboveThresholdNetwork"
+                                                (click)="setFilterDirectionNetwork(false)"
+                                                title="Show values below threshold">
+                                                &#9660; </span>
+                                            <button class="btn btn-sm btn-outline-primary-custom"
+                                                (click)="updateThresholdNetwork()"
+                                                style="margin-left: 0px;">Filter</button>
+                                        </div>
+                                        <input *ngIf="isTimeInputNetwork" type="time" [(ngModel)]="startTimeNetwork"
+                                            (ngModelChange)="onTimeChangeNetwork()"
+                                            class="form-control form-control-sm" />
+                                        <input *ngIf="isTimeInputNetwork" type="time" [(ngModel)]="endTimeNetwork"
+                                            (ngModelChange)="onTimeChangeNetwork()"
+                                            class="form-control form-control-sm" />
+                                        <i class="fa-regular fa-clock"
+                                            (click)="isTimeInputNetwork = !isTimeInputNetwork"
+                                            style="cursor: pointer; font-size: 1rem;"></i>
+                                    </div>
+                                </div>
+
+
+                                <div *ngIf="networkIOChart">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="networkIOChart"
+                                        [oneToOne]="true" style="height: 28vh; width: 100%; display: block;">
+                                    </highcharts-chart>
+                                </div>
+                                <div *ngIf="!networkIOChart" class="noData">
+                                    No Data Available
+                                </div>
+                            </div>
+
+                            <div class="w-49 custom-border border div-elem2">
+                                <div class="p-1 border-bottom custom-border d-flex justify-content-between align-items-center"
+                                    style="background-color: var(--card-bg-color); font-weight: 599;">
+                                    <span>Network I/O per server (Bytes/Secs)</span>
+                                    <div class="d-flex align-items-center" style="gap: 8px;">
+                                        <div class="d-flex align-items-center">
+                                            <input type="number" class="form-control form-control-sm me-2"
+                                                style="width: 60px;font-size: 0.7rem;" placeholder="Value"
+                                                [(ngModel)]="inputValue" (keyup.enter)="updateThreshold()">
+                                            <select class="form-select form-select-sm me-1 custom-border"
+                                                [(ngModel)]="thresholdUnit" style="font-size: small;"
+                                                (change)="updateThreshold()">
+                                                <option value="KBps">KBps</option>
+                                                <option value="MBps">MBps</option>
+                                            </select>
+                                            <span class="me-1 filter-icon" [class.active-filter]="showAboveThreshold"
+                                                (click)="setFilterDirection(true)"
+                                                title="Show values above or equal to threshold">
+                                                &#9650; </span>
+                                            <span class="me-2 filter-icon" [class.active-filter]="!showAboveThreshold"
+                                                (click)="setFilterDirection(false)" title="Show values below threshold">
+                                                &#9660; </span>
+                                            <button class="btn btn-sm btn-outline-primary-custom"
+                                                (click)="updateThreshold()" style="margin-left: 0px;">Filter</button>
+                                        </div>
+                                        <input *ngIf="isTimeInput2" type="time" [(ngModel)]="startTime2"
+                                            (ngModelChange)="onTimeChange2()" class="form-control form-control-sm" />
+                                        <input *ngIf="isTimeInput2" type="time" [(ngModel)]="endTime2"
+                                            (ngModelChange)="onTimeChange2()" class="form-control form-control-sm" />
+                                        <i class="fa-regular fa-clock" (click)="isTimeInput2 = !isTimeInput2"
+                                            style="cursor: pointer; font-size: 1rem;"></i>
+                                    </div>
+                                </div>
+                                <div *ngIf="networkIoPerServerChart">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="networkIoPerServerChart"
+                                        [oneToOne]="true" style="height: 28vh; width: 100%; display: block;">
+                                    </highcharts-chart>
+                                </div>
+                                <div *ngIf="!networkIoPerServerChart" class="noData">
+                                    No Data Available
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- <div class="tab-pane fade" id="libraries">
+                    <div class="row d-flex justify-content-between p-2">
+                        <div class="libraryTable">
+                            <div class="card shadow shadow-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 style="font-size: xx-small; color: #fb8500; letter-spacing: 0.5px;"
+                                        class="mb-0 ml-1">
+                                        APPLICATION LIST</h5>
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" class="form-control form-control-sm mr-2"
+                                            [ngClass]="{ 'search-input-hidden': !showSearch }" [(ngModel)]="searchQuery"
+                                            (input)="onSearch()" style="width: 200px;" />
+                                        <i class="fas fa-search mr-3" (click)="toggleSearch()"
+                                            style="cursor: pointer;"></i>
+                                        <i class="fas fa-download" (click)="downloadReport()"
+                                            style="cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th (click)="onSort('name')" style="cursor: pointer;">
+                                                        Application
+                                                        Name
+                                                        &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                    <th (click)="onSort('version')" style="cursor: pointer;">Version
+                                                        &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                    <th (click)="onSort('source')" style="cursor: pointer;">Source
+                                                        &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                    <th (click)="onSort('hostCount')" style="cursor: pointer;">Host
+                                                        Count &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="pagedReports.length !== 0" style="height: 58vh;">
+                                                <tr *ngFor="let report of pagedReports; let i = index">
+                                                    <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                                                    <td class="text-link" style="cursor: pointer;"
+                                                        (click)="showAppDetail(report.name, report.id, report.enabled)">
+                                                        {{ report.name
+                                                        }}</td>
+                                                    <td>{{ report.version }}</td>
+                                                    <td>{{ report.source }}</td>
+                                                    <td>{{ report.hostCount }}</td>
+                                                </tr>
+                                            </tbody>
+                                            <div class="noDataDisplay d-flex justify-content-center align-items-center"
+                                                style="height: 58vh;" *ngIf="pagedReports.length === 0">
+                                                <h4>No Data to Display</h4>
+                                            </div>
+                                        </table>
+                                        <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                            <nav class="mb-1 mr-1">
+                                                <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+                                                    <li class="page-item" [class.disabled]="currentPage === 1">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage()" [disabled]="currentPage === 1"
+                                                            tabindex="0">
+                                                            &laquo; Previous
+                                                        </button>
+                                                    </li>
+                                                    <li class="page-item d-flex align-items-center">
+                                                        <span class="me-2" style="color: var(--text-color);">Page</span>
+                                                        <input type="number" class="form-control form-control-sm text-center" style="width:60px" [(ngModel)]="pageInput"
+                                                            (keydown.enter)="goToPage(pageInput)" min="1" [max]="totalPages" aria-label="Page number input" />
+                                                    
+                                                    
+                                                        <span class="ms-2" style="color: var(--text-color);">of {{
+                                                            totalPages }}</span>
+                                                    </li>
+
+                                                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage()"
+                                                            [disabled]="currentPage === totalPages" tabindex="0">
+                                                            Next &raquo;
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meterignSetUp rounded rounded-1">
+                            <div class="card shadow shadow-3">
+                                <div class="card-header d-flex justify-content-between align-items-center"
+                                    style="height: 30px;">
+                                    <h5 style="font-size: small; letter-spacing: 0.5px;" class="mb-0 ml-1" style="text-transform: capitalize;">
+                                        {{ selectedAppName || pagedReports[0]?.name }}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group col-md-12">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            [value]="selectedAppName || pagedReports_1[0]?.name" readonly>
+                                    </div>
+
+                                    <div class="form-group col-md-12">
+                                        <label>Source</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            [value]="pagedReports_1[0]?.source" readonly>
+                                    </div>
+
+                                    <div class="form-group col-md-12">
+                                        <label>Version</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            [value]="pagedReports_1[0]?.version" readonly>
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th (click)="onSort_1('hostname')" style="cursor: pointer;">
+                                                        Host
+                                                        Name &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                    <th (click)="onSort_1('version')" style="cursor: pointer;">
+                                                        Operating System &nbsp;<i class="fa-solid fa-sort"></i>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="pagedReports_1.length !== 0" style="height: 31.5vh;">
+                                                <tr *ngFor="let report of pagedReports_1; let i = index">
+                                                    <td>{{ (currentPage_1 - 1) * itemsPerPage_1 + i + 1 }}</td>
+                                                    <td>{{ report.hostname }}</td>
+                                                    <td>{{ report.version }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                            <nav class="mb-1 mr-1">
+                                                <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+                                                    <li class="page-item" [class.disabled]="currentPage_1 === 1">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage_1()"
+                                                            [disabled]="currentPage_1 === 1" tabindex="0">
+                                                            &laquo; Previous
+                                                        </button>
+                                                    </li>
+                                    
+                                                    <li class="page-item d-flex align-items-center">
+                                                        <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                            [(ngModel)]="pageInput_1" (keydown.enter)="goToPage_1(pageInput_1)" min="1" [max]="totalPages_1"
+                                                            aria-label="Page number input" />
+                                    
+                                    
+                                                        <span class="ms-2" style="color: var(--text-color);"> of {{
+                                                            totalPages_1 }}</span>
+                                                    </li>
+                                    
+                                                    <li class="page-item" [class.disabled]="currentPage_1 === totalPages_1">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage_1()"
+                                                            [disabled]="currentPage_1 === totalPages_1" tabindex="0">
+                                                            Next &raquo;
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div> -->
+                <!-- <div *ngIf="selectedAppName">
+                                                                                                                                                                                                                                                                                                                                                                            <div class="form-group col-md-12">
+                                                                                                                                                                                                                                                                                                                                                                                <label>Name</label>
+                                                                                                                                                                                                                                                                                                                                                                                <input type="text" class="form-control form-control-sm"
+                                                [value]="selectedReport?.name" readonly>
+                                        </div>
+<div class="form-group col-md-12">
+    <label>Source</label>
+    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.source" name="fileName" readonly>
+                                        </div>
+
+                                        <div class="form-group col-md-12">
+                                            <label>Version</label>
+                                            <input type="text" class="form-control form-control-sm" [value]="selectedReport?.version" name="version" readonly>
+                                        </div>
+<div class="mt-2">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th (click)="onSort_1('hostname')" style="cursor: pointer;">
+                    Host
+                    Name &nbsp;<i class="fa-solid fa-sort"></i></th>
+                <th (click)="onSort_1('version')" style="cursor: pointer;">
+                    Operating System &nbsp;<i class="fa-solid fa-sort"></i>
+                </th>
+            </tr>
+        </thead>
+        <tbody *ngIf="pagedReports_1.length !== 0" style="height: 30vh;">
+            <tr *ngFor="let report of pagedReports_1; let i = index">
+                <td>{{ report.hostname }}</td>
+                <td>{{ report.version }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+        <nav class="mb-1 mr-1">
+            <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+                <li class="page-item" [class.disabled]="currentPage_1 === 1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage_1()"
+                        [disabled]="currentPage_1 === 1" tabindex="0">
+                        &laquo; Previous
+                    </button>
+                </li>
+
+                <li class="page-item d-flex align-items-center">
+                    <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                        [value]="currentPage_1" (keydown.enter)="goToPage_1(inputPage.value)" #inputPage min="1"
+                        [max]="totalPages_1" aria-label="Page number input" />
+                    <span class="ms-2"> of {{ totalPages_1 }}</span>
+                </li>
+
+                <li class="page-item" [class.disabled]="currentPage_1 === totalPages_1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage_1()"
+                        [disabled]="currentPage_1 === totalPages_1" tabindex="0">
+                        Next &raquo;
+                    </button>
+                </li>
+                </ul>
+                </nav>
+                </div>
+</div>
+</div>-->
+                <!-- </div>
+
+                            </div>
+                        </div>
+                        </div>
+                        </div> -->
+                <!-- Query Tab -->
+                <div class="tab-pane fade p-1" id="query" style="margin-top: -1%;">
+                    <ng-container *ngIf="selectedTab === 'query'">
+                        <app-query-tab-component [zoneId]="selectedZoneId"
+                            [groupId]="selectedGroupId"></app-query-tab-component>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <!-- Fallback template -->
+        <ng-template #noDataTemplate>
+            <div class="text-center text-muted fw-bold" style="padding: 85px;">
+                <p>No Data</p>
+            </div>
+        </ng-template>
+    </div>
+</main>
+
+<ng-template #loginModal let-modal>
+    <div class="modal-content custom-modal">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-info-circle me-2"></i>{{selectedProcessName}} Usage Per Host
+            </h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="table-container">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr class="table-header">
+                            <th class="sl-no">
+                                <i class="fas fa-hashtag"></i>
+                            </th>
+                            <th class="ps-3"><i class="fas fa-desktop me-2"></i>Host</th>
+                            <th class="ps-3"><i class="fas fa-user me-2"></i>Username</th>
+                            <th><i class="fas fa-clock me-2"></i>Usage</th>
+                            <th class="pe-3"><i class="fas fa-calendar-day me-2"></i>Last Seen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let entry of modalHostUsages; let i = index" class="table-row">
+                            <td class="sl-no">{{ i + 1 }}</td>
+                            <td class="ps-3">{{ entry.host }}</td>
+                            <td class="ps-3">{{entry.username || '-'}}</td>
+                            <td>{{(entry.usage | timeConversion : 'mins') }}</td>
+                            <td class="pe-3">{{ entry.date | date: 'MMM dd, yyyy' }}</td>
+                        </tr>
+                        <tr *ngIf="modalHostUsages.length === 0">
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                <i class="fas fa-database me-2"></i>No usage data available for this process
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="modal.dismiss()">
+                <i class="fas fa-times me-1"></i> Close
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #dormantDatesModal let-modal>
+    <div class="modal-content custom-modal">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-calendar-days me-2"></i>Dormant On Dates
+            </h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Close"></button>
+        </div>
+        <div class="px-3 pb-2 text-muted" *ngIf="selectedDeviceName">
+            <small><i class="fas fa-microchip me-1"></i>Host: {{ selectedDeviceName }}</small>
+        </div>
+
+        <div class="modal-body">
+            <div class="table-container">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr class="table-header">
+                            <th class="ps-3">Sr No</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let date of modalDormantDates; let i = index" class="table-row">
+                            <td class="ps-3">{{ i + 1 }}</td>
+                            <td>{{ date | date: 'MMM dd, yyyy' }}</td>
+                        </tr>
+                        <tr *ngIf="modalDormantDates.length === 0">
+                            <td colspan="2" class="text-center py-4 text-muted">
+                                <i class="fas fa-database me-2"></i>No dormant records found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="modal.dismiss()">
+                <i class="fas fa-times me-1"></i> Close
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deviceDetailsModal let-modal>
+    <div class="modal-content custom-modal">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-server me-2"></i>Devices Discovered On {{ selectedDate }}
+            </h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Close"></button>
+        </div>
+
+
+        <div class="modal-body">
+            <div class="table-container">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr class="table-header">
+                            <th class="ps-3">
+                                <i class="fas fa-hashtag"></i>
+                            </th>
+                            <th class="ps-3"><i class="fas fa-desktop me-2"></i>Host</th>
+                            <th class="pe-3"><i class="fas fa-calendar-day me-2"></i>Created Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let device of modalDeviceDetails; let i = index" class="table-row">
+                            <td class="ps-3">{{ i + 1 }}</td>
+                            <td>{{ device.hostname }}</td>
+                            <td>{{ device.createdOn | date:'HH:mm:ss' }}</td>
+                        </tr>
+                        <tr *ngIf="modalDeviceDetails.length === 0">
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                <i class="fas fa-database me-2"></i>No device records found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="modal.dismiss()">
+                <i class="fas fa-times me-1"></i> Close
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<div *ngIf="isModalVisible"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="w-full max-w-lg p-6 relative animate-fadeIn transition-all duration-300 rounded-xl shadow-2xl"
+        style="background-color: var(--modal-bg-color); color: var(--modal-text-color);">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4" style="border-color: var(--border-color);">
+            <h5 style="color: #379FBD;"> <i class="fas fa-info-circle me-2"></i> &nbsp; Details for {{ selectedHostName
+                }}</h5>
+            <button (click)="closeModal2()" class="text-2xl leading-none focus:outline-none"
+                style="color: var(--disabled-text-color);">
+                &times;
+            </button>
+        </div>
+        <!-- Body -->
+        <div class="space-y-4">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;" (click)="sortData('timeBucket')">Date &nbsp;<i
+                                class="fa-solid fa-sort"></i></th>
+                        <th style="cursor: pointer;" (click)="sortData('activeTime')">Active Time &nbsp;<i
+                                class="fa-solid fa-sort"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of selectedHostData">
+                        <td>{{ formatDate2(item.timeBucket) }}</td>
+                        <td>{{ item.activeTime | timeConversion: 'mins' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div *ngIf="selectedHostData.length === 0">No data available.</div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-end gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeModal2()">
+                <i class="fas fa-times me-1"></i> Close
+            </button>
+        </div>
+    </div>
+</div>

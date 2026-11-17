@@ -1,0 +1,599 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<main>
+    <div>
+        <div class="row border-2 custom-border rounded-3 rounded shadow mx-2"
+            style="width: 99%; height: 89vh; max-height: 100vh; overflow-x: hidden;">
+            <div style="padding: 0%;">
+                <ul class="nav nav-tabs" id="service-nav" style="font-size: small;">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#app_reports">Application Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#host_reports">Host Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#host_detailed_reports">Host Detailed Report</a>
+                    </li>
+                </ul>
+            </div> 
+                
+            <div class="tab-content">
+                <div class="tab-pane fade in active show" id="app_reports" role="tabpanel">
+                    <div class="custom-card">
+                        <div class="card shadow shadow-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">APPLICATION REPORT</h5>
+                                <div class="d-flex align-items-center">
+                                    <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                        [ngClass]="{ 'search-input-hidden': !showSearch }" [(ngModel)]="searchQuery" (input)="onSearch()" />
+                                    <i class="fas fa-search mr-3" (click)="toggleSearch()" style="cursor: pointer;"></i>
+                                    <i class="fas fa-download" (click)="downloadReport()" style="cursor: pointer;"></i>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="dynamic-table table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th (click)="onSort('name')" style="cursor: pointer;">Application Name &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort('version')" style="cursor: pointer;">Version &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort('source')" style="cursor: pointer;">Source &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort('hostCount')" style="cursor: pointer;">Host Count &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th>License</th>
+                                                <th>Parameter</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="pagedReports.length !== 0">
+                                            <tr *ngFor="let report of pagedReports; let i = index">
+                                                <td class="text-link" style="cursor: pointer;"
+                                                    (click)="showAppDetail(report.name, report.id)">{{ report.name }}</td>
+                                                <td>{{ report.version }}</td>
+                                                <td>{{ report.source }}</td>
+                                                <td>{{ report.hostCount }}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <div class="noData d-flex justify-content-center align-items-center"
+                                            *ngIf="pagedReports.length === 0">
+                                            <h4>No Data to Display</h4>
+                                        </div>
+                                    </table>
+                                    <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                        <nav class="mb-1 mr-1">
+                                            <ul class="pagination justify-content-center align-items-center"
+                                                style="font-size: small; gap: 0.5rem;">
+                                                <li class="page-item" [class.disabled]="currentPage === 1">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage()"
+                                                        [disabled]="currentPage === 1" tabindex="0">
+                                                        &laquo; Previous
+                                                    </button>
+                                                </li>
+                    
+                                                <li class="page-item d-flex align-items-center">
+                                                    <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                        [value]="currentPage" (keydown.enter)="goToPage(inputPage.value)" #inputPage min="1"
+                                                        [max]="totalPages" aria-label="Page number input" />
+                                                    <span class="ms-2"> of {{ totalPages }}</span>
+                                                </li>
+                    
+                                                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage()"
+                                                        [disabled]="currentPage === totalPages" tabindex="0">
+                                                        Next &raquo;
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div *ngIf="selectedAppName">
+                        <h5 class="mt-2" style="font-weight: 500;">Details of {{selectedAppName}} </h5>
+                        <div class="custom-card">
+                            <div class="shadow shadow-3">
+                                <div class="table-responsive mt-1">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th (click)="onSort_1('hostname')" style="cursor: pointer;">User Name &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort_1('version')" style="cursor: pointer;">Version &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort_1('source')" style="cursor: pointer;">Source &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort_1('installedPath')" style="cursor: pointer;">Installed Path &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort_1('lastOpenedAt')" style="cursor: pointer;">Last Access &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="pagedReports_1.length !== 0" style="max-height: 29vh;">
+                                            <tr *ngFor="let report of pagedReports_1; let i = index">
+                                                <td>{{ report.hostname }}</td>
+                                                <td>{{ report.version }}</td>
+                                                <td>{{ report.source }}</td>
+                                                <td>{{ getSafeValue(report.installedPath) }}</td>
+                                                <td>{{ report.lastOpenedAt }}</td>
+                                            </tr>
+                                        </tbody>
+                                        <div class="noData d-flex justify-content-center align-items-center" style="height: 29vh;"
+                                            *ngIf="pagedReports_1.length === 0">
+                                            <h4>No Data to Display</h4>
+                                        </div>
+                                    </table>
+                                    <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                        <nav class="mb-1 mr-1">
+                                            <ul class="pagination justify-content-center align-items-center"
+                                                style="font-size: small; gap: 0.5rem;">
+                                                <li class="page-item" [class.disabled]="currentPage_1 === 1">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        (click)="previousPage_1()" [disabled]="currentPage_1 === 1" tabindex="0">
+                                                        &laquo; Previous
+                                                    </button>
+                                                </li>
+                    
+                                                <li class="page-item d-flex align-items-center">
+                                                    <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                        [value]="currentPage_1" (keydown.enter)="goToPage_1(inputPage.value)" #inputPage
+                                                        min="1" [max]="totalPages_1" aria-label="Page number input" />
+                                                    <span class="ms-2"> of {{ totalPages_1 }}</span>
+                                                </li>
+                    
+                                                <li class="page-item" [class.disabled]="currentPage_1 === totalPages_1">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage_1()"
+                                                        [disabled]="currentPage_1 === totalPages_1" tabindex="0">
+                                                        Next &raquo;
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="host_reports" role="tabpanel">
+                    <div class="custom-card">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">HOST REPORT</h5>
+                                <div class="d-flex align-items-center">
+                                    <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                        [ngClass]="{ 'search-input-hidden': !showSearch2 }" [(ngModel)]="searchQuery2"
+                                        (input)="onSearch2()" />
+                                    <i class="fas fa-search mr-3" (click)="toggleSearch2()" style="cursor: pointer;"></i>
+                                    <i class="fas fa-download" (click)="downloadReport2()" style="cursor: pointer;"></i>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th (click)="onSort2('publicIp')" style="cursor: pointer;">IP Address &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('hostname')" style="cursor: pointer;">Hostname &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('platform')" style="cursor: pointer;">Platform &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('osVersion')" style="cursor: pointer;">OS Version &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('uptime')" style="cursor: pointer;">Uptime (Days) &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('cpuPhysicalCores')" style="cursor: pointer;">CPU Cores &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('memory')" style="cursor: pointer;">Memory (GB) &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('hardwareVendor')" style="cursor: pointer;">Vendor &nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('lastEnrolledAt')" style="cursor: pointer;">Last Enrolled At&nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <th (click)="onSort2('seenTime')" style="cursor: pointer;">Last Seen&nbsp;<i
+                                                        class="fa-solid fa-sort"></i></th>
+                                                <!-- <th (click)="onSort2('status')" style="cursor: pointer;">Status&nbsp;<i class="fa-solid fa-sort"></i></th> -->
+                                                <th>Complaint Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="pagedReports2.length !== 0">
+                                            <tr *ngFor="let report of pagedReports2; let i = index">
+                                                <td class="text-link" style="cursor: pointer;"
+                                                    (click)="showIpDetail(report.id, report.publicIp)">{{ report.publicIp }}</td>
+                                                <td class="scroll-cell" [title]="report.hostname">{{ report.hostname }}</td>
+                                                <td>{{ report.platform }}</td>
+                                                <td class="scroll-cell" [title]="report.osVersion">{{ report.osVersion }}</td>
+                                                <td>{{ report.uptime / (1000 * 1000 * 1000 * 60 * 60 * 24) | number:'1.2-2' }}</td>
+                                                <td>{{ report.cpuPhysicalCores }}</td>
+                                                <td>{{ report.memory / (1024 * 1024 * 1024) | number:'1.2-2' }}</td>
+                                                <td>{{ report.hardwareVendor }}</td>
+                                                <td class="scroll-cell" [title]="report.lastEnrolledAt">{{ report.lastEnrolledAt | date:'short' }}</td>
+                                                <td class="scroll-cell" [title]="report.seenTime">{{ report.seenTime | date: 'short' }}</td>
+                                                <!-- <td>{{ report.status }}</td> -->
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <div class="noData d-flex justify-content-center align-items-center"
+                                            *ngIf="pagedReports2.length === 0">
+                                            <h4>No Data to Display</h4>
+                                        </div>
+                                    </table>
+                                    <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                        <nav class="mb-1 mr-1">
+                                            <ul class="pagination justify-content-center align-items-center"
+                                                style="font-size: small; gap: 0.5rem;">
+                                                <li class="page-item" [class.disabled]="currentPage2 === 1">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage2()"
+                                                        [disabled]="currentPage2 === 1" tabindex="0">
+                                                        &laquo; Previous
+                                                    </button>
+                                                </li>
+                    
+                                                <li class="page-item d-flex align-items-center">
+                                                    <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                        [value]="currentPage2" (keydown.enter)="goToPage2(inputPage2.value)" #inputPage2
+                                                        min="1" [max]="totalPages2" aria-label="Page number input" />
+                                                    <span class="ms-2"> of {{ totalPages2 }}</span>
+                                                </li>
+                    
+                                                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage2()"
+                                                        [disabled]="currentPage2 === totalPages2" tabindex="0">
+                                                        Next &raquo;
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane fade" id="host_detailed_reports" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center" style="height: 30px;">
+                            <h5 class="mb-0">HOST DETAILED REPORT ({{ selectedIpAddress }})</h5>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-download" (click)="downloadReport3()" style="cursor: pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body" style="height: 78vh; overflow: auto; font-size: 11px;">
+                            <div class="custom-card">
+                                <h5 class="mb-0" style="font-weight: 500;">Summary</h5>
+                                <br>
+                                <div class="p-3 shadow shadow-3" style="background-color: var(--bg-color);">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Name</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.hostname" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Status</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="selectedReport.status"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">IP</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.publicIp" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Environment</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.env" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Platform</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.platform" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">CPU Type</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.cpuType" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">CPU Brand</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.cpuBrand" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Model</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="selectedReport.hardwareModel"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">OS Version</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.osVersion"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Serial</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="selectedReport.hardwareSerial"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="custom-card mt-2">
+                                <h5 class=" mt-2 mb-0" style="font-weight: 500;">Details</h5>
+                                <br>
+                                <div class="p-3 shadow shadow-3" style="background-color: var(--bg-color);">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Domain</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="selectedReport?.domain"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                            
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Uptime</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [value]="formattedUptime" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label" style="padding: 7px;">Last Patch Update Name</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        [value]="selectedReport?.lastPatchUpdateName" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                            
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">Last Patch Update Date</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        [(ngModel)]="selectedReport.lastPatchUpdateDate" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="userEmailSource?.length !== 0" class="row">
+                                        <div class="form-group col-md-6">
+                                            <div class="row">
+                                                <label class="col-md-3 col-form-label">{{userEmailSource}}</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="userEmail" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-2">
+                                <div style="width: 50%;">
+                                    <div class="custom-card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0" style="font-weight: 500;">List of Applications</h6>
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                                    [ngClass]="{ 'search-input-hidden': !showSearch3 }" [(ngModel)]="searchQuery3"
+                                                    (input)="onSearch3()" />
+                                                <i class="fas fa-search mr-3" (click)="toggleSearch3()" style="cursor: pointer;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive shadow shadow-3">
+                                            <table class="table table-hover mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th (click)="onSort3('name')" style="cursor: pointer;">Application Names &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort3('version')" style="cursor: pointer;">Versions &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort3('updatedDate')" style="cursor: pointer;">Updated Date &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="pagedReports3.length !== 0" style="max-height: 40vh;">
+                                                    <tr *ngFor="let report of pagedReports3; let i = index">
+                                                        <td>{{ report.name }}</td>
+                                                        <td>{{ report.version }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                                <div class="noData d-flex justify-content-center align-items-center" style="height: 12vh;"
+                                                    *ngIf="pagedReports3.length === 0">
+                                                    <h4>No Data to Display</h4>
+                                                </div>
+                                            </table>
+                                            <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                                <nav class="mb-1 mr-1">
+                                                    <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+                                                        <li class="page-item" [class.disabled]="currentPage3 === 1">
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage3()"
+                                                                [disabled]="currentPage3 === 1" tabindex="0">
+                                                                &laquo; Previous
+                                                            </button>
+                                                        </li>
+                                            
+                                                        <li class="page-item d-flex align-items-center">
+                                                            <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                                [value]="currentPage3" (keydown.enter)="goToPage3(inputPage3.value)" #inputPage3 min="1"
+                                                                [max]="totalPages3" aria-label="Page number input" />
+                                                            <span class="ms-2"> of {{ totalPages3 }}</span>
+                                                        </li>
+                                            
+                                                        <li class="page-item" [class.disabled]="currentPage3 === totalPages3">
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage3()"
+                                                                [disabled]="currentPage3 === totalPages3" tabindex="0">
+                                                                Next &raquo;
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                </div>
+                                <div style="width: 50%;">
+                                    <div class="custom-card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0" style="font-weight: 500;">Local User Accounts</h6>
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                                    [ngClass]="{ 'search-input-hidden': !showSearch4 }" [(ngModel)]="searchQuery4"
+                                                    (input)="onSearch4()" />
+                                                <i class="fas fa-search mr-3" (click)="toggleSearch4()" style="cursor: pointer;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive mt-1 shadow shadow-3">
+                                            <table class="table table-hover mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th (click)="onSort4('userName')" style="cursor: pointer;">User Names &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort4('groupName')" style="cursor: pointer;">Group Name &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                        <th (click)="onSort4('shell')" style="cursor: pointer;">Shell &nbsp;<i
+                                                                class="fa-solid fa-sort"></i></th>
+                                                        <th>Last Login</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="pagedReports4.length !== 0" style="max-height: 40vh;">
+                                                    <tr *ngFor="let report of pagedReports4; let i = index">
+                                                        <td>{{ report.userName }}</td>
+                                                        <td>{{ report.groupName }}</td>
+                                                        <td>{{ report.shell }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                                <div class="noData d-flex justify-content-center align-items-center" style="height: 12vh;"
+                                                    *ngIf="pagedReports4.length === 0">
+                                                    <h4>No Data to Display</h4>
+                                                </div>
+                                            </table>
+                                            <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                                <nav class="mb-1 mr-1">
+                                                    <ul class="pagination justify-content-center align-items-center" style="font-size: small; gap: 0.5rem;">
+                                                        <li class="page-item" [class.disabled]="currentPage4 === 1">
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="previousPage4()"
+                                                                [disabled]="currentPage4 === 1" tabindex="0">
+                                                                &laquo; Previous
+                                                            </button>
+                                                        </li>
+                                            
+                                                        <li class="page-item d-flex align-items-center">
+                                                            <input type="number" class="form-control form-control-sm text-center" style="width:60px"
+                                                                [value]="currentPage4" (keydown.enter)="goToPage4(inputPage.value)" #inputPage4 min="1"
+                                                                [max]="totalPages4" aria-label="Page number input" />
+                                                            <span class="ms-2"> of {{ totalPages4 }}</span>
+                                                        </li>
+                                            
+                                                        <li class="page-item" [class.disabled]="currentPage4 === totalPages4">
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nextPage4()"
+                                                                [disabled]="currentPage4 === totalPages4" tabindex="0">
+                                                                Next &raquo;
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                            <!-- <div *ngIf="pagedReports4.length !== 0" class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                                <nav>
+                                                    <ul class="pagination" style="font-size: x-small;">
+                                                        <li class="page-item" [class.disabled]="currentPage4 === 1">
+                                                            <a class="page-link" (click)="previousPage4()">&laquo;</a>
+                                                        </li>
+                                                        <li class="page-item" *ngFor="let page of totalPagesArray4"
+                                                            [class.active]="page === currentPage4" [class.disabled]="page === '...'">
+                                                            <a class="page-link" *ngIf="page !== '...'" (click)="goToPage4(page)">{{
+                                                                page }}</a>
+                                                            <span class="page-link" *ngIf="page === '...'">{{ page }}</span>
+                                                        </li>
+                                                        <li class="page-item" [class.disabled]="currentPage4 === totalPages4">
+                                                            <a class="page-link" (click)="nextPage4()">&raquo;</a>
+                                                        </li>
+                                                    </ul>
+                                                </nav> &nbsp;&nbsp;
+                                                <div class="pagination-info" style="align-content: center; color: #03bba4; font-size: x-small;">
+                                                    ({{ startIndex4 + 1 }}-{{ endIndex4 }}/{{ applicationReports4.length }})
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

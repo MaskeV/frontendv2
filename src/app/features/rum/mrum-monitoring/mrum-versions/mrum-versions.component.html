@@ -1,0 +1,792 @@
+<main>
+    <!-- breadcrumb part -->
+    <app-mrum-breadcrumb 
+        [breadcrumbs]="breadcrumbData">
+    </app-mrum-breadcrumb>
+    <!-- Body -->
+    <div>
+        <div class="row  border-2 custom-border rounded-3 rounded shadow mx-2"
+            style="width: 99%; height: 82vh; max-height: 100vh; overflow-x: hidden; margin-top: -4px;">
+            <div class="w-100 h-8">
+                <ul class="nav nav-tabs" id="instance-nav"
+                    style="font-weight:bold; margin-left:-1%; width:1270px; font-size:small; border-bottom:1px solid #e0e0e0;">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                            (click)="loadData('overview')" style="color:#333; border:none; background:transparent;">
+                            Overview
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#screens"
+                            (click)="loadData('screens')" style="color:#333; border:none;">
+                            Screens
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#sessions"
+                            (click)="loadData('sessions')" style="color:#333; border:none;">
+                            Sessions
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#errors" (click)="loadData('errors')"
+                            style="color:#333; border:none;">
+                            Errors & Crashes
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+            <!-- Tab Body -->
+            <div class="tab-content rounded-3 rounded">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade in active show" id="overview">
+
+                    <!-- ===================== TOP METRICS ===================== -->
+                    <div class="row reduce-horizontal-gutter my-2">
+
+                        <!-- Crash Rate -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">Crash Rate</div>
+                                <div class="metric-value">
+                                    {{ crashRate ?? '0' }} <span class="metric-unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Apdex -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">Apdex</div>
+                                <div class="metric-value">
+                                    {{ apdexScore ?? '0' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Throughput -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">Throughput</div>
+                                <div class="metric-value">
+                                    {{ throughput ?? '0' }} <span class="metric-unit">tpm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HTTP -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">HTTP Requests</div>
+                                <div class="metric-value">
+                                    {{ httpRequestCount ?? '0' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Failure -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">Failure Rate</div>
+                                <div class="metric-value">
+                                    {{ failureRate ?? '0' }} <span class="metric-unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Latency -->
+                        <div class="col-12 col-sm-6 col-md-3 col-lg-2 mb-2">
+                            <div class="card-clean">
+                                <div class="metric-title">Latency</div>
+                                <div class="metric-value">
+                                    {{ latency ?? '0' }} <span class="metric-unit">ms</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== PIE CHARTS ===================== -->
+                    <div class="row reduce-horizontal-gutter my-2">
+
+                        <!-- Network -->
+                        <div class="col-12 col-sm-6 col-lg-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="chart-title text-center mb-2">Network Connection Type</div>
+
+                                <ng-container *ngIf="pieChartConfigs.networkConnectionType; else noDataTemplate">
+                                    <highcharts-chart [Highcharts]="Highcharts"
+                                        [options]="pieChartConfigs.networkConnectionType"
+                                        style="width:100%;height:200px;display:block;">
+                                    </highcharts-chart>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <!-- Device -->
+                        <div class="col-12 col-sm-6 col-lg-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="chart-title text-center mb-2">Device</div>
+
+                                <ng-container *ngIf="pieChartConfigs.device; else noDataTemplate">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="pieChartConfigs.device"
+                                        style="width:100%;height:200px;display:block;">
+                                    </highcharts-chart>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <!-- OS -->
+                        <div class="col-12 col-sm-6 col-lg-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="chart-title text-center mb-2">OS Version</div>
+
+                                <ng-container *ngIf="pieChartConfigs.osVersion; else noDataTemplate">
+                                    <highcharts-chart [Highcharts]="Highcharts" [options]="pieChartConfigs.osVersion"
+                                        style="width:100%;height:200px;display:block;">
+                                    </highcharts-chart>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== TIME SERIES ===================== -->
+                    <div class="row reduce-horizontal-gutter my-2">
+
+                        <!-- Latency -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">Latency (ms)</span>
+                                    <strong *ngIf="latencyMetricData?.aggregated" class="chart-value">
+                                        {{ latencyMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container *ngIf="latencyMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="latencyChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Apdex -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">Apdex</span>
+                                    <strong *ngIf="apdexMetricData?.aggregated" class="chart-value">
+                                        {{ apdexMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container *ngIf="apdexMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="apdexChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Throughput -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">Throughput (tpm)</span>
+                                    <strong *ngIf="throughputMetricData?.aggregated" class="chart-value">
+                                        {{ throughputMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container *ngIf="throughputMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="throughputChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sessions -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">Sessions</span>
+                                    <strong *ngIf="sessionsMetricData?.aggregated" class="chart-value">
+                                        {{ sessionsMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container *ngIf="sessionsMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="sessionChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Failure -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">Failure Rate (%)</span>
+                                    <strong *ngIf="failureRateMetricData?.aggregated" class="chart-value">
+                                        {{ failureRateMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container
+                                        *ngIf="failureRateMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="failureRateChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HTTP -->
+                        <div class="col-12 col-md-6 col-xl-4 mb-2">
+                            <div class="card-clean chart-card">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="chart-title">HTTP Requests</span>
+                                    <strong *ngIf="httpRequestMetricData?.aggregated" class="chart-value">
+                                        {{ httpRequestMetricData.aggregated }}
+                                    </strong>
+                                </div>
+
+                                <div class="chart-body">
+                                    <ng-container
+                                        *ngIf="httpRequestMetricData?.timeSeries?.length; else noDataTemplate">
+                                        <div id="httpRequestChartContainer" class="chart-container"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- End of Overview Tab -->
+
+                <!-- Screens Tab Body -->
+                <div class="tab-pane fade" id="screens">
+
+                    <!-- ================= FILTER CARD ================= -->
+                    <div class="row" style="font-size:12px;margin-top:4px;letter-spacing:.3px;
+       background:#ffffff;border:1px solid #e0e0e0;
+       border-radius:8px;padding:10px;
+       box-shadow:0 1px 3px rgba(0,0,0,.08);margin:0px">
+
+                        <!-- Device -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Device</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.device">
+                                <option value="">All</option>
+                                <option *ngFor="let d of deviceList" [value]="d">{{ d }}</option>
+                            </select>
+                        </div>
+
+                        <!-- OS Version -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">OS Version</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.osVersion">
+                                <option value="">All</option>
+                                <option *ngFor="let os of osversionList" [value]="os">{{ os }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Outcome -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Outcome</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.outcome">
+                                <option value="">All</option>
+                                <option value="success">Success</option>
+                                <option value="failure">Failure</option>
+                            </select>
+                        </div>
+
+                        <!-- Session ID -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Session ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.sessionId" />
+                        </div>
+
+                        <!-- Min Latency -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Min Latency</label>
+                            <input type="number" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.minLatency" />
+                        </div>
+
+                        <!-- Max Latency -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Max Latency</label>
+                            <input type="number" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.maxLatency" />
+                        </div>
+
+                        <!-- Netraa Trace ID -->
+                        <div class="col-md-2 mt-2">
+                            <label style="color:#555;font-weight:600;">Backend Trace ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.netraaTraceId" />
+                        </div>
+
+                        <!-- Trace ID -->
+                        <div class="col-md-2 mt-2">
+                            <label style="color:#555;font-weight:600;">Trace ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="transactionFilters.traceId" />
+                        </div>
+
+                        <!-- Search -->
+                        <div class="col-md-2 d-flex align-items-end mt-2">
+                            <button style="width:32px;height:32px;border-radius:50%;
+              border:1px solid #219ebc;background:#fff;" (click)="getTransactions()" title="Search">
+                                <i class="bi bi-search" style="color:#219ebc;"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= TABLE ================= -->
+                    <div class="scrollable2" style="margin-top:10px;">
+                        <div class="rounded-2 p-1 overflow-hidden">
+
+                            <table class="table table-fixed"
+                                style="font-size:12px;font-family:'Inter','Segoe UI',sans-serif;background:transparent;">
+
+                                <!-- HEADER -->
+                                <thead>
+                                    <tr style="border-bottom:1px solid #e0e0e0;">
+                                        <th (click)="setSort('name')" style="padding:8px 16px;color:#1565c0;width:35%;">
+                                            Transaction Name
+                                        </th>
+                                        <th (click)="setSort('latency')" style="padding:8px 16px;color:#d84315;">
+                                            Latency (ms)
+                                        </th>
+                                        <th (click)="setSort('throughput')" style="padding:8px 16px;color:#1565c0;">
+                                            Throughput
+                                        </th>
+                                        <th (click)="setSort('failedRate')" style="padding:8px 16px;color:#ef6c00;">
+                                            Failed Tx (%)
+                                        </th>
+                                        <th (click)="setSort('apdex')" style="padding:8px 16px;color:#6a1b9a;">
+                                            Apdex
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <!-- BODY -->
+                                <tbody>
+                                    <tr *ngFor="let txn of sortedTransactions"
+                                        style="background:#fafafa;border-bottom:1px solid #eeeeee;">
+
+                                        <td style="padding:8px 16px;">
+                                            <a [routerLink]="['/mrum/mrum-transaction']"
+                                                [queryParams]="buildQueryParamsTransactions(txn.name)"
+                                                queryParamsHandling="merge"
+                                                style="color:#1565c0;font-weight:500;text-decoration:none;">
+                                                {{ txn.name }}
+                                            </a>
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#d84315;">
+                                            {{ txn.latency ?? 'No Data' }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#1565c0;">
+                                            {{ txn.throughput ?? 'No Data' }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#ef6c00;">
+                                            {{ txn.failedRate ?? 'No Data' }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#6a1b9a;">
+                                            {{ txn.apdex ?? 'No Data' }}
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                            <!-- NO DATA -->
+                            <div *ngIf="transactions.length === 0"
+                                style="text-align:center;padding:40px;color:#9e9e9e;">
+                                <strong>No Transactions</strong>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- End of Screens Tab Body -->
+
+                <!-- Sessions Tab Body -->
+                <div class="tab-pane fade" id="sessions">
+
+                    <!-- ================= FILTER CARD ================= -->
+                    <div class="row" style="font-size:12px;margin-top:4px;letter-spacing:.3px;
+       background:#ffffff;border:1px solid #e0e0e0;
+       border-radius:8px;padding:10px;
+       box-shadow:0 1px 3px rgba(0,0,0,.08);margin:0px">
+
+                        <!-- Device -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Device</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="sessionFilters.device">
+                                <option value="">All</option>
+                                <option *ngFor="let d of deviceList" [value]="d">{{ d }}</option>
+                            </select>
+                        </div>
+
+                        <!-- OS Version -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">OS Version</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="sessionFilters.osVersion">
+                                <option value="">All</option>
+                                <option *ngFor="let os of osversionList" [value]="os">{{ os }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Session ID -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Session ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="sessionFilters.sessionId" />
+                        </div>
+
+                        <!-- Search -->
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button style="width:32px;height:32px;border-radius:50%;
+              border:1px solid #219ebc;background:#fff;" (click)="getSessions()" title="Search">
+                                <i class="bi bi-search" style="color:#219ebc;"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= TABLE ================= -->
+                    <div class="scrollable2" style="margin-top:10px;">
+                        <div class="rounded-2 p-1 overflow-hidden">
+
+                            <table class="table table-fixed"
+                                style="font-size:12px;font-family:'Inter','Segoe UI',sans-serif;background:transparent;">
+
+                                <!-- HEADER -->
+                                <thead>
+                                    <tr style="border-bottom:1px solid #e0e0e0;">
+                                        <th style="padding:8px 16px;color:#1565c0;width:40%;">Session ID</th>
+                                        <th style="padding:8px 16px;color:#d84315;">Latency (ms)</th>
+                                        <th style="padding:8px 16px;color:#1565c0;">Throughput</th>
+                                        <th style="padding:8px 16px;color:#ef6c00;">Failed Tx (%)</th>
+                                        <th style="padding:8px 16px;color:#6a1b9a;">Apdex</th>
+                                        <th style="padding:8px 16px;color:#991f74;">Crash Status</th>
+                                    </tr>
+                                </thead>
+
+                                <!-- BODY -->
+                                <tbody>
+                                    <tr *ngFor="let session of paginatedSessions"
+                                        style="background:#fafafa;border-bottom:1px solid #eeeeee;">
+
+                                        <td style="padding:8px 16px;" class="text-truncate">
+                                            <a [routerLink]="['/mrum/mrum-session']"
+                                                [queryParams]="buildQueryParamsSessions(session.sessionId)"
+                                                queryParamsHandling="merge"
+                                                style="color:#1565c0;text-decoration:none;font-weight:500;">
+                                                {{ session.sessionId }}
+                                            </a>
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#d84315;">
+                                            {{ session.latency }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#1565c0;">
+                                            {{ session.throughput }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#ef6c00;">
+                                            {{ session.failure_rate }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#6a1b9a;">
+                                            {{ session.apdex }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;">
+                                            <i class="fa"
+                                                [ngClass]="session.isCrash ? 'fa-times-circle text-danger' : 'fa-check-circle text-success'">
+                                            </i>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                            <!-- PAGINATION (same logic, just cleaner spacing) -->
+                            <nav *ngIf="totalSessionsPages > 1" class="mt-2">
+                                <ul class="pagination pagination-sm justify-content-center">
+
+                                    <li class="page-item" [class.disabled]="currentSessionsPage === 1">
+                                        <a class="page-link"
+                                            (click)="changeSessionsPage(currentSessionsPage - 1)">Previous</a>
+                                    </li>
+
+                                    <li class="page-item" [class.active]="currentSessionsPage === 1">
+                                        <a class="page-link" (click)="changeSessionsPage(1)">1</a>
+                                    </li>
+
+                                    <li class="page-item disabled" *ngIf="paginationStart > 2">
+                                        <span class="page-link">...</span>
+                                    </li>
+
+                                    <li class="page-item" *ngFor="let page of paginationPages"
+                                        [class.active]="currentSessionsPage === page">
+                                        <a class="page-link" (click)="changeSessionsPage(page)">{{ page }}</a>
+                                    </li>
+
+                                    <li class="page-item disabled" *ngIf="paginationEnd < totalSessionsPages - 1">
+                                        <span class="page-link">...</span>
+                                    </li>
+
+                                    <li class="page-item" *ngIf="totalSessionsPages > 1"
+                                        [class.active]="currentSessionsPage === totalSessionsPages">
+                                        <a class="page-link" (click)="changeSessionsPage(totalSessionsPages)">
+                                            {{ totalSessionsPages }}
+                                        </a>
+                                    </li>
+
+                                    <li class="page-item" [class.disabled]="currentSessionsPage === totalSessionsPages">
+                                        <a class="page-link"
+                                            (click)="changeSessionsPage(currentSessionsPage + 1)">Next</a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+
+                            <!-- NO DATA -->
+                            <div *ngIf="paginatedSessions.length === 0"
+                                style="text-align:center;padding:40px;color:#9e9e9e;">
+                                <strong>No Sessions</strong>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- End of Sessions Tab Body -->
+
+                <!-- Errors Tab Body -->
+                <div class="tab-pane fade" id="errors">
+
+                    <!-- ================= FILTER CARD ================= -->
+                    <div class="row" style="font-size:12px;margin-top:4px;letter-spacing:.3px;
+       background:#ffffff;border:1px solid #e0e0e0;
+       border-radius:8px;padding:10px;
+       box-shadow:0 1px 3px rgba(0,0,0,.08);margin:0px">
+
+                        <!-- Device -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Device</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="errorFilters.device">
+                                <option value="">All</option>
+                                <option *ngFor="let d of deviceList" [value]="d">{{ d }}</option>
+                            </select>
+                        </div>
+
+                        <!-- OS Version -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">OS Version</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="errorFilters.osVersion">
+                                <option value="">All</option>
+                                <option *ngFor="let os of osversionList" [value]="os">{{ os }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Crash Status -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Crash Status</label>
+                            <select class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="errorFilters.isCrash">
+                                <option [ngValue]="undefined">All</option>
+                                <option [ngValue]="true">Crashed</option>
+                                <option [ngValue]="false">Not Crashed</option>
+                            </select>
+                        </div>
+
+                        <!-- Session ID -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Session ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="errorFilters.sessionId" />
+                        </div>
+
+                        <!-- Trace ID -->
+                        <div class="col-md-2">
+                            <label style="color:#555;font-weight:600;">Trace ID</label>
+                            <input type="text" class="form-control"
+                                style="height:26px;font-size:11px;padding:2px 6px;border-radius:6px;"
+                                [(ngModel)]="errorFilters.traceId" />
+                        </div>
+
+                        <!-- Search -->
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button style="width:32px;height:32px;border-radius:50%;
+              border:1px solid #219ebc;background:#fff;" (click)="loadData('errors')" title="Search">
+                                <i class="bi bi-search" style="color:#219ebc;"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= TABLE ================= -->
+                    <div class="scrollable2" style="margin-top:10px;">
+                        <div class="rounded-2 p-1 overflow-hidden">
+
+                            <table class="table table-fixed"
+                                style="font-size:12px;font-family:'Inter','Segoe UI',sans-serif;background:transparent;">
+
+                                <!-- HEADER -->
+                                <thead>
+                                    <tr style="border-bottom:1px solid #e0e0e0;">
+                                        <th style="padding:8px 16px;color:#1565c0;width:20%;">Group ID</th>
+                                        <th style="padding:8px 16px;color:#d84315;">Type</th>
+                                        <th style="padding:8px 16px;color:#1565c0;width:25%;">Error Message</th>
+                                        <th style="padding:8px 16px;color:#ef6c00;">Last Seen</th>
+                                        <th style="padding:8px 16px;color:#6a1b9a;">Occurrences</th>
+                                    </tr>
+                                </thead>
+
+                                <!-- BODY -->
+                                <tbody>
+                                    <tr *ngFor="let error of paginatedError"
+                                        style="background:#fafafa;border-bottom:1px solid #eeeeee;">
+
+                                        <td style="padding:8px 16px;" class="text-truncate">
+                                            <a [routerLink]="['/mrum/mrum-error']"
+                                                [queryParams]="buildQueryParams(error.groupId)"
+                                                style="color:#1565c0;text-decoration:none;font-weight:500;">
+                                                {{ error.groupId }}
+                                            </a>
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#d84315;">
+                                            {{ error.type }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#1565c0;" class="text-truncate">
+                                            {{ error.message }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#ef6c00;">
+                                            {{ error.lastSeen }}
+                                        </td>
+
+                                        <td style="padding:8px 16px;color:#6a1b9a;">
+                                            {{ error.occurrences }}
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                            <!-- PAGINATION -->
+                            <nav *ngIf="totalErrorPages > 1" class="mt-2">
+                                <ul class="pagination pagination-sm justify-content-center">
+
+                                    <li class="page-item" [class.disabled]="currentErrorPage === 1">
+                                        <a class="page-link"
+                                            (click)="changeErrorPage(currentErrorPage - 1)">Previous</a>
+                                    </li>
+
+                                    <li class="page-item" [class.active]="currentErrorPage === 1">
+                                        <a class="page-link" (click)="changeErrorPage(1)">1</a>
+                                    </li>
+
+                                    <li class="page-item disabled" *ngIf="errorPaginationStart > 2">
+                                        <span class="page-link">...</span>
+                                    </li>
+
+                                    <li class="page-item" *ngFor="let page of errorPaginationPages"
+                                        [class.active]="currentErrorPage === page">
+                                        <a class="page-link" (click)="changeErrorPage(page)">{{ page }}</a>
+                                    </li>
+
+                                    <li class="page-item disabled" *ngIf="errorPaginationEnd < totalErrorPages - 1">
+                                        <span class="page-link">...</span>
+                                    </li>
+
+                                    <li class="page-item" *ngIf="totalErrorPages > 1"
+                                        [class.active]="currentErrorPage === totalErrorPages">
+                                        <a class="page-link" (click)="changeErrorPage(totalErrorPages)">
+                                            {{ totalErrorPages }}
+                                        </a>
+                                    </li>
+
+                                    <li class="page-item" [class.disabled]="currentErrorPage === totalErrorPages">
+                                        <a class="page-link" (click)="changeErrorPage(currentErrorPage + 1)">Next</a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+
+                            <!-- NO DATA -->
+                            <div *ngIf="paginatedError.length === 0"
+                                style="text-align:center;padding:40px;color:#9e9e9e;">
+                                <strong>No Error & Crashes</strong>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- End of Errors Tab Body -->
+            </div>
+            <!-- End of Tab Body -->
+        </div>
+    </div>
+    <ng-template #noDataTemplate>
+        <div class="text-center" style="color: rgb(137, 137, 137); font-weight: bold; padding: 85px;">
+            <p>No Data</p>
+        </div>
+    </ng-template>
+</main>

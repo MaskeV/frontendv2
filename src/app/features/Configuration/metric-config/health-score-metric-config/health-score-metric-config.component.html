@@ -1,0 +1,215 @@
+<main>
+    <div class="page-container">
+
+        <div class="page-title">
+            <span>CONFIGURE METRIC WEIGHT</span> 
+            <button *ngIf="configMetricForm && this.userTypeCrudMapList?.configureHealthScoreMetrics?.view" class="custom-btn clear-btn ms-3" style="width: 10%;" (click)="onSeeAll()">See All</button>
+            <button *ngIf="seeAllTable" class="custom-btn clear-btn ms-3" style="width: 10%;" (click)="onGoBack()">Go Back</button>
+        </div>
+        <div *ngIf="configMetricForm">
+            <div class="mb-3">
+                <div class="form-label">Application Type</div>
+                <select [(ngModel)]="selectedAppType" class="form-select" (change)="onAppTypeChange()">
+                    <option value="">Select Application Type</option>
+                
+                    <option *ngFor="let product of productList" [value]="product">
+                                {{ product }}
+                            </option>
+                </select>
+            </div>
+            
+         <div class="mb-3" *ngIf="technologyList.length > 0">
+                        <div class="form-label">Technology Type</div>
+
+                        <select class="form-select"  [(ngModel)]="technology"
+                             name="technology" (ngModelChange)="onTechChange($event)">
+                            <option value="">Select Technology</option>
+
+                            <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                                {{ tech.technologyType }}
+                            </option>
+                        </select>
+        </div>
+
+            <div class="mb-3">
+                <div class="form-label">Application Name</div>
+                <select [(ngModel)]="selectedAppId" class="form-select" (change)="onAppNameChange()">
+                    <option value="">Select</option>
+                    <option *ngFor="let item of applicationNames" [value]="item.applicationId">
+                        {{ item.applicationName }}
+                    </option>
+                </select>
+            </div>
+        
+            <div class="mb-3" *ngIf="selectedAppType?.toUpperCase() === 'HOST'">
+                <div class="form-label">Application IP</div>
+                <select [(ngModel)]="infraId" class="form-select" (change)="getMetricName()">
+                    <option value="">Select</option>
+                    <option *ngFor="let item of ipAddresses" [value]="item.ipAddrID">
+                        {{ item.ipAddress }}
+                    </option>
+                </select>
+            </div>
+        
+            <div class="mb-3">
+                <div class="form-label">Metric Name</div>
+                <div class="metric-row">
+                    <select class="form-select" [(ngModel)]="selectedMetric">
+                        <option value="">Select</option>
+                        <option *ngFor="let item of metricList" [value]="item.metric_name">
+                            {{ item.metric_name }}
+                        </option>
+                    </select>
+        
+                    <button class="add-btn" type="button" (click)="addMetric()">Add</button>
+                </div>
+            </div>
+        
+            <div class="metrics-box">
+                <div class="form-label mb-2">Selected Metrics & Weights</div>
+        
+                <div *ngIf="selectedMetrics.length !== 0">
+                    <div class="metric-card" *ngFor="let metric of selectedMetrics; let i = index">
+                        <div class="metric-name">{{ metric.name }}</div>
+                        <div class="weight-box">
+                            <span class="weight-badge">Initial Weight: {{ metric.initialWt }}</span>
+                            <input type="number" class="weight-input" [(ngModel)]="metric.weight" min="1" max="10">
+                            <button type="button" class="remove-btn" (click)="removeMetric(i)">×</button>
+                        </div>
+                    </div>
+                </div>
+        
+        
+                <div class="mb-3" *ngIf="selectedMetrics.length === 0">
+                    <div class="p-3 noDataAvailable">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span style="font-weight: 500;">No Metric Selected</span>
+                        <span style="font-size: small;">Use the dropdown above to add Metrics</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="mt-2 d-flex justify-content-end" *ngIf="this.userTypeCrudMapList?.configureHealthScoreMetrics?.create">
+                <button class="custom-btn save-btn" style="width: 36%;" (click)="saveConfig()">Save Configuration</button>
+                <button class="custom-btn clear-btn ms-3" style="width: 20%;" (click)="onReset()">Clear</button>
+            </div>
+        </div>
+        <div *ngIf="seeAllTable && this.userTypeCrudMapList?.configureHealthScoreMetrics?.view">
+            <div class="mb-3">
+                <div class="form-label">Application Type</div>
+                <select [(ngModel)]="selectedAppType" class="form-select" (change)="onAppTypeChange()">
+                    <option value="">Select Application Type</option>
+                
+                    <option *ngFor="let product of productList" [value]="product">
+                                {{ product }}
+                            </option>
+                </select>
+            </div>
+
+             <div class="mb-3" *ngIf="technologyList.length > 0">
+                        <div class="form-label">Technology Type</div>
+
+                        <select class="form-select"  [(ngModel)]="technology"
+                             name="technology" (ngModelChange)="onTechChange($event)">
+                            <option value="">Select Technology</option>
+
+                            <option *ngFor="let tech of technologyList" [value]="tech.technologyType">
+                                {{ tech.technologyType }}
+                            </option>
+                        </select>
+        </div>
+
+            <div class="mb-3">
+                <div class="form-label">Application Name</div>
+                <select [(ngModel)]="selectedAppId" class="form-select" (change)="onAppNameChange2()">
+                    <option value="">Select</option>
+                    <option *ngFor="let item of applicationNames" [value]="item.applicationId">
+                        {{ item.applicationName }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3"  *ngIf="selectedAppType?.toUpperCase() === 'HOST'">
+                <div class="form-label">Application IP</div>
+                <select [(ngModel)]="infraId" class="form-select" (change)="getHealthScoreMetrics()">
+                    <option value="">Select</option>
+                    <option *ngFor="let item of ipAddresses" [value]="item.ipAddrID">
+                        {{ item.ipAddress }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="metrics-box">
+                <!-- <div class="form-label mb-2">Metrics Details</div> -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="form-label">Metrics Details</div>
+                    <div class="d-flex justify-content-end align-items-center" style="width: 40%;">
+                        <button class="custom-btn clear-btn" *ngIf="!isEditMode && !isDeleteMode && metricsDetails.length && this.userTypeCrudMapList?.configureHealthScoreMetrics?.edit"
+                            (click)="enableEdit()">
+                            Edit
+                        </button>
+
+                        <button class="custom-btn clear-btn" style="width: 50%;" *ngIf="isEditMode && this.userTypeCrudMapList?.configureHealthScoreMetrics?.edit" (click)="updateHealthScoreMetricConfig()">
+                            Update
+                        </button>
+                    
+                        <button class="custom-btn clear-btn ms-3" style="width: 50%;" *ngIf="isEditMode && this.userTypeCrudMapList?.configureHealthScoreMetrics?.edit" (click)="cancelEdit()">
+                            Cancel
+                        </button>
+                    
+                        <button class="custom-btn clear-btn ms-3" *ngIf="!isEditMode && !isDeleteMode && metricsDetails.length && this.userTypeCrudMapList?.configureHealthScoreMetrics?.delete"
+                            (click)="enableDeleteMode()">
+                            Delete
+                        </button>
+                    
+                        <button class="custom-btn clear-btn ms-3" *ngIf="isDeleteMode && this.userTypeCrudMapList?.configureHealthScoreMetrics?.delete"
+                            [disabled]="selectedMetricIds.size === 0" (click)="confirmDelete()">
+                            Confirm Delete
+                        </button>
+                    
+                        <button class="custom-btn clear-btn ms-3" *ngIf="isDeleteMode && this.userTypeCrudMapList?.configureHealthScoreMetrics?.delete" (click)="cancelDelete()">
+                            Cancel
+                        </button>
+                    </div>
+                    
+                </div>
+
+
+                <div *ngIf="isLoading">
+                    <div class="metric-card skeleton" *ngFor="let s of [1,2,3]">
+                        <div class="metric-name skeleton-text"></div>
+                        <div class="weight-box">
+                            <span class="weight-badge skeleton-badge"></span>
+                            <div class="weight-input skeleton-input"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!isLoading && metricsDetails.length !== 0">
+                    <div class="metric-card" *ngFor="let metric of metricsDetails; let i = index">
+                
+                        <div class="metric-name">{{ metric.metric_name }}</div>
+                
+                        <div class="weight-box">
+                            <span class="weight-badge">Default Weight: {{ metric.default_weight }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" class="weight-input" [(ngModel)]="metric.custom_weight" min="1" max="10" [disabled]="!isEditMode">
+                                <input *ngIf="isDeleteMode" type="checkbox" class="delete-checkbox" [checked]="selectedMetricIds.has(metric.global_metric_id)"
+                                    (change)="toggleMetricSelection(metric.global_metric_id, $event)" />
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
+        
+                <div class="mb-3" *ngIf="!isLoading && metricsDetails.length === 0">
+                    <div class="p-3 noDataAvailable">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span style="font-weight: 500;">No Data Available</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>

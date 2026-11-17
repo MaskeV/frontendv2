@@ -1,0 +1,87 @@
+<div class="sv-root">
+
+  <div class="sv-header">
+    <h3 class="sv-header__title raleway-font semi-text">Relational Database</h3>
+    <div class="sv-search-wrap">
+      <input type="text" class="sv-search-input" placeholder="Search DB Name" [(ngModel)]="searchText"
+        (input)="updateDisplayData()" autocomplete="off" />
+      <i class="fas fa-search sv-search-wrap__icon"></i>
+    </div>
+  </div>
+
+  <div class="sv-table-wrap">
+    <table>
+      <colgroup>
+        <col style="width: 50%">
+        <col style="width: 25%">
+        <col style="width: 25%">
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th (click)="sortBy('name')">
+            Name
+            <i class="ms-2 fa"
+              [ngClass]="sortParam === 'name' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'">
+            </i>
+          </th>
+
+          <th (click)="sortBy('status')">
+            Status
+            <i class="ms-1 fa"
+              [ngClass]="sortParam === 'status' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'">
+            </i>
+          </th>
+
+          <th (click)="sortBy('started')">
+            Uptime <span class="sv-th-unit">(Days)</span>
+            <i class="ms-1 fa"
+              [ngClass]="sortParam === 'started' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'">
+            </i>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="pagedServiceData.length !== 0">
+        <tr *ngFor="let item of pagedServiceData">
+          <td class="sv-td--name" (click)="setServiceId(item.name, item.type, item.applicationId)">
+            <img class="icon" [src]="getImagePath(item.applicationTechnology, item.applicationType)" alt="logo"
+              (error)="onImageError($event)" />
+            <span class="sv-name-text">{{ item.name }}</span>
+          </td>
+
+          <td>
+            <span class="sv-status-label"
+              [ngClass]="{'up-status': item.status === 'UP', 'down-status': item.status === 'DOWN'}">
+              {{ item.status }}
+            </span>
+          </td>
+
+          <td>{{ item.started | daysFormat }}</td>
+        </tr>
+      </tbody>
+      
+      </table>
+      <div class="noData" *ngIf="pagedServiceData.length === 0" style="height: 90%;">
+        No Data Available
+      </div>
+  </div>
+
+  <div class="sv-pager">
+    <span class="sv-pager__info">
+      Showing {{ startIndex }}–{{ endIndex }} of {{ totalItems }} services
+    </span>
+    <div class="sv-pager__controls">
+      <button class="sv-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <input type="number" class="sv-pager__input" [value]="currentPage" (keydown.enter)="goToPage(+inputPage.value)"
+        #inputPage min="1" [max]="totalPages" />
+      <span class="sv-pager__of">of {{ totalPages }}</span>
+      <button class="sv-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+  
+</div>

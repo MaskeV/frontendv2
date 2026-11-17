@@ -1,0 +1,276 @@
+<main>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb custom-breadcrumb mb-0" style="padding: 5px 10px; font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img src="assets/images/MicrosoftIIS.png" class="icons" alt="IIS Logo" />
+                <a routerLink="/iis-monitoring">IIS Monitoring</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page" routerLink="/iis-monitoring/iis-service">{{selectedService}}</li>
+        </ol>
+    </nav>
+
+    <div class="tab-content p-1" style="margin-bottom: -4px;">
+        
+        <!-- Top KPI Row -->
+        <div class="bs-kpi-row mx-2">
+            <div class="metric-box w-14 shadow-sm border rounded-3">
+                <div class="small fw-semibold text-secondary">Version</div>
+                <div class="fw-bold kpi-value">
+                    {{ versionData != null ? (versionData | number:'1.1-1') : 'N/A' }}
+                </div>
+            </div>
+            <div class="metric-box w-14 shadow-sm border rounded-3">
+                <div class="small fw-semibold text-secondary">Uptime</div>
+                <div class="fw-bold kpi-value">
+                    {{ combinedData?.app_pool_st != null ? convertSeconds(combinedData.app_pool_st): 'N/A' }}
+                </div>
+            </div>
+            <div class="metric-box w-14 shadow-sm border rounded-3">
+                <div class="small fw-semibold text-secondary">App Pool State</div>
+                <div class="fw-bold kpi-value" [ngClass]="combinedData?.app_pool_state === 1 ? 'text-success' : 'text-danger'">
+                    {{ combinedData?.app_pool_state === 1 ? 'Up' : 'Down' }}
+                </div>
+            </div>
+            <div class="metric-box w-14 shadow-sm border rounded-3">
+                <div class="small fw-semibold text-secondary">Max File Cache</div>
+                <div class="fw-bold kpi-value">
+                    {{ combinedData?.max_file_cache_mem != null ? combinedData.max_file_cache_mem : 'N/A' }}
+                </div>
+            </div>
+            <div class="metric-box w-14 shadow-sm border rounded-3">
+                <div class="small fw-semibold text-secondary">Output Cache</div>
+                <div class="fw-bold kpi-value">
+                    {{ combinedData?.output_cache_memory != null ? combinedData.output_cache_memory : 'N/A' }}
+                </div>
+            </div>
+            <div class="w-14"></div>
+        </div>
+
+        <!-- App. Section -->
+        <div class="bs-section mt-3 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">App.</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>HTTP Req.</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows overall HTTP request handling details over time, including traffic load and queue behavior."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="httpRequestChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Server Cache Ops.</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows server cache operation activity over time."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="serverCacheOpsChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Output Cache</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows IIS output-cache behavior over time. Helps monitor cached responses, cache performance, and overall output-cache health."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="outputCacheChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App. Section Row 2 -->
+        <div class="bs-section mt-2 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">App.</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>App Pool</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Tracks the overall lifecycle activity of an IIS application pool, including recycles and start times."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="appPoolMetricsChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="w-66"></div>
+            </div>
+        </div>
+
+        <!-- File Section -->
+        <div class="bs-section mt-3 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">File</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>File Cache Items</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows how IIS file-cache items change over time. Helps monitor cache usage, item growth, and overall cache behavior."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="fileCacheItemsChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>File Cache Hits</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows how effectively IIS is serving requests from the file cache over time. Helps monitor cache performance and efficiency."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="fileCacheHitsChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>File Cache Mem</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows IIS file-cache memory usage over time. Helps track memory consumption and monitor cache capacity."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="fileCacheMemsChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Data Section -->
+        <div class="bs-section mt-3 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">Meta Data</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Metadata Cache Item</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows IIS metadata cache activity over time. Helps monitor cache usage, growth, and flushing behavior."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="metadataCacheItemChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Metadata Cache Hits</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows IIS metadata cache hits over time. Helps evaluate cache efficiency and lookup behavior."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="metadataCacheHitsChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="w-33"></div>
+            </div>
+        </div>
+
+        <!-- Worker Section -->
+        <div class="bs-section mt-3 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">Worker</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Worker Process Stability</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Tracks how stable worker processes are and how frequently failures occur."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="workerProcessStabilityChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Worker Process Failure</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Monitors failures of IIS worker processes, helps diagnose failure causes such as unresponsiveness, shutdown issues, or startup problems."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="workerProcessFailureChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Worker Process Creation</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Indicates process recycling frequency and resource churn."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="workerProcessCreationChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Worker Section Row 2 -->
+        <div class="bs-section mt-2 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">Worker</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>Worker Process State</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Shows how many worker processes are currently running, the maximum allowed, and how many recent worker process failures occurred over time."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="workerProcessStateChartContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="w-66"></div>
+            </div>
+        </div>
+
+        <!-- URI Section -->
+        <div class="bs-section mt-3 ps-2 pe-3">
+            <div class="bs-section__side">
+                <span class="bs-section__title">URI</span>
+            </div>
+            <div class="bs-section__content bs-cards-row">
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>URI Cache Eff</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Indicates how effectively requests are served from cache, reducing backend calls."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="uriCacheEfficiencyChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>URI Cache Usage</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Indicates how many items are stored in the URI cache and how usage evolves."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="uriCacheUsageChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+                <div class="bs-card w-33">
+                    <div class="bs-card__header">
+                        <span>URI Cache Maintenance</span>
+                        <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Indicates how often the URI cache is cleared and how many entries are removed."></i>
+                    </div>
+                    <div class="bs-card__body h-26">
+                        <div id="uriCacheMaintenanceChartsContainer" style="width: 100%; height: 26vh;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

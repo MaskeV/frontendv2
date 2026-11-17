@@ -1,0 +1,558 @@
+<main>
+    <!-- breadcrumb part -->
+    <app-mrum-breadcrumb 
+        [breadcrumbs]="breadcrumbData">
+    </app-mrum-breadcrumb>
+    
+    <div class="container-fluid px-3 pb-4" style="background-color: #ffffff; padding-top: 15px; height: 85vh; overflow-y: auto; overflow-x: hidden;">
+        
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="bi bi-record-circle" style="color: #7e22ce;"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0 fw-bold" style="color: #0f172a; letter-spacing: -0.5px;">User Details</h4>
+                    <div style="color: #64748b; font-size: 13px;">Detailed analysis of user behavior and performance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="card shadow-sm border-0 mb-4 rounded-4" style="background: linear-gradient(to right, #f8fafc, #f1f5f9); position: relative; overflow: hidden;">
+            <div class="card-body p-5 position-relative z-1">
+                <div class="row align-items-center g-4 flex-xl-nowrap overflow-hidden">
+                    <!-- Left Side -->
+                    <div class="col-12 col-xl-auto pe-xl-5 responsive-border">
+                        <div class="d-flex align-items-center gap-4">
+                            <!-- Avatar -->
+                            <div class="position-relative flex-shrink-0">
+                                 <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 84px; height: 84px; font-size: 32px; background-color: #4f46e5;">
+                                     {{ (userDetails?.name || 'U')[0] | uppercase }}
+                                 </div>
+                            </div>
+                            
+                            <!-- Info -->
+                            <div>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <h2 class="mb-0 fw-bold text-dark" style="font-size: 26px; line-height: 1.2;">{{ userDetails?.name }}</h2>
+                                </div>
+                                <div class="d-flex align-items-center gap-4">
+                                    <!-- Last Seen -->
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: #eff6ff; color: #2563eb; font-size: 16px;">
+                                            <i class="bi bi-clock-history"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Last Seen</div>
+                                            <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.lastSeen }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Right Side (Grid of specs) -->
+                    <div class="col-12 col-xl ps-xl-5 mt-3 mt-xl-0">
+                        <div class="d-flex justify-content-between flex-wrap gap-4">
+                            <!-- Column 1 -->
+                            <div class="d-flex flex-column gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #dcfce7; color: #16a34a; font-size: 16px;"><i class="bi bi-android2"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Platform</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.platform }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #dcfce7; color: #16a34a; font-size: 16px;"><i class="bi bi-phone"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">OS / Version</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.osVersion }}</div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <!-- Column 2 -->
+                            <div class="d-flex flex-column gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #e0f2fe; color: #0284c7; font-size: 16px;"><i class="bi bi-box"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">App Version</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.appVersion }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #e0f2fe; color: #0284c7; font-size: 16px;"><i class="bi bi-phone"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Device</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.device }}</div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <!-- Column 3 -->
+                            <div class="d-flex flex-column gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #f3e8ff; color: #9333ea; font-size: 16px;"><i class="bi bi-display"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Screen Resolution</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.screenResolution }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #e0f2fe; color: #0284c7; font-size: 16px;"><i class="bi bi-wifi"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Network</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.network }}</div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <!-- Column 4 -->
+                            <div class="d-flex flex-column gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #eff6ff; color: #2563eb; font-size: 16px;"><i class="bi bi-broadcast"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Carrier</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.carrier }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #dcfce7; color: #16a34a; font-size: 16px;"><i class="bi bi-flag"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">Country</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.country }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 5 -->
+                            <div class="d-flex flex-column gap-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #fee2e2; color: #dc2626; font-size: 16px;"><i class="bi bi-geo-alt"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">State</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">Karnataka</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: #e0f2fe; color: #0284c7; font-size: 16px;"><i class="bi bi-buildings"></i></div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #64748b; font-weight: 600;">City</div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #0f172a;">{{ userDetails?.city }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs Row -->
+        <div class="row g-3 mb-4">
+            <!-- Sessions -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #f3e8ff; color: #9333ea; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-people"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Sessions</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.sessions }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #9333ea; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-up"></i> {{ kpis?.sessionsTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 25 L10 22 L20 28 L30 18 L40 25 L50 15 L60 20 L70 10 L80 18 L90 5 L100 8" fill="none" stroke="#9333ea" stroke-width="2"/>
+                                <circle cx="10" cy="22" r="2" fill="#9333ea"/><circle cx="20" cy="28" r="2" fill="#9333ea"/><circle cx="30" cy="18" r="2" fill="#9333ea"/><circle cx="40" cy="25" r="2" fill="#9333ea"/><circle cx="50" cy="15" r="2" fill="#9333ea"/><circle cx="60" cy="20" r="2" fill="#9333ea"/><circle cx="70" cy="10" r="2" fill="#9333ea"/><circle cx="80" cy="18" r="2" fill="#9333ea"/><circle cx="90" cy="5" r="2" fill="#9333ea"/><circle cx="100" cy="8" r="2" fill="#9333ea"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Avg. Session Duration -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #dcfce7; color: #16a34a; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-alarm"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Avg. Session Duration</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.avgSessionDuration }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #16a34a; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-up"></i> {{ kpis?.avgSessionDurationTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 20 L15 15 L30 25 L45 10 L60 20 L75 5 L100 15" fill="none" stroke="#16a34a" stroke-width="2"/>
+                                <circle cx="15" cy="15" r="2" fill="#16a34a"/><circle cx="30" cy="25" r="2" fill="#16a34a"/><circle cx="45" cy="10" r="2" fill="#16a34a"/><circle cx="60" cy="20" r="2" fill="#16a34a"/><circle cx="75" cy="5" r="2" fill="#16a34a"/><circle cx="100" cy="15" r="2" fill="#16a34a"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avg. Load Time -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #e0f2fe; color: #0284c7; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-graph-up-arrow"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Avg. Load Time</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.avgLoadTime }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #0284c7; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-down"></i> {{ kpis?.avgLoadTimeTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 15 L20 20 L40 5 L60 25 L80 15 L100 10" fill="none" stroke="#0284c7" stroke-width="2"/>
+                                <circle cx="20" cy="20" r="2" fill="#0284c7"/><circle cx="40" cy="5" r="2" fill="#0284c7"/><circle cx="60" cy="25" r="2" fill="#0284c7"/><circle cx="80" cy="15" r="2" fill="#0284c7"/><circle cx="100" cy="10" r="2" fill="#0284c7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Rate -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #fee2e2; color: #dc2626; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-exclamation-circle"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Error Rate</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.errorRate }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #dc2626; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-down"></i> {{ kpis?.errorRateTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 25 L20 20 L40 28 L60 15 L80 20 L100 25" fill="none" stroke="#dc2626" stroke-width="2"/>
+                                <circle cx="20" cy="20" r="2" fill="#dc2626"/><circle cx="40" cy="28" r="2" fill="#dc2626"/><circle cx="60" cy="15" r="2" fill="#dc2626"/><circle cx="80" cy="20" r="2" fill="#dc2626"/><circle cx="100" cy="25" r="2" fill="#dc2626"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crash Rate -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #ffedd5; color: #ea580c; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-bug"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Crash Rate</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.crashRate }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #ea580c; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-down"></i> {{ kpis?.crashRateTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 25 L30 22 L50 28 L70 20 L100 28" fill="none" stroke="#ea580c" stroke-width="2"/>
+                                <circle cx="30" cy="22" r="2" fill="#ea580c"/><circle cx="50" cy="28" r="2" fill="#ea580c"/><circle cx="70" cy="20" r="2" fill="#ea580c"/><circle cx="100" cy="28" r="2" fill="#ea580c"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apdex Score -->
+            <div class="col-12 col-sm-6 col-md-4 col-xl">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-body p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width: 28px; height: 28px; background-color: #dcfce7; color: #16a34a; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-speedometer2"></i></div>
+                            <div style="font-size: 12px; font-weight: 700; color: #475569;">Apdex Score</div>
+                        </div>
+                        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ kpis?.apdexScore }}</div>
+                        <div style="font-size: 11px; font-weight: 600; color: #16a34a; display: flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-arrow-up"></i> {{ kpis?.apdexTrend }}
+                        </div>
+                        <div style="width: 100%; height: 30px; margin-top: 10px;">
+                            <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <path d="M0 18 L20 10 L40 15 L60 5 L80 12 L100 8" fill="none" stroke="#16a34a" stroke-width="2"/>
+                                <circle cx="20" cy="10" r="2" fill="#16a34a"/><circle cx="40" cy="15" r="2" fill="#16a34a"/><circle cx="60" cy="5" r="2" fill="#16a34a"/><circle cx="80" cy="12" r="2" fill="#16a34a"/><circle cx="100" cy="8" r="2" fill="#16a34a"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold" style="color: #0f172a; display: flex; align-items: center; gap: 8px;">Session Trend <i class="bi bi-info-circle text-muted" style="font-size: 12px;"></i></h6>
+                        <select class="form-select form-select-sm fw-bold text-muted" style="width: 70px; font-size: 11px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            <option>7D</option>
+                        </select>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0">
+                        <div class="d-flex gap-3 mb-2" style="font-size: 11px; font-weight: 600;">
+                            <div class="d-flex align-items-center gap-1"><i class="bi bi-diamond-fill" style="color: #8b5cf6; font-size: 8px;"></i> Sessions</div>
+                            <div class="d-flex align-items-center gap-1"><i class="bi bi-circle-fill" style="color: #0ea5e9; font-size: 8px;"></i> Avg. Load Time (s)</div>
+                        </div>
+                        <div id="sessionTrendChart" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4">
+                        <h6 class="mb-0 fw-bold" style="color: #0f172a;">Sessions by Outcome</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0 d-flex flex-column justify-content-center">
+                        <div id="sessionsOutcomeChart" style="height: 220px; width: 100%;"></div>
+                        <div class="d-flex flex-column gap-2 mt-2" style="font-size: 11px; font-weight: 600; padding: 0 20px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2"><i class="bi bi-circle-fill" style="color: #10b981; font-size: 8px;"></i> Successful</div>
+                                <div>24 (85.7%)</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2"><i class="bi bi-circle-fill" style="color: #f59e0b; font-size: 8px;"></i> Errored</div>
+                                <div>3 (10.7%)</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2"><i class="bi bi-circle-fill" style="color: #ef4444; font-size: 8px;"></i> Crashed</div>
+                                <div>1 (3.6%)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold" style="color: #0f172a;">Apdex Over Time</h6>
+                        <select class="form-select form-select-sm fw-bold text-muted" style="width: 70px; font-size: 11px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            <option>30m</option>
+                        </select>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0">
+                        <div id="apdexOverTimeChart" style="height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="row g-4 mb-4">
+            <!-- Top Errors -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #f1f5f9 !important;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-bug text-primary" style="font-size: 16px;"></i>
+                            <h6 class="mb-0 fw-bold" style="color: #0f172a;">Top Errors</h6>
+                        </div>
+                        <a [routerLink]="['/mrum/mrum-errors-list']" [queryParams]="{ serviceId: selectedService, st: startTime, et: endTime, type: 'Error', user: userDetails?.name }" class="text-decoration-none fw-bold" style="color: #3b82f6; font-size: 12px;">View all errors <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-borderless mb-0" style="font-size: 12px;">
+                            <thead style="color: #64748b; border-bottom: 1px solid #f1f5f9;">
+                                <tr>
+                                    <th style="padding: 12px 20px; font-weight: 600;">Error</th>
+                                    <th style="padding: 12px 20px; font-weight: 600; text-align: center;">Count</th>
+                                    <th style="padding: 12px 20px; font-weight: 600; text-align: right;">Last Seen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let e of topErrors">
+                                    <td style="padding: 12px 20px; font-weight: 700; color: #3b82f6;">{{ e.error }}</td>
+                                    <td style="padding: 12px 20px; font-weight: 700; color: #0f172a; text-align: center;">{{ e.count }}</td>
+                                    <td style="padding: 12px 20px; font-weight: 600; color: #0f172a; text-align: right;">{{ e.lastSeen }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Crashes -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #f1f5f9 !important;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-octagon text-danger" style="font-size: 16px;"></i>
+                            <h6 class="mb-0 fw-bold" style="color: #0f172a;">Top Crashes</h6>
+                        </div>
+                        <a [routerLink]="['/mrum/mrum-errors-list']" [queryParams]="{ serviceId: selectedService, st: startTime, et: endTime, type: 'Crash', user: userDetails?.name }" class="text-decoration-none fw-bold" style="color: #3b82f6; font-size: 12px;">View all crashes <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-borderless mb-0" style="font-size: 12px;">
+                            <thead style="color: #64748b; border-bottom: 1px solid #f1f5f9;">
+                                <tr>
+                                    <th style="padding: 12px 20px; font-weight: 600;">Crash Type</th>
+                                    <th style="padding: 12px 20px; font-weight: 600; text-align: center;">Count</th>
+                                    <th style="padding: 12px 20px; font-weight: 600; text-align: right;">Last Seen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let c of topCrashes">
+                                    <td style="padding: 12px 20px; font-weight: 700; color: #0f172a;">{{ c.type }}</td>
+                                    <td style="padding: 12px 20px; font-weight: 700; color: #0f172a; text-align: center;">{{ c.count }}</td>
+                                    <td style="padding: 12px 20px; font-weight: 600; color: #0f172a; text-align: right;">{{ c.lastSeen }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load Time Distribution -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4" style="background-color: #ffffff;">
+                    <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold" style="color: #0f172a;">Load Time Distribution</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-2">
+                        <div class="d-flex flex-column gap-3" style="font-size: 12px; font-weight: 600;">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 70px; color: #475569;">5+ s</div>
+                                <div class="flex-grow-1" style="height: 12px; background-color: #f1f5f9; border-radius: 2px;">
+                                    <div style="height: 100%; width: 1.2%; background-color: #a78bfa; border-radius: 2px;"></div>
+                                </div>
+                                <div style="width: 30px; text-align: right; color: #0f172a;">1.2%</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 70px; color: #475569;">2s - 5s</div>
+                                <div class="flex-grow-1" style="height: 12px; background-color: #f1f5f9; border-radius: 2px;">
+                                    <div style="height: 100%; width: 5.6%; background-color: #a78bfa; border-radius: 2px;"></div>
+                                </div>
+                                <div style="width: 30px; text-align: right; color: #0f172a;">5.6%</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 70px; color: #475569;">1s - 2s</div>
+                                <div class="flex-grow-1" style="height: 12px; background-color: #f1f5f9; border-radius: 2px;">
+                                    <div style="height: 100%; width: 32.4%; background-color: #a78bfa; border-radius: 2px;"></div>
+                                </div>
+                                <div style="width: 30px; text-align: right; color: #0f172a;">32.4%</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 70px; color: #475569;">500ms - 1s</div>
+                                <div class="flex-grow-1" style="height: 12px; background-color: #f1f5f9; border-radius: 2px;">
+                                    <div style="height: 100%; width: 42.3%; background-color: #a78bfa; border-radius: 2px;"></div>
+                                </div>
+                                <div style="width: 30px; text-align: right; color: #0f172a;">42.3%</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 70px; color: #475569;">0 - 500ms</div>
+                                <div class="flex-grow-1" style="height: 12px; background-color: #f1f5f9; border-radius: 2px;">
+                                    <div style="height: 100%; width: 18.5%; background-color: #a78bfa; border-radius: 2px;"></div>
+                                </div>
+                                <div style="width: 30px; text-align: right; color: #0f172a;">18.5%</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3 ms-5 pe-4" style="font-size: 10px; color: #64748b; font-weight: 600;">
+                            <div>0%</div>
+                            <div>20%</div>
+                            <div>40%</div>
+                            <div>60%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Sessions Table (Moved to Bottom) -->
+        <div class="card shadow-sm border-0 mb-4 rounded-4" style="background-color: #ffffff;">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h5 class="mb-0 fw-bold" style="color: #0f172a;">All Sessions ({{ allSessions.length }})</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size: 12px; color: #334155;">
+                    <thead style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+                        <tr>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Session ID</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Start Time</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Duration</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Pages / Screens</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Actions</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Errors</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Crashes</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Apdex</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Load Time (Avg)</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Network</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none;">Location</th>
+                            <th style="font-weight: 700; color: #475569; padding: 12px 16px; border: none; text-align: right;">More</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let s of paginatedSessions" style="border-bottom: 1px solid #e2e8f0; cursor: pointer;">
+                            <td style="padding: 16px; font-weight: 700;">
+                                <a [routerLink]="['/mrum/mrum-session']" 
+                                   [queryParams]="{ serviceId: selectedService, sessionId: s.id, user: userDetails?.id, st: startTime, et: endTime }" 
+                                   class="text-decoration-none" style="color: #3b82f6;">{{ s.id }}</a>
+                            </td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.startTime }}</td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.duration }}</td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.pages }}</td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.actions }}</td>
+                            <td style="padding: 16px; font-weight: 700;" [ngClass]="{'text-danger': s.errors > 0}">{{ s.errors }}</td>
+                            <td style="padding: 16px; font-weight: 700;" [ngClass]="{'text-danger': s.crashes > 0}">{{ s.crashes }}</td>
+                            <td style="padding: 16px;">
+                                <span class="badge" [ngStyle]="{'background-color': getApdexColor(s.apdex) + '20', 'color': getApdexColor(s.apdex), 'border': '1px solid ' + getApdexColor(s.apdex)}" style="padding: 4px 8px; font-size: 11px;">{{ s.apdex }}</span>
+                            </td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.loadTime }}</td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.network }}</td>
+                            <td style="padding: 16px; font-weight: 600;">{{ s.location }}</td>
+                            <td style="padding: 16px; text-align: right; color: #3b82f6;"><i class="bi bi-three-dots-vertical"></i></td>
+                        </tr>
+                        <tr *ngIf="paginatedSessions.length === 0">
+                            <td colspan="12" class="text-center py-5 text-muted">No sessions found for this user.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center p-3 border-top" style="background-color: #ffffff;" *ngIf="paginatedSessions.length > 0">
+                <div style="font-size: 12.0px; color:#64748b; display:flex; align-items:center; gap: 10.0px;">
+                    Rows per page:
+                    <input type="number" class="form-control form-control-sm shadow-none"
+                        style="width: 70.0px; display: inline-block; font-size: 12.0px; padding: 4.0px 10px; border-radius:6px; color:#0f172a; font-weight:500;"
+                        min="1" [(ngModel)]="sessionPageSize"
+                        (change)="onSessionPageSizeChange()"
+                        (keyup.enter)="onSessionPageSizeChange()">
+                    <span class="ms-3 fw-medium text-dark">{{ paginationDisplayRange }} of {{ allSessions.length | number }}</span>
+                </div>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm bg-white text-muted"
+                        style="border:1px solid #e2e8f0; border-radius:6px; width: 32.0px; height: 32.0px; padding:0;"
+                        [disabled]="currentSessionsPage === 1"
+                        (click)="changeSessionsPage(currentSessionsPage - 1)">
+                        <i class="bi bi-chevron-left" style="font-size: 12.0px;"></i>
+                    </button>
+                    <ng-container *ngFor="let page of paginationPages">
+                        <button class="btn btn-sm" 
+                            [ngStyle]="page === currentSessionsPage ? {'background-color':'#eff6ff', 'color':'#3b82f6', 'font-weight':'600', 'border':'none'} : {'background-color':'#ffffff', 'color':'#64748b', 'border':'1px solid #e2e8f0'}"
+                            style="border-radius:6px; min-width: 32.0px; height: 32.0px; padding:0 10px;"
+                            (click)="changeSessionsPage($any(page))">
+                            {{ page }}
+                        </button>
+                    </ng-container>
+                    <button class="btn btn-sm bg-white text-muted"
+                        style="border:1px solid #e2e8f0; border-radius:6px; width: 32.0px; height: 32.0px; padding:0;"
+                        [disabled]="currentSessionsPage === totalSessionsPages"
+                        (click)="changeSessionsPage(currentSessionsPage + 1)">
+                        <i class="bi bi-chevron-right" style="font-size: 12.0px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

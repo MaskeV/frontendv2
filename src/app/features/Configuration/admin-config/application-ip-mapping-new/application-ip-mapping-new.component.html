@@ -1,0 +1,518 @@
+<!-- TOP SUCCESS BAR -->
+<div class="top-success-bar" *ngIf="showUpdateSuccess">
+    <span class="success-icon">✓</span>
+    <span>Application updated successfully</span>
+</div>
+
+<div class="page-wrapper">
+    <div class="card">
+
+        <div class="header">
+            <div class="header-left">
+                <div class="icon home-icon" aria-label="Home" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Create Application" (click)="goToCreateForm()" style="cursor: pointer;"></div>
+
+                <div *ngIf="!showApplicationsTable" class="ms-1">
+                    <h2>Application & IP Mapping</h2>
+                    <p class="text-muted" style="font-size: 13px; margin: 0;">Configure your application and IP
+                        addresses</p>
+                </div>
+            </div>
+
+            <!-- TABLE TOGGLE LINK -->
+            <div class="see-all-link" (click)="showTable()" *ngIf="showForm">
+                See All <i class="fa fa-arrow-right ms-1"></i>
+            </div>
+        </div>
+
+        <form *ngIf="showForm" [formGroup]="appForm">
+
+            <!-- Application Details -->
+            <section>
+                <h4>Application Details</h4>
+
+                <div [ngClass]="showTechType ? 'grid-3' : 'grid-2'">
+                    <div>
+                        <label>Application Name <span class="text-danger">*</span></label>
+                        <input type="text" formControlName="applicationName" placeholder="Enter Application Name"
+                            appSanitizeInput
+                            [class.is-invalid]="appForm.get('applicationName')?.invalid && appForm.get('applicationName')?.touched" />
+                        <div class="error-message"
+                            *ngIf="appForm.get('applicationName')?.invalid && appForm.get('applicationName')?.touched">
+                            <span *ngIf="appForm.get('applicationName')?.errors?.['required']">Application name is
+                                required.</span>
+                            <span *ngIf="appForm.get('applicationName')?.errors?.['pattern']">Application name should
+                                include alphabets, numbers, space, ':', '-', '.' and '_' only !! [V2]</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Application Type <span class="text-danger">*</span></label>
+                        <select formControlName="applicationType"
+                            [class.is-invalid]="appForm.get('applicationType')?.invalid && appForm.get('applicationType')?.touched">
+                            <option value="" disabled selected>Select Application Type</option>
+                            <option *ngFor="let product of availableProducts" [value]="product">{{product}}</option>
+                        </select>
+                        <div class="error-message"
+                            *ngIf="appForm.get('applicationType')?.invalid && appForm.get('applicationType')?.touched">
+                            Please select an application type.
+                        </div>
+                    </div>
+                    <div *ngIf="showTechType">
+                        <label>Tech Type <span class="text-danger">*</span></label>
+                        <select formControlName="techType"
+                            [class.is-invalid]="appForm.get('techType')?.invalid && appForm.get('techType')?.touched">
+                            <option value="" disabled>-- Select Technology --</option>
+                            <option *ngFor="let tech of availableTechnologies" [value]="tech.technologyType">
+                                {{tech.technologyType}}
+                            </option>
+                        </select>
+                        <div class="error-message"
+                            *ngIf="appForm.get('techType')?.invalid && appForm.get('techType')?.touched">
+                            Technology type is required.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3"
+                    *ngIf="appForm.get('techType')?.value === 'AKS' && appForm.get('applicationType')?.value === 'Kubernetes'">
+                    <label>
+                        Node <span class="text-danger">*</span>
+                    </label>
+
+                    <!-- Chip Input Container -->
+                    <div class="form-control py-1 d-flex flex-wrap align-items-center"
+                        style="cursor: text; min-height: 38px;">
+
+                        <!-- Existing Nodes -->
+                        <span *ngFor="let n of node; let i = index"
+                            class="  nodeBadge text-dark mr-2 mb-1 d-flex align-items-center">
+                            {{ n }}
+                            <i class="fa fa-times ml-2" style="cursor: pointer;" (click)="removeNode(i)">
+                            </i>
+                        </span>
+
+                        <!-- Input -->
+                        <input type="text" [(ngModel)]="nodeInputValue" (keydown)="handleNodeKeydown($event)"
+                            appSanitizeInput placeholder="Type node and press Enter"
+                            [ngModelOptions]="{ standalone: true }"
+                            style="border: none; outline: none; flex: 1; min-width: 120px;" />
+                    </div>
+
+                    <small class="text-muted">
+                        Press <b>Enter</b> or <b>,</b> to add node
+                    </small>
+                </div>
+            </section>
+
+            <!-- IP Mappings -->
+            <section>
+                <h4>IP Mappings</h4>
+
+                <div class="ip-card" *ngFor="let ip of ipFormGroups; let i = index" [formGroup]="ip">
+
+                    <div class="badge">{{ i + 1 }}</div>
+
+                    <div class="grid-4">
+                        <div>
+                            <label>IP Address <span class="text-danger">*</span></label>
+                            <input type="text" formControlName="ipAddress" placeholder="e.g. 192.168.1.1"
+                                appSanitizeInput
+                                [class.is-invalid]="ip.get('ipAddress')?.invalid && ip.get('ipAddress')?.touched" />
+                            <div class="error-message"
+                                *ngIf="ip.get('ipAddress')?.invalid && ip.get('ipAddress')?.touched">
+                                <span *ngIf="ip.get('ipAddress')?.errors?.['required']">IP Address is required.</span>
+                                <span *ngIf="ip.get('ipAddress')?.errors?.['pattern']">Invalid IP format.</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>IP Type <span class="text-danger">*</span></label>
+                            <select formControlName="ipType"
+                                [class.is-invalid]="ip.get('ipType')?.invalid && ip.get('ipType')?.touched">
+                                <option selected="selected" value="" disabled>-- Select --</option>
+                                <option value="WEB" *ngIf="appForm.get('applicationType')?.value !== 'Host'">WEB
+                                </option>
+                                <option value="Application" *ngIf="appForm.get('applicationType')?.value !== 'Host'">
+                                    Application</option>
+                                <option value="LINUX" *ngIf="appForm.get('applicationType')?.value == 'Host'">Linux
+                                </option>
+                                <option value="WINDOWS" *ngIf="appForm.get('applicationType')?.value == 'Host'">Windows
+                                </option>
+                                <option value="CONTAINER" *ngIf="appForm.get('applicationType')?.value == 'Host'">
+                                    Container</option>
+                                <option value="DB" *ngIf="appForm.get('applicationType')?.value !== 'Host'">DB</option>
+                            </select>
+                            <div class="error-message" *ngIf="ip.get('ipType')?.invalid && ip.get('ipType')?.touched">
+                                IP type is required.
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>Environment <span class="text-danger">*</span></label>
+                            <select formControlName="environment"
+                                [class.is-invalid]="ip.get('environment')?.invalid && ip.get('environment')?.touched">
+                                <option selected="selected" value="" disabled>-- Select --</option>
+                                <option value="Production">Production</option>
+                                <option value="DR">DR</option>
+                                <option value="CUG">CUG</option>
+                                <option value="UAT">UAT</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <div class="error-message"
+                                *ngIf="ip.get('environment')?.invalid && ip.get('environment')?.touched">
+                                Environment is required.
+                            </div>
+                        </div>
+
+                        <div class="action-col">
+                            <button type="button" class="delete-icon" *ngIf="ipMappings.length > 1"
+                                (click)="removeIpMapping(i)" aria-label="Delete IP">
+                                <span class="trash"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- <div class="add-ip-row" (click)="addIpMapping()">
+                    <span class="plus">+</span>
+                    <span>Add IP Entry</span>
+                </div> -->
+            </section>
+
+            <!-- Index Pattern -->
+            <section>
+                <h4>Index Pattern</h4>
+
+                <div class="index-card" *ngFor="let idx of indexFormGroups; let i = index" [formGroup]="idx">
+
+                    <div class="grid-index">
+                        <div>
+                            <label>Index Pattern</label>
+                            <input type="text" formControlName="pattern" placeholder="e.g. log-* or user-service-*"
+                                appSanitizeInput />
+                            <small class="text-muted" style="font-size: 11px;">Specify the index pattern for log
+                                aggregation (Optional)</small>
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="action-col">
+                            <!-- <button type="button" class="add" (click)="addIndexPattern()">+</button> -->
+                            <button type="button" class="delete-icon" *ngIf="indexPatterns.length > 1"
+                                (click)="removeIndexPattern(i)" aria-label="Delete Index Pattern">
+                                <span class="trash"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="add-ip-row" style="border-style: dotted; color: #2563eb; border-color: #cbd5e1;"
+                    (click)="addIndexPattern()">
+                    <span class="plus"><i class="fa fa-plus"></i></span>
+                    <span>Add Index Entry</span>
+                </div>
+
+            </section>
+
+
+            <div class="form-actions">
+                <button type="button" class="discard-btn" (click)="resetApplicationForm()">
+                    <i class="fa fa-times"></i> Discard Changes
+                </button>
+
+                <button *ngIf="!isUpdation" class="submit" (click)="createIPAddressMapping()" [disabled]="!canCreate">
+                    <i class="fa fa-plus-circle"></i> Create Application
+                </button>
+
+                <button *ngIf="isUpdation" class="submit" (click)="updateApplicationIPMapping()" [disabled]="!canEdit">
+                    <i class="fa fa-save"></i> Update Application
+                </button>
+            </div>
+
+
+        </form>
+        <!-- See ALL -->
+        <!-- TABLE VIEW -->
+        <div class="role-management-container" *ngIf="showApplicationsTable && !showForm && allApplications.length">
+            <div class="header-row">
+                <div class="title-section">
+                    <h2>Application & IP Mapping</h2>
+                    <p>Manage application configurations, IP addresses, and index patterns across the platform.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="search-container">
+                        <i class="fa fa-search"></i>
+                        <input type="text" [formControl]="searchControl" placeholder="Search applications..."
+                            appSanitizeInput />
+                    </div>
+                    <button class="create-btn" (click)="goToCreateForm()" [disabled]="!canCreate">
+                        <i class="fa fa-plus"></i> Add Application
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="role-table">
+                    <thead>
+                        <tr>
+                            <th>SR</th>
+                            <th (click)="sortBy('applicationName')" style="cursor: pointer;">APPLICATION NAME <i
+                                    class="fa"
+                                    [ngClass]="sortColumn === 'applicationName' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                            </th>
+                            <th class="text-center" (click)="sortBy('applicationType')" style="cursor: pointer;">
+                                APPLICATION TYPE <i class="fa"
+                                    [ngClass]="sortColumn === 'applicationType' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                            </th>
+                            <th class="text-center" (click)="sortBy('createdOn')" style="cursor: pointer;">CREATED ON <i
+                                    class="fa"
+                                    [ngClass]="sortColumn === 'createdOn' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                            </th>
+                            <th class="text-center" (click)="sortBy('createdByUserName')" style="cursor: pointer;">
+                                CREATED BY <i class="fa"
+                                    [ngClass]="sortColumn === 'createdByUserName' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                            </th>
+                            <th class="text-center" (click)="sortBy('ipAddresses')" style="cursor: pointer;">IP
+                                ADDRESS(ES) <i class="fa"
+                                    [ngClass]="sortColumn === 'ipAddresses' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                            </th>
+                            <th class="text-center">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let app of pagedApplications; let i = index">
+                            <td class="text-center">{{ (page - 1) * pageSize + i + 1 }}</td>
+                            <td class="fw-bold">{{ app.applicationName }}</td>
+                            <td class="text-center">{{ app.applicationType }}</td>
+                            <td class="text-center">{{ app.createdOn | date:'dd/MM/yyyy' }}</td>
+                            <td class="text-center">{{ app.createdByUserName }}</td>
+                            <td class="text-center">
+                                <span class="view-link" (click)="openIpDetails(app, ipDetailsModal)">View</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center gap-3">
+                                    <button class="action-btn edit-btn" title="Edit"
+                                        (click)="openUpdateApplication(app)" [disabled]="!canEdit">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-btn" title="Delete" (click)="confirmDelete(app)"
+                                        [disabled]="!canDelete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- No Data Found -->
+                        <tr *ngIf="pagedApplications.length === 0">
+                            <td colspan="7" class="py-12 text-center text-slate-400">
+                                No applications found matching your criteria.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-info">
+                <div class="flex items-center gap-4">
+                    <div class="text-xs text-slate-500 font-medium">
+                        Showing <span class="text-slate-900 font-bold">{{(page - 1) * pageSize + 1}}</span>
+                        to
+                        <span class="text-slate-900 font-bold">{{ Math.min(page * pageSize, filteredApplications.length
+                            || 0) }}</span>
+                        of
+                        <span class="text-slate-900 font-bold">{{filteredApplications.length || 0}}</span> results
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-500 font-medium">Rows per page:</label>
+                        <input type="number" [(ngModel)]="pageSize" (ngModelChange)="updatePagination()" min="1"
+                            class="rows-input" />
+                    </div>
+                </div>
+
+                <div class="pagination-controls">
+                    <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+
+                    <button class="page-btn active-page">
+                        {{ page }}
+                    </button>
+
+                    <button class="page-btn" (click)="nextPage()" [disabled]="page >= totalPages">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================
+             SUCCESS PREVIEW
+        ====================== -->
+        <div class="success-wrapper" *ngIf="showSuccessPreview && !showForm && !showApplicationsTable">
+
+            <div class="success-header">
+                <div class="check">✓</div>
+                <div>
+                    <h2>Application Created Successfully!</h2>
+                    <p>Review your application details below</p>
+                </div>
+            </div>
+
+            <!-- Application Info -->
+            <div class="preview-card">
+                <h4>Application Information</h4>
+
+                <div class="preview-grid">
+                    <div>
+                        <label>APPLICATION NAME</label>
+                        <strong>{{ createdApplication.applicationName }}</strong>
+                    </div>
+
+                    <div>
+                        <label>APPLICATION TYPE</label>
+                        <strong>{{ createdApplication.applicationType }}</strong>
+                    </div>
+
+                    <div>
+                        <label>INDEX PATTERN</label>
+                        <strong>
+                            {{ createdApplication.indexPatterns.join(', ') || '-' }}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IP Mappings -->
+            <div class="preview-card">
+                <h4>IP Mappings ({{ createdApplication.ipMappings.length }})</h4>
+
+                <div class="ip-preview" *ngFor="let ip of createdApplication.ipMappings; let i = index">
+
+                    <div class="badge">{{ i + 1 }}</div>
+
+                    <div class="preview-grid">
+                        <div>
+                            <label>IP ADDRESS</label>
+                            <strong>{{ ip.ipAddress }}</strong>
+                        </div>
+
+                        <div>
+                            <label>IP TYPE</label>
+                            <strong>{{ ip.ipType }}</strong>
+                        </div>
+
+                        <div>
+                            <label>ENVIRONMENT</label>
+                            <strong>{{ ip.environment }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit" (click)="createAnother()">
+                Create Another Application
+            </button>
+
+        </div>
+
+        <ng-template #alert_message>
+            <div class="modal-body text-center">
+                <p>{{ alertMessage }}</p>
+
+                <button type="button" *ngIf="isError" class="btn btn-danger" (click)="cancelRequest()">
+                    OK
+                </button>
+
+                <button type="button" *ngIf="isSuccess" class="btn btn-success" (click)="cancelRequest()">
+                    OK
+                </button>
+            </div>
+        </ng-template>
+
+        <ng-template #ipDetailsModal let-modal>
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    IP Address Details
+                    <small class="text-muted">
+                        – {{ selectedApplication?.applicationName }}
+                    </small>
+                </h5>
+                <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="text" [formControl]="modalSearchControl" placeholder="Search..." appSanitizeInput />
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Sr No</th>
+                            <th>IP Address</th>
+                            <th>IP Type</th>
+                            <th>Environment</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let ip of filteredIps(); let i = index">
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ ip.ipAddress }}</td>
+                            <td>
+                                {{ ip.ipType }}
+                            </td>
+                            <td>
+                                {{ ip.environment }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <small class="text-muted">
+                    Showing {{ filteredIps().length }} entries
+                </small>
+            </div>
+
+            <!-- <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="modal.close()">Close</button>
+            </div> -->
+        </ng-template>
+
+        <ng-template #deleteConfirmTemplate let-modal>
+            <div class="delete-modal-wrapper">
+
+                <!-- HEADER -->
+                <div class="delete-header">
+                    <div class="delete-icon-circle">
+                        !
+                    </div>
+                    <div class="delete-header-text">
+                        <h3>Confirm Deletion</h3>
+                        <p>
+                            You are about to delete an application.
+                            This will remove all associated data including IP mappings
+                            and configurations.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- CAUTION -->
+                <div class="delete-warning">
+                    <span class="warn-icon">⚠</span>
+                    <span><strong>Caution:</strong> This action cannot be undone.</span>
+                </div>
+
+                <!-- FOOTER ACTIONS -->
+                <div class="delete-actions">
+                    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">
+                        No, Keep It
+                    </button>
+
+                    <button class="btn btn-danger" (click)="confirmDelete(deleteConfirmTemplate)">
+                        Yes, Delete
+                    </button>
+                </div>
+
+            </div>
+        </ng-template>

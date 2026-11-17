@@ -1,0 +1,173 @@
+<div class="aks-wrapper">
+
+  <!-- ===== HEADER ===== -->
+  <div class="page-header">
+    <div class="page-title">
+      <span class="page-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+      </span>
+      <div>
+        <h1>AKS Cluster Overview</h1>
+        <p>Cluster wise node capacity and workload distribution</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LIST (TABLE REMOVED → CARD STYLE) ===== -->
+  <div class="cluster-list">
+
+    <ng-container *ngIf="clusters.length > 0; else noClusters">
+
+      <div class="cluster-card" *ngFor="let cluster of clusters">
+
+        <!-- HEADER -->
+        <div class="cluster-header" (click)="toggle(cluster)" [class.expanded]="cluster.expanded">
+
+          <div class="cluster-left">
+            <div class="cluster-icon" style="background: transparent; border: none; display: flex; align-items: center; justify-content: center;">
+              <span class="avatar-wrap" style="display: flex; align-items: center; justify-content: center; height: 32px; width: 32px;">
+                <img [src]="getImagePath(cluster.applicationTechnology, cluster.applicationType)" class="avatar-img" (error)="onImageError($event)" style="height: 100%; width: 100%; object-fit: contain; border-radius: 0;" />
+              </span>
+            </div>
+
+            <div class="cluster-info">
+              <span class="cluster-name">{{ cluster.name }}</span>
+              <!-- <span class="cluster-meta">AKS • Kubernetes Cluster</span> -->
+            </div>
+          </div>
+
+          <!-- METRICS -->
+          <div class="cluster-right">
+            <div class="summary-pills">
+
+              <span class="summary-pill nodes">
+                Nodes: {{ cluster.nodes.length }}
+              </span>
+
+              <span class="summary-pill pods">
+                Pods: {{ totalPods(cluster) }}
+              </span>
+
+              <span class="summary-pill deploys">
+                Deployments: {{ totalDeployments(cluster) }}
+              </span>
+
+              <span class="summary-pill daemon">
+                DaemonSets: {{ totalDaemonSets(cluster) }}
+              </span>
+
+              <span class="summary-pill replica">
+                ReplicaSets: {{ totalReplicaSets(cluster) }}
+              </span>
+
+            </div>
+
+            <div class="chevron" [class.open]="cluster.expanded">
+              ▼
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===== EXPANDED ===== -->
+        <div class="node-section" *ngIf="cluster.expanded">
+
+          <!-- EMPTY -->
+          <div *ngIf="cluster.nodes.length === 0" class="empty-state">
+            <h4>No Nodes Available</h4>
+            <p>This cluster currently has no active nodes.</p>
+          </div>
+
+          <!-- NODE TABLE (UNCHANGED STRUCTURE) -->
+          <table *ngIf="cluster.nodes.length > 0" class="node-table">
+
+            <thead>
+              <tr>
+                <th class="left">NODE</th>
+                <th class="left">HOSTNAME</th>
+                <th class="center">PODS USAGE</th>
+                <th class="center">RUNNING PODS</th>
+
+                <th class="center">DEPLOYMENTS</th>
+                <th class="center">DAEMONSETS</th>
+                <th class="center">REPLICASETS</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr *ngFor="let node of cluster.nodes" class="node-row" (click)="openNode(node)">
+
+                <td class="left">
+                  <span class="node-name">{{ node.name }}</span>
+                </td>
+                <td class="left">
+                  <span class="hostname-tag">
+                    {{ node.hostname }}
+                  </span>
+                </td>
+
+                <td class="center">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="podPercent(node)">
+                    </div>
+                  </div>
+                  <small>
+                    {{ node.allocatedPods }}/{{ node.allocatablePods }}
+                  </small>
+                </td>
+
+                <td class="center">
+                  <span class="status-badge" [class.zero]="node.runningPods === 0">
+                    {{ node.runningPods }}
+                  </span>
+                </td>
+
+
+
+                <td class="center">
+                  <span class="summary-pill deploys" [class.zero]="node.deployments === 0">
+                    {{ node.deployments }}
+                  </span>
+                </td>
+
+                <td class="center">
+                  <span class="summary-pill daemon" [class.zero]="node.daemonsets === 0">
+                    {{ node.daemonsets }}
+                  </span>
+                </td>
+
+                <td class="center">
+                  <span class="summary-pill replica" [class.zero]="node.replicasets === 0">
+                    {{ node.replicasets }}
+                  </span>
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </ng-container>
+
+    <!-- NO DATA -->
+    <ng-template #noClusters>
+      <div class="no-data-wrapper">
+        <div class="no-data-card">
+          <h4>No AKS Cluster Data</h4>
+          <p>No clusters found for the selected time range.</p>
+        </div>
+      </div>
+    </ng-template>
+
+  </div>
+
+</div>

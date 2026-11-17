@@ -1,0 +1,454 @@
+<div class="app-shell">
+    <div class="body-wrap">
+        <div class="main-content">
+
+            <!-- Tabs and Breadcrumb Header -->
+            <app-kubernetes-tab-header activeTab="namespace"
+                [selectedCluster]="selectedCluster"></app-kubernetes-tab-header>
+
+            <!-- Stat Cards -->
+            <div class="summary-grid">
+
+                <!-- 1. Total Namespaces -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-blue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                                    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <span class="tile-title">Namespaces</span>
+                                <span class="tile-value">{{ totalNamespaces }}</span>
+                                <span class="tile-sub">Total Namespaces</span>
+                            </div>
+                        </div>
+                        <div class="tile-bottom-left">
+                            <div class="tile-dots">
+                                <span class="dot-item"><span class="dot green"></span>{{ totalNamespaces -
+                                    namespacesWithIssues }} Active</span>
+                                <span class="dot-item"><span class="dot red"></span>{{ namespacesWithIssues }}
+                                    Issues</span>
+                            </div>
+                            <div class="tile-bar-track">
+                                <div class="tile-bar-fill green" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill green" cx="18" cy="18" r="15.9155" stroke-dasharray="92 100">
+                                </circle>
+                            </svg>
+                            <span class="donut-text">92%</span>
+                        </div>
+                        <span class="donut-sub">Active</span>
+                    </div>
+                </div>
+
+                <!-- 2. Total Pods -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-purple">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"></path>
+                                    <path d="M12 11l8-4.5M12 11L4 6.5M12 11v9"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <span class="tile-title">Pods</span>
+                                <span class="tile-value">{{ totalPods }}</span>
+                                <span class="tile-sub">Total Pods</span>
+                            </div>
+                        </div>
+                        <div class="tile-bottom-left">
+                            <div class="tile-dots">
+                                <span class="dot-item"><span class="dot green"></span>{{ runningPods }} Running</span>
+                                <span class="dot-item"><span class="dot yellow"></span>{{ pendingPods }} Pending</span>
+                            </div>
+                            <div class="tile-bar-track">
+                                <div class="tile-bar-fill purple" [style.width.%]="podsUsagePercent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill purple" cx="18" cy="18" r="15.9155"
+                                    [attr.stroke-dasharray]="podsUsagePercent + ' 100'"></circle>
+                            </svg>
+                            <span class="donut-text">{{ podsUsagePercent }}%</span>
+                        </div>
+                        <span class="donut-sub">Healthy</span>
+                    </div>
+                </div>
+
+                <!-- 3. CPU Usage -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-blue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+                                    <rect x="9.5" y="9.5" width="5" height="5"></rect>
+                                    <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <span class="tile-title">CPU Usage</span>
+                                <span class="tile-value">{{ cpuUsagePercent }}%</span>
+                                <span class="tile-sub">{{ cpuDetail }}</span>
+                            </div>
+                        </div>
+                        <div class="tile-bottom-left">
+                            <div class="tile-dots">
+                                <span class="dot-item"><span class="dot blue"></span>{{ cpuDetail }}</span>
+                            </div>
+                            <div class="tile-bar-track">
+                                <div class="tile-bar-fill blue" [style.width.%]="cpuUsagePercent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill blue" cx="18" cy="18" r="15.9155"
+                                    [attr.stroke-dasharray]="cpuUsagePercent + ' 100'"></circle>
+                            </svg>
+                            <span class="donut-text">{{ cpuUsagePercent }}%</span>
+                        </div>
+                        <span class="donut-sub">Normal</span>
+                    </div>
+                </div>
+
+                <!-- 4. Memory Usage -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-green">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                    <path d="M3 10h18M3 15h18M9 4v16M15 4v16"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <span class="tile-title">Memory Usage</span>
+                                <span class="tile-value">{{ memoryUsagePercent }}%</span>
+                                <span class="tile-sub">{{ memoryDetail }}</span>
+                            </div>
+                        </div>
+                        <div class="tile-bottom-left">
+                            <div class="tile-dots">
+                                <span class="dot-item"><span class="dot green"></span>{{ memoryDetail }}</span>
+                            </div>
+                            <div class="tile-bar-track">
+                                <div class="tile-bar-fill green" [style.width.%]="memoryUsagePercent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill green" cx="18" cy="18" r="15.9155"
+                                    [attr.stroke-dasharray]="memoryUsagePercent + ' 100'"></circle>
+                            </svg>
+                            <span class="donut-text">{{ memoryUsagePercent }}%</span>
+                        </div>
+                        <span class="donut-sub">Optimal</span>
+                    </div>
+                </div>
+
+                <!-- 6. Namespaces with Issues -->
+                <div class="summary-card donut-card">
+                    <div class="tile-main-content">
+                        <div class="tile-left">
+                            <div class="tile-icon-box bg-red">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 3L2 21h20L12 3z"></path>
+                                    <path d="M12 10v5M12 18h.01"></path>
+                                </svg>
+                            </div>
+                            <div class="tile-info">
+                                <span class="tile-title">Issues</span>
+                                <span class="tile-value">{{ namespacesWithIssues }}</span>
+                                <span class="tile-sub">Namespaces with issues</span>
+                            </div>
+                        </div>
+                        <div class="tile-bottom-left">
+                            <div class="tile-dots">
+                                <span class="dot-item"><span class="dot red"></span>{{ namespacesWithIssues }}
+                                    Critical</span>
+                                <span class="dot-item"><span class="dot yellow"></span>{{ issuesPercent }}% Rate</span>
+                            </div>
+                            <div class="tile-bar-track">
+                                <div class="tile-bar-fill red" [style.width.%]="issuesPercent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-donut-wrap">
+                        <div class="tile-donut">
+                            <svg viewBox="0 0 36 36">
+                                <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+                                <circle class="donut-fill red" cx="18" cy="18" r="15.9155"
+                                    [attr.stroke-dasharray]="issuesPercent + ' 100'"></circle>
+                            </svg>
+                            <span class="donut-text">{{ issuesPercent }}%</span>
+                        </div>
+                        <span class="donut-sub">Warning</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Table Card -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title-wrap">
+                        <span class="table-title-icon">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linejoin="round">
+                                <path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"></path>
+                                <path d="M12 11l8-4.5M12 11L4 6.5M12 11v9"></path>
+                            </svg>
+                        </span>
+                        <h2 class="table-title">Namespaces ({{ totalNamespaces }})</h2>
+                    </div>
+
+                    <div class="table-controls">
+                        <div class="k8s-table-search">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="11" cy="11" r="7" />
+                                <path d="M21 21l-4.35-4.35" />
+                            </svg>
+                            <input type="text" placeholder="Search namespaces..." [(ngModel)]="searchTerm"
+                                (ngModelChange)="currentPage = 1" />
+                        </div>
+
+                        <!-- Export Dropdown -->
+                        <div class="k8s-export-wrap">
+                            <button type="button" class="k8s-export-btn" (click)="toggleExportMenu(); $event.stopPropagation()" title="Download namespaces table">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                            <div class="k8s-export-menu" *ngIf="exportMenuOpen" (click)="$event.stopPropagation()">
+                                <button type="button" class="k8s-export-item" (click)="exportNamespaces('xlsx')">
+                                    <span class="k8s-export-badge xlsx">XLSX</span>
+                                    <span>Download Excel</span>
+                                </button>
+                                <button type="button" class="k8s-export-item" (click)="exportNamespaces('csv')">
+                                    <span class="k8s-export-badge csv">CSV</span>
+                                    <span>Download CSV</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="columns-wrap">
+                            <button type="button" class="ctrl-btn icon-only" title="Columns"
+                                [class.active]="columnsMenuOpen"
+                                (click)="toggleColumnsMenu(); $event.stopPropagation()">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                </svg>
+                            </button>
+
+                            <div class="columns-popup" *ngIf="columnsMenuOpen" (click)="$event.stopPropagation()">
+                                <label class="columns-option" *ngFor="let c of columns">
+                                    <input type="checkbox" [checked]="visibleCols[c.key]"
+                                        (change)="toggleColumn(c.key)" />
+                                    <span>{{ c.label }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Namespace <span class="sort">&#8593;</span></th>
+
+                                <th class="th-filter-col">
+                                    <div class="th-filter-wrap status-filter-wrap">
+                                        <span>Status</span>
+                                        <button type="button" class="th-filter-trigger"
+                                            [class.active]="statusFilter !== 'All'"
+                                            (click)="toggleStatusMenu(); $event.stopPropagation()"
+                                            title="Filter by status">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                                                stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                            </svg>
+                                        </button>
+
+                                        <div class="th-filter-popup" *ngIf="statusMenuOpen"
+                                            (click)="$event.stopPropagation()">
+                                            <div class="th-filter-option" *ngFor="let opt of statusOptions"
+                                                [class.selected]="statusFilter === opt" (click)="setStatusFilter(opt)">
+                                                <span class="th-filter-check">
+                                                    <svg *ngIf="statusFilter === opt" viewBox="0 0 24 24" width="12"
+                                                        height="12" fill="none" stroke="currentColor" stroke-width="3">
+                                                        <path d="M20 6L9 17l-5-5" />
+                                                    </svg>
+                                                </span>
+                                                <span class="th-filter-label">{{ opt }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+
+                                <th *ngIf="visibleCols['pods']">Pods</th>
+                                <th *ngIf="visibleCols['deployments']">Deployments</th>
+                                <th *ngIf="visibleCols['services']">Services</th>
+                                <th *ngIf="visibleCols['cpu']">CPU Usage</th>
+                                <th *ngIf="visibleCols['memory']">Memory Usage</th>
+                                <th *ngIf="visibleCols['restarts']">Restarts</th>
+                                <th *ngIf="visibleCols['unhealthy']">Unhealthy Pods</th>
+                                <th *ngIf="visibleCols['throttling']">
+                                    <span class="th-with-icon">CPU Throttling
+                                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                        </svg>
+                                    </span>
+                                </th>
+                                <th *ngIf="visibleCols['oom']">
+                                    <span class="th-with-icon">OOM Kills
+                                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                        </svg>
+                                    </span>
+                                </th>
+                                <th *ngIf="visibleCols['alerts']">Alerts</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr *ngFor="let ns of pagedNamespaces">
+                                <td>
+                                    <span class="ns-cell" (click)="onNamespaceClick(ns)">
+                                        <a href="javascript:void(0)" class="ns-link">{{ ns.name }}</a>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-pill" [class.warning]="ns.status === 'Warning'">
+                                        <span class="dot"></span>{{ ns.status }}
+                                    </span>
+                                </td>
+
+                                <td *ngIf="visibleCols['pods']">{{ ns.podsUsed }} / {{ ns.podsTotal }}</td>
+                                <td *ngIf="visibleCols['deployments']"><span class="num-link">{{ ns.deployments
+                                        }}</span></td>
+                                <td *ngIf="visibleCols['services']"><span class="num-link">{{ ns.services }}</span></td>
+
+                                <td *ngIf="visibleCols['cpu']">
+                                    <div class="usage-cell">
+                                        <div class="bar-track">
+                                            <div class="bar-fill cpu" [style.width.%]="ns.cpu"></div>
+                                        </div>
+                                        <span class="usage-pct">{{ ns.cpu }}%</span>
+                                    </div>
+                                </td>
+                                <td *ngIf="visibleCols['memory']">
+                                    <div class="usage-cell">
+                                        <div class="bar-track">
+                                            <div class="bar-fill memory" [style.width.%]="ns.memory"></div>
+                                        </div>
+                                        <span class="usage-pct">{{ ns.memory }}%</span>
+                                    </div>
+                                </td>
+
+                                <td *ngIf="visibleCols['restarts']">
+                                    <span class="pill" [ngClass]="ns.restarts.sev">{{ ns.restarts.value }}</span>
+                                </td>
+                                <td *ngIf="visibleCols['unhealthy']">
+                                    <span class="pill" [ngClass]="ns.unhealthyPods.sev">{{ ns.unhealthyPods.value
+                                        }}</span>
+                                </td>
+                                <td *ngIf="visibleCols['throttling']">
+                                    <span class="pill" [ngClass]="ns.cpuThrottling.sev">{{ ns.cpuThrottling.value |
+                                        number:'1.1-1' }}%</span>
+                                </td>
+                                <td *ngIf="visibleCols['oom']">
+                                    <span class="pill" [ngClass]="ns.oomKills.sev">{{ ns.oomKills.value }}</span>
+                                </td>
+
+                                <td *ngIf="visibleCols['alerts']">
+                                    <span *ngIf="ns.alerts === 0" class="alert-zero">0</span>
+                                    <span *ngIf="ns.alerts > 0" class="alert-badge" [ngClass]="ns.alertLevel">
+                                        <svg viewBox="0 0 24 24" width="13" height="13">
+                                            <path d="M12 2L1 21h22L12 2z" fill="currentColor" />
+                                            <path d="M12 9v5M12 16.5v1" stroke="#ffffff" stroke-width="2"
+                                                stroke-linecap="round" />
+                                        </svg>
+                                        {{ ns.alerts }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mrum-pagination-container">
+                    <div class="mrum-showing-text">
+                        Showing {{ startIndex }} to {{ endIndex }} of {{ filteredNamespaces.length }} namespaces
+                    </div>
+                    <div class="mrum-pagination-controls">
+                        <div class="mrum-per-page">
+                            <div class="select-box small">
+                                <select [(ngModel)]="itemsPerPage" (ngModelChange)="onItemsPerPageChange()">
+                                    <option *ngFor="let n of pageSizeOptions" [ngValue]="n">{{ n }}</option>
+                                </select>
+                                <svg class="select-chevron" viewBox="0 0 24 24" width="13" height="13" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            </div>
+                            <span>per page</span>
+                        </div>
+                        <div class="mrum-pager">
+                            <button class="mrum-pager-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="mrum-pager-btn" *ngFor="let page of totalPagesArray"
+                                [class.active]="currentPage === page" (click)="page !== '...' && goToPage(page)"
+                                [disabled]="page === '...'">
+                                {{ page }}
+                            </button>
+                            <button class="mrum-pager-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,131 @@
+<main class="bm-root">
+
+  <div class="bm-header">
+    <h3 class="bm-header__title raleway-font semi-text">Browser Monitoring</h3>
+    <div class="bm-search-wrap">
+      <input
+        type="text"
+        class="bm-search-input"
+        placeholder="Search Application Name"
+        [(ngModel)]="searchText"
+        (input)="applySearchFilter()"
+        autocomplete="off"
+      />
+      <i class="fas fa-search bm-search-wrap__icon"></i>
+    </div>
+  </div>
+
+  <div class="bm-table-wrap">
+    <table class="bm-table">
+      <colgroup>
+        <col style="width: 50%">
+        <col style="width: 25%">
+        <col style="width: 25%">
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th (click)="onSort('serviceName')">
+            Service Name
+            <i class="ms-1 fa"
+              [ngClass]="sortColumn === 'serviceName' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+          </th>
+          <th (click)="onSort('errorRate')">
+            Error Rate
+            <i class="ms-1 fa"
+              [ngClass]="sortColumn === 'errorRate' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+          </th>
+          <th (click)="onSort('pv')">
+            PV
+            <i class="ms-1 fa"
+              [ngClass]="sortColumn === 'pv' ? (sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort'"></i>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="isLoading">
+        <tr class="bm-tr" *ngFor="let i of [].constructor(15)">
+          <td><div class="bm-skeleton"></div></td>
+          <td><div class="bm-skeleton"></div></td>
+          <td><div class="bm-skeleton"></div></td>
+        </tr>
+      </tbody>
+
+      <tbody *ngIf="!isLoading && pagedTableData.length > 0">
+        <tr class="bm-tr" *ngFor="let row of pagedTableData">
+
+          <td class="bm-td--name" (click)="setServiceId(row.serviceName)">
+            <span class="bm-avatar">
+              <img
+                *ngIf="row.applicationTechnology || row.applicationType"
+                [src]="'assets/images/' + getLogoPath(row.applicationTechnology, row.applicationType)"
+                class="bm-avatar__img"
+                (error)="onImageError($event)"
+              />
+              <span
+                *ngIf="!row.applicationTechnology && !row.applicationType"
+                class="bm-avatar__initials">
+                {{ (row.serviceName + '') | slice:0:2 | uppercase }}
+              </span>
+            </span>
+            <span class="bm-name-text">{{ row.serviceName || 'No Data' }}</span>
+          </td>
+
+          <td [ngClass]="{'bm-td--nodata': row.errorRate == null}">
+            <ng-container *ngIf="row.errorRate != null; else noData">
+              <span class="bm-metric-val">{{ row.errorRate }}</span>
+            </ng-container>
+          </td>
+
+          <td [ngClass]="{'bm-td--nodata': row.pv == null}">
+            <ng-container *ngIf="row.pv != null; else noData">
+              <span class="bm-metric-val">{{ row.pv }}</span>
+            </ng-container>
+          </td>
+
+        </tr>
+      </tbody>
+
+      <tbody *ngIf="!isLoading && pagedTableData.length === 0">
+        <tr>
+          <td colspan="3" class="bm-td--empty">
+            <div class="bm-empty-container">
+              <i class="fas fa-search bm-empty-icon"></i>
+              <p class="bm-empty-text">No services found</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+    <ng-template #noData>
+      <span class="bm-nodata-text">No Data</span>
+    </ng-template>
+  </div>
+
+  <div class="bm-pager">
+    <span class="bm-pager__info">
+      Showing {{ startIndex }}–{{ endIndex }} of {{ filteredServiceNames.length }} services
+    </span>
+    <div class="bm-pager__controls">
+      <button class="bm-pager__btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <input
+        type="number"
+        class="bm-pager__input"
+        [value]="currentPage"
+        (keydown.enter)="goToPage(inputPage.value)"
+        #inputPage
+        min="1"
+        [max]="totalPages"
+      />
+      <span class="bm-pager__of">of {{ totalPages }}</span>
+      <button class="bm-pager__btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+
+</main>

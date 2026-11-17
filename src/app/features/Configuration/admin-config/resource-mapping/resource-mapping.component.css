@@ -1,0 +1,55 @@
+/* Premium UI Utilities */
+.premium-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.label-caps {
+  font-size: 0.625rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.075em !important;
+  padding-left: 0.25rem !important;
+}
+
+.text-caps {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.premium-title {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.animate-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-hover:hover {
+  transform: scale(1.02);
+}
+
+.animate-hover:active {
+  transform: scale(0.95);
+}
+
+.no-native-arrow {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none !important;
+}
+
+.no-native-arrow::-ms-expand {
+  display: none;
+}
+

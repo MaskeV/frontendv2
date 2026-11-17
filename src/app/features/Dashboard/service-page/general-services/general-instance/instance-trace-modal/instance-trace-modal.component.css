@@ -1,0 +1,349 @@
+.modal {
+    display: block;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    overflow: auto;
+}
+
+.modal-dialog {
+    position: relative;
+    margin: 1.75rem auto;
+    max-width: 90%;
+    /* Adjust max-width to control size */
+    width: auto;
+    height: auto;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 94vh;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    color: #2d3748;
+    font-size: 14px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #edf2f7;
+    padding: 12px 20px;
+    background: #f8fafc;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.modal-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0;
+}
+
+.modal-body {
+    height: calc(94vh - 60px);
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+.scrollable {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-select {
+    background-color: #fff !important;
+    border: 1px solid #ced4da;
+    color: #495057;
+    border-radius: 4px;
+    height: 24px;
+    font-size: 0.75rem;
+    padding-left: 5px;
+}
+
+.custom-select option {
+    background-color: #fff;
+    color: #495057;
+}
+
+.custom-select:focus {
+    border-color: #5a9ee0;
+    outline: none;
+    box-shadow: none;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 520px 1fr;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #edf2f7;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    flex: 1;
+}
+
+.grid-container > div {
+    height: 100%;
+    overflow: hidden;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    color: #2d3748;
+    height: 100%;
+    overflow: auto;
+    border-right: 1px solid #edf2f7;
+    background: #fafbfc;
+}
+
+.right-grid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #fff;
+}
+
+.left,
+.right-top,
+.right-bottom {
+    border: 1px solid #d6d6d6cf;
+}
+
+.right-top {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.right-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.right-top-left {
+    flex: 1;
+}
+
+.right-top-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.right-bottom {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.scrollable-right {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+    background-color: #ffffff;
+    display: block;
+    position: relative;
+    padding: 15px;
+}
+
+.scrollable-right > * {
+    min-width: 100%;
+    display: inline-block;
+}
+
+.right-top-left h6 {
+    color: #1a202c;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+}
+
+.right-top-left span {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.right-top-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.icon-btn {
+    font-size: 18px;
+    cursor: pointer;
+    color: #718096;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    color: #0071A7;
+    background: #f0f7ff;
+    border-color: #bee3f8;
+}
+
+.icon-btn.selected {
+    color: #fff;
+    background: #0071A7;
+    border-color: #0071A7;
+    box-shadow: 0 2px 4px rgba(0, 113, 167, 0.2);
+}
+
+/* Internal Component Styling Overrides - Tables, Trees, Lists */
+:host ::ng-deep .table {
+    font-size: 16px !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    border-collapse: separate !important;
+}
+
+:host ::ng-deep .table th {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: #4a5568 !important;
+    background-color: #f8fafc !important;
+    padding: 16px 20px !important;
+    border-bottom: 2px solid #edf2f7 !important;
+}
+
+:host ::ng-deep .table td {
+    padding: 16px 20px !important;
+    color: #1a202c !important;
+    border-bottom: 1px solid #f7fafc !important;
+    vertical-align: middle !important;
+}
+
+/* Targeting nested badges in tables (latency/counts) */
+:host ::ng-deep .table .badge,
+:host ::ng-deep .table span[style*="font-size"] {
+    font-size: 13px !important;
+    padding: 4px 10px !important;
+}
+
+/* Targeting Tree View Nodes and Labels */
+:host ::ng-deep app-tree-view div, 
+:host ::ng-deep app-tree-view span,
+:host ::ng-deep app-tree-view text {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+}
+
+/* Targeting List View Items */
+:host ::ng-deep app-list-view div, 
+:host ::ng-deep app-list-view span {
+    font-size: 15px !important;
+}
+
+/* Already handled by aggressive overrides above */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 3px;
+}
+
+/* Scrollbar for Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Custom Pagination Styling */
+.custom-pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    gap: 8px;
+    align-items: center;
+}
+
+.custom-pagination .page-item .page-link {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #4a5568;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.custom-pagination .page-item .page-link:hover:not(:disabled) {
+    background-color: #f8fafc;
+    border-color: #cbd5e0;
+    color: #0071A7;
+    z-index: 2;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: #0071A7 !important;
+    border-color: #0071A7 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 113, 167, 0.2);
+}
+
+.custom-pagination .page-item.disabled .page-link {
+    color: #cbd5e0;
+    pointer-events: none;
+    background-color: #f8fafc;
+    border-color: #edf2f7;
+}
+
+.custom-pagination .page-link i {
+    font-size: 11px;
+}
+
+.text-ellipsis-cell {
+    max-width: 100%;
+    /* adjust as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* display: inline-block; 
+  vertical-align: middle; */
+}

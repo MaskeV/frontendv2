@@ -1,0 +1,195 @@
+<div class="h-100 overflow-auto" style="background-color: #F8FAFC;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2 my-1">
+        <ol class="breadcrumb text-dark mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1" aria-current="page">
+                <img [src]="getImagePath()" class="icons" alt="activemq logo" title="activemq" (error)="onImageError($event)" /><a
+                    routerLink="/activemq" class="text-decoration-none">ActiveMQ-Clusters</a>
+            </li>
+            <li class="breadcrumb-item"><a href="javascript:void(0)" routerLink="/activemq/overview"
+                    class="text-decoration-none">{{clusterName}}</a></li>
+            <li class="breadcrumb-item active">{{brokerName}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-2">
+        <div class="row g-2 mb-2">
+            <!-- Uptime Card -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Uptime</span>
+                        <span class="text-muted" matTooltip="Uptime of the broker in day." matTooltipPosition="above"><i
+                                class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                        <span class="fs-2 text-success"><b>{{ formatUptime(uptime) }}</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slave Broker Card -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Slave Broker</span>
+                        <span class="text-muted" matTooltip="If slave broker then 1 else 0"
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                        <span class="fs-2"
+                            [ngClass]="slaveBroker == 1 ? 'text-warning' : 'text-info'"><b>{{slaveBroker}}</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connections Chart -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Connections</span>
+                        <span class="text-muted" matTooltip="The number of clients connected to the broker currently."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="connections-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-2">
+            <!-- Current Producer Count -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Current Producer Count</span>
+                        <span class="text-muted" matTooltip="The number of producers currently attached to the broker."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                        <span class="fs-2 text-primary"><b>{{producerCount}}</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Consumer Count -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 d-flex flex-column overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Current Consumer Count</span>
+                        <span class="text-muted" matTooltip="The number of consumers consuming messages from the broker"
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                        <span class="fs-2" style="color: #8B5CF6;"><b>{{consumerCount}}</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Increased Producer Count Chart -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Increased Producer Count</span>
+                        <span class="text-muted" matTooltip="The number of producers currently attached to the broker."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="inc-producer-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Increased Consumer Count Chart -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Increased Consumer Count</span>
+                        <span class="text-muted"
+                            matTooltip="The number of consumers consuming messages from the broker."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="inc-consumer-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-2">
+            <!-- Enqueue/Dequeue Count -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Enqueue/Dequeue Count</span>
+                        <span class="text-muted"
+                            matTooltip="The total number of messages sent to the broker & The total number of messages the broker has delivered to consumers."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="enq-deq-count-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enqueue/Dequeue Rate -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Enqueue/Dequeue Rate</span>
+                        <span class="text-muted" matTooltip="Enqueue/Dequeue Rate per second."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="enq-deq-rate-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2">
+            <!-- Memory Usage -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Memory Usage(MB)</span>
+                        <span class="text-muted" matTooltip="Memory used by undelivered messages in the broker."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="memory-usage-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Limit -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Usage Limit(GB)</span>
+                        <span class="text-muted" matTooltip="Disk limit for messages." matTooltipPosition="above"><i
+                                class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="usage-limit-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Size -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border rounded-3 p-2 h-100 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="small fw-semibold text-secondary">Message Size</span>
+                        <span class="text-muted" matTooltip="Average/Max message size on this broker."
+                            matTooltipPosition="above"><i class="fa fa-info-circle"></i></span>
+                    </div>
+                    <div class="chart-wrapper-sm">
+                        <div id="message-size-chart" class="h-100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

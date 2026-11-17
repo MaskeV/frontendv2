@@ -1,0 +1,1054 @@
+<main>
+    <div class=" p-1 rounded">
+        <header class="pb-0 mb-0 ">
+            <ul class="nav nav-tabs">
+                <li class="nav-item ">
+                    <a class="nav-link active" aria-current="page" style="color: black; font-size: small;">Oracle</a>
+                </li>
+            </ul>
+        </header>
+    </div>
+
+    <nav aria-label="breadcrumb" class="mx-1" style="height: 7.5vh; font-size: small;margin-bottom: -20px;">
+        <ol class="breadcrumb" style="padding: 0px 5px;margin-top: -8px;">
+            <li class="breadcrumb-item"><a routerLink="/database">Oracle Service</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{selectedService}}</li>
+        </ol>
+    </nav>
+
+    <div class="p-1 rounded" style="margin-bottom: -14px;">
+        <header class="pb-0 mb-0">
+            <ul class="nav nav-tabs border-bottom mb-0" id="service-nav" style="font-size: small;">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#overview"
+                        (click)="loadData('overview')">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#instance"
+                        (click)="loadData('instance')">Instance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" role="tab" href="#slowStatements"
+                        (click)="loadData('slowStatements')">Query Details</a>
+                </li>
+            </ul>
+        </header>
+
+        <div class="tab-content custom-bg p-1">
+            <div class="tab-pane fade in active show px-1" id="overview" role="tabpanel">
+                <div class="row mr-1 justify-content-between" style="padding-right: 4rem;">
+                    <div style="width: 8%;">
+                        <img [src]="'assets/img/technologies/ORACLE.png'" />
+                    </div>
+                    <div class="metric-box w-14">
+                        <div class="small">Uptime</div>
+                        <div *ngIf="combinedData?.uptime != null" class="uptim1 fw-bold kpi-value">
+                            <p class="pb-0 mb-0 fw-bold" [ngStyle]="{'color': '#3A8008'}" [innerHTML]="upTime"></p>
+                            <span class="pt-0 mt-0"
+                                style="color: rgb(144, 143, 143); font-size: x-small; font-weight: 400;">
+                                since {{sinceWhenUptime}}</span>
+                        </div>
+                        <div *ngIf="upTime==null" class="fw-bold kpi-value">
+                            <span style="color: red; font-size: smaller;">Down</span>
+                        </div>
+                    </div>
+                    <div class="metric-box w-14">
+                        <div class="small">Avg QPS</div>
+                        <div class="fw-bold kpi-value">
+                            {{ combinedData?.avg_qps != null ? combinedData.avg_qps : 'N/A' }}
+                        </div>
+                    </div>
+                    <div class="metric-box w-14">
+                        <div class="small">Max Session</div>
+                        <div class="fw-bold kpi-value">
+                            {{ combinedData?.max_session != null ? combinedData.max_session : 'N/A' }}
+                        </div>
+                    </div>
+                    <div class="metric-box w-14">
+                        <div class="small">Max Process</div>
+                        <div class="fw-bold kpi-value">
+                            {{ combinedData?.max_process != null ? combinedData.max_process : 'N/A' }}
+                        </div>
+                    </div>
+                    <div style="width: 30%;"></div>
+                </div>
+
+                <div class="mt-3 pe-3">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Execution</h3>
+                    </div>
+                    <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 99%;">
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        QPS
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{combinedData?.avg_qps != null ? combinedData.avg_qps : '-'}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_qps"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_qps"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['qps'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="currentQpsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Stale Queries
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgStaleQueries}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_stale_queries"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_stale_queries"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['stale'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="staleQueriesChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Slow Query Count
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgSlowQueryRate}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_slow_queries_count"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_slow_queries_count"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['slow'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="slowQueryRateChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pe-3">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Performance</h3>
+                    </div>
+                    <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 99%;">
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Buffer Cache Hit Ratio
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgBufferCacheRatio}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_buffer_cache_hit_ratio"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_buffer_cache_hit_ratio"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['bufferCache'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="bufferCacheHitRatioChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Open Cursor</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['openCursor'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="openCursorChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Process Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['process'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="processDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Connection Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['connection'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="connectsDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Command Trends</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['command'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="commandTrendChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Locks Detail</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['locks'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="locksDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pe-3">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Session</h3>
+                    </div>
+                    <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 99%;">
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Sessions Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['sessionDetails'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="sessionDetailsChartsContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Session Utilization
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgSessionUtilization}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_session_utilization"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_session_utilization"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['sessionUtil'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="sessionUtilizationChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="w-33"></div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pe-3">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">Error</h3>
+                    </div>
+                    <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 99%;">
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        User Error
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgUserError}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_user_errors"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_user_errors"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['userError'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="userErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Connection Error
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgConnectionError}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_connection_errors"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_connection_errors"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['connectionError'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="connectionErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="font-size: small;font-weight:500">
+                                        Deadlock
+                                    </span>
+                                    <div class=" d-flex align-items-center justify-content-between">
+                                        <select [(ngModel)]="chart_criteria" style="line-height: 1.2; font-size: small; width: 100px;"
+                                            class="form-select py-0 ps-1 pe-3 me-1 sm-font form-select-sm ng-valid ng-dirty ng-touched"
+                                            aria-label="Small select example">
+                                            <option value="avg" selected>Average</option>
+                                            <option value="threshold">Threshold</option>
+                                        </select>
+                                        <div *ngIf="chart_criteria=='avg'" class="bg-white rounded-2 me-1 px-1 chart-threshold fw-bold"
+                                            style="color:#0e38f1">{{avgDeadlocks}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'" class="bg-white rounded-2  px-1 chart-threshold fw-bold"
+                                            style="color:#e07e23">{{thresholds?.["meter_oracle_deadlocks"]?.warningValue}}
+                                        </div>
+                                        <div *ngIf="chart_criteria=='threshold'"
+                                            class="bg-white  mx-1 rounded-2 text-danger chart-threshold px-1 fw-bold">
+                                            {{thresholds?.["meter_oracle_deadlocks"]?.criticalValue}}</div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['deadlock'] }}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="deadlockChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-3 pe-3">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class=" fw-bold text-secondary text-uppercase ls-wider" style="font-size:.7em;">DB Object</h3>
+                    </div>
+                    <div class="ml-1 d-flex flex-wrap justify-content-around" style="width: 99%;">
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Procedures Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['procedures'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="proceduresDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Functions Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['functions'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="functionsDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <div class="card w-33">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Packages Details</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['packages'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="packagesDetailsChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div>
+                        <!-- <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Locks by Type</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['locksType'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="locksByTypeChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div> -->
+                        <!-- <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Procedure Execution</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['procExec'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="procedureExecutionChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div> -->
+                        <!-- <div class="card w-33 mt-1">
+                            <div class="card-header chart-title d-flex justify-content-between align-items-center">
+                                <span class="mb-0">Procedure Errors</span>
+                                <i class="fa-solid fa-circle-info gradiantIcon" matButton="elevated" matTooltip="{{ tooltips['procError'] }}"></i>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="procedureErrorChartContainer" style="width: 100%; height: 26vh;"></div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- INSTANCE -->
+            <div class="tab-pane fade " id="instance" role="tabpanel">
+                <div style="width: 99.5%;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Oracle Instances</h5>
+                        <div style="position: relative; width: 250px;">
+                            <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                                placeholder="Search Instance" [(ngModel)]="searchText" />
+                            <i class="fas fa-search"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" style="height: 65vh; overflow: auto;">
+                        <div class="mt-1">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="pointer" (click)="sortBy('instanceName')">
+                                            Service ID
+                                            <span class="ms-1">
+                                                <i *ngIf="sortparam !== 'instanceName'" class="fas fa-sort"></i>
+                                                <i *ngIf="sortparam === 'instanceName' && sortDirection === 'asc'"
+                                                    class="fas fa-sort"></i>
+                                                <i *ngIf="sortparam === 'instanceName' && sortDirection === 'desc'"
+                                                    class="fas fa-sort"></i>
+                                            </span>
+                                        </th>
+                                        <th class="pointer" (click)="sortBy('upTime')">
+                                            Uptime
+                                            <span class="ms-1">
+                                                <i *ngIf="sortparam !== 'upTime'" class="fas fa-sort"></i>
+                                                <i *ngIf="sortparam === 'upTime' && sortDirection === 'asc'"
+                                                    class="fas fa-sort"></i>
+                                                <i *ngIf="sortparam === 'upTime' && sortDirection === 'desc'"
+                                                    class="fas fa-sort"></i>
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        *ngFor="let instance of instanceList | searchItem: searchText:'instanceName' | sortOracle: sortparam:sortDirection">
+                                        <td class="text-link"
+                                            [ngClass]="{'no-data': !instance.instanceName, 'has-data': instance.instanceName}"
+                                            (click)="setServiceId(instance.instanceName)">
+                                            <span class="service-name">
+                                                {{ instance.instanceName ? instance.instanceName : 'No Data' }}
+                                            </span>
+                                        </td>
+
+                                        <td [ngClass]="{'no-data': !instance.upTime, 'has-data': instance.upTime}">
+                                            <i class="fa-regular fa-hourglass me-2" style="color: blue;"></i>
+                                            {{ instance.upTime ? convertSeconds(instance.upTime) : 'No Data' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <div class="noData" *ngIf="instanceList?.length === 0">
+                                    <span>No Data Available</span>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLOW STATEMENT -->
+            <div class="tab-pane fade" id="slowStatements" role="tabpanel">
+                <div style="width: 99.5%;">
+                    <!-- Slow Statement Chart -->
+                    <div>
+                        <div class="duration-container mb-2">
+                            <div class="duration-row">
+                                <div class="label">Duration Ranges</div>
+
+                                <div class="range-box">
+                                    <div class="ranges-scroll">
+                                        <span class="chip" *ngFor="let r of ranges; let i = index">
+                                            {{ r.min }}–{{ r.max }} sec
+                                            <button (click)="removeRange(i)">×</button>
+                                        </span>
+                                    </div>
+
+                                    <div class="range-actions">
+                                        <input type="number" class="form-control form-control-sm range-input"
+                                            placeholder="Min" [(ngModel)]="minInput" (keyup.enter)="addRange()"
+                                            min="4" />
+
+                                        <span class="range-separator">–</span>
+
+                                        <input type="number" class="form-control form-control-sm range-input"
+                                            placeholder="Max" [(ngModel)]="maxInput" (keyup.enter)="addRange()" />
+
+                                        <button class="add-btn" (click)="addRange()">Add range</button>
+                                        <button class="generate-btn" (click)="generateChart()">Generate Chart</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-1 mb-4">
+                            <div class="card-slowQueryDur" style="width: 100%;" [hidden]="isSlowStatementChartLoading">
+                                <div class="card-body p-1">
+                                    <div id="slowQueryDurRangeContainer" style="width: 100%; height: 26vh;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="isSlowStatementChartLoading" class="mt-1 mb-4">
+                            <div class="card p-3 slow-chart-skeleton">
+                                <div class="skeleton-chart">
+                                    <div class="skeleton-bars">
+                                        <span class="bar" *ngFor="let _ of [].constructor(30)"></span>
+                                    </div>
+                                </div>
+
+                                <div class="skeleton-x-axis mt-2">
+                                    <span *ngFor="let _ of [].constructor(20)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oracle Slow Queries Table -->
+                <div style="width: 99.5%; margin-top: 20px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Oracle Slow Queries</h5>
+                        <div style="position: relative; width: 250px;">
+                            <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                                placeholder="Search Oracle Slow Queries..." [(ngModel)]="searchTextOracleSlowQueries"
+                                (input)="onSearchOracleSlowQueries()">
+                            <i class="fas fa-search"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: gray;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" style="height: 53vh; display: flex; flex-direction: column;">
+                        <div class="mt-1" style="overflow-x: auto; flex-grow: 1;">
+                            <table class="table table-sm table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 40%;">SQL Text</th>
+                                        <th style="width: 12%;">Username</th>
+                                        <th style="width: 12%;">Machine</th>
+                                        <th style="width: 12%;">Active Secs</th>
+                                        <th style="width: 12%;">First Seen</th>
+                                        <th style="width: 12%;">Last Seen</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="isOracleSlowQueriesLoading">
+                                    <tr *ngFor="let i of [].constructor(8)">
+                                        <td style="width: 40%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 12%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 12%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 12%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 12%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 12%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!isOracleSlowQueriesLoading && pagedOracleSlowQueries.length !== 0">
+                                    <tr *ngFor="let item of pagedOracleSlowQueries">
+                                        <td style="width: 40%; font-size: x-small;"
+                                            (click)="item.expanded = !item.expanded" class="pointer">
+                                            <span *ngIf="!item.expanded">
+                                                {{ item.sql_text | slice:0:100 }}<span
+                                                    *ngIf="item.sql_text && item.sql_text.length > 100">...</span>
+                                            </span>
+                                            <span *ngIf="item.expanded">{{ item.sql_text }}</span>
+                                        </td>
+                                        <td style="width: 12%; font-size: x-small;">{{ item.username }}</td>
+                                        <td style="width: 12%; font-size: x-small;">{{ item.machine }}</td>
+                                        <td style="width: 12%; font-size: x-small;">{{ item.approx_active_seconds }}
+                                        </td>
+                                        <td style="width: 12%; font-size: x-small;">{{ item.first_seen }}</td>
+                                        <td style="width: 12%; font-size: x-small;">{{ item.last_seen }}</td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!isOracleSlowQueriesLoading && pagedOracleSlowQueries.length === 0">
+                                    <tr>
+                                        <td colspan="6" class="text-center"
+                                            style="height: 40vh; vertical-align: middle;">
+                                            <div class="noData">
+                                                <span>No Data Available</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 d-flex justify-content-between p-2"
+                            style="background-color: var(--card-bg-color, white); border-top: 1px solid #dee2e6;">
+                            <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                                {{ (currentPageOracleSlowQueries - 1) * itemsPerPageOracleSlowQueries + 1 }} - {{
+                                (currentPageOracleSlowQueries * itemsPerPageOracleSlowQueries) >
+                                filteredOracleSlowQueriesList.length ? filteredOracleSlowQueriesList.length :
+                                (currentPageOracleSlowQueries * itemsPerPageOracleSlowQueries) }} of {{
+                                filteredOracleSlowQueriesList.length }}
+                            </span>
+                            <nav class="mb-1 mr-1">
+                                <ul class="pagination justify-content-center align-items-center mb-0"
+                                    style="font-size: small; gap: 0.5rem;">
+                                    <li class="page-item" [class.disabled]="currentPageOracleSlowQueries === 1">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="previousPageOracleSlowQueries()"
+                                            [disabled]="currentPageOracleSlowQueries === 1" tabindex="0">
+                                            &laquo; Previous
+                                        </button>
+                                    </li>
+
+                                    <li class="page-item d-flex align-items-center">
+                                        <input type="number" class="form-control form-control-sm text-center"
+                                            style="width:60px" [value]="currentPageOracleSlowQueries"
+                                            (keydown.enter)="goToPageOracleSlowQueries(inputPageOracleSlowQueries.value)"
+                                            #inputPageOracleSlowQueries min="1" [max]="totalPagesOracleSlowQueries"
+                                            aria-label="Page number input" />
+                                        <span class="ms-2"> of {{ totalPagesOracleSlowQueries }}</span>
+                                    </li>
+
+                                    <li class="page-item"
+                                        [class.disabled]="currentPageOracleSlowQueries === totalPagesOracleSlowQueries">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="nextPageOracleSlowQueries()"
+                                            [disabled]="currentPageOracleSlowQueries === totalPagesOracleSlowQueries"
+                                            tabindex="0">
+                                            Next &raquo;
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oracle Locks Table -->
+                <div style="width: 99.5%; margin-top: 20px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Oracle Locks</h5>
+                        <div style="position: relative; width: 250px;">
+                            <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                                placeholder="Search Oracle Locks..." [(ngModel)]="searchTextOracleLocks"
+                                (input)="onSearchOracleLocks()">
+                            <i class="fas fa-search"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: gray;"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0" style="height: 53vh; display: flex; flex-direction: column;">
+
+                        <div class="mt-1" style="overflow-x: auto; flex-grow: 1;">
+                            <table class="table table-sm table-bordered table-hover"
+                                style="min-width: 1500px; table-layout: fixed; word-wrap: break-word;">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 150px;">Blocked Event</th>
+                                        <th style="width: 120px;">Blocked Machine</th>
+                                        <th style="width: 250px;">Blocked SQL</th>
+                                        <th style="width: 140px;">Blocked SQL Start (IST)</th>
+                                        <th style="width: 100px;">Blocked User</th>
+                                        <th style="width: 80px;">Wait Secs</th>
+                                        <th style="width: 140px;">Blocking Logon (IST)</th>
+                                        <th style="width: 120px;">Blocking Machine</th>
+                                        <th style="width: 250px;">Blocking SQL</th>
+                                        <th style="width: 140px;">Blocking SQL Start (IST)</th>
+                                        <th style="width: 100px;">Blocking User</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="isOracleLocksLoading">
+                                    <tr *ngFor="let i of [].constructor(8)">
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td>
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!isOracleLocksLoading && pagedOracleLocks.length !== 0">
+                                    <tr *ngFor="let item of pagedOracleLocks">
+                                        <td style="font-size: x-small;">{{ item.blocked_event }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocked_machine }}</td>
+                                        <td style="font-size: x-small;"
+                                            (click)="item.blocked_sql_expanded = !item.blocked_sql_expanded"
+                                            class="pointer">
+                                            <span *ngIf="!item.blocked_sql_expanded">
+                                                {{ item.blocked_sql | slice:0:100 }}<span
+                                                    *ngIf="item.blocked_sql && item.blocked_sql.length > 100">...</span>
+                                            </span>
+                                            <span *ngIf="item.blocked_sql_expanded" style="white-space: pre-wrap;">{{
+                                                item.blocked_sql }}</span>
+                                        </td>
+                                        <td style="font-size: x-small;">{{ item.blocked_sql_start_time_ist }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocked_user }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocked_wait_seconds }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocking_logon_time_ist }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocking_machine }}</td>
+                                        <td style="font-size: x-small;"
+                                            (click)="item.blocking_sql_expanded = !item.blocking_sql_expanded"
+                                            class="pointer">
+                                            <span *ngIf="!item.blocking_sql_expanded">
+                                                {{ item.blocking_sql | slice:0:100 }}<span
+                                                    *ngIf="item.blocking_sql && item.blocking_sql.length > 100">...</span>
+                                            </span>
+                                            <span *ngIf="item.blocking_sql_expanded" style="white-space: pre-wrap;">{{
+                                                item.blocking_sql }}</span>
+                                        </td>
+                                        <td style="font-size: x-small;">{{ item.blocking_sql_start_time_ist }}</td>
+                                        <td style="font-size: x-small;">{{ item.blocking_user }}</td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody *ngIf="!isOracleLocksLoading && pagedOracleLocks.length === 0">
+                                    <tr>
+                                        <td colspan="11" class="text-center"
+                                            style="height: 40vh; vertical-align: middle;">
+                                            <div class="noData">
+                                                <span>No Data Available</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 d-flex justify-content-between p-2"
+                            style="background-color: var(--card-bg-color, white); border-top: 1px solid #dee2e6;">
+                            <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                                {{ (currentPageOracleLocks - 1) * itemsPerPageOracleLocks + 1 }} - {{
+                                (currentPageOracleLocks * itemsPerPageOracleLocks) > filteredOracleLocksList.length ?
+                                filteredOracleLocksList.length : (currentPageOracleLocks * itemsPerPageOracleLocks) }}
+                                of {{ filteredOracleLocksList.length }}
+                            </span>
+                            <nav class="mb-1 mr-1">
+                                <ul class="pagination justify-content-center align-items-center mb-0"
+                                    style="font-size: small; gap: 0.5rem;">
+                                    <li class="page-item" [class.disabled]="currentPageOracleLocks === 1">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="previousPageOracleLocks()"
+                                            [disabled]="currentPageOracleLocks === 1" tabindex="0">
+                                            &laquo; Previous
+                                        </button>
+                                    </li>
+
+                                    <li class="page-item d-flex align-items-center">
+                                        <input type="number" class="form-control form-control-sm text-center"
+                                            style="width:60px" [value]="currentPageOracleLocks"
+                                            (keydown.enter)="goToPageOracleLocks(inputPageOracleLocks.value)"
+                                            #inputPageOracleLocks min="1" [max]="totalPagesOracleLocks"
+                                            aria-label="Page number input" />
+                                        <span class="ms-2"> of {{ totalPagesOracleLocks }}</span>
+                                    </li>
+
+                                    <li class="page-item"
+                                        [class.disabled]="currentPageOracleLocks === totalPagesOracleLocks">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="nextPageOracleLocks()"
+                                            [disabled]="currentPageOracleLocks === totalPagesOracleLocks" tabindex="0">
+                                            Next &raquo;
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Oracle Invalid SP Table -->
+                <div style="width: 99.5%; margin-top: 20px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Invalid Stored Procedures</h5>
+                        <div style="position: relative; width: 250px;">
+                            <input type="text" class="form-control form-control-sm" style="padding-right: 30px;"
+                                placeholder="Search Invalid SP..." [(ngModel)]="searchTextOracleInvalidSp"
+                                (input)="onSearchOracleInvalidSp()">
+                            <i class="fas fa-search"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: gay;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" style="height: 53vh; display: flex; flex-direction: column;">
+                        <div class="mt-1" style="overflow-x: auto; flex-grow: 1;">
+                            <table class="table table-sm table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 20%;">Object Name</th>
+                                        <th style="width: 15%;">Owner</th>
+                                        <th style="width: 10%;">Error Count</th>
+                                        <th style="width: 15%;">Last Modified</th>
+                                        <th style="width: 40%;">Error Snippet</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="isOracleInvalidSpLoading">
+                                    <tr *ngFor="let i of [].constructor(8)">
+                                        <td style="width: 20%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 15%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 10%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 15%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                        <td style="width: 40%;">
+                                            <div class="skeleton h-4 w-100"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!isOracleInvalidSpLoading && pagedOracleInvalidSp.length !== 0">
+                                    <tr *ngFor="let item of pagedOracleInvalidSp">
+                                        <td style="width: 20%; font-size: x-small;">{{ item.object_name }}</td>
+                                        <td style="width: 15%; font-size: x-small;">{{ item.owner }}</td>
+                                        <td style="width: 10%; font-size: x-small;">{{ item.error_count }}</td>
+                                        <td style="width: 15%; font-size: x-small;">{{ item.last_modified_time }}</td>
+                                        <td style="width: 40%; font-size: x-small;"
+                                            (click)="item.expanded = !item.expanded" class="pointer">
+                                            <span *ngIf="!item.expanded">
+                                                {{ item.error_snippet | slice:0:100 }}<span
+                                                    *ngIf="item.error_snippet && item.error_snippet.length > 100">...</span>
+                                            </span>
+                                            <span *ngIf="item.expanded">{{ item.error_snippet }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody *ngIf="!isOracleInvalidSpLoading && pagedOracleInvalidSp.length === 0">
+                                    <tr>
+                                        <td colspan="5" class="text-center"
+                                            style="height: 40vh; vertical-align: middle;">
+                                            <div class="noData">
+                                                <span>No Data Available</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-12 d-flex justify-content-between p-2"
+                            style="background-color: var(--card-bg-color, white); border-top: 1px solid #dee2e6;">
+                            <span style="color: gray; font-size: small; display: flex; align-items: center;">
+                                {{ (currentPageOracleInvalidSp - 1) * itemsPerPageOracleInvalidSp + 1 }} - {{
+                                (currentPageOracleInvalidSp * itemsPerPageOracleInvalidSp) >
+                                filteredOracleInvalidSpList.length ? filteredOracleInvalidSpList.length :
+                                (currentPageOracleInvalidSp * itemsPerPageOracleInvalidSp) }} of {{
+                                filteredOracleInvalidSpList.length }}
+                            </span>
+                            <nav class="mb-1 mr-1">
+                                <ul class="pagination justify-content-center align-items-center mb-0"
+                                    style="font-size: small; gap: 0.5rem;">
+                                    <li class="page-item" [class.disabled]="currentPageOracleInvalidSp === 1">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="previousPageOracleInvalidSp()"
+                                            [disabled]="currentPageOracleInvalidSp === 1" tabindex="0">
+                                            &laquo; Previous
+                                        </button>
+                                    </li>
+
+                                    <li class="page-item d-flex align-items-center">
+                                        <input type="number" class="form-control form-control-sm text-center"
+                                            style="width:60px" [value]="currentPageOracleInvalidSp"
+                                            (keydown.enter)="goToPageOracleInvalidSp(inputPageOracleInvalidSp.value)"
+                                            #inputPageOracleInvalidSp min="1" [max]="totalPagesOracleInvalidSp"
+                                            aria-label="Page number input" />
+                                        <span class="ms-2"> of {{ totalPagesOracleInvalidSp }}</span>
+                                    </li>
+
+                                    <li class="page-item"
+                                        [class.disabled]="currentPageOracleInvalidSp === totalPagesOracleInvalidSp">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            (click)="nextPageOracleInvalidSp()"
+                                            [disabled]="currentPageOracleInvalidSp === totalPagesOracleInvalidSp"
+                                            tabindex="0">
+                                            Next &raquo;
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert" *ngIf="rangeError">
+        {{ rangeError }}
+        <button type="button" class="btn-close" aria-label="Close" (click)="rangeError = ''"></button>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showTableModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <span>Queries ({{ selectedInterval }} ms)</span>
+                <button class="close-btn" (click)="showTableModal = false">✕</button>
+            </div>
+
+            <div class="modal-body p-3" *ngIf="tableData.length; else noData">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 40%;">SQL Text</th>
+                            <th style="width: 12%;">Username</th>
+                            <th style="width: 12%;">Machine</th>
+                            <th style="width: 12%;">Active secs</th>
+                            <th style="width: 12%;">First Seen</th>
+                            <th style="width: 12%;">Last Seen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of tableData">
+                            <td style="width: 40%; font-size: x-small;" (click)="toggleExpand(item)" class="pointer">
+                                <span *ngIf="!item.expanded">
+                                    {{ item.sql_text | slice:0:100 }}<span *ngIf="item.sql_text.length > 100">...</span>
+                                </span>
+
+                                <span *ngIf="item.expanded">
+                                    {{ item.sql_text }}
+                                </span>
+                            </td>
+                            <td style="width: 12%; font-size: x-small;">{{ item.username }}</td>
+                            <td style="width: 12%; font-size: x-small;">{{ item.machine }}</td>
+                            <td style="width: 12%; font-size: x-small;">{{ item.duration }}</td>
+                            <td style="width: 12%; font-size: x-small;">{{ item.first_seen }}</td>
+                            <td style="width: 12%; font-size: x-small;">{{ item.last_seen }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ng-template #noData>
+                <div class="noData">No Data Available</div>
+            </ng-template>
+        </div>
+    </div>
+
+</main>

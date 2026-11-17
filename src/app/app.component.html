@@ -1,0 +1,4 @@
+<app-loader></app-loader>
+<app-nav-bar *ngIf="showNavBar"></app-nav-bar>
+<app-faq-bot *ngIf="showNavBar"></app-faq-bot>
+<router-outlet *ngIf="!showNavBar"></router-outlet> 

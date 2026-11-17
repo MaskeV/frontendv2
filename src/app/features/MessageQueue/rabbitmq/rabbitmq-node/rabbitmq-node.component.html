@@ -1,0 +1,478 @@
+<main style="font-family: 'Inter', 'Roboto','Segoe UI', sans-serif;" class="d-flex flex-column my-2 overflow-hidden">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mx-2">
+        <ol class="breadcrumb text-light mb-0" style="font-size: small;">
+            <li class="breadcrumb-item d-flex align-items-center gap-1">
+                <img src="assets/img/technologies/rabbitmq.png" class="icons" alt="rabbitmq logo" style="height: 16px;" />
+                <a routerLink="/message-queue/rabbitmq-service">RabbitMQ-Cluster</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/message-queue/rabbitmq-service/cluster', clusterId]" [queryParams]="{ tab: 'node' }">{{clusterName}}</a>
+            </li>
+            <li class="breadcrumb-item active">{{nodeName}}</li>
+        </ol>
+    </nav>
+
+    <div class="flex-fill overflow-y-auto overflow-x-hidden">
+        <div class="flex-fill p-2 d-flex flex-column gap-2 mb-4" *ngIf="!isLoadingKPI; else nodeSkeletonTemplate">
+            <section class="mb-1">
+                <!-- Header -->
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Critical Indicators</h3>
+                </div>
+
+                <!-- Critical Indicators -->
+                <div class="row g-2 justify-content-start row-cols-2 row-cols-md-3 row-cols-lg-6 px-1">
+                    <!-- Total Queues -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Total Queues</span>
+                                <span class="text-success fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total number of queues hosted on this specific node">layers</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.queue_total !== null; else noData">{{nodeKPI.queue_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Queues</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unacknowledged -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Unacknowledged</span>
+                                <span class="text-warning fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Messages delivered to consumers but not yet acknowledged by the client">warning</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.unacknowledged_messages !== null; else noData">{{(nodeKPI.unacknowledged_messages || 0) | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">In flight</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connections -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Connections</span>
+                                <span class="text-primary fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total active TCP connections currently established to this node">link</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.connections_total !== null; else noData">{{nodeKPI.connections_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">TCP connections</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consumers -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Consumers</span>
+                                <span class="text-indigo fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Number of active consuming channels and processes on this node">people</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.consumer_total !== null; else noData">{{nodeKPI.consumer_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Active consumers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publishers -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Publishers</span>
+                                <span class="text-purple fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Number of active publishing channels and processes on this node">publish</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.publisher_total !== null; else noData">{{nodeKPI.publisher_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Active producers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Channels -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Channels</span>
+                                <span class="text-success fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total number of logical channels currently managed by this node">autorenew</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.channel_total !== null; else noData">{{nodeKPI.channel_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Total channels</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incoming Rate -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Incoming</span>
+                                <span class="text-success fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Rate of messages entering the node from all publishers">arrow_downward</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.incoming_messages_total !== null; else noData">{{nodeKPI.incoming_messages_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Publishing rate</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Rate -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Delivered</span>
+                                <span class="text-primary fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Rate of messages successfully delivered to consumers from this node">arrow_upward</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.outgoing_messages_total !== null; else noData">{{nodeKPI.outgoing_messages_total | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">Delivery rate</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Ready -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Ready Messages</span>
+                                <span class="text-danger fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Messages waiting in queues on this node to be delivered to consumers">drafts</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.messages_ready !== null; else noData">{{nodeKPI.messages_ready | shortNumber:0}}</span>
+                                <p class="small mb-0 text-muted">In queues</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Capacity -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Memory Limit</span>
+                                <span class="text-purple fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total memory limit allocated for this RabbitMQ node">memory</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.allocated_total_bytes !== null; else noData">{{nodeKPI.allocated_total_bytes | bytes:true}}</span>
+                                <p class="small mb-0 text-muted">Total capacity</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Node Status Indicator -->
+                    <div class="col">
+                        <div class="card shadow-sm border rounded-3 p-2 h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-semibold text-secondary">Node Status</span>
+                                <span class="text-success fs-6"><mat-icon data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Current operational health status of the RabbitMQ node">monitor_heart</mat-icon></span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="fs-lg fw-bold text-dark">{{ nodeKPI.connections_total != null ? 'Active' : 'No Data' }}</span>
+                                <p class="small mb-0 text-muted">System healthy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">System Health</h3>
+                    <span class="fw-bold rounded-pill px-2 py-1 border text-success small" style="background:#e6f4ea; border-color:#b7e0c2;">Healthy</span>
+                </div>
+
+                <!-- System Health -->
+                <div class="row g-3">
+                    <!-- Node Status -->
+                    <div class="col-6 col-lg-3 col-md-3">
+                        <div class="card p-2 rounded-3 border shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <mat-icon class="icon-sm text-success" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Current operational status of the RabbitMQ node runtime">dns</mat-icon>
+                                <span class="text-secondary small fw-medium">Node State</span>
+                            </div>
+                            <span class="fs-lg fw-bold text-dark">{{ nodeKPI.connections_total != null ? 'Running' : 'No Data' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Consumers -->
+                    <div class="col-6 col-lg-3 col-md-3">
+                        <div class="card p-2 rounded-3 border shadow-sm d-flex flex-column justify-content-between h-100">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <mat-icon class="icon-sm text-indigo" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total number of active consumer processes currently connected to this node">groups</mat-icon>
+                                <span class="text-secondary small fw-medium">Active Consumers</span>
+                            </div>
+                            <span class="fs-lg fw-bold text-dark" *ngIf="nodeKPI.consumer_total !== null; else noData">{{nodeKPI.consumer_total | shortNumber:0}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Throughput (Outgoing Messages) -->
+                    <div class="col-12 col-lg-6 col-md-6">
+                        <div class="card p-2 rounded-3 bg-primary shadow-sm h-100 text-white">
+                            <div class="row">
+                                <div class="col-9">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <mat-icon class="icon-sm text-warning" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Aggregate rate of outgoing messages processed by this specific node">speed</mat-icon>
+                                        <span class="small fw-medium">Node Throughput</span>
+                                    </div>
+                                    <div class="d-flex align-items-end gap-2">
+                                        <span class="fs-lg fw-bold" *ngIf="nodeKPI.outgoing_messages_total !== null; else noData">{{nodeKPI.outgoing_messages_total | shortNumber:0}}</span>
+                                        <span class="small fw-medium mb-1" *ngIf="nodeKPI.outgoing_messages_total !== null">msgs / sec</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 pt-2">
+                                    <svg viewBox="0 0 100 40" class="w-100 overflow-visible">
+                                        <path d="M0 30 Q 15 25, 25 15 T 50 20 T 75 10 T 100 25" fill="none" stroke="white" stroke-linecap="round" stroke-width="2.5" />
+                                        <circle cx="100" cy="25" r="3" fill="white" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-2">
+                <!-- Header -->
+                <div class="flex align-items-center mb-2 px-1">
+                    <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Node Metrics</h3>
+                </div>
+
+                <!-- Main Stack -->
+                <div class="row g-3">
+                    <!-- Memory Utilization -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border shadow-sm p-2 rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Memory Utilization</h4>
+                                    <div class="fs-lg fw-bold text-dark">
+                                        {{(memoryUtilizationMetaData?.kpi?.allocated_used_percent?.avg || 0) | number:'1.2-2'}} 
+                                        <span class="text-muted small fw-medium">%</span>
+                                    </div>
+                                </div>
+                                <div class="icon-wrapper bg-primary bg-opacity-10">
+                                    <mat-icon style="cursor: pointer;" class="icon-sm text-primary" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Current memory utilization percentage of the node process">pie_chart</mat-icon>
+                                </div>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="memory-utilization-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource Stack (Memory + Capacity) -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="d-flex flex-column gap-3 h-100">
+                            <!-- Memory Usage -->
+                            <div class="card border shadow-sm p-2 rounded-3 bg-white flex-fill d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div>
+                                        <h4 class="text-11 fw-bold text-secondary mb-1">Memory Usage</h4>
+                                        <div class="fs-lg fw-bold text-dark">
+                                            {{memoryUsageMetaData?.kpi?.allocated_used_bytes?.avg | bytes:true}}
+                                        </div>
+                                    </div>
+                                    <div class="icon-wrapper bg-primary bg-opacity-10" (click)="toggleMemoryChart()" style="cursor: pointer;">
+                                        <mat-icon style="cursor: pointer;" class="icon-sm text-purple" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Physical memory used by the RabbitMQ process and Erlang VM">data_usage</mat-icon>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2" *ngIf="!memoryToggle">
+                                    <div class="progress rounded-pill mb-1" style="height: 10px;">
+                                        <div class="progress-bar bg-purple" role="progressbar" [style.width.%]="50"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-uppercase fw-bold text-muted" style="font-size: 9px;">
+                                        <span>Used: {{memoryUsageMetaData?.kpi?.allocated_used_bytes?.avg | bytes}}</span>
+                                        <span>Total: {{memoryUsageMetaData?.kpi?.allocated_total_bytes?.avg | bytes}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white chart-wrapper-xsm" *ngIf="memoryToggle">
+                                    <div id="memory-usage-chart" class="h-100"></div>
+                                </div>
+                            </div>
+
+                            <!-- Node Resources Monitor -->
+                            <div class="card border shadow-sm p-2 rounded-3 flex-fill d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="icon-wrapper bg-success bg-opacity-10">
+                                            <mat-icon class="text-success icon-sm" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Current operational health status of the RabbitMQ node">inventory_2</mat-icon>
+                                        </div>
+                                        <h4 class="text-11 fw-bold text-secondary mb-0 mt-1">Resource Health</h4>
+                                    </div>
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success" style="font-size: 8px;">Active</span>
+                                </div>
+                                
+                                <div class="row g-2">
+                                    <!-- Channels Monitor -->
+                                    <div class="col-6 text-center border-end border-light">
+                                        <p class="text-uppercase fw-semibold text-secondary mb-1" style="font-size: 8px; letter-spacing: 0.5px;">Channels</p>
+                                        <h6 class="fw-bold text-dark mb-1 fs-5">{{nodeKPI.channel_total || 0 | shortNumber}}</h6>
+                                        <div class="d-flex align-items-end justify-content-center bg-light rounded-1 overflow-hidden mx-auto" style="height:16px; gap:2px; width: 70%;">
+                                            <div class="bg-success bg-opacity-50" style="width:3px; height:40%"></div>
+                                            <div class="bg-success" style="width:3px; height:70%"></div>
+                                            <div class="bg-success bg-opacity-75" style="width:3px; height:50%"></div>
+                                            <div class="bg-success" style="width:3px; height:90%"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Queues Monitor -->
+                                    <div class="col-6 text-center">
+                                        <p class="text-uppercase text-secondary fw-semibold mb-1" style="font-size: 8px; letter-spacing: 0.5px;">Queues</p>
+                                        <h6 class="fw-bold text-dark mb-1 fs-5">{{nodeKPI.queue_total || 0 | shortNumber}}</h6>
+                                        <div class="d-flex align-items-end justify-content-center bg-light rounded-1 overflow-hidden mx-auto" style="height:16px; gap:2px; width: 70%;">
+                                            <div class="bg-primary bg-opacity-50" style="width:3px; height:30%"></div>
+                                            <div class="bg-primary bg-opacity-75" style="width:3px; height:60%"></div>
+                                            <div class="bg-primary" style="width:3px; height:40%"></div>
+                                            <div class="bg-primary bg-opacity-50" style="width:3px; height:80%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Message Rates -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border shadow-sm p-2 rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Message Rates</h4>
+                                    <p class="small text-muted fw-medium mb-0">Publish vs Deliver</p>
+                                </div>
+                                <div class="icon-wrapper bg-primary bg-opacity-10">
+                                    <mat-icon style="cursor: pointer;" class="icon-sm text-primary" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Aggregate rate of incoming and outgoing messages on this node">forum</mat-icon>
+                                </div>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="message-rates-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connections & Channels -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border shadow-sm p-2 rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Connections & Channels</h4>
+                                    <p class="small text-muted fw-medium mb-0">Network activity</p>
+                                </div>
+                                <div class="icon-wrapper bg-success bg-opacity-10">
+                                    <mat-icon style="cursor: pointer;" class="icon-sm text-success" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Active network connections and logical channels handled by this node">link</mat-icon>
+                                </div>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="connections-channels-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consumers & Publishers -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border shadow-sm p-2 rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Consumers & Publishers</h4>
+                                    <p class="small text-muted fw-medium mb-0">Active clients</p>
+                                </div>
+                                <div class="icon-wrapper bg-primary bg-opacity-10">
+                                    <mat-icon style="cursor: pointer;" class="icon-sm text-indigo" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Number of active consumers and publishers interacting with this node">people</mat-icon>
+                                </div>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="consumers-publishers-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Queue Stats -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border shadow-sm p-2 rounded-3 bg-white h-100 d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="text-11 fw-bold text-secondary mb-1">Queue Depth</h4>
+                                    <p class="small text-muted fw-medium mb-0">Ready vs Unacked</p>
+                                </div>
+                                <div class="icon-wrapper bg-warning bg-opacity-10">
+                                    <mat-icon style="cursor: pointer;" class="icon-sm text-warning" data-bs-toggle="tooltip" matButton="elevated" data-bs-placement="top" title="Total number of messages ready and unacknowledged in this node's queues">reorder</mat-icon>
+                                </div>
+                            </div>
+                            <div class="bg-white chart-wrapper-sm">
+                                <div id="queue-stats-chart" class="h-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Node Skeleton Template -->
+        <ng-template #nodeSkeletonTemplate>
+            <div class="flex-fill p-2 d-flex flex-column gap-2 mb-4">
+                <section class="mb-1">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Critical Indicators</h3>
+                    </div>
+                    <div class="row g-2 row-cols-2 row-cols-md-3 row-cols-lg-6 px-1">
+                        <div class="col" *ngFor="let s of skeletonRows.slice(0,11)">
+                            <div class="card shadow-sm border rounded-3 p-2 h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="skeleton" style="width:70px; height:10px; border-radius:4px;"></div>
+                                    <div class="skeleton" style="width:16px; height:16px; border-radius:50%;"></div>
+                                </div>
+                                <div class="skeleton" style="width:50px; height:18px; border-radius:4px; margin-bottom:6px;"></div>
+                                <div class="skeleton" style="width:60px; height:8px; border-radius:4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class="small fw-bold text-secondary text-uppercase ls-wider">System Health</h3>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6 col-lg-3 col-md-3" *ngFor="let s of [1,2]">
+                            <div class="card p-2 rounded-3 border shadow-sm h-100">
+                                <div class="skeleton" style="width:80px; height:10px; border-radius:4px; margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:60px; height:18px; border-radius:4px;"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 col-md-6">
+                            <div class="card p-2 rounded-3 bg-light shadow-sm h-100">
+                                <div class="skeleton" style="width:120px; height:12px; border-radius:4px; margin-bottom:12px;"></div>
+                                <div class="skeleton w-100" style="height:30px; border-radius:4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-2">
+                    <div class="flex align-items-center mb-2 px-1">
+                        <h3 class="small fw-bold text-secondary text-uppercase ls-wider">Node Metrics</h3>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-md-6" *ngFor="let s of skeletonRows.slice(0,6)">
+                            <div class="card border shadow-sm p-2 rounded-3 bg-white h-100">
+                                <div class="skeleton" style="width:100px; height:12px; border-radius:4px; margin-bottom:8px;"></div>
+                                <div class="skeleton" style="width:60px; height:8px; border-radius:4px; margin-bottom:12px;"></div>
+                                <div class="skeleton w-100" style="height:15vh; border-radius:8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </ng-template>
+    </div>
+    <ng-template #noData>
+        <span class="text-muted fw-normal" style="font-size: 0.85rem;">No Data</span>
+    </ng-template>
+</main>
+

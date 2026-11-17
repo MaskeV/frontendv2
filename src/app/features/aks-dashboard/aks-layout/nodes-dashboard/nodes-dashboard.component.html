@@ -1,0 +1,186 @@
+<div class="nodes-dashboard">
+
+<!-- ===== TABLE 1 ===== -->
+<div class="card">
+  <div class="card-title card-title-row">
+    <div>
+      Allocated and Allocatable Pods per Node <span>(Metrics Kubernetes)</span>
+    </div>
+
+    <button class="btn-download" (click)="downloadPodsAllocation()" [disabled]="podsAllocationList.length === 0">
+      ⬇ Download
+    </button>
+  </div>
+
+    <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Node</th>
+          <th>Allocated Pods</th>
+          <th>Total Allocatable Pods</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of paginatedPodsAllocation">
+          <td>{{ p.node }}</td>
+          <td>{{ p.pods_running }}</td>
+          <td>{{ p.pods_allocatable }}</td>
+        </tr>
+
+        <!-- optional empty state -->
+        <tr *ngIf="podsAllocationList.length === 0">
+          <td colspan="3" style="text-align:center;color:#64748b">
+            No pod allocation data available
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination Controls for Pod Allocation -->
+  <div class="pagination-controls" *ngIf="podsAllocationList.length > 0">
+    <button class="btn-download" (click)="prevPagePod()" [disabled]="podCurrentPage === 1">Previous</button>
+    <span>Page {{ podCurrentPage }} of {{ podTotalPages }}</span>
+    <button class="btn-download" (click)="nextPagePod()" [disabled]="podCurrentPage === podTotalPages">Next</button>
+  </div>
+</div>
+
+
+ <!-- ===== TABLE 2 ===== -->
+<div class="card">
+  <div class="card-title card-title-row">
+    <div>
+      Node Informations by Labels <span>(Metrics Kubernetes)</span>
+    </div>
+
+    <button class="btn-download" (click)="downloadNodeMetadata()" [disabled]="nodeMetadataList.length === 0">
+      ⬇ Download
+    </button>
+  </div>
+
+  <div class="table-wrapper table-wrapper-lg">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Node</th>
+          <th>Architecture</th>
+          <th>OS</th>
+          <th>Hostname</th>
+          <th>Ready</th>
+          <th>Unschedulable</th>
+          <th>Disk Pressure</th>
+          <th>Memory Pressure</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let n of paginatedNodeMetadata">
+          <td>{{ n.node }}</td>
+          <td>{{ n.arch }}</td>
+          <td>{{ n.os }}</td>
+          <td>{{ n.hostname }}</td>
+
+          <td
+            [ngClass]="{
+              'status-true': n.ready === 'true',
+              'status-false': n.ready === 'false'
+            }">
+            {{ n.ready }}
+          </td>
+
+          <td
+            [ngClass]="{
+              'status-true': n.unschedulable === 'true',
+              'status-false': n.unschedulable === 'false'
+            }">
+            {{ n.unschedulable }}
+          </td>
+
+          <td
+            [ngClass]="{
+              'status-true': n.disk_pressure === 'true',
+              'status-false': n.disk_pressure === 'false'
+            }">
+            {{ n.disk_pressure }}
+          </td>
+
+          <td
+            [ngClass]="{
+              'status-true': n.memory_pressure === 'true',
+              'status-false': n.memory_pressure === 'false'
+            }">
+            {{ n.memory_pressure }}
+          </td>
+        </tr>
+
+        <!-- optional empty state -->
+        <tr *ngIf="nodeMetadataList.length === 0">
+          <td colspan="8" style="text-align:center;color:#64748b">
+            No node metadata available
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination Controls for Node Metadata -->
+  <div class="pagination-controls" *ngIf="nodeMetadataList.length > 0">
+    <button class="btn-download" (click)="prevPageNode()" [disabled]="nodeCurrentPage === 1">Previous</button>
+    <span>Page {{ nodeCurrentPage }} of {{ nodeTotalPages }}</span>
+    <button class="btn-download" (click)="nextPageNode()" [disabled]="nodeCurrentPage === nodeTotalPages">Next</button>
+  </div>
+</div>
+
+  <!-- ===== CHARTS GRID (2 × 2) ===== -->
+  <div class="chart-grid">
+
+    <div class="card">
+      <div class="card-title">CPU usage by Node</div>
+      <highcharts-chart *ngIf="cpuChartOptions" [Highcharts]="Highcharts" [options]="cpuChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!cpuChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Memory usage by Node</div>
+      <highcharts-chart *ngIf="memoryChartOptions" [Highcharts]="Highcharts" [options]="memoryChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!memoryChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Working set Memory usage by Node</div>
+      <highcharts-chart *ngIf="workingSetChartOptions" [Highcharts]="Highcharts" [options]="workingSetChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!workingSetChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Network in by Node</div>
+      <highcharts-chart *ngIf="networkInChartOptions" [Highcharts]="Highcharts" [options]="networkInChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!networkInChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Network out by Node</div>
+      <highcharts-chart *ngIf="networkOutChartOptions" [Highcharts]="Highcharts" [options]="networkOutChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!networkOutChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Filesystem usage by Node</div>
+      <highcharts-chart *ngIf="filesystemChartOptions" [Highcharts]="Highcharts" [options]="filesystemChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!filesystemChartOptions" class="no-data">No data available</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Filesystem inodes usage by Node</div>
+      <highcharts-chart *ngIf="inodeChartOptions" [Highcharts]="Highcharts" [options]="inodeChartOptions">
+      </highcharts-chart>
+      <div *ngIf="!inodeChartOptions" class="no-data">No data available</div>
+    </div>
+
+  </div>
+
+</div>

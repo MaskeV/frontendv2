@@ -1,0 +1,948 @@
+<main class="py-0 my-0 mx-0">
+    <div class="scrollbar mb-2">
+
+        <div class="px-2 py-0 rounded ">
+            <header class="pb-0 mb-0">
+                <ul class="nav nav-tabs border-bottom">
+                    <li class="nav-item">
+                        <a class="nav-link active sm-font" aria-current="page" data-bs-toggle="tab"
+                            href="#standardReports">Standard
+                            Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sm-font" data-bs-toggle="tab" href="#applicationReport">Applications
+                            Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sm-font" data-bs-toggle="tab" href="#hostReport">Host Reports</a>
+                    </li>
+                </ul>
+            </header>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="standardReports">
+
+
+                <div class="custom-card mb-2 px-3 pb-3 pt-3 mt-0 mx-0">
+                    <div class="card shadow shadow-3">
+                        <div class="d-flex card-header smm-font justify-content-end align-items-center gap-1 ">
+                            <div class=" py-0 "><i class="fa-solid fa-download "></i></div>
+                            <!-- <div class=" py-1">
+                                <button
+                                    class="btn btn-sm  fw-bold border px-1 py-0 me-1 smm-font fontStyle-heading rounded-0"
+                                    style="height: 19px; border: none;" >+ add new</button>
+                            </div> -->
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%;">Report Name</th>
+                                            <th style="width: 10%;">Zone</th>
+                                            <th style="width: 10%;">Team</th>
+                                            <th style="width: 16%;">From Date</th>
+                                            <th style="width: 16%;">To Date</th>
+                                            <th style="width: 10%;">Generate</th>
+                                            <th style="width: 2%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="reportItems">
+                                        <tr *ngFor="let item of reportItems">
+                                            <td style="width: 20%;">{{ item.reportName }}</td>
+
+                                            <td style="width: 10%;">
+                                                <select class="form-control form-control-sm"
+                                                    [(ngModel)]="generateReportMap[item.id].zoneId"
+                                                    (ngModelChange)="onZoneChange($event, item.id)">
+                                                    <option value="0">-- Select --</option>
+                                                    <option *ngFor="let zone of zones" [value]="zone.id">{{ zone.name }}
+                                                    </option>
+                                                </select>
+                                            </td>
+
+                                            <td style="width: 10%;">
+                                                <select class="form-control form-control-sm"
+                                                    [(ngModel)]="generateReportMap[item.id].teamId">
+                                                    <option value="0">-- Select --</option>
+                                                    <option *ngFor="let team of teams[item.id]" [value]="team.id">{{
+                                                        team.name }}</option>
+                                                </select>
+                                            </td>
+
+                                            <td style="width: 16%;">
+                                                <input type="date" class="form-control form-control-sm"
+                                                    [(ngModel)]="generateReportMap[item.id].st">
+                                            </td>
+
+                                            <td style="width: 16%;">
+                                                <input type="date" class="form-control form-control-sm"
+                                                    [(ngModel)]="generateReportMap[item.id].et">
+                                            </td>
+
+                                            <td style="width: 6%;" class="text-link"
+                                                (click)="generateReport(generateReportMap[item.id])">Generate</td>
+
+                                            <td style="width: 6%;" class="text-link" (click)="schedule()">Schedule</td>
+                                        </tr>
+                                    </tbody>
+                                    <div *ngIf="!reportItems || reportItems.length === 0" class="noData"
+                                        style="height: 40vh;">
+                                        <h4>No Data Available</h4>
+                                    </div>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="my-0 py-0">
+                        <div class="my-0 py-1 sm-font px-2 fw-bold fontStyle-heading">
+                            History
+                        </div>
+                        <div class="table-responsive small p-1 card-shadow">
+                            <div class="d-flex smm-font justify-content-end align-items-center gap-3">
+                                <div>Total: {{ totalItems }} | </div>
+                                <i class="fa-solid fa-download me-1"></i>
+                            </div>
+                            <div>
+                                <table class="table striped table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 25%;" scope="col">Report Name</th>
+                                            <th style="width: 15%;" scope="col">Zone</th>
+                                            <th style="width: 15%;" scope="col">Team</th>
+                                            <th style="width: 15%;" scope="col">From Date</th>
+                                            <th style="width: 15%;" scope="col">To Date</th>
+                                            <th style="width: 15%;" scope="col">Generated On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="reportHistoryData">
+                                        <tr *ngFor="let item of reportHistoryData | paginate: currentPage: pageSize">
+                                            <td style="width: 25%;">{{ item.reportName }}</td>
+                                            <td style="width: 15%;">{{ zoneIdNameMap[item.zoneId] || 'Unknown Zone' }}
+                                            </td>
+                                            <td style="width: 15%;">{{ teamIdNameMap[item.teamId] || 'Unknown Team' }}
+                                            </td>
+                                            <td style="width: 15%;">{{ item.fromDate }}</td>
+                                            <td style="width: 15%;">{{ item.toDate }}</td>
+                                            <td style="width: 15%;">{{ formatDate3(item.generatedOn) }}</td>
+                                        </tr>
+                                    </tbody>
+                                    <div *ngIf="!reportHistoryData || reportHistoryData.length === 0" class="noData"
+                                        style="height: 40vh;">
+                                        <h4>No Data Available</h4>
+                                    </div>
+                                </table>
+
+                                <div class="d-flex justify-content-end  my-1">
+                                    <!-- Showing Range -->
+                                    <!-- <div class="me-2">
+                                            {{ (currentPage - 1) * pageSize + 1 }} -
+                                            {{ getEndIndex() }} of {{ totalItems }}
+                                        </div> -->
+
+
+
+                                    <!-- Arrows and Page Number -->
+                                    <div class="d-flex me-2 ">
+                                        <div class="d-flex justify-content-end  my-1">
+                                            <!-- Showing Range -->
+                                            <!-- <div class="me-2">
+                                            {{ (currentPage - 1) * pageSize + 1 }} -
+                                            {{ getEndIndex() }} of {{ totalItems }}
+                                        </div> -->
+
+
+
+                                            <!-- Arrows and Page Number -->
+                                            <div class="d-flex me-2 ">
+
+                                                <div class="pagination-container">
+                                                    <button class="py-0 px-2"
+                                                        (click)="currentPage = currentPage - 1;this.inputPage=this.currentPage"
+                                                        [disabled]="currentPage <= 1">
+                                                        <i class="fa-solid fa-angle-left icon-color"></i>
+                                                    </button>
+
+
+                                                    <span class="page-number">
+                                                        Page
+                                                        <input type="number" [(ngModel)]="inputPage"
+                                                            (keydown.enter)="goToPage()" class="page-input" />
+                                                        of {{ totalPages }}
+                                                    </span>
+
+                                                    <button class="py-0 px-2"
+                                                        (click)="currentPage = currentPage + 1;this.inputPage=this.currentPage"
+                                                        [disabled]="currentPage >= totalPages">
+                                                        <i class="fa-solid fa-angle-right icon-color"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="applicationReport">
+                <div class="custom-card">
+                    <div class="card shadow shadow-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">APPLICATION REPORT</h5>
+                            <div class="d-flex align-items-center">
+                                <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                    [ngClass]="{ 'search-input-hidden': !showSearch }" [(ngModel)]="searchQuery"
+                                    (input)="onSearch()" />
+                                <i class="fas fa-search mr-3" (click)="toggleSearch()" style="cursor: pointer;"></i>
+                                <i class="fas fa-download" (click)="downloadReport()" style="cursor: pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="dynamic-table table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th (click)="onSort('name')" style="cursor: pointer;">Application Name
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort('version')" style="cursor: pointer;">Version &nbsp;<i
+                                                    class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort('source')" style="cursor: pointer;">Source &nbsp;<i
+                                                    class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort('hostCount')" style="cursor: pointer;">Host Count
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th>License</th>
+                                            <th>Parameter</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="pagedReports.length !== 0">
+                                        <ng-container *ngFor="let report of pagedReports; let i = index">
+                                            <tr>
+                                                <td class="text-link" style="cursor: pointer;"
+                                                    (click)="toggleDetailApp(report.name, report.id)">
+                                                    {{ expandedAppName === report.id ? '▼' : '▶' }}&nbsp;{{ report.name
+                                                    }}
+                                                </td>
+                                                <td>{{ report.version }}</td>
+                                                <td>{{ report.source }}</td>
+                                                <td>{{ report.hostCount }}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            <tr *ngIf="expandedAppName === report.id">
+                                                <td colspan="11" style="background-color: #e2e2e2">
+                                                    <div class="table-responsive mt-1">
+                                                        <table class="table table-hover mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th (click)="onSort_1('hostname')"
+                                                                        style="cursor: pointer;">User Name
+                                                                        &nbsp;<i class="fa-solid fa-sort"></i>
+                                                                    </th>
+                                                                    <th (click)="onSort_1('version')"
+                                                                        style="cursor: pointer;">Version
+                                                                        &nbsp;<i class="fa-solid fa-sort"></i>
+                                                                    </th>
+                                                                    <th (click)="onSort_1('source')"
+                                                                        style="cursor: pointer;">Source &nbsp;<i
+                                                                            class="fa-solid fa-sort"></i></th>
+                                                                    <th (click)="onSort_1('installedPath')"
+                                                                        style="cursor: pointer;">Installed
+                                                                        Path &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                                                    <th (click)="onSort_1('lastOpenedAt')"
+                                                                        style="cursor: pointer;">Last Access
+                                                                        &nbsp;<i class="fa-solid fa-sort"></i>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody *ngIf="pagedReports_1.length !== 0"
+                                                                style="max-height: 29vh;">
+                                                                <tr
+                                                                    *ngFor="let report of pagedReports_1; let i = index">
+                                                                    <td>{{ report.hostname }}</td>
+                                                                    <td>{{ report.version }}</td>
+                                                                    <td>{{ report.source }}</td>
+                                                                    <td>{{ getSafeValue(report.installedPath) }}
+                                                                    </td>
+                                                                    <td>{{ report.lastOpenedAt }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                            <div class="noData d-flex justify-content-center align-items-center"
+                                                                style="height: 29vh;"
+                                                                *ngIf="pagedReports_1.length === 0">
+                                                                <h4>No Data to Display</h4>
+                                                            </div>
+                                                        </table>
+                                                        <div class="col-12 d-flex justify-content-end"
+                                                            style="margin-top: 10px;">
+                                                            <nav class="mb-1 mr-1">
+                                                                <ul class="pagination justify-content-center align-items-center"
+                                                                    style="font-size: small; gap: 0.5rem;">
+                                                                    <li class="page-item"
+                                                                        [class.disabled]="currentPage_1 === 1">
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-outline-secondary"
+                                                                            (click)="previousPage_1()"
+                                                                            [disabled]="currentPage_1 === 1"
+                                                                            tabindex="0">
+                                                                            &laquo; Previous
+                                                                        </button>
+                                                                    </li>
+
+                                                                    <li class="page-item d-flex align-items-center">
+                                                                        <input type="number"
+                                                                            class="form-control form-control-sm text-center"
+                                                                            style="width:60px" [value]="currentPage_1"
+                                                                            (keydown.enter)="goToPage_1(inputPage_1.value)"
+                                                                            #inputPage_1 min="1" [max]="totalPages_1"
+                                                                            aria-label="Page number input" />
+                                                                        <span class="ms-2"> of {{ totalPages_1
+                                                                            }}</span>
+                                                                    </li>
+
+                                                                    <li class="page-item"
+                                                                        [class.disabled]="currentPage_1 === totalPages_1">
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-outline-secondary"
+                                                                            (click)="nextPage_1()"
+                                                                            [disabled]="currentPage_1 === totalPages_1"
+                                                                            tabindex="0">
+                                                                            Next &raquo;
+                                                                        </button>
+                                                                    </li>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+
+                                    </tbody>
+                                    <div class="noData d-flex justify-content-center align-items-center"
+                                        *ngIf="pagedReports.length === 0">
+                                        <h4>No Data to Display</h4>
+                                    </div>
+                                </table>
+                                <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                    <nav class="mb-1 mr-1">
+                                        <ul class="pagination justify-content-center align-items-center"
+                                            style="font-size: small; gap: 0.5rem;">
+                                            <li class="page-item" [class.disabled]="currentPageReport === 1">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    (click)="previousPage()" [disabled]="currentPageReport === 1"
+                                                    tabindex="0">
+                                                    &laquo; Previous
+                                                </button>
+                                            </li>
+
+                                            <li class="page-item d-flex align-items-center">
+                                                <input type="number" class="form-control form-control-sm text-center"
+                                                    style="width:60px" [value]="currentPageReport"
+                                                    (keydown.enter)="goToPageReport(inputPageReport.value)"
+                                                    #inputPageReport min="1" [max]="totalPagesReport"
+                                                    aria-label="Page number input" />
+                                                <span class="ms-2"> of {{ totalPagesReport }}</span>
+                                            </li>
+
+                                            <li class="page-item"
+                                                [class.disabled]="currentPageReport === totalPagesReport">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    (click)="nextPage()"
+                                                    [disabled]="currentPageReport === totalPagesReport" tabindex="0">
+                                                    Next &raquo;
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="hostReport">
+                <div class="custom-card">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">HOST REPORT</h5>
+                            <div class="d-flex align-items-center">
+                                <input type="text" class="form-control form-control-sm mr-2" style="width: 200px;"
+                                    [ngClass]="{ 'search-input-hidden': !showSearch2 }" [(ngModel)]="searchQuery2"
+                                    (input)="onSearch2()" />
+                                <i class="fas fa-search mr-3" (click)="toggleSearch2()" style="cursor: pointer;"></i>
+                                <i class="fas fa-download" (click)="downloadReport2()" style="cursor: pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th (click)="onSort2('publicIp')" style="cursor: pointer;">IP Address
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('hostname')" style="cursor: pointer;">Hostname &nbsp;<i
+                                                    class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('platform')" style="cursor: pointer;">Platform &nbsp;<i
+                                                    class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('osVersion')" style="cursor: pointer;">OS Version
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('uptime')" style="cursor: pointer;">Uptime (Days)
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('cpuPhysicalCores')" style="cursor: pointer;">CPU Cores
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('memory')" style="cursor: pointer;">Memory (GB)
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('hardwareVendor')" style="cursor: pointer;">Vendor
+                                                &nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('lastEnrolledAt')" style="cursor: pointer;">Last
+                                                Enrolled At&nbsp;<i class="fa-solid fa-sort"></i></th>
+                                            <th (click)="onSort2('seenTime')" style="cursor: pointer;">Last Seen&nbsp;<i
+                                                    class="fa-solid fa-sort"></i></th>
+                                            <th>Complaint Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="pagedReports2.length !== 0">
+                                        <ng-container *ngFor="let report of pagedReports2; let i = index">
+                                            <tr>
+                                                <td class="text-link" style="cursor: pointer;"
+                                                    (click)="toggleDetail(report.id, report.publicIp)">
+                                                    {{ expandedReportId === report.id ? '▼' : '▶' }}&nbsp;{{
+                                                    report.publicIp }}
+                                                </td>
+                                                <td class="scroll-cell" [title]="report.hostname">{{ report.hostname }}
+                                                </td>
+                                                <td>{{ report.platform }}</td>
+                                                <td class="scroll-cell" [title]="report.osVersion">{{ report.osVersion
+                                                    }}</td>
+                                                <td>{{ report.uptime / (1000 * 1000 * 1000 * 60 * 60 * 24) |
+                                                    number:'1.2-2' }}</td>
+                                                <td>{{ report.cpuPhysicalCores }}</td>
+                                                <td>{{ report.memory / (1024 * 1024 * 1024) | number:'1.2-2' }}</td>
+                                                <td>{{ report.hardwareVendor }}</td>
+                                                <td class="scroll-cell" [title]="report.lastEnrolledAt">{{
+                                                    report.lastEnrolledAt | date:'short' }}</td>
+                                                <td class="scroll-cell" [title]="report.seenTime">{{ report.seenTime |
+                                                    date:'short' }}</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <tr *ngIf="expandedReportId === report.id">
+                                                <td colspan="11">
+                                                    <div class="card" style="background-color: #e2e2e2; border-radius: 0px;">
+                                                        <div class="card-header d-flex justify-content-between align-items-center"
+                                                            style="height: 30px; background-color: transparent;">
+                                                            <h5 class="mb-0">HOST DETAILED REPORT ({{ selectedIpAddress
+                                                                }})</h5>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-download" (click)="downloadReport3()"
+                                                                    style="cursor: pointer;"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-body"
+                                                            style="height: 78vh; overflow: auto; font-size: 11px;">
+                                                            <div class="custom-card">
+                                                                <h5 class="mb-0" style="font-weight: 500;">Summary</h5>
+                                                                <br>
+                                                                <div class="p-3 shadow shadow-3"
+                                                                    style="background-color: var(--bg-color);">
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Name</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.hostname"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Status</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [(ngModel)]="selectedReport.status"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">IP</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.publicIp"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Environment</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.env"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Platform</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.platform"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">CPU
+                                                                                    Type</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.cpuType"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">CPU
+                                                                                    Brand</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.cpuBrand"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Model</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [(ngModel)]="selectedReport.hardwareModel"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">OS
+                                                                                    Version</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.osVersion"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Serial</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [(ngModel)]="selectedReport.hardwareSerial"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="custom-card mt-2">
+                                                                <h5 class=" mt-2 mb-0" style="font-weight: 500;">Details
+                                                                </h5>
+                                                                <br>
+                                                                <div class="p-3 shadow shadow-3"
+                                                                    style="background-color: var(--bg-color);">
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Domain</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.domain"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Uptime</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="formattedUptime"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label class="col-md-3 col-form-label"
+                                                                                    style="padding: 7px;">Last Patch
+                                                                                    Update Name</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [value]="selectedReport?.lastPatchUpdateName"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">Last
+                                                                                    Patch Update Date</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [(ngModel)]="selectedReport.lastPatchUpdateDate"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div *ngIf="userEmailSource?.length !== 0"
+                                                                        class="row">
+                                                                        <div class="form-group col-md-6">
+                                                                            <div class="row">
+                                                                                <label
+                                                                                    class="col-md-3 col-form-label">{{userEmailSource}}</label>
+                                                                                <div class="col-md-9">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-sm"
+                                                                                        [(ngModel)]="userEmail"
+                                                                                        readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-2">
+                                                                <div style="width: 50%;">
+                                                                    <div class="custom-card">
+                                                                        <div
+                                                                            class="card-header d-flex justify-content-between align-items-center">
+                                                                            <h6 class="mb-0" style="font-weight: 500;">
+                                                                                List of Applications</h6>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="text"
+                                                                                    class="form-control form-control-sm mr-2"
+                                                                                    style="width: 200px;"
+                                                                                    [ngClass]="{ 'search-input-hidden': !showSearch3 }"
+                                                                                    [(ngModel)]="searchQuery3"
+                                                                                    (input)="onSearch3()" />
+                                                                                <i class="fas fa-search mr-3"
+                                                                                    (click)="toggleSearch3()"
+                                                                                    style="cursor: pointer;"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="table-responsive shadow shadow-3">
+                                                                            <table class="table table-hover mb-0">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th (click)="onSort3('name')"
+                                                                                            style="cursor: pointer;">
+                                                                                            Application
+                                                                                            Names &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                        <th (click)="onSort3('version')"
+                                                                                            style="cursor: pointer;">
+                                                                                            Versions
+                                                                                            &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                        <th (click)="onSort3('updatedDate')"
+                                                                                            style="cursor: pointer;">
+                                                                                            Updated Date &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody
+                                                                                    *ngIf="pagedReports3.length !== 0"
+                                                                                    style="max-height: 40vh;">
+                                                                                    <tr
+                                                                                        *ngFor="let report of pagedReports3; let i = index">
+                                                                                        <td>{{ report.name }}</td>
+                                                                                        <td>{{ report.version }}</td>
+                                                                                        <td></td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                                <div class="noData d-flex justify-content-center align-items-center"
+                                                                                    style="height: 12vh;"
+                                                                                    *ngIf="pagedReports3.length === 0">
+                                                                                    <h4>No Data to Display</h4>
+                                                                                </div>
+                                                                            </table>
+                                                                            <div class="col-12 d-flex justify-content-end"
+                                                                                style="margin-top: 10px;">
+                                                                                <nav class="mb-1 mr-1">
+                                                                                    <ul class="pagination justify-content-center align-items-center"
+                                                                                        style="font-size: small; gap: 0.5rem;">
+                                                                                        <li class="page-item"
+                                                                                            [class.disabled]="currentPage3 === 1">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-sm btn-outline-secondary"
+                                                                                                (click)="previousPage3()"
+                                                                                                [disabled]="currentPage3 === 1"
+                                                                                                tabindex="0">
+                                                                                                &laquo; Previous
+                                                                                            </button>
+                                                                                        </li>
+
+                                                                                        <li
+                                                                                            class="page-item d-flex align-items-center">
+                                                                                            <input type="number"
+                                                                                                class="form-control form-control-sm text-center"
+                                                                                                style="width:60px"
+                                                                                                [value]="currentPage3"
+                                                                                                (keydown.enter)="goToPage3(inputPage3.value)"
+                                                                                                #inputPage3 min="1"
+                                                                                                [max]="totalPages3"
+                                                                                                aria-label="Page number input" />
+                                                                                            <span class="ms-2"> of {{
+                                                                                                totalPages3 }}</span>
+                                                                                        </li>
+
+                                                                                        <li class="page-item"
+                                                                                            [class.disabled]="currentPage3 === totalPages3">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-sm btn-outline-secondary"
+                                                                                                (click)="nextPage3()"
+                                                                                                [disabled]="currentPage3 === totalPages3"
+                                                                                                tabindex="0">
+                                                                                                Next &raquo;
+                                                                                            </button>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </nav>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div style="width: 50%;">
+                                                                    <div class="custom-card">
+                                                                        <div
+                                                                            class="card-header d-flex justify-content-between align-items-center">
+                                                                            <h6 class="mb-0" style="font-weight: 500;">
+                                                                                Local User Accounts</h6>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="text"
+                                                                                    class="form-control form-control-sm mr-2"
+                                                                                    style="width: 200px;"
+                                                                                    [ngClass]="{ 'search-input-hidden': !showSearch4 }"
+                                                                                    [(ngModel)]="searchQuery4"
+                                                                                    (input)="onSearch4()" />
+                                                                                <i class="fas fa-search mr-3"
+                                                                                    (click)="toggleSearch4()"
+                                                                                    style="cursor: pointer;"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div
+                                                                            class="table-responsive mt-1 shadow shadow-3">
+                                                                            <table class="table table-hover mb-0">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th (click)="onSort4('userName')"
+                                                                                            style="cursor: pointer;">
+                                                                                            User
+                                                                                            Names &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                        <th (click)="onSort4('groupName')"
+                                                                                            style="cursor: pointer;">
+                                                                                            Group
+                                                                                            Name &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                        <th (click)="onSort4('shell')"
+                                                                                            style="cursor: pointer;">
+                                                                                            Shell
+                                                                                            &nbsp;<i
+                                                                                                class="fa-solid fa-sort"></i>
+                                                                                        </th>
+                                                                                        <th>Last Login</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody
+                                                                                    *ngIf="pagedReports4.length !== 0"
+                                                                                    style="max-height: 40vh;">
+                                                                                    <tr
+                                                                                        *ngFor="let report of pagedReports4; let i = index">
+                                                                                        <td>{{ report.userName }}</td>
+                                                                                        <td>{{ report.groupName }}</td>
+                                                                                        <td>{{ report.shell }}</td>
+                                                                                        <td></td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                                <div class="noData d-flex justify-content-center align-items-center"
+                                                                                    style="height: 12vh;"
+                                                                                    *ngIf="pagedReports4.length === 0">
+                                                                                    <h4>No Data to Display</h4>
+                                                                                </div>
+                                                                            </table>
+                                                                            <div class="col-12 d-flex justify-content-end"
+                                                                                style="margin-top: 10px;">
+                                                                                <nav class="mb-1 mr-1">
+                                                                                    <ul class="pagination justify-content-center align-items-center"
+                                                                                        style="font-size: small; gap: 0.5rem;">
+                                                                                        <li class="page-item"
+                                                                                            [class.disabled]="currentPage4 === 1">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-sm btn-outline-secondary"
+                                                                                                (click)="previousPage4()"
+                                                                                                [disabled]="currentPage4 === 1"
+                                                                                                tabindex="0">
+                                                                                                &laquo; Previous
+                                                                                            </button>
+                                                                                        </li>
+
+                                                                                        <li
+                                                                                            class="page-item d-flex align-items-center">
+                                                                                            <input type="number"
+                                                                                                class="form-control form-control-sm text-center"
+                                                                                                style="width:60px"
+                                                                                                [value]="currentPage4"
+                                                                                                (keydown.enter)="goToPage4(inputPage4.value)"
+                                                                                                #inputPage4 min="1"
+                                                                                                [max]="totalPages4"
+                                                                                                aria-label="Page number input" />
+                                                                                            <span class="ms-2"> of {{
+                                                                                                totalPages4 }}</span>
+                                                                                        </li>
+
+                                                                                        <li class="page-item"
+                                                                                            [class.disabled]="currentPage4 === totalPages4">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-sm btn-outline-secondary"
+                                                                                                (click)="nextPage4()"
+                                                                                                [disabled]="currentPage4 === totalPages4"
+                                                                                                tabindex="0">
+                                                                                                Next &raquo;
+                                                                                            </button>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </nav>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+
+                                    <div class="noData d-flex justify-content-center align-items-center"
+                                        *ngIf="pagedReports2.length === 0">
+                                        <h4>No Data to Display</h4>
+                                    </div>
+                                </table>
+                                <div class="col-12 d-flex justify-content-end" style="margin-top: 10px;">
+                                    <nav class="mb-1 mr-1">
+                                        <ul class="pagination justify-content-center align-items-center"
+                                            style="font-size: small; gap: 0.5rem;">
+                                            <li class="page-item" [class.disabled]="currentPage2 === 1">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    (click)="previousPage2()" [disabled]="currentPage2 === 1"
+                                                    tabindex="0">
+                                                    &laquo; Previous
+                                                </button>
+                                            </li>
+
+                                            <li class="page-item d-flex align-items-center">
+                                                <input type="number" class="form-control form-control-sm text-center"
+                                                    style="width:60px" [value]="currentPage2"
+                                                    (keydown.enter)="goToPage2(inputPage2.value)" #inputPage2 min="1"
+                                                    [max]="totalPages2" aria-label="Page number input" />
+                                                <span class="ms-2"> of {{ totalPages2 }}</span>
+                                            </li>
+
+                                            <li class="page-item" [class.disabled]="currentPage2 === totalPages2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    (click)="nextPage2()" [disabled]="currentPage2 === totalPages2"
+                                                    tabindex="0">
+                                                    Next &raquo;
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <app-standard-form *ngIf="addReport" (closeForm)="handleCloseForm()"></app-standard-form>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div *ngIf="toast.visible" class="toast-box" [ngClass]="toast.type">
+    {{ toast.message }}
+</div>

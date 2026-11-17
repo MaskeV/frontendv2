@@ -1,0 +1,223 @@
+<div class="page">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-bar">
+    <div class="header-right">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input class="search" placeholder="Search dashboards..." [(ngModel)]="searchText" />
+      </div>
+      <button class="sort-btn" (click)="toggleSort()">
+        <i class="fa-solid fa-arrow-up-wide-short"></i>
+        <span>{{ sortAsc ? 'A → Z' : 'Z → A' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== CARD GRID ===== -->
+  <div class="grid-scroll">
+
+    <div class="card-grid" *ngIf="filteredDashboards.length > 0">
+      <div class="dash-card" *ngFor="let d of filteredDashboards; let i = index" [style.animation-delay]="i * 45 + 'ms'"
+        [attr.data-slug]="d.slug" [routerLink]="[d.slug]">
+
+        <div class="card-accent"></div>
+        <div class="card-glow"></div>
+
+        <!-- Icon + Name inline -->
+        <div class="card-top">
+          <div class="card-icon" [attr.data-slug]="d.slug">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <ng-container [ngSwitch]="d.slug">
+
+                <ng-container *ngSwitchCase="'api-server'">
+                  <!-- central server -->
+                  <rect x="9" y="4" width="6" height="4" rx="1.5" />
+
+                  <!-- connections -->
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="6" y1="14" x2="18" y2="14" />
+
+                  <!-- nodes -->
+                  <circle cx="6" cy="14" r="1.5" />
+                  <circle cx="12" cy="14" r="1.5" />
+                  <circle cx="18" cy="14" r="1.5" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'cluster-overview'">
+                  <circle cx="12" cy="12" r="3" />
+                  <circle cx="12" cy="4" r="1.5" />
+                  <circle cx="20" cy="12" r="1.5" />
+                  <circle cx="12" cy="20" r="1.5" />
+                  <circle cx="4" cy="12" r="1.5" />
+                  <line x1="12" y1="5.5" x2="12" y2="9" />
+                  <line x1="18.5" y1="12" x2="15" y2="12" />
+                  <line x1="12" y1="18.5" x2="12" y2="15" />
+                  <line x1="5.5" y1="12" x2="9" y2="12" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'daemonsets'">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'deployments'">
+                  <rect x="2" y="2" width="9" height="9" rx="1.5" />
+                  <rect x="13" y="2" width="9" height="9" rx="1.5" />
+                  <rect x="2" y="13" width="9" height="9" rx="1.5" />
+                  <rect x="13" y="13" width="9" height="9" rx="1.5" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'nodes'">
+                  <rect x="2" y="3" width="20" height="4" rx="1.5" />
+                  <rect x="2" y="10" width="20" height="4" rx="1.5" />
+                  <rect x="2" y="17" width="20" height="4" rx="1.5" />
+                  <circle cx="5.5" cy="5" r="1" fill="currentColor" stroke="none" />
+                  <circle cx="5.5" cy="12" r="1" fill="currentColor" stroke="none" />
+                  <circle cx="5.5" cy="19" r="1" fill="currentColor" stroke="none" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'pv-pvc'">
+                  <ellipse cx="12" cy="7" rx="9" ry="3" />
+                  <path d="M3 7v5c0 1.66 4.03 3 9 3s9-1.34 9-3V7" />
+                  <path d="M3 12v5c0 1.66 4.03 3 9 3s9-1.34 9-3v-5" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'pods'">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="4" />
+                  <line x1="12" y1="3" x2="12" y2="8" />
+                  <line x1="12" y1="16" x2="12" y2="21" />
+                  <line x1="3" y1="12" x2="8" y2="12" />
+                  <line x1="16" y1="12" x2="21" y2="12" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'proxy'">
+                  <rect x="2" y="2" width="8" height="8" rx="1.5" />
+                  <rect x="14" y="2" width="8" height="8" rx="1.5" />
+                  <rect x="2" y="14" width="8" height="8" rx="1.5" />
+                  <rect x="14" y="14" width="8" height="8" rx="1.5" />
+                  <path d="M10 6h4M6 10v4M18 10v4M10 18h4" stroke-dasharray="1.5 1.5" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'services'">
+                  <circle cx="12" cy="5" r="2" />
+                  <circle cx="5" cy="19" r="2" />
+                  <circle cx="19" cy="19" r="2" />
+                  <path d="M12 7v4M9.5 17.5L7 17M14.5 17.5L17 17" />
+                  <rect x="9" y="11" width="6" height="4" rx="1" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'statefulsets'">
+                  <rect x="3" y="3" width="18" height="4" rx="2" />
+                  <rect x="3" y="10" width="18" height="4" rx="2" />
+                  <rect x="3" y="17" width="18" height="4" rx="2" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'volumes'">
+                  <path
+                    d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                  <line x1="12" y1="22.08" x2="12" y2="12" />
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'logs'">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="8" y1="13" x2="16" y2="13" />
+                  <line x1="8" y1="17" x2="12" y2="17" />
+                </ng-container>
+
+                <ng-container *ngSwitchDefault>
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </ng-container>
+
+              </ng-container>
+            </svg>
+          </div>
+          <h3 class="card-title">{{ getDisplayName(d.name) }}</h3>
+        </div>
+
+        <!-- Description -->
+        <p class="card-desc">{{ d.description }}</p>
+
+        <!-- Footer -->
+        <div class="card-footer">
+
+          <!-- LEFT SECTION (NEW STRUCTURE) -->
+          <div class="footer-metric-container">
+
+            <!-- PRIMARY METRIC -->
+            <ng-container *ngIf="getMetricForSlug(d.slug) !== null">
+              <div class="metric-badge" [attr.data-slug]="d.slug">
+
+                <div class="metric-right">
+                  <span class="metric-label">TOTAL</span>
+                  <span class="metric-sublabel">{{ getSlugLabel(d.slug) }}</span>
+                </div>
+
+                <span class="metric-value">
+                  <span *ngIf="isLoading" class="metric-skeleton"></span>
+                  <span *ngIf="!isLoading">{{ getMetricForSlug(d.slug) }}</span>
+                </span>
+
+              </div>
+            </ng-container>
+
+            <!-- LOGS SECTION -->
+            <div class="logs-row" *ngIf="nodeData && d.slug === 'logs'">
+
+              <div class="log-item info">
+                <!-- <span class="log-dot"></span> -->
+                <span class="log-value">{{ nodeData.infoLogs }}</span>
+              </div>
+
+              <div class="log-item warn">
+                <!-- <span class="log-dot"></span> -->
+                <span class="log-value">{{ nodeData.warnLogs }}</span>
+              </div>
+
+              <div class="log-item error">
+                <!-- <span class="log-dot"></span> -->
+                <span class="log-value">{{ nodeData.errorLogs }}</span>
+              </div>
+
+            </div>
+
+            <!-- SPACER -->
+            <span *ngIf="getMetricForSlug(d.slug) === null" class="metric-spacer"></span>
+
+          </div>
+
+          <!-- RIGHT ARROW (UNCHANGED) -->
+          <div class="card-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="filteredDashboards.length === 0" class="empty-state">
+      <div class="empty-orb">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+      </div>
+      <h4>No dashboards found</h4>
+      <p>Try adjusting your search</p>
+    </div>
+
+  </div>
+</div>

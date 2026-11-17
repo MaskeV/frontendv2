@@ -1,0 +1,189 @@
+<main class="py-0 my-0">
+    <div class="scrollbar mb-2">
+
+        <div class=" p-1 rounded ">
+            <header class="pb-0 mb-0 ">
+                <ul class="nav nav-tabs border-bottom">
+                    <li class="nav-item ">
+                        <a class="nav-link active  sm-font" aria-current="page" href="#">Custom Reports</a>
+                    </li>
+                </ul>
+            </header>
+            <!-- <div class="d-flex mt-1 align-items-center py-0">
+                <div class="d-flex smm-font ">
+                    <span>Report Name : </span><b class="ms-3 fontStyle-heading"> Printer Details</b>
+                </div>
+                <div class="d-flex   align-items-center ms-3">
+                    <button class="btn btn-sm light-btn  border px-2 py-0 smm-font rounded-0"
+                        [routerLink]="['/custom-reports/custom-report-form']">Edit</button>
+                    <button class="btn btn-sm light-btn border px-2 py-0 mx-2 smm-font rounded-0">Save</button>
+                    <button class="btn btn-sm light-btn border px-2 py-0 smm-font rounded-0">Cancel</button>
+
+                </div>
+            </div> -->
+        </div>
+
+        <div>
+            <app-custom-report-form  *ngIf="addReport"  (closeForm)="handleCloseForm()"></app-custom-report-form>
+        </div>
+
+        <div class="custom-bg mb-2">
+
+            <div class="table-responsive small p-1 mt-1 card-shadow">
+                <div class="d-flex smm-font justify-content-end align-items-center gap-1 ">
+                    <div class=" py-1 " style="">Total: {{ totalItems }} |  <i class="fa-solid fa-download me-1"></i></div>
+                    <div class=" py-1">
+
+                        <button class="btn btn-sm light-btn fw-bold border px-1 py-0 me-1 smm-font fontStyle-heading rounded-0"
+                            (click)="addNew()">add new</button>
+                    </div>
+
+                   
+
+
+                </div>
+                <div class=" ">
+
+
+                    <table class="table striped table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Hardware Name</th>
+                                <th scope="col">Hardware Detected Time</th>
+                                <th scope="col">Manufacturer</th>
+                                <th scope="col">Network Installations</th>
+                                <th scope="col">Managed Installations</th>
+                                <th scope="col">Printer Driver Name</th>
+                                <th scope="col">Printer Port Name</th>
+                                <th scope="col">Default Printer</th>
+                                <th scope="col">Printer Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of pagedData">
+                                <td>{{ item.hardwareName }}</td>
+                                <td>{{ item.detectedTime }}</td>
+                                <td>{{ item.manufacturer }}</td>
+                                <td>{{ item.networkInstallations }}</td>
+                                <td>{{ item.managedInstallations }}</td>
+                                <td>{{ item.driverName }}</td>
+                                <td>{{ item.portName }}</td>
+                                <td>{{ item.defaultPrinter }}</td>
+                                <td>{{ item.printerType }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-end  my-1">
+                        <!-- Showing Range -->
+                        <div class="me-2">
+                            {{ (currentPage - 1) * pageSize + 1 }} -
+                            {{ getEndIndex() }} of {{ totalItems }}
+                        </div>
+
+
+
+                        <!-- Arrows and Page Number -->
+                        <div class="d-flex me-2 ">
+                            <button class="btn btn-sm bg-white  border  py-0" [disabled]="currentPage === 1"
+                                (click)="changePage(currentPage - 1)">
+                                ‹
+                            </button>
+                            <!-- Page Size Dropdown -->
+
+
+                            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
+                                class="form-select form-select-sm mx-1 w-auto py-0">
+                                <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                            </select>
+
+                            <button class="btn btn-sm bg-white  border  py-0" [disabled]="currentPage === totalPages"
+                                (click)="changePage(currentPage + 1)">
+                                ›
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="my-0 py-0">
+                <div class="my-0 py-1 sm-font fw-bold fontStyle-heading">
+                    History
+                </div>
+                <div class="table-responsive small p-1 card-shadow">
+                    <div class="d-flex smm-font justify-content-end align-items-center gap-3">
+                        <div>Total: {{ totalItems }} | </div>
+
+                        <i class="fa-solid fa-download me-1"></i>
+
+
+                    </div>
+                    <div class=" ">
+
+
+                        <table class="table striped table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Hardware Name</th>
+                                    <th scope="col">Hardware Detected Time</th>
+                                    <th scope="col">Manufacturer</th>
+                                    <th scope="col">Network Installations</th>
+                                    <th scope="col">Managed Installations</th>
+                                    <th scope="col">Printer Driver Name</th>
+                                    <th scope="col">Printer Port Name</th>
+                                    <th scope="col">Default Printer</th>
+                                    <th scope="col">Printer Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of pagedData">
+                                    <td>{{ item.hardwareName }}</td>
+                                    <td>{{ item.detectedTime }}</td>
+                                    <td>{{ item.manufacturer }}</td>
+                                    <td>{{ item.networkInstallations }}</td>
+                                    <td>{{ item.managedInstallations }}</td>
+                                    <td>{{ item.driverName }}</td>
+                                    <td>{{ item.portName }}</td>
+                                    <td>{{ item.defaultPrinter }}</td>
+                                    <td>{{ item.printerType }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="d-flex justify-content-end  my-1">
+                            <!-- Showing Range -->
+                            <div class="me-2">
+                                {{ (currentPage - 1) * pageSize + 1 }} -
+                                {{ getEndIndex() }} of {{ totalItems }}
+                            </div>
+
+
+
+                            <!-- Arrows and Page Number -->
+                            <div class="d-flex me-2 ">
+                                <button class="btn btn-sm bg-white  border  py-0" [disabled]="currentPage === 1"
+                                    (click)="changePage(currentPage - 1)">
+                                    ‹
+                                </button>
+                                <!-- Page Size Dropdown -->
+
+
+                                <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
+                                    class="form-select form-select-sm mx-1 w-auto py-0">
+                                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                                </select>
+
+                                <button class="btn btn-sm bg-white  border  py-0"
+                                    [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+                                    ›
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>

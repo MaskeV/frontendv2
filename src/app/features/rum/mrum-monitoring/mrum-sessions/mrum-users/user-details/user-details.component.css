@@ -1,0 +1,47 @@
+.custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.custom-breadcrumb {
+    margin-bottom: 0;
+}
+
+/* Custom Table Hover Colors */
+.custom-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+.custom-table td {
+    vertical-align: middle;
+}
+
+/* Responsive border for user details card */
+.responsive-border {
+    border-right: 2px solid #f1f5f9;
+}
+@media (max-width: 1199.98px) {
+    .responsive-border {
+        border-right: none;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 1.5rem;
+    }
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
